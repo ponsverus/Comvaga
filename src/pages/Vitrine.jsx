@@ -286,6 +286,9 @@ export default function Vitrine({ user, userType }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // ─────────────────────────────────────────────────────────────
+  // grupo semântico derivado do tipo de negócio
+  // ─────────────────────────────────────────────────────────────
   const businessGroup = useMemo(
     () => getBusinessGroup(negocio?.tipo_negocio),
     [negocio?.tipo_negocio]
@@ -1036,6 +1039,7 @@ export default function Vitrine({ user, userType }) {
                       <div className="text-xs text-vmuted font-normal">{lista.length} {lista.length === 1 ? counterSingular : counterPlural}</div>
                     </div>
                     {lista.length ? (
+                      // ── GRID 2 COLUNAS NO MOBILE, 3 NO DESKTOP ──
                       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                         {lista.map(s => {
                           const preco = Number(s.preco ?? 0);
