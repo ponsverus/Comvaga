@@ -34,14 +34,14 @@ export const ptBR = {
   booking: {
     canceled: {
       title: 'Agendamento cancelado',
-      body: 'Este horario foi liberado novamente na agenda.',
+      body: 'Seu agendamento foi cancelado.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
     confirmed: {
       title: 'Agendamento confirmado',
-      body: 'Tudo certo. O horario está reservado para você.',
+      body: 'Seu agendamento foi confirmado com sucesso.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
@@ -75,7 +75,7 @@ export const ptBR = {
     // LOGO
     logo_updated: {
       title: 'Logo atualizada',
-      body: 'A nova Logo já está visível no perfil do negócio.',
+      body: 'Sua logo foi atualizada com sucesso.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
@@ -171,7 +171,7 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    // SERVIÇOS
+    // SERVIÇOS (estático — mantido como fallback e para barbearia/salão)
     service_created: {
       title: 'Serviço criado',
       body: 'O novo serviço já está disponível para agendamento.',
@@ -211,7 +211,7 @@ export const ptBR = {
     },
     service_deleted: {
       title: 'Serviço excluído',
-      body: 'O serviço foi retirado da lista de ofertas.',
+      body: 'O serviço foi removido da lista de ofertas.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
@@ -252,10 +252,261 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
+    // =======================================================================
+    // BUSINESS — dinâmico por tipo de negócio (via businessTerms.js)
+    // Uso: const group = getBusinessGroup(negocio.tipo_negocio)
+    //      ptBR.dashboard.business.tab_title[group]
+    //      ptBR.dashboard.business[group].service_created
+    // =======================================================================
+    business: {
+
+      // Título da aba no dashboard (ex.: "Serviços", "Consultas", "Aulas")
+      tab_title: {
+        servicos:  'Serviços',
+        consultas: 'Consultas',
+        aulas:     'Aulas',
+        default:   'Atendimentos',
+      },
+
+      // Rótulo do botão de adicionar (ex.: "+SERVIÇO", "+CONSULTA"...)
+      button_add: {
+        servicos:  'SERVIÇO',
+        consultas: 'CONSULTA',
+        aulas:     'AULA',
+        default:   'ATENDIMENTO',
+      },
+
+      // Rótulo do modal de criar/editar
+      modal_new: {
+        servicos:  'NOVO SERVIÇO',
+        consultas: 'NOVA CONSULTA',
+        aulas:     'NOVA AULA',
+        default:   'NOVO ATENDIMENTO',
+      },
+      modal_edit: {
+        servicos:  'EDITAR SERVIÇO',
+        consultas: 'EDITAR CONSULTA',
+        aulas:     'EDITAR AULA',
+        default:   'EDITAR ATENDIMENTO',
+      },
+
+      // Rótulo do botão submit no modal
+      button_create: {
+        servicos:  'CRIAR SERVIÇO',
+        consultas: 'CRIAR CONSULTA',
+        aulas:     'CRIAR AULA',
+        default:   'CRIAR ATENDIMENTO',
+      },
+
+      // Contador de itens por profissional (ex.: "3 serviço(s)")
+      counter_singular: {
+        servicos:  'serviço',
+        consultas: 'consulta',
+        aulas:     'aula',
+        default:   'atendimento',
+      },
+      counter_plural: {
+        servicos:  'serviços',
+        consultas: 'consultas',
+        aulas:     'aulas',
+        default:   'atendimentos',
+      },
+
+      // Mensagem vazia (quando não há itens cadastrados)
+      empty_list: {
+        servicos:  'Sem serviços para este profissional.',
+        consultas: 'Sem consultas para este profissional.',
+        aulas:     'Sem aulas para este profissional.',
+        default:   'Sem atendimentos para este profissional.',
+      },
+
+      // =======================================================================
+      // ALERTAS POR GRUPO
+      // =======================================================================
+
+      servicos: {
+        service_created: {
+          title: 'Serviço criado',
+          body: 'O novo serviço já está disponível para agendamento.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_updated: {
+          title: 'Serviço atualizado',
+          body: 'Os ajustes foram salvos com sucesso.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_create_error: {
+          title: 'Erro ao criar',
+          body: 'Ocorreu uma falha ao criar este serviço. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_update_error: {
+          title: 'Erro ao salvar',
+          body: 'Ocorreu uma falha ao atualizar este serviço. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_delete_confirm: {
+          title: 'Excluir serviço?',
+          body: 'Tem certeza que deseja excluir este serviço?',
+          variant: 'warning', screen: 'dark',
+          confirmText: 'EXCLUIR', cancelText: 'CANCELAR', buttonText: 'EXCLUIR',
+        },
+        service_deleted: {
+          title: 'Serviço excluído',
+          body: 'O serviço foi removido da lista.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_delete_error: {
+          title: 'Erro',
+          body: 'Houve um erro ao excluir o serviço. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_prof_required: {
+          title: 'Selecione um profissional',
+          body: 'Escolha um profissional para o serviço.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+      },
+
+      consultas: {
+        service_created: {
+          title: 'Consulta criada',
+          body: 'A nova consulta já está disponível para agendamento.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_updated: {
+          title: 'Consulta atualizada',
+          body: 'Os ajustes foram salvos com sucesso.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_create_error: {
+          title: 'Erro ao criar',
+          body: 'Ocorreu uma falha ao criar esta consulta. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_update_error: {
+          title: 'Erro ao salvar',
+          body: 'Ocorreu uma falha ao atualizar esta consulta. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_delete_confirm: {
+          title: 'Excluir consulta?',
+          body: 'Tem certeza que deseja excluir esta consulta?',
+          variant: 'warning', screen: 'dark',
+          confirmText: 'EXCLUIR', cancelText: 'CANCELAR', buttonText: 'EXCLUIR',
+        },
+        service_deleted: {
+          title: 'Consulta excluída',
+          body: 'A consulta foi removida da lista.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_delete_error: {
+          title: 'Erro',
+          body: 'Houve um erro ao excluir a consulta. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_prof_required: {
+          title: 'Selecione um profissional',
+          body: 'Escolha um profissional para esta consulta.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+      },
+
+      aulas: {
+        service_created: {
+          title: 'Aula criada',
+          body: 'A nova aula já está disponível para agendamento.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_updated: {
+          title: 'Aula atualizada',
+          body: 'Os ajustes foram salvos com sucesso.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_create_error: {
+          title: 'Erro ao criar',
+          body: 'Ocorreu uma falha ao criar esta aula. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_update_error: {
+          title: 'Erro ao salvar',
+          body: 'Ocorreu uma falha ao atualizar esta aula. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_delete_confirm: {
+          title: 'Excluir aula?',
+          body: 'Tem certeza que deseja excluir esta aula?',
+          variant: 'warning', screen: 'dark',
+          confirmText: 'EXCLUIR', cancelText: 'CANCELAR', buttonText: 'EXCLUIR',
+        },
+        service_deleted: {
+          title: 'Aula excluída',
+          body: 'A aula foi removida da lista.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_delete_error: {
+          title: 'Erro',
+          body: 'Houve um erro ao excluir a aula. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_prof_required: {
+          title: 'Selecione um profissional',
+          body: 'Escolha um profissional para esta aula.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+      },
+
+      default: {
+        service_created: {
+          title: 'Atendimento criado',
+          body: 'O novo atendimento já está disponível para agendamento.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_updated: {
+          title: 'Atendimento atualizado',
+          body: 'Os ajustes foram salvos com sucesso.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_create_error: {
+          title: 'Erro ao criar',
+          body: 'Ocorreu uma falha ao criar este atendimento. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_update_error: {
+          title: 'Erro ao salvar',
+          body: 'Ocorreu uma falha ao atualizar este atendimento. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_delete_confirm: {
+          title: 'Excluir atendimento?',
+          body: 'Tem certeza que deseja excluir este atendimento?',
+          variant: 'warning', screen: 'dark',
+          confirmText: 'EXCLUIR', cancelText: 'CANCELAR', buttonText: 'EXCLUIR',
+        },
+        service_deleted: {
+          title: 'Atendimento excluído',
+          body: 'O atendimento foi removido da lista.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        service_delete_error: {
+          title: 'Erro',
+          body: 'Houve um erro ao excluir o atendimento. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        service_prof_required: {
+          title: 'Selecione um profissional',
+          body: 'Escolha um profissional para este atendimento.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+      },
+    },
+    // =======================================================================
+    // FIM BUSINESS
+
     // PROFISSIONAIS
     professional_created: {
       title: 'Profissional criado',
-      body: 'O novo membro já aparece na equipe do negócio.',
+      body: 'O profissional foi adicionado.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
@@ -292,7 +543,7 @@ export const ptBR = {
     },
     professional_deleted: {
       title: 'Profissional excluído',
-      body: 'O cadastro foi removido da lista de profissionais.',
+      body: 'O profissional foi removido.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
@@ -323,14 +574,14 @@ export const ptBR = {
     },
     professional_activated: {
       title: 'Ativado',
-      body: 'O profissional está ativo e visível para agendamentos.',
+      body: 'O profissional foi ativado.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
     },
     professional_inactivated: {
       title: 'Inativado',
-      body: 'O profissional foi ocultado e deixará de receber agendamentos.',
+      body: 'O profissional foi inativado.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -360,7 +611,7 @@ export const ptBR = {
     // AGENDAMENTOS
     booking_confirmed: {
       title: 'Concluído',
-      body: 'O atendimento foi registrado como concluído.',
+      body: 'O atendimento foi concluído.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
@@ -383,7 +634,7 @@ export const ptBR = {
     },
     booking_canceled: {
       title: 'Agendamento cancelado',
-      body: 'O agendamento foi cancelado com sucesso.',
+      body: 'O agendamento foi cancelado.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -572,7 +823,7 @@ export const ptBR = {
     },
     booking_canceled: {
       title: 'Agendamento cancelado',
-      body: 'Seu agendamento foi cancelado com sucesso.',
+      body: 'Seu agendamento foi cancelado.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -606,8 +857,8 @@ export const ptBR = {
       title: 'Houve uma falha ao concluir a busca agora',
       body:
         'Parece que ocorreu uma instabilidade temporária.\n\n' +
-        'Tente novamente em alguns segundos.\n' +
-        'Persistindo a dificuldade, clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Tente novamente em alguns segundos.\n\n' +
+        'Persistindo a dificuldade, utilize o SUPORTE na faixa amarela para falar com a gente.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -619,8 +870,8 @@ export const ptBR = {
       title: 'Acesso indisponível no momento.',
       body:
         '{msg}\n\n' +
-        'Confira seu email, sua senha e o tipo selecionado.\n' +
-        'Se o problema persistir, clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Confira seu email, sua senha e o tipo selecionado.\n\n' +
+        'Se o problema persistir, clique em SUPORTE na faixa amarela para falar com a gente.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -688,7 +939,7 @@ export const ptBR = {
       body:
         '{msg}\n\n' +
         'Tente novamente.\n\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Se persistir, clique em SUPORTE na faixa amarela.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -701,7 +952,7 @@ export const ptBR = {
       body:
         'Ocorreu uma falha ao abrir esta fase.\n\n' +
         'Tente novamente em alguns instantes.\n\n' +
-        'Persistindo o erro, clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Persistindo o erro, use o SUPORTE na faixa amarela para falar com a gente.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -745,7 +996,7 @@ export const ptBR = {
       body:
         'Seu perfil está ausente no sistema.\n\n' +
         'Aguarde alguns segundos e tente fazer login.\n\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Se persistir, clique em SUPORTE na faixa amarela.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -866,7 +1117,7 @@ export const ptBR = {
       body:
         'Sua conta foi criada, mas houve um erro ao iniciar. Tente novamente.\n\n' +
         'Faça login manualmente.\n\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Se persistir, clique em SUPORTE na faixa amarela.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -876,7 +1127,7 @@ export const ptBR = {
       body:
         'Houve erro ao entrar agora. Tente novamente.\n\n' +
         'Tente novamente em instantes.\n\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Se persistir, clique em SUPORTE na faixa amarela.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -887,7 +1138,7 @@ export const ptBR = {
       body:
         'Seu perfil está ausente no sistema.\n\n' +
         'Aguarde alguns segundos e tente fazer login.\n\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Se persistir, clique em SUPORTE na faixa amarela.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -896,7 +1147,7 @@ export const ptBR = {
       title: 'Cadastro inconsistente',
       body:
         'Seu perfil foi criado com tipo incorreto.\n\n' +
-        'Clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Clique em SUPORTE na faixa amarela para resolver.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -907,7 +1158,7 @@ export const ptBR = {
       body:
         'Houve um erro ao criar o negócio. Tente novamente em alguns instantes.\n\n' +
         'Tente novamente.\n\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Se persistir, clique em SUPORTE na faixa amarela.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -916,7 +1167,7 @@ export const ptBR = {
       title: 'Erro interno',
       body:
         'Seu negócio foi criado; contudo, há uma inconsistência no ID de acesso.\n\n' +
-        'Clique em SUPORTE na faixa amarela da página inicial para falar com a gente.',
+        'Clique em SUPORTE na faixa amarela para resolver.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -947,12 +1198,12 @@ export const ptBR = {
     },
     favorite_only_client: {
       title: 'Acesso restrito',
-      body: 'Apenas CLIENTES podem favoritar negócios.',
+      body: 'Apenas CLIENTE pode favoritar negócios.',
       buttonText: 'ENTENDI',
     },
     favorite_invalid_business: {
       title: 'Negócio inválido',
-      body: ':(',
+      body: 'Negócio inválido.',
       buttonText: 'ENTENDI',
     },
     favorite_toggle_error: {
@@ -979,7 +1230,7 @@ export const ptBR = {
     },
     schedule_invalid_business: {
       title: 'Negócio inválido',
-      body: 'Recarregue a pagina e tente novamente.',
+      body: 'Negócio inválido. Recarregue a vitrine.',
       buttonText: 'ENTENDI',
     },
     schedule_incomplete_data: {
@@ -998,13 +1249,13 @@ export const ptBR = {
       buttonText: 'ENTENDI',
     },
     schedule_need_one_service: {
-      title: 'Selecione um serviço',
-      body: 'Selecione pelo menos 1 serviço.',
+      title: 'Selecione um item',
+      body: 'Selecione pelo menos 1 item.',
       buttonText: 'ENTENDI',
     },
     schedule_need_valid_service: {
-      title: 'Selecione um serviço',
-      body: 'Selecione pelo menos 1 serviço válido.',
+      title: 'Selecione um item',
+      body: 'Selecione pelo menos 1 item válido.',
       buttonText: 'ENTENDI',
     },
     schedule_overlap_taken: {
@@ -1020,20 +1271,110 @@ export const ptBR = {
 
     schedule_pick_date: {
       title: 'Selecione uma data',
-      body: 'Escolha o dia para continuar.',
+      body: 'Selecione uma data.',
       buttonText: 'ENTENDI',
     },
 
     schedule_not_enough_time_title: 'Horário insuficiente',
-    schedule_not_enough_time_sad: ':( Esse horário é insuficiente para os serviços selecionados.',
     schedule_not_enough_time_free: 'Tempo disponível até o próximo compromisso',
-    schedule_not_enough_time_need: 'Seu agendamento (serviços + folga)',
     schedule_not_enough_time_fit: 'Para esse horário, cabe no máximo',
-    schedule_not_enough_time_services: 'de serviços',
-    schedule_not_enough_time_hint: 'Escolha outro horário ou ajuste os serviços.',
-
     schedule_create_error_title: 'Erro ao agendar',
     schedule_create_error_body: 'Erro ao criar agendamento:',
+
+    // =======================================================================
+    // VITRINE BUSINESS — dinâmico por tipo de negócio (via businessTerms.js)
+    // Uso: const group = getBusinessGroup(negocio.tipo_negocio)
+    //      ptBR.vitrine.business[group].schedule_need_one_service
+    //      ptBR.vitrine.business.label_button[group]
+    // =======================================================================
+    business: {
+
+      // Botão de agendamento na vitrine (ex.: "AGENDAR SERVIÇO")
+      label_button: {
+        servicos:  'AGENDAR SERVIÇO',
+        consultas: 'AGENDAR CONSULTA',
+        aulas:     'AGENDAR AULA',
+        default:   'AGENDAR ATENDIMENTO',
+      },
+
+      // Título da seção de itens na vitrine (ex.: "Serviços", "Consultas"...)
+      section_title: {
+        servicos:  'Serviços',
+        consultas: 'Consultas',
+        aulas:     'Aulas',
+        default:   'Atendimentos',
+      },
+
+      servicos: {
+        schedule_need_one_service: {
+          title: 'Selecione um serviço',
+          body: 'Selecione pelo menos 1 serviço.',
+          buttonText: 'ENTENDI',
+        },
+        schedule_need_valid_service: {
+          title: 'Selecione um serviço',
+          body: 'Selecione pelo menos 1 serviço válido.',
+          buttonText: 'ENTENDI',
+        },
+        schedule_not_enough_time_sad: ':( Esse horário é insuficiente para os serviços selecionados.',
+        schedule_not_enough_time_need: 'Seu agendamento (serviços + folga)',
+        schedule_not_enough_time_services: 'de serviços',
+        schedule_not_enough_time_hint: 'Escolha outro horário ou ajuste os serviços.',
+      },
+
+      consultas: {
+        schedule_need_one_service: {
+          title: 'Selecione uma consulta',
+          body: 'Selecione pelo menos 1 consulta.',
+          buttonText: 'ENTENDI',
+        },
+        schedule_need_valid_service: {
+          title: 'Selecione uma consulta',
+          body: 'Selecione pelo menos 1 consulta válida.',
+          buttonText: 'ENTENDI',
+        },
+        schedule_not_enough_time_sad: ':( Esse horário é insuficiente para as consultas selecionadas.',
+        schedule_not_enough_time_need: 'Seu agendamento (consultas + folga)',
+        schedule_not_enough_time_services: 'de consultas',
+        schedule_not_enough_time_hint: 'Escolha outro horário ou ajuste as consultas.',
+      },
+
+      aulas: {
+        schedule_need_one_service: {
+          title: 'Selecione uma aula',
+          body: 'Selecione pelo menos 1 aula.',
+          buttonText: 'ENTENDI',
+        },
+        schedule_need_valid_service: {
+          title: 'Selecione uma aula',
+          body: 'Selecione pelo menos 1 aula válida.',
+          buttonText: 'ENTENDI',
+        },
+        schedule_not_enough_time_sad: ':( Esse horário é insuficiente para as aulas selecionadas.',
+        schedule_not_enough_time_need: 'Seu agendamento (aulas + folga)',
+        schedule_not_enough_time_services: 'de aulas',
+        schedule_not_enough_time_hint: 'Escolha outro horário ou ajuste as aulas.',
+      },
+
+      default: {
+        schedule_need_one_service: {
+          title: 'Selecione um atendimento',
+          body: 'Selecione pelo menos 1 atendimento.',
+          buttonText: 'ENTENDI',
+        },
+        schedule_need_valid_service: {
+          title: 'Selecione um atendimento',
+          body: 'Selecione pelo menos 1 atendimento válido.',
+          buttonText: 'ENTENDI',
+        },
+        schedule_not_enough_time_sad: ':( Esse horário é insuficiente para os atendimentos selecionados.',
+        schedule_not_enough_time_need: 'Seu agendamento (atendimentos + folga)',
+        schedule_not_enough_time_services: 'de atendimentos',
+        schedule_not_enough_time_hint: 'Escolha outro horário ou ajuste os atendimentos.',
+      },
+    },
+    // =======================================================================
+    // FIM VITRINE BUSINESS
 
     review_need_login_confirm: {
       title: 'Login necessário',
@@ -1043,12 +1384,12 @@ export const ptBR = {
     },
     review_only_client: {
       title: 'Acesso restrito',
-      body: 'Apenas CLIENTES podem avaliar.',
+      body: 'Apenas CLIENTE pode avaliar.',
       buttonText: 'ENTENDI',
     },
     review_invalid_business: {
       title: 'Negócio inválido',
-      body: ':(',
+      body: 'Negócio inválido.',
       buttonText: 'ENTENDI',
     },
     review_sent: {
