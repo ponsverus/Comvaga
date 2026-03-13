@@ -47,15 +47,28 @@ function formatBR(iso) {
   return `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}`;
 }
 
-function daysInMonth(y, m)     { return new Date(y, m, 0).getDate(); }
-function firstDow(y, m)        { return new Date(y, m - 1, 1).getDay(); }
-function isoLt(a, b)           { return String(a) < String(b); }
-function isoEq(a, b)           { return String(a) === String(b); }
-function timeToMin(t)          { if (!t) return 0; const [h, m] = String(t).split(':').map(Number); return h * 60 + (m || 0); }
+function daysInMonth(y, m)    { return new Date(y, m, 0).getDate(); }
+function firstDow(y, m)       { return new Date(y, m - 1, 1).getDay(); }
+function isoLt(a, b)          { return String(a) < String(b); }
+function isoEq(a, b)          { return String(a) === String(b); }
+function timeToMin(t)         { if (!t) return 0; const [h, m] = String(t).split(':').map(Number); return h * 60 + (m || 0); }
 
-const MONTH_NAMES    = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const WEEKDAY_SHORT  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-const FOLGA          = 5;
+/**
+ * Calcula horario_fim a partir do label (HH:MM) + duração + folga.
+ * Não depende do navegador nem de conversão de timezone —
+ * usa diretamente o label que o banco já entregou no fuso correto.
+ */
+function calcHorarioFim(labelHHMM, duracaoMin, folga) {
+  const [h, m]   = labelHHMM.split(':').map(Number);
+  const totalMin = h * 60 + m + Number(duracaoMin) + Number(folga);
+  const fimH     = String(Math.floor(totalMin / 60)).padStart(2, '0');
+  const fimM     = String(totalMin % 60).padStart(2, '0');
+  return `${fimH}:${fimM}`;
+}
+
+const MONTH_NAMES   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const WEEKDAY_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const FOLGA         = 5;
 
 // ─── componente ───────────────────────────────────────────────────────────────
 
@@ -94,14 +107,15 @@ export default function BookingCalendar({
   const slotsRef     = useRef(null);
   const resumeRef    = useRef(null);
 
-  // fechar ao clicar fora
+  // fechar ao clicar fora — não fecha durante confirmação em andamento
   useEffect(() => {
     function handle(e) {
+      if (confirming) return;
       if (containerRef.current && !containerRef.current.contains(e.target)) onClose?.();
     }
     document.addEventListener('mousedown', handle);
     return () => document.removeEventListener('mousedown', handle);
-  }, [onClose]);
+  }, [onClose, confirming]);
 
   // ── buscar slots ────────────────────────────────────────────────────────────
 
@@ -117,8 +131,7 @@ export default function BookingCalendar({
     setConfirmError(null);
 
     try {
-      const dur            = Number(entrega.duracao_minutos);
-      const precisaMinutos = dur + FOLGA;
+      const dur = Number(entrega.duracao_minutos);
 
       const { data, error } = await supabase.rpc('rpc_get_slots_v4', {
         p_profissional_id: profissional.id,
@@ -130,13 +143,14 @@ export default function BookingCalendar({
       });
       if (error) throw error;
 
+      // RPC retorna: horario_inicio (timestamptz), horario_fim (timestamptz), label (HH:MM SP), is_heat, is_raio
       const list = (data || []).map(s => ({
-        hora:          String(s.label || '').slice(0, 5),
-        isHeat:        !!s.is_heat,
-        isRaio:        !!s.is_raio,
-        inicio:        s.inicio || null,
-        fim:           s.fim    || null,
-        precisaMinutos,
+        hora:           String(s.label || '').slice(0, 5), // "HH:MM" já no fuso SP
+        isHeat:         !!s.is_heat,
+        isRaio:         !!s.is_raio,
+        horario_inicio: s.horario_inicio || null,          // timestamptz (referência interna)
+        horario_fim:    s.horario_fim    || null,          // timestamptz (referência interna)
+        duracaoMin:     dur,
       }));
 
       // desduplicação — mantém maior rank (raio > heat > normal)
@@ -154,7 +168,6 @@ export default function BookingCalendar({
 
       if (!final.length) setSlotsError('Nenhum horário disponível neste dia.');
 
-      // scroll suave até a seção de horários
       setTimeout(() => slotsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
     } catch (e) {
       setSlotsError('Erro ao buscar horários. Tente outro dia.');
@@ -181,14 +194,10 @@ export default function BookingCalendar({
     setConfirming(true);
     setConfirmError(null);
     try {
-      const toSP = ts => {
-        const parts = new Intl.DateTimeFormat('pt-BR', {
-          timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', hour12: false,
-        }).formatToParts(new Date(ts));
-        const h = parts.find(p => p.type === 'hour')?.value   ?? '00';
-        const m = parts.find(p => p.type === 'minute')?.value ?? '00';
-        return `${h}:${m}`;
-      };
+      // horario_inicio vem do label da RPC — já em America/Sao_Paulo, sem conversão de timezone
+      // horario_fim calculado localmente a partir do label + duração + folga
+      const horarioInicio = selectedSlot.hora;
+      const horarioFim    = calcHorarioFim(selectedSlot.hora, entrega.duracao_minutos, FOLGA);
 
       const { error } = await supabase.from('agendamentos').insert([{
         negocio_id:      negocioId,
@@ -196,23 +205,30 @@ export default function BookingCalendar({
         cliente_id:      clienteId,
         entrega_id:      entrega.id,
         data:            selectedDay,
-        horario_inicio:  toSP(selectedSlot.inicio),
-        horario_fim:     toSP(selectedSlot.fim),
+        horario_inicio:  horarioInicio,
+        horario_fim:     horarioFim,
         status:          'agendado',
-        preco_final:     entrega.preco_promocional
-                           ? Number(entrega.preco_promocional)
-                           : Number(entrega.preco ?? 0),
+        // preco_final omitido — o banco resolve no momento da conclusão via trigger set_agendamento_timestamps
       }]);
 
       if (error) throw error;
 
-      onConfirm?.({ inicio: selectedSlot.inicio, fim: selectedSlot.fim, label: selectedSlot.hora, dataISO: selectedDay });
+      onConfirm?.({
+        inicio:  selectedSlot.horario_inicio,
+        fim:     selectedSlot.horario_fim,
+        label:   selectedSlot.hora,
+        dataISO: selectedDay,
+      });
     } catch (e) {
-      const msg = String(e?.message || '').toLowerCase();
-      const overlap = String(e?.code || '') === '23P01' || msg.includes('overlap') || msg.includes('sobrepos') || msg.includes('exclusion');
+      const msg     = String(e?.message || '').toLowerCase();
+      const overlap = String(e?.code || '') === '23P01'
+        || msg.includes('overlap')
+        || msg.includes('sobrepos')
+        || msg.includes('exclusion')
+        || msg.includes('almoco');
       if (overlap) {
         setConfirmError('Alguém acabou de reservar esse horário. Escolha outro.');
-        fetchSlots(selectedDay); // recarrega slots atualizados
+        fetchSlots(selectedDay);
       } else {
         setConfirmError('Não foi possível confirmar. Tente novamente.');
       }
@@ -355,13 +371,11 @@ export default function BookingCalendar({
 
               {/* slots */}
               {!slotsLoading && !slotsError && horariosAll.length > 0 && (() => {
-                // slots que NÃO estão na zona de calor (para expandir depois)
-                const hotHoras  = new Set(horariosHot.map(h => h.hora));
+                const hotHoras      = new Set(horariosHot.map(h => h.hora));
                 const horariosExtra = horariosAll.filter(h => !hotHoras.has(h.hora));
 
                 return (
                   <div>
-                    {/* zona de calor aparece primeiro — induz sem explicar */}
                     {horariosHot.length > 0 ? (
                       <>
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
@@ -369,13 +383,12 @@ export default function BookingCalendar({
                             <SlotButton
                               key={`hot-${i}`}
                               slot={h}
-                              isSelected={selectedSlot?.hora === h.hora && selectedSlot?.inicio === h.inicio}
+                              isSelected={selectedSlot?.hora === h.hora}
                               onClick={handleSelectSlot}
                             />
                           ))}
                         </div>
 
-                        {/* botão VER MAIS — sempre visível quando há zona de calor */}
                         <button
                           type="button"
                           onClick={() => setShowAll(v => !v)}
@@ -384,21 +397,19 @@ export default function BookingCalendar({
                           {showAll ? 'OCULTAR HORÁRIOS' : 'VER MAIS HORÁRIOS'}
                         </button>
 
-                        {/* expande APENAS os horários que não apareceram ainda */}
                         {showAll && horariosExtra.length > 0 && (
                           <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-3">
                             {horariosExtra.map((h, i) => (
                               <SlotButton
                                 key={`extra-${i}`}
                                 slot={h}
-                                isSelected={selectedSlot?.hora === h.hora && selectedSlot?.inicio === h.inicio}
+                                isSelected={selectedSlot?.hora === h.hora}
                                 onClick={handleSelectSlot}
                               />
                             ))}
                           </div>
                         )}
 
-                        {/* caso todos já sejam zona de calor */}
                         {showAll && horariosExtra.length === 0 && (
                           <p className="text-center text-xs text-gray-600 mt-3">
                             Todos os horários disponíveis já estão listados acima.
@@ -412,7 +423,7 @@ export default function BookingCalendar({
                           <SlotButton
                             key={`all-${i}`}
                             slot={h}
-                            isSelected={selectedSlot?.hora === h.hora && selectedSlot?.inicio === h.inicio}
+                            isSelected={selectedSlot?.hora === h.hora}
                             onClick={handleSelectSlot}
                           />
                         ))}
@@ -443,7 +454,7 @@ export default function BookingCalendar({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">DURAÇÃO</span>
-                  <span className="text-white">{entrega?.duracao_minutos} MIN</span>
+                  <span className="text-white">{(Number(entrega?.duracao_minutos) || 0) + FOLGA} MIN</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">VALOR</span>
@@ -495,12 +506,11 @@ function SlotButton({ slot, isSelected, onClick }) {
               : 'bg-dark-200 border-gray-800 hover:border-primary text-gray-300',
       ].join(' ')}
     >
-      {/* ⚡ discreto — apenas para is_raio, sem legenda */}
       {slot.isRaio && !isSelected && (
         <Zap className="w-3 h-3 text-primary absolute top-1 right-1" />
       )}
       <div className="text-lg normal-case">{slot.hora}</div>
-      <div className="text-[10px] text-gray-500 normal-case">{slot.precisaMinutos} MIN</div>
+      <div className="text-[10px] text-gray-500 normal-case">{(Number(slot.duracaoMin) || 0) + FOLGA} MIN</div>
     </button>
   );
 }
