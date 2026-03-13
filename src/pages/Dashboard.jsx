@@ -273,11 +273,8 @@ export default function Dashboard({ user, onLogout }) {
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [savingDados, setSavingDados] = useState(false);
 
-  const [parceiroSelected, setParceiroSelected] = useState('');
-  const [parceiroEmail, setParceiroEmail] = useState('');
-  const [parceiroSaving, setParceiroSaving] = useState(false);
-
   useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
+
   // ─────────────────────────────────────────────────────────────
   // grupo semântico derivado do tipo de negócio
   // 'servicos' | 'consultas' | 'aulas' | 'default'
@@ -286,7 +283,6 @@ export default function Dashboard({ user, onLogout }) {
     () => getBusinessGroup(negocio?.tipo_negocio),
     [negocio?.tipo_negocio]
   );
-
 
   const fetchNowFromDb = async () => {
     const { data, error: rpcErr } = await supabase.rpc('now_sp');
@@ -595,7 +591,8 @@ export default function Dashboard({ user, onLogout }) {
       if (!payload.duracao_minutos) throw new Error('Duracao invalida.');
       const { error: insErr } = await supabase.from('entregas').insert([payload]);
       if (insErr) throw insErr;
-      await uiAlert('dashboard.service_created', 'success');
+      // ── alerta dinâmico ──
+      await uiAlert(`dashboard.business.${businessGroup}.service_created`, 'success');
       setShowNovaEntrega(false); setEditingEntregaId(null);
       setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' });
       await loadData(true);
@@ -605,8 +602,8 @@ export default function Dashboard({ user, onLogout }) {
       if (msg.includes('oferta')) await uiAlert('dashboard.service_promo_invalid', 'error');
       else if (msg.includes('invalido')) await uiAlert('dashboard.service_price_invalid', 'error');
       else if (msg.includes('Duracao')) await uiAlert('dashboard.service_duration_invalid', 'error');
-      else if (msg.includes('Selecione')) await uiAlert('dashboard.service_prof_required', 'error');
-      else await uiAlert('dashboard.service_create_error', 'error');
+      else if (msg.includes('Selecione')) await uiAlert(`dashboard.business.${businessGroup}.service_prof_required`, 'error');
+      else await uiAlert(`dashboard.business.${businessGroup}.service_create_error`, 'error');
     }
   };
 
@@ -626,7 +623,8 @@ export default function Dashboard({ user, onLogout }) {
       };
       const { error: updErr } = await supabase.from('entregas').update(payload).eq('id', editingEntregaId).eq('negocio_id', negocio.id);
       if (updErr) throw updErr;
-      await uiAlert('dashboard.service_updated', 'success');
+      // ── alerta dinâmico ──
+      await uiAlert(`dashboard.business.${businessGroup}.service_updated`, 'success');
       setShowNovaEntrega(false); setEditingEntregaId(null);
       setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' });
       await loadData(true);
@@ -636,20 +634,25 @@ export default function Dashboard({ user, onLogout }) {
       if (msg.includes('oferta')) await uiAlert('dashboard.service_promo_invalid', 'error');
       else if (msg.includes('invalido')) await uiAlert('dashboard.service_price_invalid', 'error');
       else if (msg.includes('Duracao')) await uiAlert('dashboard.service_duration_invalid', 'error');
-      else if (msg.includes('Selecione')) await uiAlert('dashboard.service_prof_required', 'error');
-      else await uiAlert('dashboard.service_update_error', 'error');
+      else if (msg.includes('Selecione')) await uiAlert(`dashboard.business.${businessGroup}.service_prof_required`, 'error');
+      else await uiAlert(`dashboard.business.${businessGroup}.service_update_error`, 'error');
     }
   };
 
   const deleteEntrega = async (id) => {
-    const ok = await uiConfirm('dashboard.service_delete_confirm', 'warning');
+    // ── confirmação dinâmica ──
+    const ok = await uiConfirm(`dashboard.business.${businessGroup}.service_delete_confirm`, 'warning');
     if (!ok) return;
     try {
       const { error: delErr } = await supabase.from('entregas').delete().eq('id', id).eq('negocio_id', negocio.id);
       if (delErr) throw delErr;
-      await uiAlert('dashboard.service_deleted', 'success');
+      // ── alerta dinâmico ──
+      await uiAlert(`dashboard.business.${businessGroup}.service_deleted`, 'success');
       await loadData(true);
-    } catch (e2) { console.error('deleteEntrega error:', e2); await uiAlert('dashboard.service_delete_error', 'error'); }
+    } catch (e2) {
+      console.error('deleteEntrega error:', e2);
+      await uiAlert(`dashboard.business.${businessGroup}.service_delete_error`, 'error');
+    }
   };
 
   const createProfissional = async (e) => {
@@ -751,51 +754,6 @@ export default function Dashboard({ user, onLogout }) {
       await uiAlert('dashboard.booking_canceled', 'error');
       await loadData(true);
     } catch (e) { console.error('cancelarAgendamentoProfissional:', e); await uiAlert('dashboard.booking_cancel_error', 'error'); }
-  };
-
-  const saveParceiroEmail = async () => {
-    const email = String(parceiroEmail || '').trim();
-    if (!parceiroSelected) { await uiAlert('dashboard.parceiro_selecione_prof', 'error'); return; }
-    if (!email || !email.includes('@')) { await uiAlert('dashboard.parceiro_email_invalid', 'error'); return; }
-    try {
-      setParceiroSaving(true);
-      const { error } = await supabase
-        .from('profissionais')
-        .update({ email: email.toLowerCase() })
-        .eq('id', parceiroSelected)
-        .eq('negocio_id', negocio.id);
-      if (error) throw error;
-      // Atualiza lista local
-      setProfissionais(prev => prev.map(p =>
-        p.id === parceiroSelected ? { ...p, email: email.toLowerCase() } : p
-      ));
-      setParceiroSelected('');
-      setParceiroEmail('');
-      await uiAlert('dashboard.parceiro_saved', 'success');
-    } catch (e) {
-      console.error('saveParceiroEmail:', e);
-      await uiAlert('dashboard.parceiro_save_error', 'error');
-    } finally { setParceiroSaving(false); }
-  };
-
-  const removeParceiroEmail = async (profId) => {
-    const ok = await uiConfirm('dashboard.parceiro_delete_confirm', 'warning');
-    if (!ok) return;
-    try {
-      const { error } = await supabase
-        .from('profissionais')
-        .update({ email: null })
-        .eq('id', profId)
-        .eq('negocio_id', negocio.id);
-      if (error) throw error;
-      setProfissionais(prev => prev.map(p =>
-        p.id === profId ? { ...p, email: null } : p
-      ));
-      await uiAlert('dashboard.parceiro_deleted', 'success');
-    } catch (e) {
-      console.error('removeParceiroEmail:', e);
-      await uiAlert('dashboard.parceiro_delete_error', 'error');
-    }
   };
 
   const salvarEmail = async () => {
@@ -965,9 +923,15 @@ export default function Dashboard({ user, onLogout }) {
     { key: 'historico' }, { key: 'entregas' }, { key: 'profissionais' }, { key: 'info-negocio' },
   ];
 
+  // ── tab label dinâmico para 'entregas' ──
   const TAB_LABELS = {
-    'visao-geral': 'GERAL', 'agendamentos': 'AGENDAMENTOS', 'cancelados': 'CANCELADOS',
-    'historico': 'HISTÓRICO', 'entregas': 'ENTREGAS', 'profissionais': 'PROFISSIONAIS', 'info-negocio': 'INFO DO NEGÓCIO',
+    'visao-geral':   'GERAL',
+    'agendamentos':  'AGENDAMENTOS',
+    'cancelados':    'CANCELADOS',
+    'historico':     'HISTÓRICO',
+    'entregas':      tabEntregasLabel,
+    'profissionais': 'PROFISSIONAIS',
+    'info-negocio':  'INFO DO NEGÓCIO',
   };
 
   if (loading) return (
@@ -1063,10 +1027,11 @@ export default function Dashboard({ user, onLogout }) {
             <div className="text-3xl font-normal text-white mb-1">{profissionais.length}</div>
             <div className="text-sm text-gray-400">PROFISSIONAIS</div>
           </div>
+          {/* ── card de métrica: label dinâmico ── */}
           <div className="bg-dark-100 border border-gray-800 rounded-custom p-6">
             <TrendingUp className="w-8 h-8 text-primary mb-2" />
             <div className="text-3xl font-normal text-white mb-1">{entregas.length}</div>
-            <div className="text-sm text-gray-400">ENTREGAS</div>
+            <div className="text-sm text-gray-400">{tabEntregasLabel}</div>
           </div>
         </div>
 
@@ -1364,12 +1329,13 @@ export default function Dashboard({ user, onLogout }) {
 
             {activeTab === 'entregas' && (
               <div>
+                {/* ── cabeçalho dinâmico ── */}
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-normal">Entregas</h2>
+                  <h2 className="text-2xl font-normal">{sectionTitle}</h2>
                   <button
                     onClick={() => { setShowNovaEntrega(true); setEditingEntregaId(null); setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' }); }}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-button font-normal uppercase border bg-gradient-to-r from-primary to-yellow-600 text-black border-transparent">
-                    <Plus className="w-5 h-5" />ENTREGA
+                    <Plus className="w-5 h-5" />{btnAddLabel}
                   </button>
                 </div>
                 {profissionais.length === 0 ? (
@@ -1382,7 +1348,10 @@ export default function Dashboard({ user, onLogout }) {
                         <div key={p.id} className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                           <div className="flex items-center justify-between mb-4">
                             <div className="font-normal text-lg">{p.nome}</div>
-                            <div className="text-xs text-gray-500">{lista.length} entrega(s)</div>
+                            {/* ── contador dinâmico ── */}
+                            <div className="text-xs text-gray-500">
+                              {lista.length} {lista.length === 1 ? counterSingular : counterPlural}
+                            </div>
                           </div>
                           {lista.length ? (
                             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1418,7 +1387,10 @@ export default function Dashboard({ user, onLogout }) {
                                 );
                               })}
                             </div>
-                          ) : <p className="text-gray-500">Sem entregas para este profissional.</p>}
+                          ) : (
+                            /* ── empty state dinâmico ── */
+                            <p className="text-gray-500">{emptyListMsg}</p>
+                          )}
                         </div>
                       );
                     })}
@@ -1459,7 +1431,10 @@ export default function Dashboard({ user, onLogout }) {
                             {p.anos_experiencia != null && <p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIÊNCIA</p>}
                           </div>
                         </div>
-                        <div className="text-sm text-gray-400 mb-3">{entregas.filter(s => s.profissional_id === p.id).length} entregas</div>
+                        {/* ── contador de entregas dinâmico ── */}
+                        <div className="text-sm text-gray-400 mb-3">
+                          {entregas.filter(s => s.profissional_id === p.id).length} {counterPlural}
+                        </div>
                         <div className="text-xs text-gray-500 mb-3">
                           <Clock className="w-4 h-4 inline mr-1" />{p.horario_inicio} - {p.horario_fim}
                           {p.almoco_inicio && p.almoco_fim && <span className="ml-2 text-yellow-300">• {p.almoco_inicio} - {p.almoco_fim}</span>}
@@ -1524,73 +1499,6 @@ export default function Dashboard({ user, onLogout }) {
                     <input value={formInfo.facebook} onChange={(e) => setFormInfo(prev => ({ ...prev, facebook: e.target.value }))} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="facebook.com/..." />
                   </div>
                 </div>
-
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
-                  <div className="text-sm text-white-600 tracking-wide mb-1">Parceiros</div>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Selecione um profissional e informe o email para receber avisos de novo agendamento.
-                  </p>
-                  <div className="grid sm:grid-cols-2 gap-3 mb-3">
-                    <div>
-                      <label className="block text-xs text-gray-400 mb-1">PROFISSIONAL</label>
-                      <InputWithChevron>
-                        <select
-                          value={parceiroSelected}
-                          onChange={(e) => {
-                            setParceiroSelected(e.target.value);
-                            const prof = profissionais.find(p => p.id === e.target.value);
-                            setParceiroEmail(prof?.email || '');
-                          }}
-                          className="no-native-indicator w-full px-4 py-3 pr-12 bg-dark-100 border border-gray-800 rounded-custom text-white"
-                        >
-                          <option value="">Selecionar profissional...</option>
-                          {profissionais.filter(p => p.ativo !== false).map(p => (
-                            <option key={p.id} value={p.id}>{p.nome}</option>
-                          ))}
-                        </select>
-                      </InputWithChevron>
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-400 mb-1">EMAIL DO PARCEIRO</label>
-                      <input
-                        type="email"
-                        value={parceiroEmail}
-                        onChange={(e) => setParceiroEmail(e.target.value)}
-                        className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white"
-                        placeholder="parceiro@email.com"
-                      />
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    disabled={parceiroSaving || !parceiroSelected || !parceiroEmail.trim()}
-                    onClick={saveParceiroEmail}
-                    className="mb-5 px-5 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {parceiroSaving ? 'SALVANDO...' : 'SALVAR E-MAIL'}
-                  </button>
-                  {profissionais.filter(p => p.email).length > 0 ? (
-                    <div className="space-y-2">
-                      {profissionais.filter(p => p.email).map(p => (
-                        <div key={p.id} className="flex items-center justify-between bg-dark-100 border border-gray-800 rounded-custom px-4 py-3">
-                          <div>
-                            <div className="text-sm font-normal text-white">{p.nome}</div>
-                            <div className="text-xs text-gray-500">{p.email}</div>
-                          </div>
-                          <button
-                            onClick={() => removeParceiroEmail(p.id)}
-                            className="text-red-400 hover:text-red-300 text-xs uppercase font-normal border border-red-500/30 rounded-button px-3 py-1"
-                          >
-                            REMOVER
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-600 text-sm">Nenhum parceiro com email cadastrado ainda.</p>
-                  )}
-                </div>
-
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                   <div className="text-xs text-gray-500 uppercase tracking-wide mb-4">DADOS DA CONTA</div>
                   <div className="grid md:grid-cols-2 gap-4">
@@ -1639,8 +1547,9 @@ export default function Dashboard({ user, onLogout }) {
       {showNovaEntrega && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
+            {/* ── título do modal dinâmico ── */}
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-normal">{editingEntregaId ? 'EDITAR ENTREGA' : 'NOVA ENTREGA'}</h3>
+              <h3 className="text-2xl font-normal">{editingEntregaId ? modalEditLabel : modalNewLabel}</h3>
               <button onClick={() => { setShowNovaEntrega(false); setEditingEntregaId(null); setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' }); }}><X className="w-6 h-6" /></button>
             </div>
             <form onSubmit={editingEntregaId ? updateEntrega : createEntrega} className="space-y-4">
@@ -1672,8 +1581,9 @@ export default function Dashboard({ user, onLogout }) {
                 <input type="number" step="0.01" value={formEntrega.preco_promocional} onChange={(e) => setFormEntrega({ ...formEntrega, preco_promocional: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" placeholder="Apenas se houver oferta" />
                 <p className="text-[12px] text-gray-500 mt-2">O preço de oferta deve ser menor que o preço normal.</p>
               </div>
+              {/* ── botão submit dinâmico ── */}
               <button type="submit" className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase">
-                {editingEntregaId ? 'SALVAR' : 'CRIAR ENTREGA'}
+                {editingEntregaId ? 'SALVAR' : `CRIAR ${btnAddLabel}`}
               </button>
             </form>
           </div>
