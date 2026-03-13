@@ -354,61 +354,73 @@ export default function BookingCalendar({
               )}
 
               {/* slots */}
-              {!slotsLoading && !slotsError && horariosAll.length > 0 && (
-                <div>
-                  {/* zona de calor — exibe imediatamente */}
-                  {horariosHot.length > 0 && (
-                    <>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
-                        {horariosHot.map((h, i) => (
-                          <SlotButton
-                            key={`hot-${i}`}
-                            slot={h}
-                            isSelected={selectedSlot?.hora === h.hora && selectedSlot?.inicio === h.inicio}
-                            onClick={handleSelectSlot}
-                          />
-                        ))}
-                      </div>
+              {!slotsLoading && !slotsError && horariosAll.length > 0 && (() => {
+                // slots que NÃO estão na zona de calor (para expandir depois)
+                const hotHoras  = new Set(horariosHot.map(h => h.hora));
+                const horariosExtra = horariosAll.filter(h => !hotHoras.has(h.hora));
 
-                      {/* botão expandir todos */}
-                      <button
-                        type="button"
-                        onClick={() => setShowAll(v => !v)}
-                        className="w-full py-2.5 rounded-full border border-gray-700 bg-dark-200 text-gray-300 text-sm font-normal uppercase hover:border-gray-500 hover:text-white transition-colors"
-                      >
-                        {showAll ? 'OCULTAR HORÁRIOS' : 'VER MAIS HORÁRIOS'}
-                      </button>
-
-                      {showAll && (
-                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-3">
-                          {horariosAll.map((h, i) => (
+                return (
+                  <div>
+                    {/* zona de calor aparece primeiro — induz sem explicar */}
+                    {horariosHot.length > 0 ? (
+                      <>
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
+                          {horariosHot.map((h, i) => (
                             <SlotButton
-                              key={`all-${i}`}
+                              key={`hot-${i}`}
                               slot={h}
                               isSelected={selectedSlot?.hora === h.hora && selectedSlot?.inicio === h.inicio}
                               onClick={handleSelectSlot}
                             />
                           ))}
                         </div>
-                      )}
-                    </>
-                  )}
 
-                  {/* sem zona de calor: mostra todos direto, sem botão */}
-                  {horariosHot.length === 0 && (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                      {horariosAll.map((h, i) => (
-                        <SlotButton
-                          key={`all-${i}`}
-                          slot={h}
-                          isSelected={selectedSlot?.hora === h.hora && selectedSlot?.inicio === h.inicio}
-                          onClick={handleSelectSlot}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+                        {/* botão VER MAIS — sempre visível quando há zona de calor */}
+                        <button
+                          type="button"
+                          onClick={() => setShowAll(v => !v)}
+                          className="w-full py-2.5 rounded-full border border-gray-700 bg-dark-200 text-gray-300 text-sm font-normal uppercase hover:border-gray-500 hover:text-white transition-colors"
+                        >
+                          {showAll ? 'OCULTAR HORÁRIOS' : 'VER MAIS HORÁRIOS'}
+                        </button>
+
+                        {/* expande APENAS os horários que não apareceram ainda */}
+                        {showAll && horariosExtra.length > 0 && (
+                          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-3">
+                            {horariosExtra.map((h, i) => (
+                              <SlotButton
+                                key={`extra-${i}`}
+                                slot={h}
+                                isSelected={selectedSlot?.hora === h.hora && selectedSlot?.inicio === h.inicio}
+                                onClick={handleSelectSlot}
+                              />
+                            ))}
+                          </div>
+                        )}
+
+                        {/* caso todos já sejam zona de calor */}
+                        {showAll && horariosExtra.length === 0 && (
+                          <p className="text-center text-xs text-gray-600 mt-3">
+                            Todos os horários disponíveis já estão listados acima.
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      /* sem zona de calor: mostra todos direto */
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                        {horariosAll.map((h, i) => (
+                          <SlotButton
+                            key={`all-${i}`}
+                            slot={h}
+                            isSelected={selectedSlot?.hora === h.hora && selectedSlot?.inicio === h.inicio}
+                            onClick={handleSelectSlot}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           )}
 
