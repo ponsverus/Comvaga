@@ -8,6 +8,7 @@ import {
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { getBusinessGroup } from '../businessTerms';
+import DatePicker from '../components/DatePicker';
 
 const STATUS_COLOR_CLASS = {
   ABERTO: 'bg-green-500',
@@ -89,7 +90,7 @@ function formatDateBRFromISO(dateStr) {
   if (!dateStr) return 'Selecionar';
   const [y, m, d] = String(dateStr).split('-');
   if (!y || !m || !d) return String(dateStr);
-  return `${d}.${m}.${y}`;
+  return `${d}/${m}/${y}`;
 }
 
 function getPublicUrl(bucket, path) {
@@ -117,26 +118,6 @@ function ClienteAvatar({ cliente, size = 'w-9 h-9' }) {
   return (
     <div className={`${size} rounded-full bg-gradient-to-br from-primary to-yellow-600 flex items-center justify-center text-black text-sm font-normal shrink-0`}>
       {(cliente?.nome || '?')[0]}
-    </div>
-  );
-}
-
-function DateFilterButton({ value, onChange, title }) {
-  return (
-    <div className="relative inline-flex w-[140px]">
-      <input
-        type="date"
-        value={value}
-        onChange={onChange}
-        title={title}
-        onClick={(e) => e.target.showPicker && e.target.showPicker()}
-        onKeyDown={(e) => e.key !== 'Tab' && e.preventDefault()}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-      />
-      <div className="w-full px-2 py-2 bg-dark-200 border border-gray-800 rounded-button text-white text-base text-center flex items-center justify-center z-10 overflow-hidden pointer-events-none">
-        <span className="flex-1 truncate">{formatDateBRFromISO(value)}</span>
-        <span className="w-2.5 h-2.5 rounded-full bg-yellow-400 ml-1 flex-shrink-0" />
-      </div>
     </div>
   );
 }
@@ -640,7 +621,6 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const deleteEntrega = async (id) => {
-
     const ok = await uiConfirm(`dashboard.business.${businessGroup}.service_delete_confirm`, 'warning');
     if (!ok) return;
     try {
@@ -1002,11 +982,7 @@ export default function Dashboard({ user, onLogout }) {
   return (
     <div className="min-h-screen bg-black text-white">
       <style>{`
-        .date-no-arrow { appearance: none; -webkit-appearance: none; -moz-appearance: none; }
-        .date-no-arrow::-webkit-inner-spin-button, .date-no-arrow::-webkit-clear-button { display: none; -webkit-appearance: none; }
-        .date-no-arrow::-webkit-calendar-picker-indicator { opacity: 0; cursor: pointer; }
         .no-native-indicator { appearance: none; -webkit-appearance: none; -moz-appearance: none; }
-        .no-native-indicator::-webkit-calendar-picker-indicator { opacity: 0; cursor: pointer; }
       `}</style>
 
       <header className="bg-dark-100 border-b border-gray-800 sticky top-0 z-50">
@@ -1067,7 +1043,6 @@ export default function Dashboard({ user, onLogout }) {
             <div className="text-3xl font-normal text-white mb-1">{profissionais.length}</div>
             <div className="text-sm text-gray-400">PROFISSIONAIS</div>
           </div>
-          {/* ── card de métrica: label dinâmico ── */}
           <div className="bg-dark-100 border border-gray-800 rounded-custom p-6">
             <TrendingUp className="w-8 h-8 text-primary mb-2" />
             <div className="text-3xl font-normal text-white mb-1">{entregas.length}</div>
@@ -1155,7 +1130,11 @@ export default function Dashboard({ user, onLogout }) {
                     <h3 className="text-lg font-normal flex items-center gap-2 uppercase">
                       <span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="font-normal text-2xl">$</span>FATURAMENTO
                     </h3>
-                    <DateFilterButton value={faturamentoData} onChange={(e) => setFaturamentoData(e.target.value)} title="Filtrar faturamento por data" />
+                    <DatePicker
+                      value={faturamentoData}
+                      onChange={(iso) => setFaturamentoData(iso)}
+                      todayISO={hoje}
+                    />
                   </div>
                   <div className="text-3xl font-normal text-white mb-2">
                     {metricsLoadingDia ? <span className="text-gray-500 text-xl">...</span> : <>R$ {Number(metricsDia?.selected_day?.faturamento || 0).toFixed(2)}</>}
@@ -1325,7 +1304,11 @@ export default function Dashboard({ user, onLogout }) {
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                   <h2 className="text-2xl font-normal">Histórico</h2>
-                  <DateFilterButton value={historicoData} onChange={(e) => setHistoricoData(e.target.value)} title="Filtrar histórico por data" />
+                  <DatePicker
+                    value={historicoData}
+                    onChange={(iso) => setHistoricoData(iso)}
+                    todayISO={hoje}
+                  />
                 </div>
                 {agendamentosDiaSelecionado.length > 0 ? (
                   <div className="space-y-3">
@@ -1369,7 +1352,6 @@ export default function Dashboard({ user, onLogout }) {
 
             {activeTab === 'entregas' && (
               <div>
-                {/* ── cabeçalho dinâmico ── */}
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-normal">{sectionTitle}</h2>
                   <button
@@ -1388,7 +1370,6 @@ export default function Dashboard({ user, onLogout }) {
                         <div key={p.id} className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                           <div className="flex items-center justify-between mb-4">
                             <div className="font-normal text-lg">{p.nome}</div>
-                            {/* ── contador dinâmico ── */}
                             <div className="text-xs text-gray-500">
                               {lista.length} {lista.length === 1 ? counterSingular : counterPlural}
                             </div>
@@ -1428,7 +1409,6 @@ export default function Dashboard({ user, onLogout }) {
                               })}
                             </div>
                           ) : (
-                            /* ── empty state dinâmico ── */
                             <p className="text-gray-500">{emptyListMsg}</p>
                           )}
                         </div>
@@ -1471,7 +1451,6 @@ export default function Dashboard({ user, onLogout }) {
                             {p.anos_experiencia != null && <p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIÊNCIA</p>}
                           </div>
                         </div>
-                        {/* ── contador de entregas dinâmico ── */}
                         <div className="text-sm text-gray-400 mb-3">
                           {entregas.filter(s => s.profissional_id === p.id).length} {counterPlural}
                         </div>
@@ -1654,7 +1633,6 @@ export default function Dashboard({ user, onLogout }) {
       {showNovaEntrega && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
-            {/* ── título do modal dinâmico ── */}
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-normal">{editingEntregaId ? modalEditLabel : modalNewLabel}</h3>
               <button onClick={() => { setShowNovaEntrega(false); setEditingEntregaId(null); setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' }); }}><X className="w-6 h-6" /></button>
@@ -1688,7 +1666,6 @@ export default function Dashboard({ user, onLogout }) {
                 <input type="number" step="0.01" value={formEntrega.preco_promocional} onChange={(e) => setFormEntrega({ ...formEntrega, preco_promocional: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" placeholder="Apenas se houver oferta" />
                 <p className="text-[12px] text-gray-500 mt-2">O preço de oferta deve ser menor que o preço normal.</p>
               </div>
-              {/* ── botão submit dinâmico ── */}
               <button type="submit" className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase">
                 {editingEntregaId ? 'SALVAR' : `CRIAR ${btnAddLabel}`}
               </button>
