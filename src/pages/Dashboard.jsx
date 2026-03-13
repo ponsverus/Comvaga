@@ -273,17 +273,12 @@ export default function Dashboard({ user, onLogout }) {
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [savingDados, setSavingDados] = useState(false);
 
-  // ── parceiros ──
   const [parceiroSelected, setParceiroSelected] = useState('');
   const [parceiroEmail, setParceiroEmail] = useState('');
   const [parceiroSaving, setParceiroSaving] = useState(false);
 
   useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
 
-  // ─────────────────────────────────────────────────────────────
-  // grupo semântico derivado do tipo de negócio
-  // 'servicos' | 'consultas' | 'aulas' | 'default'
-  // ─────────────────────────────────────────────────────────────
   const businessGroup = useMemo(
     () => getBusinessGroup(negocio?.tipo_negocio),
     [negocio?.tipo_negocio]
@@ -596,7 +591,7 @@ export default function Dashboard({ user, onLogout }) {
       if (!payload.duracao_minutos) throw new Error('Duracao invalida.');
       const { error: insErr } = await supabase.from('entregas').insert([payload]);
       if (insErr) throw insErr;
-      // ── alerta dinâmico ──
+
       await uiAlert(`dashboard.business.${businessGroup}.service_created`, 'success');
       setShowNovaEntrega(false); setEditingEntregaId(null);
       setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' });
@@ -628,7 +623,7 @@ export default function Dashboard({ user, onLogout }) {
       };
       const { error: updErr } = await supabase.from('entregas').update(payload).eq('id', editingEntregaId).eq('negocio_id', negocio.id);
       if (updErr) throw updErr;
-      // ── alerta dinâmico ──
+
       await uiAlert(`dashboard.business.${businessGroup}.service_updated`, 'success');
       setShowNovaEntrega(false); setEditingEntregaId(null);
       setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' });
@@ -645,13 +640,13 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const deleteEntrega = async (id) => {
-    // ── confirmação dinâmica ──
+
     const ok = await uiConfirm(`dashboard.business.${businessGroup}.service_delete_confirm`, 'warning');
     if (!ok) return;
     try {
       const { error: delErr } = await supabase.from('entregas').delete().eq('id', id).eq('negocio_id', negocio.id);
       if (delErr) throw delErr;
-      // ── alerta dinâmico ──
+
       await uiAlert(`dashboard.business.${businessGroup}.service_deleted`, 'success');
       await loadData(true);
     } catch (e2) {
@@ -761,7 +756,6 @@ export default function Dashboard({ user, onLogout }) {
     } catch (e) { console.error('cancelarAgendamentoProfissional:', e); await uiAlert('dashboard.booking_cancel_error', 'error'); }
   };
 
-  // ── parceiros ──
   const saveParceiroEmail = async () => {
     const email = String(parceiroEmail || '').trim();
     if (!parceiroSelected) { await uiAlert('dashboard.parceiro_selecione_prof', 'error'); return; }
@@ -909,9 +903,6 @@ export default function Dashboard({ user, onLogout }) {
     return pairs;
   }, [metricsDia]);
 
-  // ─────────────────────────────────────────────────────────────
-  // Textos dinâmicos derivados do businessGroup
-  // ─────────────────────────────────────────────────────────────
   const tabEntregasLabel = {
     servicos:  'SERVIÇOS',
     consultas: 'CONSULTAS',
@@ -973,7 +964,6 @@ export default function Dashboard({ user, onLogout }) {
     { key: 'historico' }, { key: 'entregas' }, { key: 'profissionais' }, { key: 'info-negocio' },
   ];
 
-  // ── tab label dinâmico para 'entregas' ──
   const TAB_LABELS = {
     'visao-geral':   'GERAL',
     'agendamentos':  'AGENDAMENTOS',
@@ -1550,10 +1540,9 @@ export default function Dashboard({ user, onLogout }) {
                   </div>
                 </div>
 
-                {/* ── bloco parceiros ── */}
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                   <div className="text-sm text-white-600 tracking-wide mb-1">Parceiros</div>
-                  <p className="text-xs text-gray-500 mb-4">
+                  <p className="text-sm text-gray-600 mb-4">
                     Selecione um profissional e informe o email para receber avisos de novo agendamento.
                   </p>
                   <div className="grid sm:grid-cols-2 gap-3 mb-3">
