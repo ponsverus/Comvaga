@@ -7,18 +7,21 @@ import {
   Phone,
   Heart,
   ArrowLeft,
-  Zap,
   X,
   AlertCircle,
   Instagram,
   Facebook,
-  ChevronDown
 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { ptBR } from '../feedback/messages/ptBR';
 import { getBusinessGroup } from '../businessTerms';
+import BookingCalendar from '../components/BookingCalendar';
+
+// ─── constantes ──────────────────────────────────────────────────────────────
 
 const FOLGA_MINUTOS = 5;
+
+// ─── helpers ─────────────────────────────────────────────────────────────────
 
 function timeToMinutes(t) {
   if (!t) return 0;
@@ -29,25 +32,13 @@ function timeToMinutes(t) {
 function getNowSP() {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Sao_Paulo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false,
   }).formatToParts(new Date());
-
   const get = (type) => parts.find(p => p.type === type)?.value;
-  const y = get('year');
-  const mo = get('month');
-  const d = get('day');
-  const hh = get('hour');
-  const mm = get('minute');
-
-  return {
-    date: `${y}-${mo}-${d}`,
-    minutes: (Number(hh) * 60) + Number(mm)
-  };
+  const y = get('year'), mo = get('month'), d = get('day');
+  const hh = get('hour'), mm = get('minute');
+  return { date: `${y}-${mo}-${d}`, minutes: (Number(hh) * 60) + Number(mm) };
 }
 
 function formatDateBR(ymd) {
@@ -61,10 +52,8 @@ function getDowFromDateSP(dateStr) {
   if (!dateStr) return null;
   const dt = new Date(`${dateStr}T12:00:00`);
   const weekday = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Sao_Paulo',
-    weekday: 'short'
+    timeZone: 'America/Sao_Paulo', weekday: 'short',
   }).format(dt);
-
   const map = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
   return map[weekday] ?? null;
 }
@@ -83,9 +72,7 @@ function getPublicUrl(bucket, path) {
     const stripped = path.replace(new RegExp(`^${bucket}/`), '');
     const { data } = supabase.storage.from(bucket).getPublicUrl(stripped);
     return data?.publicUrl || null;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 function gerarLinkGoogle(titulo, dataInicioISO, duracaoMin) {
@@ -96,11 +83,7 @@ function gerarLinkGoogle(titulo, dataInicioISO, duracaoMin) {
 }
 
 function StarChar({ size = 18, className = 'text-primary' }) {
-  return (
-    <span className={className} style={{ fontSize: size, lineHeight: 1 }} aria-hidden="true">
-      ★
-    </span>
-  );
+  return <span className={className} style={{ fontSize: size, lineHeight: 1 }} aria-hidden="true">★</span>;
 }
 
 function Stars5Char({ value = 0, size = 14 }) {
@@ -108,14 +91,7 @@ function Stars5Char({ value = 0, size = 14 }) {
   return (
     <div className="flex items-center gap-1" aria-label={`Nota ${v} de 5`}>
       {[1, 2, 3, 4, 5].map(i => (
-        <span
-          key={i}
-          style={{ fontSize: size, lineHeight: 1 }}
-          className={i <= v ? 'text-primary' : 'text-gray-700'}
-          aria-hidden="true"
-        >
-          ★
-        </span>
+        <span key={i} style={{ fontSize: size, lineHeight: 1 }} className={i <= v ? 'text-primary' : 'text-gray-700'} aria-hidden="true">★</span>
       ))}
     </div>
   );
@@ -123,11 +99,7 @@ function Stars5Char({ value = 0, size = 14 }) {
 
 function normalizeDiasTrabalho(arr) {
   const base = Array.isArray(arr) ? arr : [];
-  const cleaned = base
-    .map(n => Number(n))
-    .filter(n => Number.isFinite(n))
-    .map(n => (n === 7 ? 0 : n))
-    .filter(n => n >= 0 && n <= 6);
+  const cleaned = base.map(n => Number(n)).filter(n => Number.isFinite(n)).map(n => (n === 7 ? 0 : n)).filter(n => n >= 0 && n <= 6);
   return Array.from(new Set(cleaned)).sort((a, b) => a - b);
 }
 
@@ -136,8 +108,7 @@ function resolveInstagram(instaRaw) {
   if (!raw) return null;
   if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
   const handle = raw.replace(/^@/, '').replace(/\s+/g, '');
-  if (!handle) return null;
-  return `https://instagram.com/${handle}`;
+  return handle ? `https://instagram.com/${handle}` : null;
 }
 
 function resolveFacebook(fbRaw) {
@@ -145,8 +116,7 @@ function resolveFacebook(fbRaw) {
   if (!raw) return null;
   if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
   const handle = raw.replace(/^@/, '').replace(/\s+/g, '');
-  if (!handle) return null;
-  return `https://facebook.com/${handle}`;
+  return handle ? `https://facebook.com/${handle}` : null;
 }
 
 function getPrecoFinalServico(s) {
@@ -162,42 +132,7 @@ function sanitizeTel(raw) {
   return v.replace(/[^\d+]/g, '');
 }
 
-function DatePickerButton({ value, onChange, min, placeholder = 'SELECIONAR DATA', className = '' }) {
-  const label = value ? formatDateBR(value) : placeholder;
-  const inputRef = useRef(null);
-
-  const handleClick = () => {
-    if (inputRef.current) {
-      inputRef.current.showPicker?.();
-      inputRef.current.click();
-    }
-  };
-
-  return (
-    <div className={`relative ${className}`}>
-      <div
-        onClick={handleClick}
-        className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white flex items-center justify-between uppercase cursor-pointer select-none hover:border-primary/50 transition-colors"
-      >
-        <span className={`text-base pointer-events-none ${value ? 'text-white' : 'text-gray-400'}`}>{label}</span>
-        <span className="sm:hidden w-2.5 h-2.5 rounded-full bg-yellow-400 shrink-0 pointer-events-none" />
-        <span className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full border border-gray-700 bg-dark-100/60 shrink-0 pointer-events-none">
-          <ChevronDown className="w-4 h-4 text-gray-300" />
-        </span>
-      </div>
-      <input
-        ref={inputRef}
-        type="date"
-        min={min}
-        value={value}
-        onChange={onChange}
-        className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
-        aria-label="Selecionar data"
-        tabIndex={-1}
-      />
-    </div>
-  );
-}
+// ─── sub-componentes de modal ─────────────────────────────────────────────────
 
 function AlertModal({ open, onClose, title, body, buttonText }) {
   if (!open) return null;
@@ -206,15 +141,10 @@ function AlertModal({ open, onClose, title, body, buttonText }) {
       <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-6">
         <div className="flex justify-between items-start gap-3 mb-3">
           <h3 className="text-xl font-normal text-white">{title}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
-            <X className="w-6 h-6" />
-          </button>
+          <button onClick={onClose} className="text-gray-400 hover:text-white"><X className="w-6 h-6" /></button>
         </div>
         {body && <p className="text-gray-300 font-normal whitespace-pre-line">{body}</p>}
-        <button
-          onClick={onClose}
-          className="mt-5 w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal"
-        >
+        <button onClick={onClose} className="mt-5 w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal">
           {buttonText || 'OK'}
         </button>
       </div>
@@ -229,29 +159,19 @@ function ConfirmModal({ open, onCancel, onConfirm, title, body, confirmText, can
       <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-6">
         <div className="flex justify-between items-start gap-3 mb-3">
           <h3 className="text-xl font-normal text-white">{title}</h3>
-          <button onClick={onCancel} className="text-gray-400 hover:text-white">
-            <X className="w-6 h-6" />
-          </button>
+          <button onClick={onCancel} className="text-gray-400 hover:text-white"><X className="w-6 h-6" /></button>
         </div>
         {body && <p className="text-gray-300 font-normal whitespace-pre-line">{body}</p>}
         <div className="mt-5 flex gap-3">
-          <button
-            onClick={onCancel}
-            className="flex-1 py-3 bg-dark-200 border border-gray-800 rounded-button uppercase font-normal text-gray-200"
-          >
-            {cancelText || 'CANCELAR'}
-          </button>
-          <button
-            onClick={onConfirm}
-            className="flex-1 py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal"
-          >
-            {confirmText || 'CONFIRMAR'}
-          </button>
+          <button onClick={onCancel} className="flex-1 py-3 bg-dark-200 border border-gray-800 rounded-button uppercase font-normal text-gray-200">{cancelText || 'CANCELAR'}</button>
+          <button onClick={onConfirm} className="flex-1 py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal">{confirmText || 'CONFIRMAR'}</button>
         </div>
       </div>
     </div>
   );
 }
+
+// ─── componente principal ─────────────────────────────────────────────────────
 
 export default function Vitrine({ user, userType }) {
   const { slug } = useParams();
@@ -260,32 +180,28 @@ export default function Vitrine({ user, userType }) {
   const vitrineMsgs = ptBR?.vitrine || {};
   const getMsg = (key, fallback) => vitrineMsgs?.[key] || fallback;
 
-  const [negocio, setNegocio] = useState(null);
-  const [profissionais, setProfissionais] = useState([]);
-  const [entregas, setEntregas] = useState([]);
-  const [avaliacoes, setAvaliacoes] = useState([]);
-  const [galeriaItems, setGaleriaItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [negocio,        setNegocio]        = useState(null);
+  const [profissionais,  setProfissionais]  = useState([]);
+  const [entregas,       setEntregas]       = useState([]);
+  const [avaliacoes,     setAvaliacoes]     = useState([]);
+  const [galeriaItems,   setGaleriaItems]   = useState([]);
+  const [loading,        setLoading]        = useState(true);
+  const [error,          setError]          = useState(null);
 
-  const businessGroup = useMemo(
-    () => getBusinessGroup(negocio?.tipo_negocio),
-    [negocio?.tipo_negocio]
-  );
+  const businessGroup = useMemo(() => getBusinessGroup(negocio?.tipo_negocio), [negocio?.tipo_negocio]);
 
-  const bizV = vitrineMsgs?.business || {};
+  const bizV          = vitrineMsgs?.business || {};
   const sectionTitle    = bizV?.section_title?.[businessGroup]  ?? 'Atendimentos';
   const btnAgendarLabel = bizV?.label_button?.[businessGroup]   ?? 'AGENDAR ATENDIMENTO';
   const counterSingular = ptBR?.dashboard?.business?.counter_singular?.[businessGroup] ?? 'atendimento';
   const counterPlural   = ptBR?.dashboard?.business?.counter_plural?.[businessGroup]   ?? 'atendimentos';
   const emptyListMsg    = ptBR?.dashboard?.business?.empty_list?.[businessGroup]       ?? 'Sem atendimentos para este profissional.';
 
-  const [nativeAlertOpen, setNativeAlertOpen] = useState(false);
-  const [nativeAlertData, setNativeAlertData] = useState({ title: '', body: '', buttonText: 'OK' });
+  // ── sistema de alertas/confirm nativos ──
+  const [nativeAlertOpen,   setNativeAlertOpen]   = useState(false);
+  const [nativeAlertData,   setNativeAlertData]   = useState({ title: '', body: '', buttonText: 'OK' });
   const [nativeConfirmOpen, setNativeConfirmOpen] = useState(false);
-  const [nativeConfirmData, setNativeConfirmData] = useState({
-    title: '', body: '', confirmText: 'CONFIRMAR', cancelText: 'CANCELAR'
-  });
+  const [nativeConfirmData, setNativeConfirmData] = useState({ title: '', body: '', confirmText: 'CONFIRMAR', cancelText: 'CANCELAR' });
   const confirmResolverRef = useRef(null);
   const alertAfterCloseRef = useRef(null);
 
@@ -300,7 +216,7 @@ export default function Vitrine({ user, userType }) {
     setNativeAlertData({
       title: title || getMsg('generic_title', 'Aviso'),
       body: body || '',
-      buttonText: buttonText || 'OK'
+      buttonText: buttonText || 'OK',
     });
     setNativeAlertOpen(true);
   };
@@ -308,11 +224,7 @@ export default function Vitrine({ user, userType }) {
   const alertKey = (key, fallbackTitle, fallbackBody, fallbackBtn = 'OK') => {
     const m = vitrineMsgs?.[key];
     if (m && typeof m === 'object') {
-      openAlert({
-        title: m.title || fallbackTitle || getMsg('generic_title', 'Aviso'),
-        body: m.body || fallbackBody || '',
-        buttonText: m.buttonText || fallbackBtn || 'OK'
-      });
+      openAlert({ title: m.title || fallbackTitle || getMsg('generic_title', 'Aviso'), body: m.body || fallbackBody || '', buttonText: m.buttonText || fallbackBtn || 'OK' });
       return;
     }
     openAlert({ title: fallbackTitle || getMsg('generic_title', 'Aviso'), body: fallbackBody || '', buttonText: fallbackBtn || 'OK' });
@@ -323,10 +235,10 @@ export default function Vitrine({ user, userType }) {
       confirmResolverRef.current = resolve;
       const m = vitrineMsgs?.[key];
       setNativeConfirmData({
-        title: (m && m.title) ? m.title : (fallbackTitle || getMsg('generic_title', 'Confirmar')),
-        body: (m && m.body) ? m.body : (fallbackBody || ''),
+        title:       (m && m.title)       ? m.title       : (fallbackTitle   || getMsg('generic_title', 'Confirmar')),
+        body:        (m && m.body)        ? m.body        : (fallbackBody    || ''),
         confirmText: (m && m.confirmText) ? m.confirmText : fallbackConfirm,
-        cancelText: (m && m.cancelText) ? m.cancelText : fallbackCancel
+        cancelText:  (m && m.cancelText)  ? m.cancelText  : fallbackCancel,
       });
       setNativeConfirmOpen(true);
     });
@@ -339,24 +251,36 @@ export default function Vitrine({ user, userType }) {
     if (typeof r === 'function') r(!!value);
   };
 
-  const [isFavorito, setIsFavorito] = useState(false);
-  const [showAgendamento, setShowAgendamento] = useState(false);
-  const [calendarLink, setCalendarLink] = useState('');
+  // ── estado de agendamento ──
+  const [isFavorito,     setIsFavorito]     = useState(false);
+  const [calendarLink,   setCalendarLink]   = useState('');
+
+  // flow.step:
+  //   0  = fechado
+  //   2  = selecionar serviços (no modal)
+  //   'booking' = BookingCalendar aberto
+  //   5  = sucesso
   const [flow, setFlow] = useState({
-    step: 1, profissional: null, data: '', horario: null, servicosSelecionados: []
+    step: 0,
+    profissional: null,
+    servicosSelecionados: [],
+    lastSlot: null,   // { inicio, label, dataISO } — preenchido ao confirmar
   });
 
-  const minDateSP = useMemo(() => getNowSP().date, []);
+  // todayISO vem do device como fallback; no fluxo real usaria serverNow.date
+  const todayISO = useMemo(() => getNowSP().date, []);
 
-  const [showAvaliar, setShowAvaliar] = useState(false);
-  const [avaliarNota, setAvaliarNota] = useState(5);
-  const [avaliarTexto, setAvaliarTexto] = useState('');
-  const [avaliarLoading, setAvaliarLoading] = useState(false);
-  const [avaliarTipo, setAvaliarTipo] = useState('negocio');
+  // ── avaliação ──
+  const [showAvaliar,         setShowAvaliar]         = useState(false);
+  const [avaliarNota,         setAvaliarNota]         = useState(5);
+  const [avaliarTexto,        setAvaliarTexto]        = useState('');
+  const [avaliarLoading,      setAvaliarLoading]      = useState(false);
+  const [avaliarTipo,         setAvaliarTipo]         = useState('negocio');
   const [avaliarProfissionalId, setAvaliarProfissionalId] = useState(null);
 
   const isProfessional = user && userType === 'professional';
-  const [enviando, setEnviando] = useState(false);
+
+  // ── carregamento ──────────────────────────────────────────────────────────
 
   useEffect(() => { loadVitrine(); }, [slug]);
 
@@ -403,7 +327,7 @@ export default function Vitrine({ user, userType }) {
           ? withTimeout(supabase.from('entregas').select('*').in('profissional_id', profissionalIds).eq('ativo', true), 7000, 'entregas')
           : Promise.resolve({ data: [], error: null }),
         withTimeout(supabase.from('galerias').select('id, path, ordem').eq('negocio_id', negocioData.id).order('ordem', { ascending: true }).order('created_at', { ascending: true }), 7000, 'galerias'),
-        withTimeout(supabase.from('depoimentos').select('id, tipo, negocio_id, profissional_id, cliente_id, nota, comentario, created_at').or(avalFilter).order('created_at', { ascending: false }).limit(20), 7000, 'avaliacoes')
+        withTimeout(supabase.from('depoimentos').select('id, tipo, negocio_id, profissional_id, cliente_id, nota, comentario, created_at').or(avalFilter).order('created_at', { ascending: false }).limit(20), 7000, 'avaliacoes'),
       ]);
 
       if (entregasResult.error) throw entregasResult.error;
@@ -435,7 +359,7 @@ export default function Vitrine({ user, userType }) {
           ...a,
           users: u ? { nome: u.nome, avatar_path: u.avatar_path, type: u.type } : null,
           profissionais: p ? { nome: p.nome } : null,
-          negocios: { nome: negociosNome }
+          negocios: { nome: negociosNome },
         };
       });
 
@@ -477,6 +401,8 @@ export default function Vitrine({ user, userType }) {
     } catch { alertKey('favorite_toggle_error', 'Erro', 'Erro ao favoritar. Tente novamente.', 'OK'); }
   };
 
+  // ── iniciar agendamento ───────────────────────────────────────────────────
+
   const iniciarAgendamento = async (profissional) => {
     if (!user) {
       const ok = await confirmKey('schedule_need_login_confirm', 'Login necessário', 'Você precisa fazer login para agendar. Deseja fazer login agora?', 'IR PARA LOGIN', 'MAIS TARDE');
@@ -488,40 +414,15 @@ export default function Vitrine({ user, userType }) {
       return;
     }
     setCalendarLink('');
-    setFlow({ step: 1, profissional, data: '', horario: null, servicosSelecionados: [] });
-    setShowAgendamento(true);
+    setFlow({ step: 2, profissional, servicosSelecionados: [], lastSlot: null });
   };
+
+  // ── dados derivados do flow ───────────────────────────────────────────────
 
   const entregasDoProf = useMemo(() => {
     if (!flow.profissional) return [];
     return entregas.filter(s => s.profissional_id === flow.profissional.id);
   }, [entregas, flow.profissional]);
-
-  const [horariosAll, setHorariosAll] = useState([]);
-  const [horariosHot, setHorariosHot] = useState([]);
-  const [showAllSlots, setShowAllSlots] = useState(false);
-
-  const diaSelecionadoEhTrabalho = useMemo(() => {
-    if (!flow.profissional || !flow.data) return true;
-    const dias = normalizeDiasTrabalho(flow.profissional.dias_trabalho);
-    const diasEfetivos = dias.length ? dias : [0, 1, 2, 3, 4, 5, 6];
-    const dow = getDowFromDateSP(flow.data);
-    if (dow == null) return true;
-    return diasEfetivos.includes(dow);
-  }, [flow.profissional, flow.data]);
-
-  const totalSelecionado = useMemo(() => {
-    const lista = Array.isArray(flow.servicosSelecionados) ? flow.servicosSelecionados : [];
-    const dur = lista.reduce((sum, s) => sum + Number(s?.duracao_minutos || 0), 0);
-    const val = lista.reduce((sum, s) => sum + getPrecoFinalServico(s), 0);
-    return { duracao: dur, valor: val, qtd: lista.length };
-  }, [flow.servicosSelecionados]);
-
-  const duracaoTotalComFolga = useMemo(() => {
-    const dur = Number(totalSelecionado.duracao || 0);
-    if (!dur || dur <= 0) return 0;
-    return dur + FOLGA_MINUTOS;
-  }, [totalSelecionado.duracao]);
 
   const entregasPossiveis = useMemo(() => {
     return (entregasDoProf || [])
@@ -534,169 +435,68 @@ export default function Vitrine({ user, userType }) {
       });
   }, [entregasDoProf]);
 
-  const getAlmocoRange = (p) => ({ ini: p?.almoco_inicio || null, fim: p?.almoco_fim || null });
+  const totalSelecionado = useMemo(() => {
+    const lista = Array.isArray(flow.servicosSelecionados) ? flow.servicosSelecionados : [];
+    const dur = lista.reduce((sum, s) => sum + Number(s?.duracao_minutos || 0), 0);
+    const val = lista.reduce((sum, s) => sum + getPrecoFinalServico(s), 0);
+    return { duracao: dur, valor: val, qtd: lista.length };
+  }, [flow.servicosSelecionados]);
 
-  const isInLunchNow = (p) => {
-    const { ini, fim } = getAlmocoRange(p);
-    if (!ini || !fim) return false;
-    const now = getNowSP();
-    const a = timeToMinutes(ini);
-    const b = timeToMinutes(fim);
-    if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
-    if (b < a) return (now.minutes >= a || now.minutes < b);
-    return (now.minutes >= a && now.minutes < b);
-  };
+  const duracaoTotalComFolga = useMemo(() => {
+    const dur = Number(totalSelecionado.duracao || 0);
+    return dur > 0 ? dur + FOLGA_MINUTOS : 0;
+  }, [totalSelecionado.duracao]);
 
-  const getProfStatus = (p) => {
-    const ativo = (p?.ativo === undefined) ? true : !!p.ativo;
-    if (!ativo) return { label: 'FECHADO', color: 'bg-red-500' };
-    const now = getNowSP();
-    const ini = timeToMinutes(p?.horario_inicio || '08:00');
-    const fim = timeToMinutes(p?.horario_fim || '18:00');
-    const dias = normalizeDiasTrabalho(p?.dias_trabalho);
-    const diasEfetivos = dias.length ? dias : [0, 1, 2, 3, 4, 5, 6];
-    const hojeDow = getDowFromDateSP(now.date);
-    const trabalhaHoje = hojeDow == null ? true : diasEfetivos.includes(hojeDow);
-    const dentroHorario = now.minutes >= ini && now.minutes < fim;
-    if (!(trabalhaHoje && dentroHorario)) return { label: 'FECHADO', color: 'bg-red-500' };
-    if (isInLunchNow(p)) return { label: 'ALMOÇO', color: 'bg-yellow-400' };
-    return { label: 'ABERTO', color: 'bg-green-500' };
-  };
+  // "entrega virtual" unificada que o BookingCalendar recebe
+  // representa a soma dos serviços selecionados
+  const entregaVirtual = useMemo(() => {
+    if (!flow.servicosSelecionados?.length) return null;
+    const primeiroServico = flow.servicosSelecionados[0];
+    return {
+      id:               primeiroServico.id,     // usado no insert — serviço principal
+      nome:             flow.servicosSelecionados.length === 1
+                          ? primeiroServico.nome
+                          : `${flow.servicosSelecionados.length} serviços`,
+      duracao_minutos:  totalSelecionado.duracao,
+      preco:            totalSelecionado.valor,
+      preco_promocional: null,
+    };
+  }, [flow.servicosSelecionados, totalSelecionado]);
 
-  const carregarSlotsBanco = async () => {
-    if (!flow.profissional || !flow.data) return;
-    if (!diaSelecionadoEhTrabalho) { setHorariosAll([]); setHorariosHot([]); setShowAllSlots(false); return; }
-    const durServicos = Number(totalSelecionado.duracao || 0);
-    if (!durServicos || durServicos <= 0) { setHorariosAll([]); setHorariosHot([]); setShowAllSlots(false); return; }
-    const precisaMinutos = durServicos + FOLGA_MINUTOS;
-    try {
-      const { data: slotsV4, error: errV4 } = await withTimeout(
-        supabase.rpc('rpc_get_slots_v4', {
-          p_profissional_id: flow.profissional.id,
-          p_dia: flow.data,
-          p_entrega_min: durServicos,
-          p_folga_min: 5,
-          p_margem_min: 5,
-          p_modo: 'todos'
-        }), 9000, 'rpc-slots-v4'
-      );
-      if (errV4) throw errV4;
-      const list = (slotsV4 || []).map(s => {
-        const label = String(s.label || '').slice(0, 5);
-        return { hora: label, tipo: 'normal', cabe: true, maxMinutos: precisaMinutos, precisaMinutos, motivo: null, isHeat: !!s.is_heat, isRaio: !!s.is_raio, inicio: s.inicio || null, fim: s.fim || null };
+  // ── callback de confirmação do BookingCalendar ────────────────────────────
+
+  const handleBookingConfirm = (slot) => {
+    // slot = { inicio, fim, label, dataISO }
+    // O BookingCalendar já inseriu no banco — aqui só geramos o link do Google
+    const primeiroServico = flow.servicosSelecionados?.[0];
+    const link = gerarLinkGoogle(
+      primeiroServico?.nome || 'Agendamento',
+      slot.inicio,
+      totalSelecionado.duracao,
+    );
+
+    if (window.OneSignalDeferred) {
+      window.OneSignalDeferred.push(async function (OneSignal) {
+        await OneSignal.sendTags({
+          ultima_acao:         'agendamento_realizado',
+          servico_nome:        primeiroServico?.nome || 'Serviço',
+          data_agendamento:    slot.dataISO,
+          horario_agendamento: slot.label,
+        });
       });
-      const uniq = new Map();
-      const rank = (h) => (h?.isRaio ? 3 : h?.isHeat ? 2 : 1);
-      for (const h of list) {
-        if (!h.hora) continue;
-        const key = h.hora;
-        if (!uniq.has(key)) { uniq.set(key, h); continue; }
-        const prev = uniq.get(key);
-        if (rank(h) > rank(prev)) uniq.set(key, h);
-        else if (rank(h) === rank(prev) && h.isRaio && !prev.isRaio) uniq.set(key, h);
-      }
-      const finalList = Array.from(uniq.values()).sort((a, b) => timeToMinutes(a.hora) - timeToMinutes(b.hora));
-      const hot = finalList.filter(x => x.isHeat || x.isRaio);
-      setHorariosAll(finalList);
-      setHorariosHot(hot);
-      setShowAllSlots(false);
-    } catch { setHorariosAll([]); setHorariosHot([]); setShowAllSlots(false); }
+    }
+
+    setCalendarLink(link);
+    setFlow(prev => ({ ...prev, step: 5, lastSlot: slot }));
   };
 
-  useEffect(() => {
-    if (showAgendamento && flow.step === 3) carregarSlotsBanco();
-  }, [showAgendamento, flow.profissional?.id, flow.data, flow.step, diaSelecionadoEhTrabalho, totalSelecionado.duracao]);
-
-  const confirmarAgendamento = async () => {
-    if (enviando) return;
-    if (!user || userType !== 'client') { alertKey('schedule_must_be_client', 'Ação restrita', 'Você precisa estar logado como CLIENTE para agendar.', 'ENTENDI'); return; }
-    if (!negocio?.id) { alertKey('schedule_invalid_business', 'Negócio inválido', 'Negócio inválido. Recarregue a vitrine.', 'ENTENDI'); return; }
-    setEnviando(true);
-    try {
-      if (!flow.profissional || !flow.data || !flow.horario || !flow.servicosSelecionados?.length) {
-        alertKey('schedule_incomplete_data', 'Dados incompletos', 'Dados incompletos. Refaça o agendamento.', 'ENTENDI'); return;
-      }
-      if (!diaSelecionadoEhTrabalho) {
-        alertKey('schedule_closed_day', 'Profissional fechado', 'Esse profissional está FECHADO nesse dia. Escolha outra data.', 'ENTENDI');
-        setFlow(prev => ({ ...prev, step: 1, horario: null, servicosSelecionados: [] })); return;
-      }
-      const durServicos = Number(totalSelecionado.duracao || 0);
-      if (!durServicos) {
-        const needOneMsg = bizV?.[businessGroup]?.schedule_need_one_service;
-        if (needOneMsg) openAlert({ title: needOneMsg.title, body: needOneMsg.body, buttonText: needOneMsg.buttonText || 'ENTENDI' });
-        else alertKey('schedule_need_one_service', 'Selecione um item', 'Selecione pelo menos 1 item.', 'ENTENDI');
-        return;
-      }
-      const addMinutesToISO = (iso, minutes) => {
-        const d = new Date(iso);
-        if (Number.isNaN(d.getTime())) throw new Error('Horário inválido.');
-        return new Date(d.getTime() + (minutes * 60 * 1000)).toISOString();
-      };
-      const baseInicioISO = String(flow.horario.inicio || '');
-      if (!baseInicioISO) { alertKey('schedule_pick_time', 'Selecione um horário', 'Selecione um horário.', 'ENTENDI'); return; }
-      const ordered = Array.isArray(flow.servicosSelecionados) ? [...flow.servicosSelecionados] : [];
-      const agendamentosParaInserir = [];
-      let curInicioISO = baseInicioISO;
-      for (let i = 0; i < ordered.length; i++) {
-        const s = ordered[i];
-        const dur = Number(s?.duracao_minutos || 0);
-        if (!dur) continue;
-        const iniDate = new Date(curInicioISO);
-        const hIni = String(iniDate.getUTCHours()).padStart(2, '0');
-        const mIni = String(iniDate.getUTCMinutes()).padStart(2, '0');
-        const horarioIni = `${hIni}:${mIni}`;
-        let curFimISO = addMinutesToISO(curInicioISO, dur);
-        const isLast = i === ordered.length - 1;
-        if (isLast) curFimISO = addMinutesToISO(curFimISO, FOLGA_MINUTOS);
-        const fimDate = new Date(curFimISO);
-        const hFim = String(fimDate.getUTCHours()).padStart(2, '0');
-        const mFim = String(fimDate.getUTCMinutes()).padStart(2, '0');
-        const horarioFim = `${hFim}:${mFim}`;
-        agendamentosParaInserir.push({
-          negocio_id: negocio.id, profissional_id: flow.profissional.id, cliente_id: user.id,
-          entrega_id: s.id, data: flow.data, horario_inicio: horarioIni, horario_fim: horarioFim, status: 'agendado'
-        });
-        curInicioISO = curFimISO;
-      }
-      if (!agendamentosParaInserir.length) {
-        const needValidMsg = bizV?.[businessGroup]?.schedule_need_valid_service;
-        if (needValidMsg) openAlert({ title: needValidMsg.title, body: needValidMsg.body, buttonText: needValidMsg.buttonText || 'ENTENDI' });
-        else alertKey('schedule_need_valid_service', 'Selecione um item', 'Selecione pelo menos 1 item válido.', 'ENTENDI');
-        return;
-      }
-      const { error: insErr } = await withTimeout(
-        supabase.from('agendamentos').insert(agendamentosParaInserir).select('id'), 10000, 'bulk-insert-agendamento'
-      );
-      if (insErr) {
-        const msg = String(insErr.message || '').toLowerCase();
-        const isOverlap = String(insErr.code || '') === '23P01' || msg.includes('impedir_sobreposicao') || msg.includes('exclusion') || msg.includes('overlap') || msg.includes('sobrepos');
-        if (isOverlap) {
-          alertKey('schedule_overlap_taken', 'Horário ocupado', 'Alguém acabou de reservar esse horário. Escolha outro.', 'ENTENDI');
-          setFlow(prev => ({ ...prev, step: 3, horario: null }));
-          await carregarSlotsBanco(); return;
-        }
-        throw insErr;
-      }
-      if (window.OneSignalDeferred) {
-        window.OneSignalDeferred.push(async function (OneSignal) {
-          const nomeServico = flow.servicosSelecionados?.[0]?.nome || 'Serviço';
-          await OneSignal.sendTags({ ultima_acao: "agendamento_realizado", servico_nome: nomeServico, data_agendamento: flow.data, horario_agendamento: flow.horario?.hora || '' });
-        });
-      }
-      const link = gerarLinkGoogle(flow.servicosSelecionados[0]?.nome || 'Agendamento', flow.horario.inicio, totalSelecionado.duracao);
-      setCalendarLink(link);
-      setFlow(prev => ({ ...prev, step: 5 }));
-    } catch (e) {
-      const title = getMsg('schedule_create_error_title', 'Erro ao agendar');
-      const body = `${getMsg('schedule_create_error_body', 'Erro ao criar agendamento:')} ${e?.message || ''}`;
-      openAlert({ title, body, buttonText: getMsg('common_ok', 'ENTENDI') });
-    } finally { setEnviando(false); }
-  };
+  // ── avaliação ─────────────────────────────────────────────────────────────
 
   const abrirAvaliar = async () => {
     if (!user) {
       const ok = await confirmKey('review_need_login_confirm', 'Login necessário', 'Você precisa fazer login para avaliar. Deseja fazer login agora?', 'IR PARA LOGIN', 'MAIS TARDE');
-      if (ok) navigate('/login'); return;
+      if (ok) navigate('/login');
+      return;
     }
     if (userType !== 'client') { alertKey('review_only_client', 'Ação restrita', 'Apenas CLIENTE pode avaliar.', 'ENTENDI'); return; }
     setAvaliarNota(5); setAvaliarTexto(''); setAvaliarTipo('negocio'); setAvaliarProfissionalId(null); setShowAvaliar(true);
@@ -707,22 +507,57 @@ export default function Vitrine({ user, userType }) {
     if (!negocio?.id) { alertKey('review_invalid_business', 'Negócio inválido', 'Negócio inválido.', 'ENTENDI'); return; }
     try {
       setAvaliarLoading(true);
-      const payload = { cliente_id: user.id, tipo: avaliarTipo, nota: avaliarNota, comentario: avaliarTexto || null, negocio_id: avaliarTipo === 'negocio' ? negocio.id : null, profissional_id: avaliarTipo === 'profissional' ? avaliarProfissionalId : null };
+      const payload = {
+        cliente_id:       user.id,
+        tipo:             avaliarTipo,
+        nota:             avaliarNota,
+        comentario:       avaliarTexto || null,
+        negocio_id:       avaliarTipo === 'negocio'       ? negocio.id           : null,
+        profissional_id:  avaliarTipo === 'profissional'  ? avaliarProfissionalId : null,
+      };
       const { error: avErr } = await withTimeout(supabase.from('depoimentos').insert(payload), 7000, 'enviar-avaliacao');
       if (avErr) throw avErr;
       setShowAvaliar(false);
       await loadVitrine();
       alertKey('review_sent', 'Avaliação enviada', 'Avaliação enviada!', 'OK');
     } catch (e) {
-      const title = getMsg('review_send_error_title', 'Erro ao avaliar');
-      const body = `${getMsg('review_send_error_body', 'Erro ao enviar avaliação:')} ${e?.message || ''}`;
-      openAlert({ title, body, buttonText: getMsg('common_ok', 'ENTENDI') });
+      openAlert({ title: getMsg('review_send_error_title', 'Erro ao avaliar'), body: `${getMsg('review_send_error_body', 'Erro ao enviar avaliação:')} ${e?.message || ''}`, buttonText: getMsg('common_ok', 'ENTENDI') });
     } finally { setAvaliarLoading(false); }
   };
 
-  const logoUrl = useMemo(() => getPublicUrl('logos', negocio?.logo_path), [negocio?.logo_path]);
-  const instagramUrl = useMemo(() => resolveInstagram(negocio?.instagram), [negocio?.instagram]);
-  const facebookUrl = useMemo(() => resolveFacebook(negocio?.facebook), [negocio?.facebook]);
+  // ── memos de URL e maps ───────────────────────────────────────────────────
+
+  const logoUrl      = useMemo(() => getPublicUrl('logos',    negocio?.logo_path),  [negocio?.logo_path]);
+  const instagramUrl = useMemo(() => resolveInstagram(negocio?.instagram),          [negocio?.instagram]);
+  const facebookUrl  = useMemo(() => resolveFacebook(negocio?.facebook),            [negocio?.facebook]);
+
+  const getAlmocoRange = (p) => ({ ini: p?.almoco_inicio || null, fim: p?.almoco_fim || null });
+
+  const isInLunchNow = (p) => {
+    const { ini, fim } = getAlmocoRange(p);
+    if (!ini || !fim) return false;
+    const now = getNowSP();
+    const a = timeToMinutes(ini), b = timeToMinutes(fim);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+    if (b < a) return (now.minutes >= a || now.minutes < b);
+    return (now.minutes >= a && now.minutes < b);
+  };
+
+  const getProfStatus = (p) => {
+    const ativo = (p?.ativo === undefined) ? true : !!p.ativo;
+    if (!ativo) return { label: 'FECHADO', color: 'bg-red-500' };
+    const now = getNowSP();
+    const ini = timeToMinutes(p?.horario_inicio || '08:00');
+    const fim = timeToMinutes(p?.horario_fim    || '18:00');
+    const dias = normalizeDiasTrabalho(p?.dias_trabalho);
+    const diasEfetivos = dias.length ? dias : [0, 1, 2, 3, 4, 5, 6];
+    const hojeDow = getDowFromDateSP(now.date);
+    const trabalhaHoje = hojeDow == null ? true : diasEfetivos.includes(hojeDow);
+    const dentroHorario = now.minutes >= ini && now.minutes < fim;
+    if (!(trabalhaHoje && dentroHorario)) return { label: 'FECHADO', color: 'bg-red-500' };
+    if (isInLunchNow(p)) return { label: 'ALMOÇO', color: 'bg-yellow-400' };
+    return { label: 'ABERTO', color: 'bg-green-500' };
+  };
 
   const entregasPorProf = useMemo(() => {
     const map = new Map();
@@ -749,6 +584,8 @@ export default function Vitrine({ user, userType }) {
     }
     return medias;
   }, [avaliacoes]);
+
+  // ── loading / error / not found ───────────────────────────────────────────
 
   if (loading) return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -783,44 +620,14 @@ export default function Vitrine({ user, userType }) {
   const nomeNegocioLabel = String(negocio?.nome || '').trim() || 'NEGÓCIO';
   const temaAtivo = negocio?.tema || 'dark';
 
-  const renderSlotButton = (h, i, prefix) => {
-    const isCancel = !!h.isRaio;
-    const disabled = !h.cabe;
-    return (
-      <button
-        key={`${prefix}-${i}`}
-        disabled={disabled}
-        onClick={() => {
-          if (!h.cabe) {
-            const maxServico = Math.max(0, Number(h.maxMinutos || 0) - FOLGA_MINUTOS);
-            const bizMsgs = bizV?.[businessGroup];
-            const title = getMsg('schedule_not_enough_time_title', 'Horário insuficiente');
-            const body =
-              `${bizMsgs?.schedule_not_enough_time_sad || ':( Esse horário é insuficiente para os itens selecionados.'}\n\n` +
-              `${getMsg('schedule_not_enough_time_free', 'Tempo disponível')}: ${h.maxMinutos} MIN\n` +
-              `${bizMsgs?.schedule_not_enough_time_need || 'Seu agendamento (itens + folga)'}: ${h.precisaMinutos} MIN\n\n` +
-              `${getMsg('schedule_not_enough_time_fit', 'Cabe no máximo')}: ${maxServico} MIN ${bizMsgs?.schedule_not_enough_time_services || 'de itens'}.\n` +
-              `${bizMsgs?.schedule_not_enough_time_hint || 'Escolha outro horário ou ajuste os itens.'}`;
-            openAlert({ title, body, buttonText: getMsg('common_ok', 'ENTENDI') });
-            return;
-          }
-          setFlow(prev => ({ ...prev, horario: h, step: 4 }));
-        }}
-        className={`relative p-3 rounded-custom transition-all bg-dark-200 border uppercase font-normal ${
-          disabled ? 'border-gray-800 opacity-60 cursor-not-allowed' : 'border-gray-800 hover:border-primary'
-        }`}
-      >
-        {isCancel && <Zap className="w-4 h-4 text-primary absolute top-1 right-1" />}
-        <div className="text-lg normal-case">{h.hora}</div>
-        <div className="text-[10px] text-gray-500 normal-case">ATÉ {h.maxMinutos} MIN</div>
-      </button>
-    );
-  };
+  const modalAberto = flow.step !== 0;
+
+  // ── render ────────────────────────────────────────────────────────────────
 
   return (
     <div className={`min-h-screen bg-vbg text-vtext${temaAtivo === 'light' ? ' vitrine-light' : ''}`}>
-      <AlertModal open={nativeAlertOpen} onClose={closeAlert} title={nativeAlertData.title} body={nativeAlertData.body} buttonText={nativeAlertData.buttonText} />
-      <ConfirmModal open={nativeConfirmOpen} title={nativeConfirmData.title} body={nativeConfirmData.body} confirmText={nativeConfirmData.confirmText} cancelText={nativeConfirmData.cancelText} onCancel={() => closeConfirm(false)} onConfirm={() => closeConfirm(true)} />
+      <AlertModal  open={nativeAlertOpen}   onClose={closeAlert}          title={nativeAlertData.title}   body={nativeAlertData.body}   buttonText={nativeAlertData.buttonText} />
+      <ConfirmModal open={nativeConfirmOpen} onCancel={() => closeConfirm(false)} onConfirm={() => closeConfirm(true)} title={nativeConfirmData.title} body={nativeConfirmData.body} confirmText={nativeConfirmData.confirmText} cancelText={nativeConfirmData.cancelText} />
 
       {/* ─── Barra de anúncio ─────────────────────────────────────────────── */}
       <div className="bg-primary overflow-hidden relative h-10 flex items-center">
@@ -953,7 +760,7 @@ export default function Vitrine({ user, userType }) {
                           <span className="inline-block px-2 py-1 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase whitespace-nowrap">{profissao}</span>
                         )}
                       </div>
-                      {avalInfo && avalInfo.media && (
+                      {avalInfo?.media && (
                         <div className="flex items-center gap-2 mb-1">
                           <StarChar size={16} className="text-primary" />
                           <span className="text-lg font-normal text-primary">{avalInfo.media}</span>
@@ -975,13 +782,15 @@ export default function Vitrine({ user, userType }) {
                           Almoço: <span className="text-vsub">{String(almIni).slice(0, 5)} - {String(almFim).slice(0, 5)}</span>
                         </p>
                       )}
-                      <p className="text-xs text-vmuted font-normal mt-2">{totalEntregas} {totalEntregas === 1 ? counterSingular : counterPlural} disponíve{totalEntregas === 1 ? 'l' : 'is'}</p>
+                      <p className="text-xs text-vmuted font-normal mt-2">
+                        {totalEntregas} {totalEntregas === 1 ? counterSingular : counterPlural} disponíve{totalEntregas === 1 ? 'l' : 'is'}
+                      </p>
                     </div>
                   </div>
                   <button
                     onClick={() => iniciarAgendamento(prof)}
-                    className={`w-full py-3 rounded-button hover:shadow-lg transition-all flex items-center justify-center gap-2 uppercase font-normal ${isProfessional ? 'bg-vcard2 border border-vborder text-vmuted cursor-not-allowed' : 'bg-gradient-to-r from-primary to-yellow-600 text-black'}`}
                     disabled={!!isProfessional}
+                    className={`w-full py-3 rounded-button hover:shadow-lg transition-all flex items-center justify-center gap-2 uppercase font-normal ${isProfessional ? 'bg-vcard2 border border-vborder text-vmuted cursor-not-allowed' : 'bg-gradient-to-r from-primary to-yellow-600 text-black'}`}
                   >
                     <Calendar className="w-5 h-5" />{btnAgendarLabel}
                   </button>
@@ -1002,23 +811,22 @@ export default function Vitrine({ user, userType }) {
         ) : (
           <div className="space-y-px">
             {profissionais.map(p => {
-                const lista = (entregasPorProf.get(p.id) || [])
-                  .slice()
-                  .sort((a, b) => {
-                    const pa = Number(getPrecoFinalServico(a) ?? 0);
-                    const pb = Number(getPrecoFinalServico(b) ?? 0);
-                    if (pb !== pa) return pb - pa;
-                    return String(a.nome || '').localeCompare(String(b.nome || ''));
-                  });
-                return (
-                  <div key={p.id} className="bg-vcard border-t border-b border-vborder w-full px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="max-w-7xl mx-auto">
+              const lista = (entregasPorProf.get(p.id) || [])
+                .slice()
+                .sort((a, b) => {
+                  const pa = Number(getPrecoFinalServico(a) ?? 0);
+                  const pb = Number(getPrecoFinalServico(b) ?? 0);
+                  if (pb !== pa) return pb - pa;
+                  return String(a.nome || '').localeCompare(String(b.nome || ''));
+                });
+              return (
+                <div key={p.id} className="bg-vcard border-t border-b border-vborder w-full px-4 sm:px-6 lg:px-8 py-6">
+                  <div className="max-w-7xl mx-auto">
                     <div className="flex items-center justify-between mb-4">
                       <div className="font-normal text-lg">{p.nome}</div>
                       <div className="text-xs text-vmuted font-normal">{lista.length} {lista.length === 1 ? counterSingular : counterPlural}</div>
                     </div>
                     {lista.length ? (
-
                       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                         {lista.map(s => {
                           const preco = Number(s.preco ?? 0);
@@ -1051,10 +859,10 @@ export default function Vitrine({ user, userType }) {
                     ) : (
                       <p className="text-vmuted font-normal">{emptyListMsg}</p>
                     )}
-                    </div>
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
           </div>
         )}
       </section>
@@ -1124,180 +932,130 @@ export default function Vitrine({ user, userType }) {
         </div>
       </section>
 
-      {/* ─── Modal Agendamento ────────────────────────────────────────────── */}
-      {showAgendamento && (
+      {/* ═══════════════════════════════════════════════════════════════════
+          MODAL DE AGENDAMENTO
+          step 2  = selecionar serviços
+          step 'booking' = BookingCalendar (renderizado fora do modal)
+          step 5  = sucesso
+      ═══════════════════════════════════════════════════════════════════ */}
+
+      {/* ── step 2: selecionar serviços ── */}
+      {flow.step === 2 && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 z-30 bg-dark-100 border-b border-gray-800 p-6 flex justify-between items-center">
               <h2 className="text-2xl font-normal text-white">AGENDAR COM {flow.profissional?.nome}</h2>
-              <button onClick={() => setShowAgendamento(false)} className="text-gray-400 hover:text-white"><X className="w-6 h-6" /></button>
+              <button onClick={() => setFlow(prev => ({ ...prev, step: 0 }))} className="text-gray-400 hover:text-white"><X className="w-6 h-6" /></button>
             </div>
-            <div className="p-6 relative z-0">
+            <div className="p-6">
+              <h3 className="text-xl font-normal mb-2 text-white">Selecione {sectionTitle}</h3>
 
-              {flow.step === 1 && (
-                <div>
-                  <h3 className="text-xl font-normal mb-4 text-white">ESCOLHA A DATA</h3>
-                  <DatePickerButton value={flow.data} min={minDateSP} placeholder="Selecionar data" onChange={(e) => setFlow(prev => ({ ...prev, data: e.target.value }))} />
-                  {flow.data && !diaSelecionadoEhTrabalho && (
-                    <div className="mt-3 bg-red-500/10 border border-red-500/30 rounded-custom p-3 text-red-300 text-sm font-normal">
-                      Este profissional está <b>FECHADO</b> nessa data. Escolha outro dia.
-                    </div>
-                  )}
-                  <button
-                    onClick={() => {
-                      if (!flow.data) { alertKey('schedule_pick_date', 'Selecione uma data', 'Selecione uma data.', 'ENTENDI'); return; }
-                      if (!diaSelecionadoEhTrabalho) { alertKey('schedule_closed_day', 'Profissional fechado', 'Esse profissional está FECHADO nesse dia. Escolha outra data.', 'ENTENDI'); return; }
-                      setFlow(prev => ({ ...prev, step: 2, horario: null, servicosSelecionados: [] }));
-                    }}
-                    className={`mt-4 w-full py-3 rounded-button uppercase font-normal ${(!flow.data || !diaSelecionadoEhTrabalho) ? 'bg-dark-200 border border-gray-800 text-gray-500 cursor-not-allowed' : 'bg-gradient-to-r from-primary to-yellow-600 text-black'}`}
-                    disabled={!flow.data || !diaSelecionadoEhTrabalho}
-                  >
-                    CONTINUAR
-                  </button>
-                </div>
-              )}
+              {/* resumo da seleção */}
+              <div className="mb-4 bg-dark-200 border border-gray-800 rounded-custom p-4">
+                <div className="flex justify-between text-sm"><span className="text-gray-500 font-normal">SELECIONADOS:</span><span className="font-normal text-white">{totalSelecionado.qtd}</span></div>
+                <div className="flex justify-between text-sm mt-1"><span className="text-gray-500 font-normal">TEMPO ESTIMADO:</span><span className="font-normal text-gray-200">{totalSelecionado.duracao} MIN</span></div>
+                <div className="flex justify-between text-sm mt-1"><span className="text-gray-500 font-normal">FOLGA:</span><span className="font-normal text-gray-200">{totalSelecionado.duracao ? FOLGA_MINUTOS : 0} MIN</span></div>
+                <div className="flex justify-between text-sm mt-1"><span className="text-gray-500 font-normal">TEMPO TOTAL:</span><span className="font-normal text-primary">{duracaoTotalComFolga || 0} MIN</span></div>
+                <div className="flex justify-between text-sm mt-1"><span className="text-gray-500 font-normal">VALOR TOTAL:</span><span className="font-normal text-primary">R$ {totalSelecionado.valor.toFixed(2)}</span></div>
+              </div>
 
-              {flow.step === 2 && (
-                <div>
-                  <button onClick={() => setFlow(prev => ({ ...prev, step: 1, servicosSelecionados: [], horario: null }))} className="text-primary mb-4 uppercase font-normal">VOLTAR</button>
-                  <h3 className="text-xl font-normal mb-2 text-white">Selecione {sectionTitle}</h3>
-                  <div className="mb-4 bg-dark-200 border border-gray-800 rounded-custom p-4">
-                    <div className="flex justify-between text-sm"><span className="text-gray-500 font-normal">SELECIONADOS:</span><span className="font-normal text-white">{totalSelecionado.qtd}</span></div>
-                    <div className="flex justify-between text-sm mt-1"><span className="text-gray-500 font-normal">TEMPO ESTIMADO:</span><span className="font-normal text-gray-200">{totalSelecionado.duracao} MIN</span></div>
-                    <div className="flex justify-between text-sm mt-1"><span className="text-gray-500 font-normal">FOLGA:</span><span className="font-normal text-gray-200">{totalSelecionado.duracao ? FOLGA_MINUTOS : 0} MIN</span></div>
-                    <div className="flex justify-between text-sm mt-1"><span className="text-gray-500 font-normal">TEMPO TOTAL:</span><span className="font-normal text-primary">{duracaoTotalComFolga || 0} MIN</span></div>
-                    <div className="flex justify-between text-sm mt-1"><span className="text-gray-500 font-normal">VALOR TOTAL:</span><span className="font-normal text-primary">R$ {totalSelecionado.valor.toFixed(2)}</span></div>
-                  </div>
-                  {entregasPossiveis.length > 0 ? (
-                    <div className="space-y-3">
-                      {entregasPossiveis.map(s => {
-                        const selected = (flow.servicosSelecionados || []).some(x => x.id === s.id);
-                        const precoFinal = getPrecoFinalServico(s);
-                        return (
-                          <button key={s.id} onClick={() => { const cur = Array.isArray(flow.servicosSelecionados) ? [...flow.servicosSelecionados] : []; const next = selected ? cur.filter(x => x.id !== s.id) : [...cur, s]; setFlow(prev => ({ ...prev, servicosSelecionados: next })); }} className={`w-full rounded-custom p-4 transition-all text-left border-2 ${selected ? 'bg-primary/10 border-primary' : 'bg-dark-200 border-gray-800 hover:border-primary/50'}`}>
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <p className="font-normal text-white">{s.nome}</p>
-                                <p className="text-sm text-gray-500 font-normal"><Clock className="w-4 h-4 inline mr-1" />{s.duracao_minutos} MIN</p>
-                              </div>
-                              <div className="text-2xl font-normal text-primary">R$ {precoFinal.toFixed(2)}</div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : <div className="text-gray-500 font-normal">Nenhum {counterSingular} disponível.</div>}
-                  <button
-                    onClick={() => {
-                      if (!flow.servicosSelecionados?.length) {
-                        const needOneMsg = bizV?.[businessGroup]?.schedule_need_one_service;
-                        if (needOneMsg) openAlert({ title: needOneMsg.title, body: needOneMsg.body, buttonText: needOneMsg.buttonText || 'ENTENDI' });
-                        else alertKey('schedule_need_one_service', 'Selecione um item', 'Selecione pelo menos 1 item.', 'ENTENDI');
-                        return;
-                      }
-                      setFlow(prev => ({ ...prev, step: 3, horario: null }));
-                    }}
-                    className={`mt-4 w-full py-3 rounded-button uppercase font-normal ${flow.servicosSelecionados?.length ? 'bg-gradient-to-r from-primary to-yellow-600 text-black' : 'bg-dark-200 border border-gray-800 text-gray-500 cursor-not-allowed'}`}
-                    disabled={!flow.servicosSelecionados?.length}
-                  >
-                    Continuar
-                  </button>
-                </div>
-              )}
-
-              {flow.step === 3 && (
-                <div>
-                  <button onClick={() => setFlow(prev => ({ ...prev, step: 2, horario: null }))} className="text-primary mb-4 font-normal uppercase">Voltar</button>
-                  <h3 className="text-xl font-normal mb-4 text-white">ESCOLHA O HORÁRIO</h3>
-                  {!diaSelecionadoEhTrabalho ? (
-                    <p className="text-gray-500 font-normal">Esse profissional está fechado nessa data.</p>
-                  ) : horariosHot.length > 0 ? (
-                    <div className="bg-dark-200 border border-gray-800 rounded-custom p-4">
-                      <div className="flex items-start justify-between gap-3 mb-4">
-                        <div>
-                          <div className="text-xs text-gray-500 font-normal uppercase mb-1">HORÁRIOS INTELIGENTES</div>
-                          <div className="text-sm text-gray-200 font-normal">Lista priorizada pelo sistema.</div>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">{horariosHot.map((h, i) => renderSlotButton(h, i, 'hot'))}</div>
-                      {horariosAll.length > 0 && (
-                        <>
-                          <button type="button" onClick={() => setShowAllSlots(v => !v)} className="w-full mt-4 px-4 py-3 rounded-button border bg-dark-100 border-gray-800 text-gray-200 uppercase font-normal">
-                            {showAllSlots ? 'OCULTAR HORÁRIOS' : 'VER MAIS HORÁRIOS'}
-                          </button>
-                          {showAllSlots && (
-                            <div className="mt-4">
-                              <div className="text-xs text-gray-500 font-normal uppercase mb-3">TODOS OS HORÁRIOS</div>
-                              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">{horariosAll.map((h, i) => renderSlotButton(h, i, 'all'))}</div>
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="bg-dark-200 border border-gray-800 rounded-custom p-4">
-                      <div className="flex items-start justify-between gap-3 mb-4">
-                        <div>
-                          <div className="text-xs text-gray-500 font-normal uppercase mb-1">HORÁRIOS DISPONÍVEIS</div>
-                          <div className="text-sm text-gray-200 font-normal">Lista completa de horários calculados pelo sistema.</div>
-                        </div>
-                      </div>
-                      {horariosAll.length > 0 ? (
-                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">{horariosAll.map((h, i) => renderSlotButton(h, i, 'all'))}</div>
-                      ) : (
-                        <div className="flex items-center justify-center bg-yellow-500/10 border border-yellow-500/30 rounded-button p-3 text-yellow-300 text-sm font-normal text-center">
-                          Nenhum horario disponivel nessa data :(
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {flow.step === 4 && (
-                <div>
-                  <h3 className="text-xl font-normal mb-4 text-white">CONFIRMAR AGENDAMENTO</h3>
-                  <div className="bg-dark-200 rounded-custom p-4 space-y-3 mb-6">
-                    <div className="flex justify-between"><span className="text-gray-500 font-normal">PROFISSIONAL:</span><span className="font-normal text-white">{flow.profissional?.nome}</span></div>
-                    <div className="flex justify-between"><span className="text-gray-500 font-normal">DATA:</span><span className="font-normal text-white">{formatDateBR(flow.data)}</span></div>
-                    <div className="flex justify-between"><span className="text-gray-500 font-normal">HORÁRIO:</span><span className="font-normal text-white">{flow.horario?.hora}</span></div>
-                    <div className="pt-2 border-t border-gray-800">
-                      <div className="text-gray-500 font-normal text-sm mb-2">SERVIÇOS:</div>
-                      <div className="space-y-1">
-                        {(flow.servicosSelecionados || []).map(s => (
-                          <div key={s.id} className="flex justify-between text-sm">
-                            <span className="font-normal text-gray-200">{s.nome}</span>
-                            <span className="text-gray-400 font-normal">{s.duracao_minutos} MIN • R$ {getPrecoFinalServico(s).toFixed(2)}</span>
+              {/* lista de serviços */}
+              {entregasPossiveis.length > 0 ? (
+                <div className="space-y-3">
+                  {entregasPossiveis.map(s => {
+                    const selected = (flow.servicosSelecionados || []).some(x => x.id === s.id);
+                    const precoFinal = getPrecoFinalServico(s);
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => {
+                          const cur = Array.isArray(flow.servicosSelecionados) ? [...flow.servicosSelecionados] : [];
+                          const next = selected ? cur.filter(x => x.id !== s.id) : [...cur, s];
+                          setFlow(prev => ({ ...prev, servicosSelecionados: next }));
+                        }}
+                        className={`w-full rounded-custom p-4 transition-all text-left border-2 ${selected ? 'bg-primary/10 border-primary' : 'bg-dark-200 border-gray-800 hover:border-primary/50'}`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="font-normal text-white">{s.nome}</p>
+                            <p className="text-sm text-gray-500 font-normal"><Clock className="w-4 h-4 inline mr-1" />{s.duracao_minutos} MIN</p>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex justify-between"><span className="text-gray-500 font-normal">TEMPO ESTIMADO:</span><span className="font-normal text-white">{totalSelecionado.duracao} MIN</span></div>
-                    <div className="flex justify-between"><span className="text-gray-500 font-normal">FOLGA:</span><span className="font-normal text-white">{FOLGA_MINUTOS} MIN</span></div>
-                    <div className="flex justify-between"><span className="text-gray-500 font-normal">TOTAL PARA ENCAIXE:</span><span className="font-normal text-primary">{duracaoTotalComFolga} MIN</span></div>
-                    <div className="flex justify-between"><span className="text-gray-500 font-normal">VALOR TOTAL:</span><span className="font-normal text-primary text-xl">R$ {totalSelecionado.valor.toFixed(2)}</span></div>
-                  </div>
-                  <div className="flex gap-3">
-                    <button onClick={() => setFlow(prev => ({ ...prev, step: 3 }))} className="flex-1 py-3 bg-dark-200 border border-gray-800 rounded-button uppercase font-normal text-white" disabled={enviando}>VOLTAR</button>
-                    <button onClick={confirmarAgendamento} disabled={enviando} className="flex-1 py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal disabled:opacity-60">
-                      {enviando ? 'ENVIANDO...' : 'CONFIRMAR'}
-                    </button>
-                  </div>
+                          <div className="text-2xl font-normal text-primary">R$ {precoFinal.toFixed(2)}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
+              ) : (
+                <div className="text-gray-500 font-normal">Nenhum {counterSingular} disponível.</div>
               )}
 
-              {flow.step === 5 && (
-                <div className="text-center py-6">
-                  <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Calendar className="w-10 h-10 text-green-400" />
-                  </div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">AGENDADO</h3>
-                  <p className="text-gray-400 font-normal mb-6">Salve um lembrete no seu celular para se lembrar.</p>
-                  <a href={calendarLink} target="_blank" rel="noreferrer" className="block w-full py-4 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal mb-3">ADICIONAR A MINHA AGENDA</a>
-                  <button onClick={() => { setShowAgendamento(false); navigate('/minha-area'); }} className="w-full py-3 bg-transparent border border-red-500 text-red-500 rounded-button uppercase font-normal hover:bg-red-500/10 transition-colors">PREFIRO ESQUECER</button>
-                </div>
-              )}
+              {/* botão continuar → abre BookingCalendar */}
+              <button
+                onClick={() => {
+                  if (!flow.servicosSelecionados?.length) {
+                    const needOneMsg = bizV?.[businessGroup]?.schedule_need_one_service;
+                    if (needOneMsg) openAlert({ title: needOneMsg.title, body: needOneMsg.body, buttonText: needOneMsg.buttonText || 'ENTENDI' });
+                    else alertKey('schedule_need_one_service', 'Selecione um item', 'Selecione pelo menos 1 item.', 'ENTENDI');
+                    return;
+                  }
+                  setFlow(prev => ({ ...prev, step: 'booking' }));
+                }}
+                disabled={!flow.servicosSelecionados?.length}
+                className={`mt-4 w-full py-3 rounded-button uppercase font-normal ${flow.servicosSelecionados?.length ? 'bg-gradient-to-r from-primary to-yellow-600 text-black' : 'bg-dark-200 border border-gray-800 text-gray-500 cursor-not-allowed'}`}
+              >
+                CONTINUAR — ESCOLHER DATA E HORÁRIO
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
+      {/* ── step 'booking': BookingCalendar ── */}
+      {flow.step === 'booking' && entregaVirtual && (
+        <BookingCalendar
+          profissional={flow.profissional}
+          entrega={entregaVirtual}
+          todayISO={todayISO}
+          negocioId={negocio.id}
+          clienteId={user?.id}
+          onConfirm={handleBookingConfirm}
+          onClose={() => setFlow(prev => ({ ...prev, step: 2 }))}
+        />
+      )}
+
+      {/* ── step 5: sucesso ── */}
+      {flow.step === 5 && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full">
+            <div className="p-8 text-center">
+              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-10 h-10 text-green-400" />
+              </div>
+              <h3 className="text-2xl font-normal mb-2 text-white">AGENDADO!</h3>
+              <p className="text-gray-400 font-normal mb-1">
+                {flow.lastSlot?.label && (
+                  <span className="text-primary font-normal">{flow.lastSlot.label}</span>
+                )}
+                {flow.lastSlot?.dataISO && (
+                  <span className="text-gray-400"> — {formatDateBR(flow.lastSlot.dataISO)}</span>
+                )}
+              </p>
+              <p className="text-gray-500 font-normal text-sm mb-6">Salve um lembrete no seu celular para não esquecer.</p>
+              <a
+                href={calendarLink}
+                target="_blank"
+                rel="noreferrer"
+                className="block w-full py-4 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal mb-3"
+              >
+                ADICIONAR À MINHA AGENDA
+              </a>
+              <button
+                onClick={() => { setFlow(prev => ({ ...prev, step: 0 })); navigate('/minha-area'); }}
+                className="w-full py-3 bg-transparent border border-red-500 text-red-500 rounded-button uppercase font-normal hover:bg-red-500/10 transition-colors"
+              >
+                PREFIRO ESQUECER
+              </button>
             </div>
           </div>
         </div>
