@@ -10,7 +10,6 @@ import {
   X,
   AlertCircle,
   Instagram,
-  Facebook,
 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { ptBR } from '../feedback/messages/ptBR';
@@ -80,6 +79,27 @@ function gerarLinkGoogle(titulo, dataInicioISO, duracaoMin) {
   const inicio = new Date(dataInicioISO);
   const fim = new Date(inicio.getTime() + duracaoMin * 60000);
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&dates=${fmt(inicio)}/${fmt(fim)}&details=Agendamento+confirmado+pelo+Comvaga&sf=true&output=xml`;
+}
+
+// ícone Facebook com traços finos — substitui o Lucide que é visualmente mais pesado
+function FacebookIcon({ className = '', size = 16 }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  );
 }
 
 function StarChar({ size = 18, className = 'text-primary' }) {
@@ -708,7 +728,7 @@ export default function Vitrine({ user, userType }) {
                 )}
                 {facebookUrl && (
                   <a href={facebookUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-primary hover:text-yellow-500 text-sm font-normal transition-colors" aria-label="Facebook">
-                    <Facebook className="w-4 h-4" strokeWidth={1.5} />clique :)
+                    <FacebookIcon className="w-4 h-4" />clique :)
                   </a>
                 )}
               </div>
