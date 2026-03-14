@@ -595,6 +595,59 @@ export const ptBR = {
     account_password_mismatch_inline: 'As senhas não conferem. Revise e tente novamente.',
     account_password_updated_inline: 'Senha atualizada com sucesso.',
     account_password_update_error_inline: 'Falha ao atualizar a senha. Tente novamente.',
+
+    // PARCEIROS
+    parceiro_selecione_prof: {
+      title: 'Selecione um profissional',
+      body: 'Escolha um profissional antes de salvar o e-mail.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
+    parceiro_email_invalid: {
+      title: 'E-mail inválido',
+      body: 'Informe um e-mail válido para continuar.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
+    parceiro_saved: {
+      title: 'E-mail salvo',
+      body: 'O e-mail do parceiro foi vinculado com sucesso.',
+      variant: 'success',
+      screen: 'light',
+      buttonText: 'OK',
+    },
+    parceiro_save_error: {
+      title: 'Erro ao salvar',
+      body: 'Houve um erro ao salvar o e-mail do parceiro. Tente novamente.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
+    parceiro_delete_confirm: {
+      title: 'Remover parceiro?',
+      body: 'Tem certeza que deseja remover o e-mail deste parceiro?',
+      variant: 'warning',
+      screen: 'dark',
+      confirmText: 'REMOVER',
+      cancelText: 'CANCELAR',
+      buttonText: 'REMOVER',
+    },
+    parceiro_deleted: {
+      title: 'Parceiro removido',
+      body: 'O e-mail do parceiro foi removido com sucesso.',
+      variant: 'success',
+      screen: 'light',
+      buttonText: 'OK',
+    },
+    parceiro_delete_error: {
+      title: 'Erro ao remover',
+      body: 'Houve um erro ao remover o e-mail do parceiro. Tente novamente.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
   },
 
   // =========================
