@@ -81,7 +81,7 @@ function gerarLinkGoogle(titulo, dataInicioISO, duracaoMin) {
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&dates=${fmt(inicio)}/${fmt(fim)}&details=Agendamento+confirmado+pelo+Comvaga&sf=true&output=xml`;
 }
 
-// ícone Facebook com traços finos — substitui o Lucide que é visualmente mais pesado
+// ícone Facebook com traços finos — strokeWidth 1 para paridade visual com Instagram
 function FacebookIcon({ className = '', size = 16 }) {
   return (
     <svg
@@ -91,7 +91,7 @@ function FacebookIcon({ className = '', size = 16 }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
@@ -845,29 +845,23 @@ export default function Vitrine({ user, userType }) {
                             <div key={s.id} className="bg-vcard2 border border-vborder rounded-custom p-4">
 
                               {temPromo ? (
-                                /*
-                                  Layout com oferta:
-                                  linha 1 → nome (esq)          OFERTA (dir)
-                                  linha 2 → —                   R$ 120,00 riscado (dir)
-                                  linha 3 → 30 MIN (esq)        R$ 89,90 verde (dir)
-                                */
-                                <div className="flex justify-between items-start gap-3">
-                                  {/* coluna esquerda: nome + duração */}
-                                  <div className="flex flex-col justify-between min-h-[4rem]">
+                                /* layout com oferta:
+                                   linha 1 → nome (esq)       OFERTA (dir)
+                                   linha 2 → 🕐 30 MIN (esq)  R$ 89,90 verde (dir) */
+                                <>
+                                  <div className="flex items-start justify-between gap-3">
                                     <div className="font-normal text-sm leading-tight">{s.nome}</div>
-                                    <div className="flex items-center gap-1 mt-auto pt-2 text-xs text-vmuted font-normal">
-                                      <Clock className="w-3 h-3 shrink-0" />{s.duracao_minutos} MIN
-                                    </div>
-                                  </div>
-                                  {/* coluna direita: etiqueta + riscado + final */}
-                                  <div className="flex flex-col items-end shrink-0 gap-2">
-                                    <span className="inline-block px-1.5 py-0.5 bg-green-500/20 border border-green-500/40 rounded-button text-[9px] text-green-400 font-normal uppercase">
+                                    <span className="inline-block px-1.5 py-0.5 bg-green-500/20 border border-green-500/40 rounded-button text-[9px] text-green-400 font-normal uppercase shrink-0">
                                       OFERTA
                                     </span>
-                                    <div className="text-red-400 text-xs font-normal line-through leading-tight">R$ {preco.toFixed(2)}</div>
-                                    <div className="text-green-400 font-normal text-base leading-snug">R$ {precoFinal.toFixed(2)}</div>
                                   </div>
-                                </div>
+                                  <div className="flex items-center justify-between gap-3 mt-3">
+                                    <div className="flex items-center gap-1 text-xs text-vmuted font-normal">
+                                      <Clock className="w-3 h-3 shrink-0" />{s.duracao_minutos} MIN
+                                    </div>
+                                    <div className="text-green-400 font-normal text-base shrink-0">R$ {precoFinal.toFixed(2)}</div>
+                                  </div>
+                                </>
                               ) : (
                                 /* layout normal: nome à esquerda, preço à direita, duração na base */
                                 <>
