@@ -10,18 +10,10 @@
  *
  * O componente NÃO usa o horário do device do usuário para nada.
  * Toda referência de "hoje" vem do serverNow do banco (America/Sao_Paulo).
- *
- * Uso no Dashboard — exemplo:
- *
- *   <DatePicker
- *     value={historicoData}
- *     onChange={(iso) => setHistoricoData(iso)}
- *     todayISO={hoje}
- *   />
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -38,12 +30,12 @@ function toISO(year, month, day) {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-/** Formata "YYYY-MM-DD" → "DD/MM/YYYY" para exibição */
+/** Formata "YYYY-MM-DD" → "DD.MM.YYYY" para exibição na pílula */
 function formatDisplay(iso) {
   if (!iso) return null;
   const p = parseISO(iso);
   if (!p) return null;
-  return `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}`;
+  return `${String(p.day).padStart(2, '0')}.${String(p.month).padStart(2, '0')}.${p.year}`;
 }
 
 /** Quantos dias tem o mês */
@@ -56,27 +48,21 @@ function firstDayOfMonth(year, month) {
   return new Date(year, month - 1, 1).getDay();
 }
 
-const MONTH_NAMES = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
-];
-
-const WEEKDAY_LABELS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+const MONTH_NAMES   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const WEEKDAY_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
 // ─── componente ──────────────────────────────────────────────────────────────
 
 export default function DatePicker({ value, onChange, todayISO }) {
-  const today = parseISO(todayISO);   // âncora vinda do banco (now_sp)
+  const today    = parseISO(todayISO);
   const selected = parseISO(value);
 
-  // mês visível no calendário — inicia no mês do valor selecionado,
-  // ou no mês de hoje (pelo banco), ou no mês atual do JS como fallback
   const initYear  = selected?.year  ?? today?.year  ?? new Date().getFullYear();
   const initMonth = selected?.month ?? today?.month ?? (new Date().getMonth() + 1);
 
   const [viewYear,  setViewYear]  = useState(initYear);
   const [viewMonth, setViewMonth] = useState(initMonth);
-  const [open, setOpen] = useState(false);
+  const [open,      setOpen]      = useState(false);
 
   const containerRef = useRef(null);
 
@@ -111,69 +97,65 @@ export default function DatePicker({ value, onChange, todayISO }) {
   }
 
   function selectDay(day) {
-    const iso = toISO(viewYear, viewMonth, day);
-    onChange(iso);
+    onChange(toISO(viewYear, viewMonth, day));
     setOpen(false);
   }
 
-  // Monta a grade do calendário
-  const totalDays  = daysInMonth(viewYear, viewMonth);
-  const startDow   = firstDayOfMonth(viewYear, viewMonth); // 0–6
-  const cells = [];
-
-  // células vazias antes do dia 1
-  for (let i = 0; i < startDow; i++) cells.push(null);
-  // dias do mês
-  for (let d = 1; d <= totalDays; d++) cells.push(d);
+  // Grade do calendário
+  const totalDays = daysInMonth(viewYear, viewMonth);
+  const startDow  = firstDayOfMonth(viewYear, viewMonth);
+  const cells     = [...Array(startDow).fill(null), ...Array.from({ length: totalDays }, (_, i) => i + 1)];
 
   const displayValue = formatDisplay(value);
 
   return (
     <div className="relative inline-block" ref={containerRef}>
-      {/* botão disparador */}
+
+      {/* ── pílula disparadora ── */}
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-2 px-3 py-2 bg-dark-200 border border-gray-800 rounded-button text-white text-sm cursor-pointer hover:border-primary/50 focus:border-primary/50 focus:outline-none transition-colors min-w-[140px]"
+        className="flex items-center gap-2 px-3 py-1.5 bg-dark-200 border border-gray-800 rounded-full text-sm font-normal text-white hover:border-primary/50 focus:border-primary/50 focus:outline-none transition-colors"
       >
-        <CalendarDays className="w-4 h-4 text-gray-400 shrink-0" />
-        <span className="flex-1 text-center">
+        {/* bolinha amarela (cor primary do app) */}
+        <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+        <span className="text-white">
           {displayValue ?? <span className="text-gray-500">Selecionar</span>}
         </span>
       </button>
 
-      {/* popover do calendário */}
+      {/* ── popover calendário — mesmo design do BookingCalendar ── */}
       {open && (
-        <div className="absolute right-0 mt-2 z-50 bg-dark-100 border border-gray-700 rounded-custom shadow-2xl p-4 w-[280px]">
+        <div className="absolute right-0 mt-2 z-50 bg-dark-100 border border-gray-800 rounded-custom shadow-2xl p-5 w-[300px]">
 
-          {/* cabeçalho — mês e ano */}
-          <div className="flex items-center justify-between mb-3">
+          {/* navegação de mês */}
+          <div className="flex items-center justify-between mb-4">
             <button
               type="button"
               onClick={prevMonth}
-              className="p-1 rounded hover:bg-dark-200 text-gray-400 hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-dark-200 text-gray-400 hover:text-white transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
 
-            <span className="text-sm font-normal text-white uppercase tracking-wide">
+            <span className="text-sm font-normal text-white uppercase tracking-wide select-none">
               {MONTH_NAMES[viewMonth - 1]} {viewYear}
             </span>
 
             <button
               type="button"
               onClick={nextMonth}
-              className="p-1 rounded hover:bg-dark-200 text-gray-400 hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-dark-200 text-gray-400 hover:text-white transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* labels dos dias da semana */}
+          {/* labels dias da semana */}
           <div className="grid grid-cols-7 mb-1">
-            {WEEKDAY_LABELS.map((label, i) => (
-              <div key={i} className="text-center text-[10px] text-gray-500 uppercase py-1">
-                {label}
+            {WEEKDAY_SHORT.map((l, i) => (
+              <div key={i} className="text-center text-[10px] text-gray-500 uppercase py-1 select-none">
+                {l}
               </div>
             ))}
           </div>
@@ -181,9 +163,7 @@ export default function DatePicker({ value, onChange, todayISO }) {
           {/* grade de dias */}
           <div className="grid grid-cols-7 gap-y-1">
             {cells.map((day, i) => {
-              if (day === null) {
-                return <div key={`empty-${i}`} />;
-              }
+              if (day === null) return <div key={`e-${i}`} />;
 
               const isSelected = selected &&
                 selected.year  === viewYear &&
@@ -200,15 +180,14 @@ export default function DatePicker({ value, onChange, todayISO }) {
                   type="button"
                   key={day}
                   onClick={() => selectDay(day)}
-                  className={`
-                    h-8 w-full rounded text-sm font-normal transition-colors
-                    ${isSelected
+                  className={[
+                    'h-9 w-full flex items-center justify-center text-sm font-normal transition-colors select-none rounded-full',
+                    isSelected
                       ? 'bg-primary text-black'
-                      : isToday
-                        ? 'border border-primary/60 text-primary hover:bg-primary/20'
-                        : 'text-gray-300 hover:bg-dark-200 hover:text-white'
-                    }
-                  `}
+                      : isToday && !isSelected
+                        ? 'text-primary'
+                        : 'text-gray-300 hover:bg-dark-200 hover:text-white cursor-pointer',
+                  ].join(' ')}
                 >
                   {day}
                 </button>
@@ -216,9 +195,9 @@ export default function DatePicker({ value, onChange, todayISO }) {
             })}
           </div>
 
-          {/* rodapé — botão "Hoje" */}
+          {/* rodapé — botão HOJE */}
           {today && (
-            <div className="mt-3 pt-3 border-t border-gray-800">
+            <div className="mt-4">
               <button
                 type="button"
                 onClick={() => {
@@ -227,12 +206,13 @@ export default function DatePicker({ value, onChange, todayISO }) {
                   setViewMonth(today.month);
                   setOpen(false);
                 }}
-                className="w-full py-1.5 text-xs text-primary border border-primary/30 rounded-button hover:bg-primary/10 transition-colors uppercase font-normal"
+                className="w-full py-2 rounded-full border border-gray-700 bg-dark-200 text-gray-300 text-sm font-normal uppercase hover:border-gray-500 hover:text-white transition-colors"
               >
                 HOJE
               </button>
             </div>
           )}
+
         </div>
       )}
     </div>
