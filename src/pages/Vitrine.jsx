@@ -822,39 +822,44 @@ export default function Vitrine({ user, userType }) {
                           const temPromo = Number.isFinite(promo) && promo > 0 && promo < preco;
                           const precoFinal = getPrecoFinalServico(s);
                           return (
-                            <div key={s.id} className="relative bg-vcard2 border border-vborder rounded-custom p-4">
-
-                              {/* etiqueta OFERTA — canto superior direito, sempre fixa */}
-                              {temPromo && (
-                                <span className="absolute top-2 right-2 inline-block px-1.5 py-0.5 bg-green-500/20 border border-green-500/40 rounded-button text-[9px] text-green-400 font-normal uppercase">
-                                  OFERTA
-                                </span>
-                              )}
+                            <div key={s.id} className="bg-vcard2 border border-vborder rounded-custom p-4">
 
                               {temPromo ? (
-                                /* layout com oferta:
-                                   - nome à esquerda com pt-5 para descer abaixo da etiqueta OFERTA
-                                   - preços empilhados à direita: riscado acima, verde abaixo
-                                     pt-6 para alinhar os preços abaixo da etiqueta */
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="font-normal text-sm leading-tight pt-5">{s.nome}</div>
-                                  <div className="flex flex-col items-end shrink-0 pt-6">
+                                /*
+                                  Layout com oferta:
+                                  linha 1 → nome (esq)          OFERTA (dir)
+                                  linha 2 → —                   R$ 120,00 riscado (dir)
+                                  linha 3 → 30 MIN (esq)        R$ 89,90 verde (dir)
+                                */
+                                <div className="flex justify-between items-start gap-3">
+                                  {/* coluna esquerda: nome + duração */}
+                                  <div className="flex flex-col justify-between min-h-[4rem]">
+                                    <div className="font-normal text-sm leading-tight">{s.nome}</div>
+                                    <div className="flex items-center gap-1 mt-auto pt-2 text-xs text-vmuted font-normal">
+                                      <Clock className="w-3 h-3 shrink-0" />{s.duracao_minutos} MIN
+                                    </div>
+                                  </div>
+                                  {/* coluna direita: etiqueta + riscado + final */}
+                                  <div className="flex flex-col items-end shrink-0 gap-0.5">
+                                    <span className="inline-block px-1.5 py-0.5 bg-green-500/20 border border-green-500/40 rounded-button text-[9px] text-green-400 font-normal uppercase">
+                                      OFERTA
+                                    </span>
                                     <div className="text-red-400 text-xs font-normal line-through leading-tight">R$ {preco.toFixed(2)}</div>
-                                    <div className="text-green-400 font-normal text-base leading-tight">R$ {precoFinal.toFixed(2)}</div>
+                                    <div className="text-green-400 font-normal text-base leading-snug">R$ {precoFinal.toFixed(2)}</div>
                                   </div>
                                 </div>
                               ) : (
-                                /* layout normal: nome à esquerda, preço à direita */
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="font-normal text-sm leading-tight">{s.nome}</div>
-                                  <div className="text-primary font-normal text-base shrink-0">R$ {precoFinal.toFixed(2)}</div>
-                                </div>
+                                /* layout normal: nome à esquerda, preço à direita, duração na base */
+                                <>
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="font-normal text-sm leading-tight">{s.nome}</div>
+                                    <div className="text-primary font-normal text-base shrink-0">R$ {precoFinal.toFixed(2)}</div>
+                                  </div>
+                                  <div className="flex items-center gap-1 mt-3 text-xs text-vmuted font-normal">
+                                    <Clock className="w-3 h-3 shrink-0" />{s.duracao_minutos} MIN
+                                  </div>
+                                </>
                               )}
-
-                              {/* duração — sempre na base */}
-                              <div className="flex items-center gap-1 mt-3 text-xs text-vmuted font-normal">
-                                <Clock className="w-3 h-3 shrink-0" />{s.duracao_minutos} MIN
-                              </div>
 
                             </div>
                           );
