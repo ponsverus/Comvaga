@@ -10,7 +10,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
-
     session_invalid: {
       title: 'Falha no acesso',
       body: 'Faça login novamente.',
@@ -18,7 +17,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     business_not_loaded: {
       title: 'Falha ao ler os dados do negócio',
       body: 'Recarregue a página e tente novamente.',
@@ -171,58 +169,7 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    // SERVIÇOS (estático — mantido como fallback e para barbearia/salão)
-    service_created: {
-      title: 'Serviço criado',
-      body: 'O novo serviço já está disponível para agendamento.',
-      variant: 'success',
-      screen: 'light',
-      buttonText: 'OK',
-    },
-    service_updated: {
-      title: 'Serviço atualizado',
-      body: 'Os ajustes foram salvos com sucesso.',
-      variant: 'success',
-      screen: 'light',
-      buttonText: 'OK',
-    },
-    service_create_error: {
-      title: 'Erro ao criar',
-      body: 'Ocorreu uma falha ao criar este serviço. Tente novamente.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
-    service_update_error: {
-      title: 'Erro ao salvar',
-      body: 'Ocorreu uma falha ao atualizar este serviço. Tente novamente.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
-    service_delete_confirm: {
-      title: 'Excluir serviço?',
-      body: 'Tem certeza que deseja excluir este serviço?',
-      variant: 'warning',
-      screen: 'dark',
-      confirmText: 'EXCLUIR',
-      cancelText: 'CANCELAR',
-      buttonText: 'EXCLUIR',
-    },
-    service_deleted: {
-      title: 'Serviço excluído',
-      body: 'O serviço foi removido da lista de ofertas.',
-      variant: 'success',
-      screen: 'light',
-      buttonText: 'OK',
-    },
-    service_delete_error: {
-      title: 'Erro',
-      body: 'Houve um erro ao excluir o serviço. Tente novamente.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
+    // VALIDAÇÕES DE ENTREGA (chamadas diretamente, sem grupo dinâmico)
     service_promo_invalid: {
       title: 'Oferta inválida',
       body: 'O preço de oferta precisa ser menor que o preço normal.',
@@ -244,36 +191,30 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-    service_prof_required: {
-      title: 'Selecione um profissional',
-      body: 'Escolha um profissional para o serviço.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
 
     // =======================================================================
     // BUSINESS — dinâmico por tipo de negócio (via businessTerms.js)
+    // 3 grupos: 'servicos' | 'consultas' | 'aulas'
+    // Fallback: 'servicos'
+    //
     // Uso: const group = getBusinessGroup(negocio.tipo_negocio)
     //      ptBR.dashboard.business.tab_title[group]
     //      ptBR.dashboard.business[group].service_created
     // =======================================================================
     business: {
 
-      // Título da aba no dashboard (ex.: "Serviços", "Consultas", "Aulas")
+      // Título da aba no dashboard
       tab_title: {
         servicos:  'Serviços',
         consultas: 'Consultas',
         aulas:     'Aulas',
-        default:   'Atendimentos',
       },
 
-      // Rótulo do botão de adicionar (ex.: "+SERVIÇO", "+CONSULTA"...)
+      // Rótulo do botão de adicionar
       button_add: {
         servicos:  'SERVIÇO',
         consultas: 'CONSULTA',
         aulas:     'AULA',
-        default:   'ATENDIMENTO',
       },
 
       // Rótulo do modal de criar/editar
@@ -281,13 +222,11 @@ export const ptBR = {
         servicos:  'NOVO SERVIÇO',
         consultas: 'NOVA CONSULTA',
         aulas:     'NOVA AULA',
-        default:   'NOVO ATENDIMENTO',
       },
       modal_edit: {
         servicos:  'EDITAR SERVIÇO',
         consultas: 'EDITAR CONSULTA',
         aulas:     'EDITAR AULA',
-        default:   'EDITAR ATENDIMENTO',
       },
 
       // Rótulo do botão submit no modal
@@ -295,34 +234,28 @@ export const ptBR = {
         servicos:  'CRIAR SERVIÇO',
         consultas: 'CRIAR CONSULTA',
         aulas:     'CRIAR AULA',
-        default:   'CRIAR ATENDIMENTO',
       },
 
-      // Contador de itens por profissional (ex.: "3 serviço(s)")
+      // Contador de itens por profissional
       counter_singular: {
         servicos:  'serviço',
         consultas: 'consulta',
         aulas:     'aula',
-        default:   'atendimento',
       },
       counter_plural: {
         servicos:  'serviços',
         consultas: 'consultas',
         aulas:     'aulas',
-        default:   'atendimentos',
       },
 
-      // Mensagem vazia (quando não há itens cadastrados)
+      // Mensagem vazia
       empty_list: {
         servicos:  'Sem serviços para este profissional.',
         consultas: 'Sem consultas para este profissional.',
         aulas:     'Sem aulas para este profissional.',
-        default:   'Sem atendimentos para este profissional.',
       },
 
-      // =======================================================================
-      // ALERTAS POR GRUPO
-      // =======================================================================
+      // ── ALERTAS POR GRUPO ───────────────────────────────────────────────
 
       servicos: {
         service_created: {
@@ -452,50 +385,6 @@ export const ptBR = {
         service_prof_required: {
           title: 'Selecione um profissional',
           body: 'Escolha um profissional para esta aula.',
-          variant: 'danger', screen: 'dark', buttonText: 'OK',
-        },
-      },
-
-      default: {
-        service_created: {
-          title: 'Atendimento criado',
-          body: 'O novo atendimento já está disponível para agendamento.',
-          variant: 'success', screen: 'light', buttonText: 'OK',
-        },
-        service_updated: {
-          title: 'Atendimento atualizado',
-          body: 'Os ajustes foram salvos com sucesso.',
-          variant: 'success', screen: 'light', buttonText: 'OK',
-        },
-        service_create_error: {
-          title: 'Erro ao criar',
-          body: 'Ocorreu uma falha ao criar este atendimento. Tente novamente.',
-          variant: 'danger', screen: 'dark', buttonText: 'OK',
-        },
-        service_update_error: {
-          title: 'Erro ao salvar',
-          body: 'Ocorreu uma falha ao atualizar este atendimento. Tente novamente.',
-          variant: 'danger', screen: 'dark', buttonText: 'OK',
-        },
-        service_delete_confirm: {
-          title: 'Excluir atendimento?',
-          body: 'Tem certeza que deseja excluir este atendimento?',
-          variant: 'warning', screen: 'dark',
-          confirmText: 'EXCLUIR', cancelText: 'CANCELAR', buttonText: 'EXCLUIR',
-        },
-        service_deleted: {
-          title: 'Atendimento excluído',
-          body: 'O atendimento foi removido da lista.',
-          variant: 'success', screen: 'light', buttonText: 'OK',
-        },
-        service_delete_error: {
-          title: 'Erro',
-          body: 'Houve um erro ao excluir o atendimento. Tente novamente.',
-          variant: 'danger', screen: 'dark', buttonText: 'OK',
-        },
-        service_prof_required: {
-          title: 'Selecione um profissional',
-          body: 'Escolha um profissional para este atendimento.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
         },
       },
@@ -647,7 +536,7 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    // CONTA — modais (uiAlert)
+    // CONTA — modais
     account_email_invalid: {
       title: 'Email inválido',
       body: 'Digite um email válido.',
@@ -698,7 +587,7 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    // CONTA — textos inline (substituem o dadosMsg cru no JSX)
+    // CONTA — textos inline
     account_email_invalid_inline: 'Email inválido. Verifique e tente novamente.',
     account_email_update_sent_inline: 'Enviamos um link de confirmação para o novo email.',
     account_email_update_error_inline: 'Falha ao trocar o email. Tente novamente.',
@@ -740,7 +629,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     profile_name_required: {
       title: 'Nome obrigatório',
       body: 'Preencha seu nome para salvar.',
@@ -762,7 +650,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     account_email_invalid: {
       title: 'Email inválido',
       body: 'Digite um email válido para continuar.',
@@ -784,7 +671,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     account_password_too_short: {
       title: 'Senha muito curta',
       body: 'A senha precisa ter pelo menos 6 caracteres.',
@@ -813,7 +699,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     booking_cancel_confirm: {
       title: 'Cancelar agendamento',
       body: 'Tem certeza que deseja cancelar este agendamento?',
@@ -835,7 +720,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     favorite_removed: {
       title: 'Removido',
       body: 'Favorito removido com sucesso.',
@@ -876,7 +760,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
-
     reset_email_required: {
       title: 'Informe seu email',
       body:
@@ -886,7 +769,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     reset_sent: {
       title: 'Link enviado',
       body:
@@ -896,7 +778,6 @@ export const ptBR = {
       screen: 'light',
       buttonText: 'OK',
     },
-
     reset_error: {
       title: 'Houve um erro ao enviar o link agora.',
       body:
@@ -907,7 +788,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
-
     recovery_password_too_short: {
       title: 'Senha muito curta',
       body: 'A nova senha precisa ter pelo menos 6 caracteres.',
@@ -915,7 +795,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     recovery_password_mismatch: {
       title: 'Senhas diferentes',
       body: 'O código diverge do esperado. Revise e tente novamente.',
@@ -923,7 +802,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     recovery_password_updated: {
       title: 'Senha atualizada',
       body:
@@ -933,7 +811,6 @@ export const ptBR = {
       screen: 'light',
       buttonText: 'OK',
     },
-
     recovery_password_update_error: {
       title: 'Erro ao atualizar senha',
       body:
@@ -1067,7 +944,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     address_street_required: {
       title: 'Endereço incompleto',
       body: 'Informe a RUA do negócio.',
@@ -1103,7 +979,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     business_slug_taken: {
       title: 'URL já está em uso',
       body: 'Esta URL já está em uso. Escolha outro nome para o negócio.',
@@ -1111,7 +986,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
-
     created_but_login_failed: {
       title: 'Conta criada',
       body:
@@ -1132,7 +1006,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
-
     profile_not_created: {
       title: 'Perfil ausente',
       body:
@@ -1152,7 +1025,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
-
     business_create_error: {
       title: 'Erro ao criar negócio',
       body:
@@ -1211,7 +1083,6 @@ export const ptBR = {
       body: 'Erro ao favoritar. Tente novamente.',
       buttonText: 'OK',
     },
-
     schedule_need_login_confirm: {
       title: 'Login necessário',
       body: 'Você precisa fazer login para agendar. Deseja fazer login agora?',
@@ -1268,13 +1139,11 @@ export const ptBR = {
       body: 'Agendamento confirmado :)',
       buttonText: 'OK',
     },
-
     schedule_pick_date: {
       title: 'Selecione uma data',
       body: 'Selecione uma data.',
       buttonText: 'ENTENDI',
     },
-
     schedule_not_enough_time_title: 'Horário insuficiente',
     schedule_not_enough_time_free: 'Tempo disponível até o próximo compromisso',
     schedule_not_enough_time_fit: 'Para esse horário, cabe no máximo',
@@ -1283,26 +1152,27 @@ export const ptBR = {
 
     // =======================================================================
     // VITRINE BUSINESS — dinâmico por tipo de negócio (via businessTerms.js)
+    // 3 grupos: 'servicos' | 'consultas' | 'aulas'
+    // Fallback: 'servicos'
+    //
     // Uso: const group = getBusinessGroup(negocio.tipo_negocio)
     //      ptBR.vitrine.business[group].schedule_need_one_service
     //      ptBR.vitrine.business.label_button[group]
     // =======================================================================
     business: {
 
-      // Botão de agendamento na vitrine (ex.: "AGENDAR SERVIÇO")
+      // Botão de agendamento na vitrine
       label_button: {
         servicos:  'AGENDAR SERVIÇO',
         consultas: 'AGENDAR CONSULTA',
         aulas:     'AGENDAR AULA',
-        default:   'AGENDAR ATENDIMENTO',
       },
 
-      // Título da seção de itens na vitrine (ex.: "Serviços", "Consultas"...)
+      // Título da seção de itens na vitrine
       section_title: {
         servicos:  'Serviços',
         consultas: 'Consultas',
         aulas:     'Aulas',
-        default:   'Atendimentos',
       },
 
       servicos: {
@@ -1354,23 +1224,6 @@ export const ptBR = {
         schedule_not_enough_time_need: 'Seu agendamento (aulas + folga)',
         schedule_not_enough_time_services: 'de aulas',
         schedule_not_enough_time_hint: 'Escolha outro horário ou ajuste as aulas.',
-      },
-
-      default: {
-        schedule_need_one_service: {
-          title: 'Selecione um atendimento',
-          body: 'Selecione pelo menos 1 atendimento.',
-          buttonText: 'ENTENDI',
-        },
-        schedule_need_valid_service: {
-          title: 'Selecione um atendimento',
-          body: 'Selecione pelo menos 1 atendimento válido.',
-          buttonText: 'ENTENDI',
-        },
-        schedule_not_enough_time_sad: ':( Esse horário é insuficiente para os atendimentos selecionados.',
-        schedule_not_enough_time_need: 'Seu agendamento (atendimentos + folga)',
-        schedule_not_enough_time_services: 'de atendimentos',
-        schedule_not_enough_time_hint: 'Escolha outro horário ou ajuste os atendimentos.',
       },
     },
     // =======================================================================
