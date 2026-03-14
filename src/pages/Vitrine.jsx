@@ -203,7 +203,7 @@ export default function Vitrine({ user, userType }) {
   const [negocio,        setNegocio]        = useState(null);
   const [profissionais,  setProfissionais]  = useState([]);
   const [entregas,       setEntregas]       = useState([]);
-  const [avaliacoes,     setAvaliacoes]     = useState([]);
+  const [depoimentos,    setDepoimentos]    = useState([]);
   const [galeriaItems,   setGaleriaItems]   = useState([]);
   const [loading,        setLoading]        = useState(true);
   const [error,          setError]          = useState(null);
@@ -284,13 +284,13 @@ export default function Vitrine({ user, userType }) {
 
   const todayISO = useMemo(() => getNowSP().date, []);
 
-  // ── avaliação ──
-  const [showAvaliar,           setShowAvaliar]           = useState(false);
-  const [avaliarNota,           setAvaliarNota]           = useState(5);
-  const [avaliarTexto,          setAvaliarTexto]          = useState('');
-  const [avaliarLoading,        setAvaliarLoading]        = useState(false);
-  const [avaliarTipo,           setAvaliarTipo]           = useState('negocio');
-  const [avaliarProfissionalId, setAvaliarProfissionalId] = useState(null);
+  // ── depoimento ──
+  const [showDepoimento,           setShowDepoimento]           = useState(false);
+  const [depoimentoNota,           setDepoimentoNota]           = useState(5);
+  const [depoimentoTexto,          setDepoimentoTexto]          = useState('');
+  const [depoimentoLoading,        setDepoimentoLoading]        = useState(false);
+  const [depoimentoTipo,           setDepoimentoTipo]           = useState('negocio');
+  const [depoimentoProfissionalId, setDepoimentoProfissionalId] = useState(null);
 
   const isProfessional = user && userType === 'professional';
 
@@ -318,7 +318,7 @@ export default function Vitrine({ user, userType }) {
       );
       if (negocioError) throw negocioError;
       if (!negocioData) {
-        setNegocio(null); setProfissionais([]); setEntregas([]); setAvaliacoes([]); setGaleriaItems([]);
+        setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]);
         return;
       }
       setNegocio(negocioData);
@@ -332,26 +332,26 @@ export default function Vitrine({ user, userType }) {
       setProfissionais(profs);
       const profissionalIds = profs.map(p => p.id).filter(Boolean);
 
-      const avalFilter = profissionalIds.length
+      const depFilter = profissionalIds.length
         ? `negocio_id.eq.${negocioData.id},profissional_id.in.(${profissionalIds.join(',')})`
         : `negocio_id.eq.${negocioData.id}`;
 
-      const [entregasResult, galeriaResult, avaliacoesResult] = await Promise.all([
+      const [entregasResult, galeriaResult, depoimentosResult] = await Promise.all([
         profissionalIds.length
           ? withTimeout(supabase.from('entregas').select('*').in('profissional_id', profissionalIds).eq('ativo', true), 7000, 'entregas')
           : Promise.resolve({ data: [], error: null }),
         withTimeout(supabase.from('galerias').select('id, path, ordem').eq('negocio_id', negocioData.id).order('ordem', { ascending: true }).order('created_at', { ascending: true }), 7000, 'galerias'),
-        withTimeout(supabase.from('depoimentos').select('id, tipo, negocio_id, profissional_id, cliente_id, nota, comentario, created_at').or(avalFilter).order('created_at', { ascending: false }).limit(20), 7000, 'avaliacoes'),
+        withTimeout(supabase.from('depoimentos').select('id, tipo, negocio_id, profissional_id, cliente_id, nota, comentario, created_at').or(depFilter).order('created_at', { ascending: false }).limit(20), 7000, 'depoimentos'),
       ]);
 
       if (entregasResult.error) throw entregasResult.error;
       if (galeriaResult.error) throw galeriaResult.error;
-      if (avaliacoesResult.error) throw avaliacoesResult.error;
+      if (depoimentosResult.error) throw depoimentosResult.error;
 
       setEntregas(entregasResult.data || []);
       setGaleriaItems(galeriaResult.data || []);
 
-      const base = avaliacoesResult.data || [];
+      const base = depoimentosResult.data || [];
       const clienteIds = Array.from(new Set(base.map(a => a.cliente_id).filter(Boolean)));
       let usersMap = new Map();
 
@@ -366,7 +366,7 @@ export default function Vitrine({ user, userType }) {
       const profMap = new Map((profs || []).map(p => [p.id, p]));
       const negociosNome = negocioData?.nome || null;
 
-      const finalAval = base.map(a => {
+      const finalDep = base.map(a => {
         const u = usersMap.get(a.cliente_id) || null;
         const p = profMap.get(a.profissional_id) || null;
         return {
@@ -377,10 +377,10 @@ export default function Vitrine({ user, userType }) {
         };
       });
 
-      setAvaliacoes(finalAval);
+      setDepoimentos(finalDep);
     } catch (e) {
       setError(e?.message || getMsg('load_error', 'Erro ao carregar a vitrine.'));
-      setNegocio(null); setProfissionais([]); setEntregas([]); setAvaliacoes([]); setGaleriaItems([]);
+      setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]);
     } finally {
       clearTimeout(watchdog);
       setLoading(false);
@@ -500,39 +500,39 @@ export default function Vitrine({ user, userType }) {
     setFlow(prev => ({ ...prev, step: 5, lastSlot: slot }));
   };
 
-  // ── avaliação ─────────────────────────────────────────────────────────────
+  // ── depoimento ────────────────────────────────────────────────────────────
 
-  const abrirAvaliar = async () => {
+  const abrirDepoimento = async () => {
     if (!user) {
-      const ok = await confirmKey('review_need_login_confirm', 'Login necessário', 'Você precisa fazer login para avaliar. Deseja fazer login agora?', 'IR PARA LOGIN', 'MAIS TARDE');
+      const ok = await confirmKey('review_need_login_confirm', 'Login necessário', 'Você precisa fazer login para deixar um depoimento. Deseja fazer login agora?', 'IR PARA LOGIN', 'MAIS TARDE');
       if (ok) navigate('/login');
       return;
     }
-    if (userType !== 'client') { alertKey('review_only_client', 'Ação restrita', 'Apenas CLIENTE pode avaliar.', 'ENTENDI'); return; }
-    setAvaliarNota(5); setAvaliarTexto(''); setAvaliarTipo('negocio'); setAvaliarProfissionalId(null); setShowAvaliar(true);
+    if (userType !== 'client') { alertKey('review_only_client', 'Ação restrita', 'Apenas CLIENTE pode deixar depoimentos.', 'ENTENDI'); return; }
+    setDepoimentoNota(5); setDepoimentoTexto(''); setDepoimentoTipo('negocio'); setDepoimentoProfissionalId(null); setShowDepoimento(true);
   };
 
-  const enviarAvaliacao = async () => {
+  const enviarDepoimento = async () => {
     if (!user || userType !== 'client') return;
     if (!negocio?.id) { alertKey('review_invalid_business', 'Negócio inválido', 'Negócio inválido.', 'ENTENDI'); return; }
     try {
-      setAvaliarLoading(true);
+      setDepoimentoLoading(true);
       const payload = {
         cliente_id:       user.id,
-        tipo:             avaliarTipo,
-        nota:             avaliarNota,
-        comentario:       avaliarTexto || null,
-        negocio_id:       avaliarTipo === 'negocio'       ? negocio.id            : null,
-        profissional_id:  avaliarTipo === 'profissional'  ? avaliarProfissionalId : null,
+        tipo:             depoimentoTipo,
+        nota:             depoimentoNota,
+        comentario:       depoimentoTexto || null,
+        negocio_id:       depoimentoTipo === 'negocio'       ? negocio.id                : null,
+        profissional_id:  depoimentoTipo === 'profissional'  ? depoimentoProfissionalId  : null,
       };
-      const { error: avErr } = await withTimeout(supabase.from('depoimentos').insert(payload), 7000, 'enviar-avaliacao');
-      if (avErr) throw avErr;
-      setShowAvaliar(false);
+      const { error: depErr } = await withTimeout(supabase.from('depoimentos').insert(payload), 7000, 'enviar-depoimento');
+      if (depErr) throw depErr;
+      setShowDepoimento(false);
       await loadVitrine();
-      alertKey('review_sent', 'Avaliação enviada', 'Avaliação enviada!', 'OK');
+      alertKey('review_sent', 'Depoimento registrado', 'Seu depoimento foi entregue com sucesso!', 'OK');
     } catch (e) {
-      openAlert({ title: getMsg('review_send_error_title', 'Erro ao avaliar'), body: `${getMsg('review_send_error_body', 'Erro ao enviar avaliação:')} ${e?.message || ''}`, buttonText: getMsg('common_ok', 'ENTENDI') });
-    } finally { setAvaliarLoading(false); }
+      openAlert({ title: getMsg('review_send_error_title', 'Erro ao enviar depoimento'), body: `${getMsg('review_send_error_body', 'Erro ao enviar depoimento:')} ${e?.message || ''}`, buttonText: getMsg('common_ok', 'ENTENDI') });
+    } finally { setDepoimentoLoading(false); }
   };
 
   // ── memos de URL e maps ───────────────────────────────────────────────────
@@ -579,21 +579,21 @@ export default function Vitrine({ user, userType }) {
     return map;
   }, [profissionais, entregas]);
 
-  const avaliacoesPorProf = useMemo(() => {
+  const depoimentosPorProf = useMemo(() => {
     const map = new Map();
-    for (const av of avaliacoes) {
-      if (av.profissional_id) {
-        if (!map.has(av.profissional_id)) map.set(av.profissional_id, []);
-        map.get(av.profissional_id).push(av);
+    for (const dep of depoimentos) {
+      if (dep.profissional_id) {
+        if (!map.has(dep.profissional_id)) map.set(dep.profissional_id, []);
+        map.get(dep.profissional_id).push(dep);
       }
     }
     const medias = new Map();
-    for (const [profId, avs] of map.entries()) {
-      const media = avs.length > 0 ? (avs.reduce((sum, a) => sum + a.nota, 0) / avs.length).toFixed(1) : null;
-      medias.set(profId, { media, count: avs.length });
+    for (const [profId, deps] of map.entries()) {
+      const media = deps.length > 0 ? (deps.reduce((sum, d) => sum + d.nota, 0) / deps.length).toFixed(1) : null;
+      medias.set(profId, { media, count: deps.length });
     }
     return medias;
-  }, [avaliacoes]);
+  }, [depoimentos]);
 
   // ── loading / error / not found ───────────────────────────────────────────
 
@@ -623,8 +623,8 @@ export default function Vitrine({ user, userType }) {
     </div>
   );
 
-  const mediaAvaliacoes = avaliacoes.length > 0
-    ? (avaliacoes.reduce((sum, a) => sum + a.nota, 0) / avaliacoes.length).toFixed(1)
+  const mediaDepoimentos = depoimentos.length > 0
+    ? (depoimentos.reduce((sum, d) => sum + d.nota, 0) / depoimentos.length).toFixed(1)
     : '0.0';
 
   const nomeNegocioLabel = String(negocio?.nome || '').trim() || 'NEGÓCIO';
@@ -676,9 +676,9 @@ export default function Vitrine({ user, userType }) {
               <span className="hidden sm:inline">Voltar</span>
             </button>
             <div className="flex items-center gap-2">
-              <button onClick={abrirAvaliar} disabled={!!isProfessional} className={`flex items-center gap-2 h-9 px-5 rounded-button transition-all bg-vcard2 border uppercase focus:outline-none focus:ring-0 focus:ring-offset-0 ${isProfessional ? 'border-vborder2 text-vmuted cursor-not-allowed' : 'border-vborder text-vsub hover:border-primary'}`}>
+              <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`flex items-center gap-2 h-9 px-5 rounded-button transition-all bg-vcard2 border uppercase focus:outline-none focus:ring-0 focus:ring-offset-0 ${isProfessional ? 'border-vborder2 text-vmuted cursor-not-allowed' : 'border-vborder text-vsub hover:border-primary'}`}>
                 <StarChar size={18} className="text-primary" />
-                <span className="hidden sm:inline">Avaliar</span>
+                <span className="hidden sm:inline">Depoimento</span>
               </button>
               <button onClick={toggleFavorito} disabled={!!isProfessional} className={`h-9 flex items-center gap-2 px-5 rounded-button transition-all uppercase border focus:outline-none focus:ring-0 focus:ring-offset-0 ${isProfessional ? 'bg-vcard2 border-vborder2 text-vmuted cursor-not-allowed' : isFavorito ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-vcard2 border-vborder text-vsub hover:text-red-400'}`}>
                 <Heart className={`w-5 h-5 ${isFavorito ? 'fill-current' : ''}`} />
@@ -708,7 +708,7 @@ export default function Vitrine({ user, userType }) {
               <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                 <div className="flex items-center gap-2">
                   <StarChar size={18} className="text-primary" />
-                  <span className="text-xl font-normal text-primary">{mediaAvaliacoes}</span>
+                  <span className="text-xl font-normal text-primary">{mediaDepoimentos}</span>
                 </div>
                 {negocio.endereco && (
                   <div className="flex items-center gap-2 text-vsub text-sm">
@@ -745,7 +745,7 @@ export default function Vitrine({ user, userType }) {
             {profissionais.map(prof => {
               const totalEntregas = (entregasPorProf.get(prof.id) || []).length;
               const status = getProfStatus(prof);
-              const avalInfo = avaliacoesPorProf.get(prof.id);
+              const depInfo = depoimentosPorProf.get(prof.id);
               const profissao = String(prof?.profissao ?? '').trim();
               const { ini: almIni, fim: almFim } = getAlmocoRange(prof);
               const avatarUrl = getPublicUrl('avatars', prof.avatar_path);
@@ -768,11 +768,11 @@ export default function Vitrine({ user, userType }) {
                           <span className="inline-block px-2 py-1 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase whitespace-nowrap">{profissao}</span>
                         )}
                       </div>
-                      {avalInfo?.media && (
+                      {depInfo?.media && (
                         <div className="flex items-center gap-2 mb-1">
                           <StarChar size={16} className="text-primary" />
-                          <span className="text-lg font-normal text-primary">{avalInfo.media}</span>
-                          <span className="text-xs text-vmuted">({avalInfo.count})</span>
+                          <span className="text-lg font-normal text-primary">{depInfo.media}</span>
+                          <span className="text-xs text-vmuted">({depInfo.count})</span>
                         </div>
                       )}
                       <div className="flex items-center gap-2 mt-1">
@@ -915,24 +915,24 @@ export default function Vitrine({ user, userType }) {
         </section>
       )}
 
-      {/* ─── Avaliações ───────────────────────────────────────────────────── */}
+      {/* ─── Depoimentos ──────────────────────────────────────────────────── */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-3 mb-6">
-            <h2 className="text-2xl sm:text-3xl font-normal">Avaliações</h2>
-            <button onClick={abrirAvaliar} disabled={!!isProfessional} className={`px-5 py-2 border rounded-button text-sm transition-all uppercase font-normal ${isProfessional ? 'bg-vcard border-vborder2 text-vmuted cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'}`}>
-              + Avaliar
+            <h2 className="text-2xl sm:text-3xl font-normal">Depoimentos</h2>
+            <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`px-5 py-2 border rounded-button text-sm transition-all uppercase font-normal ${isProfessional ? 'bg-vcard border-vborder2 text-vmuted cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'}`}>
+              + Depoimento
             </button>
           </div>
-          {avaliacoes.length > 0 ? (
+          {depoimentos.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {avaliacoes.map(av => {
-                const avatarClienteUrl = getPublicUrl('avatars', av.users?.avatar_path);
+              {depoimentos.map(dep => {
+                const avatarClienteUrl = getPublicUrl('avatars', dep.users?.avatar_path);
                 return (
-                  <div key={av.id} className="bg-vcard border border-vborder rounded-custom p-4 relative">
+                  <div key={dep.id} className="bg-vcard border border-vborder rounded-custom p-4 relative">
                     <div className="absolute top-3 right-3">
-                      {av.profissional_id && av.profissionais?.nome ? (
-                        <span className="inline-block px-1.5 py-0.5 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase">{av.profissionais.nome}</span>
+                      {dep.profissional_id && dep.profissionais?.nome ? (
+                        <span className="inline-block px-1.5 py-0.5 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase">{dep.profissionais.nome}</span>
                       ) : (
                         <span className="inline-block px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded-button text-[10px] text-blue-400 font-normal uppercase">{nomeNegocioLabel}</span>
                       )}
@@ -940,24 +940,24 @@ export default function Vitrine({ user, userType }) {
                     <div className="flex items-center gap-3 mb-3">
                       {avatarClienteUrl ? (
                         <div className="w-10 h-10 rounded-full overflow-hidden border border-vborder bg-vcard2 shrink-0">
-                          <img src={avatarClienteUrl} alt={av.users?.nome} className="w-full h-full object-cover" />
+                          <img src={avatarClienteUrl} alt={dep.users?.nome} className="w-full h-full object-cover" />
                         </div>
                       ) : (
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-normal shrink-0">
-                          {av.users?.nome?.[0] || 'A'}
+                          {dep.users?.nome?.[0] || 'A'}
                         </div>
                       )}
                       <div className="flex-1">
-                        <p className="text-sm font-normal">{av.users?.nome || 'Cliente'}</p>
-                        <Stars5Char value={av.nota} size={14} />
+                        <p className="text-sm font-normal">{dep.users?.nome || 'Cliente'}</p>
+                        <Stars5Char value={dep.nota} size={14} />
                       </div>
                     </div>
-                    {av.comentario && <p className="text-sm text-vsub font-normal">{av.comentario}</p>}
+                    {dep.comentario && <p className="text-sm text-vsub font-normal">{dep.comentario}</p>}
                   </div>
                 );
               })}
             </div>
-          ) : <p className="text-vmuted font-normal">Nenhuma avaliação ainda</p>}
+          ) : <p className="text-vmuted font-normal">Nenhum depoimento ainda</p>}
         </div>
       </section>
 
@@ -1090,28 +1090,28 @@ export default function Vitrine({ user, userType }) {
         </div>
       )}
 
-      {/* ─── Modal Avaliar ────────────────────────────────────────────────── */}
-      {showAvaliar && (
+      {/* ─── Modal Depoimento ─────────────────────────────────────────────── */}
+      {showDepoimento && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full max-h-[90vh] flex flex-col">
             <div className="flex justify-between items-center p-6 pb-4 shrink-0">
-              <h3 className="text-2xl font-normal text-white">AVALIAR</h3>
-              <button onClick={() => setShowAvaliar(false)} className="text-gray-400 hover:text-white"><X className="w-6 h-6" /></button>
+              <h3 className="text-2xl font-normal text-white">DEPOIMENTO</h3>
+              <button onClick={() => setShowDepoimento(false)} className="text-gray-400 hover:text-white"><X className="w-6 h-6" /></button>
             </div>
             <div className="overflow-y-auto px-6 pb-6 flex-1">
               <div className="mb-4">
-                <div className="text-sm text-gray-300 font-normal mb-2">Você está avaliando</div>
+                <div className="text-sm text-gray-300 font-normal mb-2">Você está deixando um depoimento sobre</div>
                 <div className="grid grid-cols-2 gap-2">
-                  <button onClick={() => { setAvaliarTipo('negocio'); setAvaliarProfissionalId(null); }} className={`px-4 py-3 rounded-custom border transition-all font-normal ${avaliarTipo === 'negocio' ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-dark-200 border-gray-800 text-gray-400'}`}>{nomeNegocioLabel}</button>
-                  <button onClick={() => setAvaliarTipo('profissional')} className={`px-4 py-3 rounded-custom border transition-all font-normal ${avaliarTipo === 'profissional' ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-400'}`}>PROFISSIONAL</button>
+                  <button onClick={() => { setDepoimentoTipo('negocio'); setDepoimentoProfissionalId(null); }} className={`px-4 py-3 rounded-custom border transition-all font-normal ${depoimentoTipo === 'negocio' ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-dark-200 border-gray-800 text-gray-400'}`}>{nomeNegocioLabel}</button>
+                  <button onClick={() => setDepoimentoTipo('profissional')} className={`px-4 py-3 rounded-custom border transition-all font-normal ${depoimentoTipo === 'profissional' ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-400'}`}>PROFISSIONAL</button>
                 </div>
               </div>
-              {avaliarTipo === 'profissional' && (
+              {depoimentoTipo === 'profissional' && (
                 <div className="mb-4">
                   <div className="text-sm text-gray-300 font-normal mb-2">Qual profissional?</div>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
                     {profissionais.map(prof => (
-                      <button key={prof.id} onClick={() => setAvaliarProfissionalId(prof.id)} className={`w-full text-left px-4 py-3 rounded-custom border transition-all font-normal ${avaliarProfissionalId === prof.id ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-400 hover:border-primary/30'}`}>{prof.nome}</button>
+                      <button key={prof.id} onClick={() => setDepoimentoProfissionalId(prof.id)} className={`w-full text-left px-4 py-3 rounded-custom border transition-all font-normal ${depoimentoProfissionalId === prof.id ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-400 hover:border-primary/30'}`}>{prof.nome}</button>
                     ))}
                   </div>
                 </div>
@@ -1120,19 +1120,19 @@ export default function Vitrine({ user, userType }) {
                 <div className="text-sm text-gray-300 font-normal mb-2">Nota</div>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map(n => (
-                    <button key={n} onClick={() => setAvaliarNota(n)} className={`w-12 h-8 rounded-button border transition-all font-normal ${avaliarNota >= n ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>{n}</button>
+                    <button key={n} onClick={() => setDepoimentoNota(n)} className={`w-12 h-8 rounded-button border transition-all font-normal ${depoimentoNota >= n ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>{n}</button>
                   ))}
                 </div>
               </div>
               <div className="mb-5">
                 <div className="text-sm text-gray-300 font-normal mb-2">Comentário é opcional</div>
-                <textarea value={avaliarTexto} onChange={(e) => setAvaliarTexto(e.target.value)} rows={4} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-500 focus:border-primary focus:outline-none resize-none" placeholder="Conte como foi sua experiência..." />
+                <textarea value={depoimentoTexto} onChange={(e) => setDepoimentoTexto(e.target.value)} rows={4} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-500 focus:border-primary focus:outline-none resize-none" placeholder="Conte como foi sua experiência..." />
               </div>
-              <button onClick={enviarAvaliacao} disabled={avaliarLoading || (avaliarTipo === 'profissional' && !avaliarProfissionalId)} className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button disabled:opacity-60 uppercase font-normal">
-                {avaliarLoading ? 'ENVIANDO...' : 'AVALIAR AGORA'}
+              <button onClick={enviarDepoimento} disabled={depoimentoLoading || (depoimentoTipo === 'profissional' && !depoimentoProfissionalId)} className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button disabled:opacity-60 uppercase font-normal">
+                {depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}
               </button>
               <p className="text-xs text-gray-500 mt-3 font-normal">
-                {avaliarTipo === 'profissional' && !avaliarProfissionalId ? 'Selecione um profissional para continuar' : 'Somente clientes logados podem avaliar.'}
+                {depoimentoTipo === 'profissional' && !depoimentoProfissionalId ? 'Selecione um profissional para continuar' : 'Somente clientes logados podem deixar depoimentos.'}
               </p>
             </div>
           </div>
