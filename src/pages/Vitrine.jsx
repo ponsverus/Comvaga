@@ -824,29 +824,32 @@ export default function Vitrine({ user, userType }) {
                           return (
                             <div key={s.id} className="relative bg-vcard2 border border-vborder rounded-custom p-4">
 
-                              {/* etiqueta OFERTA — canto superior direito */}
+                              {/* etiqueta OFERTA — canto superior direito, sempre fixa */}
                               {temPromo && (
                                 <span className="absolute top-2 right-2 inline-block px-1.5 py-0.5 bg-green-500/20 border border-green-500/40 rounded-button text-[9px] text-green-400 font-normal uppercase">
                                   OFERTA
                                 </span>
                               )}
 
-                              {/* linha superior: nome + preço */}
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="font-normal text-sm leading-tight pr-14">{s.nome}</div>
-                                <div className="text-right shrink-0">
-                                  {temPromo ? (
-                                    <>
-                                      <div className="text-green-400 font-normal text-base">R$ {precoFinal.toFixed(2)}</div>
-                                      <div className="text-red-400 text-xs font-normal line-through">R$ {preco.toFixed(2)}</div>
-                                    </>
-                                  ) : (
-                                    <div className="text-primary font-normal text-base">R$ {precoFinal.toFixed(2)}</div>
-                                  )}
+                              {temPromo ? (
+                                /* layout com oferta: nome ocupa linha inteira (com padding p/ etiqueta),
+                                   preços descem para baixo sem competir com a etiqueta */
+                                <>
+                                  <div className="font-normal text-sm leading-tight pr-14">{s.nome}</div>
+                                  <div className="mt-2">
+                                    <div className="text-green-400 font-normal text-base">R$ {precoFinal.toFixed(2)}</div>
+                                    <div className="text-red-400 text-xs font-normal line-through">R$ {preco.toFixed(2)}</div>
+                                  </div>
+                                </>
+                              ) : (
+                                /* layout normal: nome à esquerda, preço à direita */
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="font-normal text-sm leading-tight">{s.nome}</div>
+                                  <div className="text-primary font-normal text-base shrink-0">R$ {precoFinal.toFixed(2)}</div>
                                 </div>
-                              </div>
+                              )}
 
-                              {/* linha inferior: duração */}
+                              {/* duração — sempre na base */}
                               <div className="flex items-center gap-1 mt-3 text-xs text-vmuted font-normal">
                                 <Clock className="w-3 h-3 shrink-0" />{s.duracao_minutos} MIN
                               </div>
