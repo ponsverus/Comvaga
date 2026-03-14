@@ -268,7 +268,7 @@ export default function BookingCalendar({
             <div className="font-normal text-white truncate">{entrega?.nome}</div>
             <div className="text-xs text-gray-400 mt-0.5">
               {profissional?.nome}
-              {entrega?.duracao_minutos && <span className="ml-2 text-gray-600">• {entrega.duracao_minutos} MIN</span>}
+              {entrega?.duracao_minutos && <span className="ml-2 text-gray-600">• {entrega.duracao_minutos} min</span>}
               <span className="ml-2 text-primary">• R$ {valorExibido}</span>
             </div>
           </div>
@@ -451,8 +451,9 @@ export default function BookingCalendar({
                 <div className="flex justify-between">
                   <span className="text-gray-500">HORÁRIO</span>
                   <span className="text-primary font-normal">{selectedSlot.hora}</span>
-                </div>                
-                  <span className="text-gray-500">TEMPO TOTAL</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">DURAÇÃO</span>
                   <span className="text-white">{(Number(entrega?.duracao_minutos) || 0) + FOLGA} MIN</span>
                 </div>
                 <div className="flex justify-between">
