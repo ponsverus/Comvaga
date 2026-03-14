@@ -1207,21 +1207,15 @@ export const ptBR = {
     // VITRINE BUSINESS — dinâmico por tipo de negócio (via businessTerms.js)
     // 3 grupos: 'servicos' | 'consultas' | 'aulas'
     // Fallback: 'servicos'
-    //
-    // Uso: const group = getBusinessGroup(negocio.tipo_negocio)
-    //      ptBR.vitrine.business[group].schedule_need_one_service
-    //      ptBR.vitrine.business.label_button[group]
     // =======================================================================
     business: {
 
-      // Botão de agendamento na vitrine
       label_button: {
         servicos:  'AGENDAR SERVIÇO',
         consultas: 'AGENDAR CONSULTA',
         aulas:     'AGENDAR AULA',
       },
 
-      // Título da seção de itens na vitrine
       section_title: {
         servicos:  'Serviços',
         consultas: 'Consultas',
@@ -1282,15 +1276,16 @@ export const ptBR = {
     // =======================================================================
     // FIM VITRINE BUSINESS
 
+    // DEPOIMENTOS
     review_need_login_confirm: {
       title: 'Login necessário',
-      body: 'Você precisa fazer login para avaliar. Deseja fazer login agora?',
+      body: 'Você precisa fazer login para deixar um depoimento. Deseja fazer login agora?',
       confirmText: 'IR PARA LOGIN',
       cancelText: 'TALVEZ DEPOIS',
     },
     review_only_client: {
       title: 'Acesso restrito',
-      body: 'Apenas CLIENTE pode avaliar.',
+      body: 'Apenas CLIENTE pode deixar depoimentos.',
       buttonText: 'ENTENDI',
     },
     review_invalid_business: {
@@ -1299,11 +1294,11 @@ export const ptBR = {
       buttonText: 'ENTENDI',
     },
     review_sent: {
-      title: 'Nota registrada',
-      body: 'Sua nota foi entregue com sucesso.',
+      title: 'Depoimento registrado',
+      body: 'Seu depoimento foi entregue com sucesso.',
       buttonText: 'OK',
     },
-    review_send_error_title: 'Erro ao dar a nota',
-    review_send_error_body: 'Houve falha ao entregar sua nota:',
+    review_send_error_title: 'Erro ao enviar depoimento',
+    review_send_error_body: 'Houve falha ao entregar seu depoimento:',
   },
 };
