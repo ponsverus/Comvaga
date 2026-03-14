@@ -44,7 +44,7 @@ function toISO(year, month, day) {
 function formatBR(iso) {
   const p = parseISO(iso);
   if (!p) return '';
-  return `${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}`;
+  return `${String(p.day).padStart(2, '0')}.${String(p.month).padStart(2, '0')}.${p.year}`;
 }
 
 function daysInMonth(y, m)    { return new Date(y, m, 0).getDate(); }
