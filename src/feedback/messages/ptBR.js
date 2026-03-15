@@ -26,9 +26,6 @@ export const ptBR = {
     },
   },
 
-  // =========================
-  // BOOKING (GERAL)
-  // =========================
   booking: {
     canceled: {
       title: 'Agendamento cancelado',
@@ -46,9 +43,6 @@ export const ptBR = {
     },
   },
 
-  // =========================
-  // COMMON (GERAL)
-  // =========================
   common: {
     saved: {
       title: 'Salvo',
@@ -66,11 +60,7 @@ export const ptBR = {
     },
   },
 
-  // =========================
-  // DASHBOARD (PROFISSIONAL)
-  // =========================
   dashboard: {
-    // LOGO
     logo_updated: {
       title: 'Logo atualizada',
       body: 'Sua logo foi atualizada com sucesso.',
@@ -86,7 +76,6 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    // INFO NEGÓCIO
     business_info_updated: {
       title: 'Salvo',
       body: 'Dados do negócio salvos com sucesso',
@@ -109,7 +98,6 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    // GALERIA
     gallery_invalid_format: {
       title: 'Formato inválido',
       body: 'Envie apenas PNG, JPG ou WEBP.',
@@ -169,7 +157,6 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    // VALIDAÇÕES DE ENTREGA (chamadas diretamente, sem grupo dinâmico)
     service_promo_invalid: {
       title: 'Oferta inválida',
       body: 'O preço de oferta precisa ser menor que o preço normal.',
@@ -192,32 +179,20 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    // =======================================================================
-    // BUSINESS — dinâmico por tipo de negócio (via businessTerms.js)
-    // 3 grupos: 'servicos' | 'consultas' | 'aulas'
-    // Fallback: 'servicos'
-    //
-    // Uso: const group = getBusinessGroup(negocio.tipo_negocio)
-    //      ptBR.dashboard.business.tab_title[group]
-    //      ptBR.dashboard.business[group].service_created
-    // =======================================================================
     business: {
 
-      // Título da aba no dashboard
       tab_title: {
         servicos:  'Serviços',
         consultas: 'Consultas',
         aulas:     'Aulas',
       },
 
-      // Rótulo do botão de adicionar
       button_add: {
         servicos:  'SERVIÇO',
         consultas: 'CONSULTA',
         aulas:     'AULA',
       },
 
-      // Rótulo do modal de criar/editar
       modal_new: {
         servicos:  'NOVO SERVIÇO',
         consultas: 'NOVA CONSULTA',
@@ -229,14 +204,12 @@ export const ptBR = {
         aulas:     'EDITAR AULA',
       },
 
-      // Rótulo do botão submit no modal
       button_create: {
         servicos:  'CRIAR SERVIÇO',
         consultas: 'CRIAR CONSULTA',
         aulas:     'CRIAR AULA',
       },
 
-      // Contador de itens por profissional
       counter_singular: {
         servicos:  'serviço',
         consultas: 'consulta',
@@ -248,14 +221,11 @@ export const ptBR = {
         aulas:     'aulas',
       },
 
-      // Mensagem vazia
       empty_list: {
         servicos:  'Sem serviços para este profissional.',
         consultas: 'Sem consultas para este profissional.',
         aulas:     'Sem aulas para este profissional.',
       },
-
-      // ── ALERTAS POR GRUPO ───────────────────────────────────────────────
 
       servicos: {
         service_created: {
@@ -389,10 +359,7 @@ export const ptBR = {
         },
       },
     },
-    // =======================================================================
-    // FIM BUSINESS
 
-    // PROFISSIONAIS
     professional_created: {
       title: 'Profissional criado',
       body: 'O profissional foi adicionado.',
@@ -497,7 +464,6 @@ export const ptBR = {
       buttonText: 'ENTENDI',
     },
 
-    // AGENDAMENTOS
     booking_confirmed: {
       title: 'Concluído',
       body: 'O atendimento foi concluído.',
@@ -536,7 +502,6 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    // CONTA — modais
     account_email_invalid: {
       title: 'Email inválido',
       body: 'Digite um email válido.',
@@ -587,7 +552,6 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    // CONTA — textos inline
     account_email_invalid_inline: 'Email inválido. Verifique e tente novamente.',
     account_email_update_sent_inline: 'Enviamos um link de confirmação para o novo email.',
     account_email_update_error_inline: 'Falha ao trocar o email. Tente novamente.',
@@ -596,7 +560,6 @@ export const ptBR = {
     account_password_updated_inline: 'Senha atualizada com sucesso.',
     account_password_update_error_inline: 'Falha ao atualizar a senha. Tente novamente.',
 
-    // PARCEIROS
     parceiro_selecione_prof: {
       title: 'Selecione um profissional',
       body: 'Escolha um profissional antes de salvar o e-mail.',
@@ -650,9 +613,6 @@ export const ptBR = {
     },
   },
 
-  // =========================
-  // CLIENT AREA (CLIENTE)
-  // =========================
   clientArea: {
     avatar_invalid_format: {
       title: 'Formato inválido',
@@ -1203,11 +1163,6 @@ export const ptBR = {
     schedule_create_error_title: 'Erro ao agendar',
     schedule_create_error_body: 'Erro ao criar agendamento:',
 
-    // =======================================================================
-    // VITRINE BUSINESS — dinâmico por tipo de negócio (via businessTerms.js)
-    // 3 grupos: 'servicos' | 'consultas' | 'aulas'
-    // Fallback: 'servicos'
-    // =======================================================================
     business: {
 
       label_button: {
@@ -1273,10 +1228,7 @@ export const ptBR = {
         schedule_not_enough_time_hint: 'Escolha outro horário ou ajuste as aulas.',
       },
     },
-    // =======================================================================
-    // FIM VITRINE BUSINESS
 
-    // DEPOIMENTOS
     review_need_login_confirm: {
       title: 'Login necessário',
       body: 'Você precisa fazer login para deixar um depoimento. Deseja fazer login agora?',
