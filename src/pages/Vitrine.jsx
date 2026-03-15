@@ -77,7 +77,6 @@ function gerarLinkGoogle(titulo, dataInicioISO, duracaoMin) {
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&dates=${fmt(inicio)}/${fmt(fim)}&details=Agendamento+confirmado+pelo+Comvaga&sf=true&output=xml`;
 }
 
-// ícone Facebook com traços finos — strokeWidth 1 para paridade visual com Instagram
 function FacebookIcon({ className = '', size = 16 }) {
   return (
     <svg
@@ -94,6 +93,25 @@ function FacebookIcon({ className = '', size = 16 }) {
       aria-hidden="true"
     >
       <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  );
+}
+function HeartIcon({ filled = false, className = '', size = 20 }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   );
 }
@@ -652,9 +670,11 @@ export default function Vitrine({ user, userType }) {
                 <span className="hidden sm:inline">Depoimento</span>
               </button>
               <button onClick={toggleFavorito} disabled={!!isProfessional} className={`h-9 flex items-center gap-2 px-5 rounded-button transition-all uppercase border focus:outline-none focus:ring-0 focus:ring-offset-0 ${isProfessional ? 'bg-vcard2 border-vborder2 text-vmuted cursor-not-allowed' : isFavorito ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-vcard2 border-vborder text-vsub hover:text-red-400'}`}>
-                <span className={`text-xl leading-none ${isFavorito ? 'text-red-500' : 'text-vsub'}`}>
-  {isFavorito ? '♥' : '♡'}
-                </span>
+                <HeartIcon
+                  filled={isFavorito}
+                  size={20}
+                  className={isFavorito ? 'text-red-500' : 'text-vsub'}
+                />
                 <span className="hidden sm:inline">{isProfessional ? 'Somente Cliente' : (isFavorito ? 'Favoritado' : 'Favoritar')}</span>
               </button>
             </div>
