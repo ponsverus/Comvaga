@@ -16,11 +16,7 @@ import { ptBR } from '../feedback/messages/ptBR';
 import { getBusinessGroup } from '../businessTerms';
 import BookingCalendar from '../components/BookingCalendar';
 
-// ─── constantes ──────────────────────────────────────────────────────────────
-
 const FOLGA_MINUTOS = 5;
-
-// ─── helpers ─────────────────────────────────────────────────────────────────
 
 function timeToMinutes(t) {
   if (!t) return 0;
@@ -152,8 +148,6 @@ function sanitizeTel(raw) {
   return v.replace(/[^\d+]/g, '');
 }
 
-// ─── sub-componentes de modal ─────────────────────────────────────────────────
-
 function AlertModal({ open, onClose, title, body, buttonText }) {
   if (!open) return null;
   return (
@@ -191,8 +185,6 @@ function ConfirmModal({ open, onCancel, onConfirm, title, body, confirmText, can
   );
 }
 
-// ─── componente principal ─────────────────────────────────────────────────────
-
 export default function Vitrine({ user, userType }) {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -217,7 +209,6 @@ export default function Vitrine({ user, userType }) {
   const counterPlural   = ptBR?.dashboard?.business?.counter_plural?.[businessGroup]   ?? 'serviços';
   const emptyListMsg    = ptBR?.dashboard?.business?.empty_list?.[businessGroup]       ?? 'Sem serviços para este profissional.';
 
-  // ── sistema de alertas/confirm nativos ──
   const [nativeAlertOpen,   setNativeAlertOpen]   = useState(false);
   const [nativeAlertData,   setNativeAlertData]   = useState({ title: '', body: '', buttonText: 'OK' });
   const [nativeConfirmOpen, setNativeConfirmOpen] = useState(false);
@@ -271,7 +262,6 @@ export default function Vitrine({ user, userType }) {
     if (typeof r === 'function') r(!!value);
   };
 
-  // ── estado de agendamento ──
   const [isFavorito,   setIsFavorito]   = useState(false);
   const [calendarLink, setCalendarLink] = useState('');
 
@@ -284,7 +274,6 @@ export default function Vitrine({ user, userType }) {
 
   const todayISO = useMemo(() => getNowSP().date, []);
 
-  // ── depoimento ──
   const [showDepoimento,           setShowDepoimento]           = useState(false);
   const [depoimentoNota,           setDepoimentoNota]           = useState(5);
   const [depoimentoTexto,          setDepoimentoTexto]          = useState('');
@@ -293,8 +282,6 @@ export default function Vitrine({ user, userType }) {
   const [depoimentoProfissionalId, setDepoimentoProfissionalId] = useState(null);
 
   const isProfessional = user && userType === 'professional';
-
-  // ── carregamento ──────────────────────────────────────────────────────────
 
   useEffect(() => { loadVitrine(); }, [slug]);
 
@@ -415,8 +402,6 @@ export default function Vitrine({ user, userType }) {
     } catch { alertKey('favorite_toggle_error', 'Erro', 'Erro ao favoritar. Tente novamente.', 'OK'); }
   };
 
-  // ── iniciar agendamento ───────────────────────────────────────────────────
-
   const iniciarAgendamento = async (profissional) => {
     if (!user) {
       const ok = await confirmKey('schedule_need_login_confirm', 'Login necessário', 'Você precisa fazer login para agendar. Deseja fazer login agora?', 'IR PARA LOGIN', 'MAIS TARDE');
@@ -430,8 +415,6 @@ export default function Vitrine({ user, userType }) {
     setCalendarLink('');
     setFlow({ step: 2, profissional, servicosSelecionados: [], lastSlot: null });
   };
-
-  // ── dados derivados do flow ───────────────────────────────────────────────
 
   const entregasDoProf = useMemo(() => {
     if (!flow.profissional) return [];
@@ -475,8 +458,6 @@ export default function Vitrine({ user, userType }) {
     };
   }, [flow.servicosSelecionados, totalSelecionado]);
 
-  // ── callback de confirmação do BookingCalendar ────────────────────────────
-
   const handleBookingConfirm = (slot) => {
     const primeiroServico = flow.servicosSelecionados?.[0];
     const link = gerarLinkGoogle(
@@ -499,8 +480,6 @@ export default function Vitrine({ user, userType }) {
     setCalendarLink(link);
     setFlow(prev => ({ ...prev, step: 5, lastSlot: slot }));
   };
-
-  // ── depoimento ────────────────────────────────────────────────────────────
 
   const abrirDepoimento = async () => {
     if (!user) {
@@ -534,8 +513,6 @@ export default function Vitrine({ user, userType }) {
       openAlert({ title: getMsg('review_send_error_title', 'Erro ao enviar depoimento'), body: `${getMsg('review_send_error_body', 'Erro ao enviar depoimento:')} ${e?.message || ''}`, buttonText: getMsg('common_ok', 'ENTENDI') });
     } finally { setDepoimentoLoading(false); }
   };
-
-  // ── memos de URL e maps ───────────────────────────────────────────────────
 
   const logoUrl      = useMemo(() => getPublicUrl('logos',   negocio?.logo_path), [negocio?.logo_path]);
   const instagramUrl = useMemo(() => resolveInstagram(negocio?.instagram),        [negocio?.instagram]);
@@ -595,8 +572,6 @@ export default function Vitrine({ user, userType }) {
     return medias;
   }, [depoimentos]);
 
-  // ── loading / error / not found ───────────────────────────────────────────
-
   if (loading) return (
     <div className="min-h-screen bg-black flex items-center justify-center">
       <div className="text-primary text-2xl font-normal animate-pulse">CARREGANDO...</div>
@@ -630,14 +605,11 @@ export default function Vitrine({ user, userType }) {
   const nomeNegocioLabel = String(negocio?.nome || '').trim() || 'NEGÓCIO';
   const temaAtivo = negocio?.tema || 'dark';
 
-  // ── render ────────────────────────────────────────────────────────────────
-
   return (
     <div className={`min-h-screen bg-vbg text-vtext${temaAtivo === 'light' ? ' vitrine-light' : ''}`}>
       <AlertModal  open={nativeAlertOpen}   onClose={closeAlert}               title={nativeAlertData.title}   body={nativeAlertData.body}   buttonText={nativeAlertData.buttonText} />
       <ConfirmModal open={nativeConfirmOpen} onCancel={() => closeConfirm(false)} onConfirm={() => closeConfirm(true)} title={nativeConfirmData.title} body={nativeConfirmData.body} confirmText={nativeConfirmData.confirmText} cancelText={nativeConfirmData.cancelText} />
 
-      {/* ─── Barra de anúncio ─────────────────────────────────────────────── */}
       <div className="bg-primary overflow-hidden relative h-10 flex items-center">
         <div className="announcement-bar-marquee flex whitespace-nowrap">
           <div className="flex animate-marquee-sync">
@@ -667,7 +639,6 @@ export default function Vitrine({ user, userType }) {
         `}</style>
       </div>
 
-      {/* ─── Header ───────────────────────────────────────────────────────── */}
       <header className="bg-vcard border-b border-vborder sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
@@ -689,7 +660,6 @@ export default function Vitrine({ user, userType }) {
         </div>
       </header>
 
-      {/* ─── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative bg-gradient-to-br from-primary/20 via-vbg to-yellow-600/20 py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row items-start gap-6">
@@ -737,7 +707,6 @@ export default function Vitrine({ user, userType }) {
         </div>
       </section>
 
-      {/* ─── Profissionais ────────────────────────────────────────────────── */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-normal mb-6">Profissionais</h2>
@@ -809,7 +778,6 @@ export default function Vitrine({ user, userType }) {
         </div>
       </section>
 
-      {/* ─── Entregas — design C (lista 1 coluna) ────────────────────────── */}
       <section className="py-12">
         <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-normal mb-6">{sectionTitle}</h2>
@@ -890,7 +858,6 @@ export default function Vitrine({ user, userType }) {
         )}
       </section>
 
-      {/* ─── Galeria ──────────────────────────────────────────────────────── */}
       {galeriaItems.length > 0 && (
         <section className="py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
@@ -909,7 +876,6 @@ export default function Vitrine({ user, userType }) {
         </section>
       )}
 
-      {/* ─── Depoimentos ──────────────────────────────────────────────────── */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-3 mb-6">
@@ -955,14 +921,6 @@ export default function Vitrine({ user, userType }) {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════
-          MODAL DE AGENDAMENTO
-          step 2       = selecionar serviços
-          step 'booking' = BookingCalendar
-          step 5       = sucesso
-      ══════════════════════════════════════════════════════════════════ */}
-
-      {/* ── step 2: selecionar serviços ── */}
       {flow.step === 2 && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -973,7 +931,6 @@ export default function Vitrine({ user, userType }) {
             <div className="p-6">
               <h3 className="text-xl font-normal mb-2 text-white">Selecione {sectionTitle}</h3>
 
-              {/* resumo da seleção */}
               <div className="mb-4 bg-dark-200 border border-gray-800 rounded-custom p-4">
                 <div className="flex justify-between text-sm"><span className="text-gray-500 font-normal">SELECIONADOS:</span><span className="font-normal text-white">{totalSelecionado.qtd}</span></div>
                 <div className="flex justify-between text-sm mt-1"><span className="text-gray-500 font-normal">TEMPO ESTIMADO:</span><span className="font-normal text-gray-200">{totalSelecionado.duracao} MIN</span></div>
@@ -982,7 +939,6 @@ export default function Vitrine({ user, userType }) {
                 <div className="flex justify-between text-sm mt-1"><span className="text-gray-500 font-normal">VALOR TOTAL:</span><span className="font-normal text-primary">R$ {totalSelecionado.valor.toFixed(2)}</span></div>
               </div>
 
-              {/* lista de serviços */}
               {entregasPossiveis.length > 0 ? (
                 <div className="space-y-3">
                   {entregasPossiveis.map(s => {
@@ -1013,7 +969,6 @@ export default function Vitrine({ user, userType }) {
                 <div className="text-gray-500 font-normal">Nenhum {counterSingular} disponível.</div>
               )}
 
-              {/* botão continuar */}
               <button
                 onClick={() => {
                   if (!flow.servicosSelecionados?.length) {
@@ -1034,7 +989,6 @@ export default function Vitrine({ user, userType }) {
         </div>
       )}
 
-      {/* ── step 'booking': BookingCalendar ── */}
       {flow.step === 'booking' && entregaVirtual && (
         <BookingCalendar
           profissional={flow.profissional}
@@ -1047,7 +1001,6 @@ export default function Vitrine({ user, userType }) {
         />
       )}
 
-      {/* ── step 5: sucesso ── */}
       {flow.step === 5 && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full">
@@ -1084,7 +1037,6 @@ export default function Vitrine({ user, userType }) {
         </div>
       )}
 
-      {/* ─── Modal Depoimento ─────────────────────────────────────────────── */}
       {showDepoimento && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full max-h-[90vh] flex flex-col">
