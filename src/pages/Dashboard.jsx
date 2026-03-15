@@ -9,6 +9,9 @@ import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { getBusinessGroup } from '../businessTerms';
 import DatePicker from '../components/DatePicker';
+import PeriodoSelect from '../components/PeriodoSelect';
+import ProfissionalSelect from '../components/ProfissionalSelect';
+import TimePicker from '../components/TimePicker';
 
 const STATUS_COLOR_CLASS = {
   ABERTO: 'bg-green-500',
@@ -118,15 +121,6 @@ function ClienteAvatar({ cliente, size = 'w-9 h-9' }) {
   return (
     <div className={`${size} rounded-full bg-gradient-to-br from-primary to-yellow-600 flex items-center justify-center text-black text-sm font-normal shrink-0`}>
       {(cliente?.nome || '?')[0]}
-    </div>
-  );
-}
-
-function InputWithChevron({ children }) {
-  return (
-    <div className="relative">
-      {children}
-      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-5 h-5 rounded-full bg-dark-100 border border-gray-800 text-gray-400 text-xs">▾</span>
     </div>
   );
 }
@@ -981,9 +975,6 @@ export default function Dashboard({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <style>{`
-        .no-native-indicator { appearance: none; -webkit-appearance: none; -moz-appearance: none; }
-      `}</style>
 
       <header className="bg-dark-100 border-b border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1170,21 +1161,15 @@ export default function Dashboard({ user, onLogout }) {
                       ))}
                     </div>
                   )}
+
+                  {/* ── FATURAMENTO POR PERÍODO — PeriodoSelect nativo ── */}
                   <div className="mt-2 bg-dark-100 border border-gray-800 rounded-custom p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                       <div className="text-xs text-gray-500 uppercase tracking-wide">FATURAMENTO POR PERÍODO</div>
-                      <div className="relative flex justify-start sm:block">
-                        <select value={faturamentoPeriodo} onChange={(e) => setFaturamentoPeriodo(e.target.value)}
-                          className="no-native-indicator appearance-none text-center w-auto min-w-[140px] px-4 py-2 bg-dark-200 border border-gray-800 rounded-button text-white text-sm cursor-pointer pr-4 sm:pr-12">
-                          <option value="7d">Últimos 7 dias</option>
-                          <option value="15d">Últimos 15 dias</option>
-                          <option value="30d">Últimos 30 dias</option>
-                          <option value="6m">Últimos 6 meses</option>
-                          <option value="12m">Últimos 12 meses</option>
-                          <option value="all">Tudo</option>
-                        </select>
-                        <span className="hidden sm:flex pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 items-center justify-center w-5 h-5 rounded-full bg-dark-100 border border-gray-800 text-gray-400 text-xs">▾</span>
-                      </div>
+                      <PeriodoSelect
+                        value={faturamentoPeriodo}
+                        onChange={setFaturamentoPeriodo}
+                      />
                     </div>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       <div className="bg-dark-200 border border-gray-800 rounded-custom p-4">
@@ -1519,6 +1504,7 @@ export default function Dashboard({ user, onLogout }) {
                   </div>
                 </div>
 
+                {/* ── PARCEIROS — ProfissionalSelect nativo ── */}
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                   <div className="text-sm text-white-600 tracking-wide mb-1">Parceiros</div>
                   <p className="text-sm text-gray-600 mb-4">
@@ -1527,22 +1513,17 @@ export default function Dashboard({ user, onLogout }) {
                   <div className="grid sm:grid-cols-2 gap-3 mb-3">
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">PROFISSIONAL</label>
-                      <InputWithChevron>
-                        <select
-                          value={parceiroSelected}
-                          onChange={(e) => {
-                            setParceiroSelected(e.target.value);
-                            const prof = profissionais.find(p => p.id === e.target.value);
-                            setParceiroEmail(prof?.email || '');
-                          }}
-                          className="no-native-indicator w-full px-4 py-3 pr-12 bg-dark-100 border border-gray-800 rounded-custom text-white"
-                        >
-                          <option value="">Selecionar profissional...</option>
-                          {profissionais.filter(p => p.ativo !== false).map(p => (
-                            <option key={p.id} value={p.id}>{p.nome}</option>
-                          ))}
-                        </select>
-                      </InputWithChevron>
+                      <ProfissionalSelect
+                        value={parceiroSelected}
+                        onChange={(id) => {
+                          setParceiroSelected(id);
+                          const prof = profissionais.find(p => p.id === id);
+                          setParceiroEmail(prof?.email || '');
+                        }}
+                        profissionais={profissionais}
+                        placeholder="Selecionar profissional..."
+                        apenasAtivos={true}
+                      />
                     </div>
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">EMAIL DO PARCEIRO</label>
@@ -1602,6 +1583,7 @@ export default function Dashboard({ user, onLogout }) {
                     </div>
                   </div>
                 </div>
+
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-normal">GALERIA</h3>
@@ -1630,6 +1612,7 @@ export default function Dashboard({ user, onLogout }) {
         </div>
       </div>
 
+      {/* ── MODAL NOVA / EDITAR ENTREGA — ProfissionalSelect nativo ── */}
       {showNovaEntrega && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
@@ -1640,14 +1623,13 @@ export default function Dashboard({ user, onLogout }) {
             <form onSubmit={editingEntregaId ? updateEntrega : createEntrega} className="space-y-4">
               <div>
                 <label className="block text-sm mb-2">Profissional</label>
-                <InputWithChevron>
-                  <select value={formEntrega.profissional_id} onChange={(e) => setFormEntrega({ ...formEntrega, profissional_id: e.target.value })} className="no-native-indicator w-full px-4 py-3 pr-12 bg-dark-200 border border-gray-800 rounded-custom text-white" required>
-                    <option value="">Selecione</option>
-                    {profissionais.filter(p => (p.ativo === undefined ? true : !!p.ativo)).map(p => (
-                      <option key={p.id} value={p.id}>{p.nome}</option>
-                    ))}
-                  </select>
-                </InputWithChevron>
+                <ProfissionalSelect
+                  value={formEntrega.profissional_id}
+                  onChange={(id) => setFormEntrega({ ...formEntrega, profissional_id: id })}
+                  profissionais={profissionais}
+                  placeholder="Selecione"
+                  apenasAtivos={true}
+                />
               </div>
               <div>
                 <label className="block text-sm mb-2">Nome</label>
@@ -1674,6 +1656,7 @@ export default function Dashboard({ user, onLogout }) {
         </div>
       )}
 
+      {/* ── MODAL NOVO / EDITAR PROFISSIONAL — TimePicker nativo ── */}
       {showNovoProfissional && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
@@ -1694,26 +1677,47 @@ export default function Dashboard({ user, onLogout }) {
                 <label className="block text-sm mb-2">Anos de experiência</label>
                 <input type="number" value={formProfissional.anos_experiencia} onChange={(e) => setFormProfissional({ ...formProfissional, anos_experiencia: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" />
               </div>
+
+              {/* Horário de trabalho — TimePicker nativo */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm mb-2">Das</label>
-                  <InputWithChevron><input type="time" value={formProfissional.horario_inicio} onChange={(e) => setFormProfissional({ ...formProfissional, horario_inicio: e.target.value })} className="no-native-indicator w-full px-4 py-3 pr-12 bg-dark-200 border border-gray-800 rounded-custom text-white" required /></InputWithChevron>
+                  <TimePicker
+                    value={formProfissional.horario_inicio}
+                    onChange={(v) => setFormProfissional({ ...formProfissional, horario_inicio: v })}
+                    step={30}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm mb-2">Até</label>
-                  <InputWithChevron><input type="time" value={formProfissional.horario_fim} onChange={(e) => setFormProfissional({ ...formProfissional, horario_fim: e.target.value })} className="no-native-indicator w-full px-4 py-3 pr-12 bg-dark-200 border border-gray-800 rounded-custom text-white" required /></InputWithChevron>
+                  <TimePicker
+                    value={formProfissional.horario_fim}
+                    onChange={(v) => setFormProfissional({ ...formProfissional, horario_fim: v })}
+                    step={30}
+                  />
                 </div>
               </div>
+
+              {/* Horário de almoço — TimePicker nativo */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm mb-2">Almoço (Início)</label>
-                  <InputWithChevron><input type="time" value={formProfissional.almoco_inicio} onChange={(e) => setFormProfissional({ ...formProfissional, almoco_inicio: e.target.value })} className="no-native-indicator w-full px-4 py-3 pr-12 bg-dark-200 border border-gray-800 rounded-custom text-white" /></InputWithChevron>
+                  <TimePicker
+                    value={formProfissional.almoco_inicio}
+                    onChange={(v) => setFormProfissional({ ...formProfissional, almoco_inicio: v })}
+                    step={15}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm mb-2">Almoço (Fim)</label>
-                  <InputWithChevron><input type="time" value={formProfissional.almoco_fim} onChange={(e) => setFormProfissional({ ...formProfissional, almoco_fim: e.target.value })} className="no-native-indicator w-full px-4 py-3 pr-12 bg-dark-200 border border-gray-800 rounded-custom text-white" /></InputWithChevron>
+                  <TimePicker
+                    value={formProfissional.almoco_fim}
+                    onChange={(v) => setFormProfissional({ ...formProfissional, almoco_fim: v })}
+                    step={15}
+                  />
                 </div>
               </div>
+
               <div>
                 <label className="block text-sm mb-2">Dias de trabalho</label>
                 <div className="grid grid-cols-5 sm:grid-cols-7 gap-2">
