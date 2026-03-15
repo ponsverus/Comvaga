@@ -174,8 +174,6 @@ function getValorAgendamento(a) {
 const normalizeKey = (s) =>
   String(s || '').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-// ─── mapas de labels dinâmicos (3 grupos + fallback servicos) ─────────────────
-
 const LABEL_TAB = {
   servicos:  'SERVIÇOS',
   consultas: 'CONSULTAS',
@@ -224,10 +222,7 @@ const LABEL_EMPTY_LIST = {
   aulas:     'Sem aulas para este profissional.',
 };
 
-// helper: lê o mapa com fallback em 'servicos'
 const g = (map, group) => map[group] ?? map['servicos'];
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 export default function Dashboard({ user, onLogout }) {
   const feedback = useFeedback?.();
@@ -315,13 +310,11 @@ export default function Dashboard({ user, onLogout }) {
 
   useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
 
-  // grupo dinâmico — fallback em 'servicos' garantido pelo getBusinessGroup
   const businessGroup = useMemo(
     () => getBusinessGroup(negocio?.tipo_negocio),
     [negocio?.tipo_negocio]
   );
 
-  // labels derivados do grupo
   const tabEntregasLabel  = g(LABEL_TAB,              businessGroup);
   const sectionTitle      = g(LABEL_SECTION,          businessGroup);
   const btnAddLabel       = g(LABEL_BTN_ADD,          businessGroup);
