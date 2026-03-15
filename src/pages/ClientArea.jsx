@@ -47,9 +47,9 @@ const moneyBR = (v) => {
   return n.toFixed(2).replace('.', ',');
 };
 
-const getPrecoFinalServico = (s) => {
-  const preco = Number(s?.preco ?? 0);
-  const promoRaw = s?.preco_promocional;
+const getPrecoFinalEntrega = (e) => {
+  const preco = Number(e?.preco ?? 0);
+  const promoRaw = e?.preco_promocional;
   const promo = (promoRaw == null || promoRaw === '') ? 0 : Number(promoRaw);
   const temPromo = Number.isFinite(promo) && promo > 0 && promo < preco;
   return temPromo ? promo : preco;
@@ -153,18 +153,20 @@ export default function ClientArea({ user, onLogout }) {
 
   const montarAgendamentosComMaps = async (agList) => {
     const list = agList || [];
-    const servicoIds = uniq(list.map(a => a.servico_id));
-    const profIds = uniq(list.map(a => a.profissional_id));
 
-    let servicosMap = new Map();
-    if (servicoIds.length) {
-      const { data: servicosData, error: servErr } = await supabase
-        .from('servicos')
+    // ── entregas (substitui servicos) ──────────────────────────────────────
+    const entregaIds = uniq(list.map(a => a.entrega_id));
+    const profIds    = uniq(list.map(a => a.profissional_id));
+
+    let entregasMap = new Map();
+    if (entregaIds.length) {
+      const { data: entregasData, error: entErr } = await supabase
+        .from('entregas')
         .select('id, nome, preco, preco_promocional')
-        .in('id', servicoIds);
+        .in('id', entregaIds);
 
-      if (servErr) throw servErr;
-      for (const s of (servicosData || [])) servicosMap.set(s.id, s);
+      if (entErr) throw entErr;
+      for (const e of (entregasData || [])) entregasMap.set(e.id, e);
     }
 
     let profissionaisMap = new Map();
@@ -194,21 +196,21 @@ export default function ClientArea({ user, onLogout }) {
     }
 
     return list.map(a => {
-      const serv = servicosMap.get(a.servico_id) || null;
-      const prof = profissionaisMap.get(a.profissional_id) || null;
-      const neg = prof?.negocio_id ? (negociosMap.get(prof.negocio_id) || null) : null;
+      const entrega = entregasMap.get(a.entrega_id) || null;
+      const prof    = profissionaisMap.get(a.profissional_id) || null;
+      const neg     = prof?.negocio_id ? (negociosMap.get(prof.negocio_id) || null) : null;
 
-      const data = a.data || toYMD_SP(a.inicio);
+      const data        = a.data || toYMD_SP(a.inicio);
       const hora_inicio = a.horario_inicio ? String(a.horario_inicio).slice(0, 5) : toHHMM_SP(a.inicio);
-      const hora_fim = a.horario_fim ? String(a.horario_fim).slice(0, 5) : toHHMM_SP(a.fim);
+      const hora_fim    = a.horario_fim    ? String(a.horario_fim).slice(0, 5)    : toHHMM_SP(a.fim);
 
       return {
         ...a,
         data,
         hora_inicio,
         hora_fim,
-        servicos: serv,
-        profissionais: prof ? { ...prof, negocios: neg } : null,
+        entregas:       entrega,                                        // ← era servicos
+        profissionais:  prof ? { ...prof, negocios: neg } : null,
       };
     });
   };
@@ -218,8 +220,8 @@ export default function ClientArea({ user, onLogout }) {
 
     for (const a of (agRaw || [])) {
       const st = String(a?.status || '');
-      if (st === 'agendado' || st === 'confirmado') {
-        const dataA = a.data || toYMD_SP(a.inicio);
+      if (st === 'agendado') {
+        const dataA  = a.data || toYMD_SP(a.inicio);
         const fimStr = a.horario_fim
           ? String(a.horario_fim).slice(0, 5)
           : toHHMM_SP(a.fim) || '00:00';
@@ -242,7 +244,7 @@ export default function ClientArea({ user, onLogout }) {
           .update({ status: 'concluido', concluido_em: new Date().toISOString() })
           .eq('id', id)
           .eq('cliente_id', user.id)
-          .in('status', ['agendado', 'confirmado'])
+          .in('status', ['agendado'])
       )
     );
 
@@ -284,8 +286,8 @@ export default function ClientArea({ user, onLogout }) {
 
       if (favErr) throw favErr;
 
-      const favList = favRaw || [];
-      const favNegIds = uniq(favList.filter(f => f.tipo === 'negocio').map(f => f.negocio_id));
+      const favList    = favRaw || [];
+      const favNegIds  = uniq(favList.filter(f => f.tipo === 'negocio').map(f => f.negocio_id));
       const favProfIds = uniq(favList.filter(f => f.tipo === 'profissional').map(f => f.profissional_id));
 
       let favProfMap = new Map();
@@ -313,18 +315,17 @@ export default function ClientArea({ user, onLogout }) {
           .in('id', allFavNegIds);
 
         if (negFavErr) throw negFavErr;
-
         for (const n of (negFavData || [])) favNegMap.set(n.id, n);
       }
 
       const favFinal = favList.map(f => {
-        const prof = f.tipo === 'profissional' ? (favProfMap.get(f.profissional_id) || null) : null;
-        const negDirect = f.tipo === 'negocio' ? (favNegMap.get(f.negocio_id) || null) : null;
-        const negFromProf = prof?.negocio_id ? (favNegMap.get(prof.negocio_id) || null) : null;
+        const prof       = f.tipo === 'profissional' ? (favProfMap.get(f.profissional_id) || null) : null;
+        const negDirect  = f.tipo === 'negocio'      ? (favNegMap.get(f.negocio_id)       || null) : null;
+        const negFromProf = prof?.negocio_id         ? (favNegMap.get(prof.negocio_id)    || null) : null;
 
         return {
           ...f,
-          negocios: negDirect,
+          negocios:      negDirect,
           profissionais: prof ? { ...prof, negocios: negFromProf } : null,
         };
       });
@@ -371,7 +372,7 @@ export default function ClientArea({ user, onLogout }) {
     if (!file) return;
     e.target.value = '';
 
-    const maxMb = 3;
+    const maxMb   = 3;
     const okTypes = ['image/png', 'image/jpeg', 'image/webp'];
 
     if (!okTypes.includes(file.type)) {
@@ -429,10 +430,7 @@ export default function ClientArea({ user, onLogout }) {
 
       if (updErr) throw updErr;
 
-      const { error: metaErr } = await supabase.auth.updateUser({
-        data: { nome }
-      });
-
+      const { error: metaErr } = await supabase.auth.updateUser({ data: { nome } });
       if (metaErr) console.warn('metaErr:', metaErr);
 
       await uiAlert('clientArea.profile_name_updated', 'success');
@@ -454,10 +452,8 @@ export default function ClientArea({ user, onLogout }) {
 
     try {
       setSavingDados(true);
-
       const { error } = await supabase.auth.updateUser({ email });
       if (error) throw error;
-
       await uiAlert('clientArea.account_email_update_sent', 'success');
       await loadData();
     } catch (e) {
@@ -483,10 +479,8 @@ export default function ClientArea({ user, onLogout }) {
 
     try {
       setSavingDados(true);
-
       const { error } = await supabase.auth.updateUser({ password: pass });
       if (error) throw error;
-
       setNovaSenha('');
       setConfirmarSenha('');
       await uiAlert('clientArea.account_password_updated', 'success');
@@ -506,9 +500,7 @@ export default function ClientArea({ user, onLogout }) {
       const { error } = await supabase.rpc('cancelar_agendamento', {
         p_agendamento_id: agendamentoId
       });
-
       if (error) throw error;
-
       await uiAlert('clientArea.booking_canceled', 'danger');
       loadData();
     } catch (error) {
@@ -538,7 +530,6 @@ export default function ClientArea({ user, onLogout }) {
   const getStatusColor = (status) => {
     switch (status) {
       case 'agendado':
-      case 'confirmado':
         return 'bg-blue-500/20 border-blue-500/50 text-blue-400';
       case 'concluido':
         return 'bg-green-500/20 border-green-500/50 text-green-400';
@@ -552,12 +543,10 @@ export default function ClientArea({ user, onLogout }) {
 
   const getStatusText = (status) => {
     const statusMap = {
-      agendado: 'AGENDADO',
-      confirmado: 'CONFIRMADO',
-      concluido: 'CONCLUÍDO',
-      cancelado_cliente: 'CANCELADO',
+      agendado:               'AGENDADO',
+      concluido:              'CONCLUÍDO',
+      cancelado_cliente:      'CANCELADO',
       cancelado_profissional: 'CANCELADO',
-      nao_compareceu: 'NÃO COMPARECEU'
     };
     return statusMap[status] || String(status || '').toUpperCase();
   };
@@ -574,19 +563,19 @@ export default function ClientArea({ user, onLogout }) {
   };
 
   const agendamentosPorStatus = useMemo(() => {
-    const abertos = [];
+    const abertos    = [];
     const cancelados = [];
     const concluidos = [];
 
     for (const a of (agendamentos || [])) {
       const st = String(a?.status || '');
-      if (st === 'concluido') concluidos.push(a);
+      if (st === 'concluido')          concluidos.push(a);
       else if (st.includes('cancelado')) cancelados.push(a);
-      else abertos.push(a);
+      else                               abertos.push(a);
     }
 
     return {
-      abertos: sortByDateThenTime(abertos),
+      abertos:    sortByDateThenTime(abertos),
       cancelados: sortByDateThenTime(cancelados),
       concluidos: sortByDateThenTime(concluidos),
     };
@@ -615,8 +604,9 @@ export default function ClientArea({ user, onLogout }) {
                   <p className="text-sm text-gray-400 mb-2">
                     {agendamento.profissionais?.nome || '—'}
                   </p>
+                  {/* ← era agendamento.servicos?.nome */}
                   <p className="text-sm text-primary">
-                    {agendamento.servicos?.nome || '—'}
+                    {agendamento.entregas?.nome || '—'}
                   </p>
                 </div>
 
@@ -636,13 +626,14 @@ export default function ClientArea({ user, onLogout }) {
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 mb-1">VALOR</div>
+                  {/* ← era getPrecoFinalServico(agendamento.servicos) */}
                   <div className="text-sm text-white">
-                    R$ {moneyBR(getPrecoFinalServico(agendamento.servicos))}
+                    R$ {moneyBR(getPrecoFinalEntrega(agendamento.entregas))}
                   </div>
                 </div>
               </div>
 
-              {(agendamento.status === 'agendado' || agendamento.status === 'confirmado') && (
+              {agendamento.status === 'agendado' && (
                 <button
                   onClick={() => cancelarAgendamento(agendamento.id)}
                   className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-400 rounded-button text-sm transition-all"
@@ -665,7 +656,7 @@ export default function ClientArea({ user, onLogout }) {
     );
   }
 
-  const nomeCabecalho = String(nomePerfil || user?.user_metadata?.nome || '—').trim();
+  const nomeCabecalho  = String(nomePerfil || user?.user_metadata?.nome || '—').trim();
   const avatarFallback = nomeCabecalho?.[0]?.toUpperCase() || '?';
 
   return (
@@ -799,7 +790,7 @@ export default function ClientArea({ user, onLogout }) {
                   agendamentosPorStatus.cancelados.length ||
                   agendamentosPorStatus.concluidos.length) ? (
                   <div>
-                    {renderSecaoAgendamentos('EM ABERTO', agendamentosPorStatus.abertos)}
+                    {renderSecaoAgendamentos('EM ABERTO',  agendamentosPorStatus.abertos)}
                     {renderSecaoAgendamentos('CANCELADOS', agendamentosPorStatus.cancelados)}
                     {renderSecaoAgendamentos('CONCLUÍDOS', agendamentosPorStatus.concluidos)}
                   </div>
