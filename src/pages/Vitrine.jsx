@@ -689,7 +689,6 @@ export default function Vitrine({ user, userType }) {
         </div>
       </section>
 
-      {/* ── Profissionais — masonry + chips ── */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-normal mb-6">Profissionais</h2>
@@ -750,10 +749,6 @@ export default function Vitrine({ user, userType }) {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          SERVIÇOS — fundo bg-vcard2, cards bg-vcard, título DENTRO
-          (mesmo padrão da seção de profissionais acima)
-      ───────────────────────────────────────────────────────────────── */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-normal mb-6">{sectionTitle}</h2>
