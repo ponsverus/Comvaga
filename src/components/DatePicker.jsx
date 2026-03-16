@@ -40,7 +40,7 @@ export default function DatePicker({ value, onChange, todayISO }) {
   const [viewYear,  setViewYear]  = useState(initYear);
   const [viewMonth, setViewMonth] = useState(initMonth);
   const [open,      setOpen]      = useState(false);
-  const [openUp,    setOpenUp]    = useState(false);
+  const [position,  setPosition]  = useState("down");
 
   const containerRef = useRef(null);
 
@@ -48,10 +48,18 @@ export default function DatePicker({ value, onChange, todayISO }) {
     if (!open) return;
 
     const rect = containerRef.current.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - rect.bottom;
     const calendarHeight = 360;
 
-    setOpenUp(spaceBelow < calendarHeight);
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    if (spaceBelow >= calendarHeight) {
+      setPosition("down");
+    } else if (spaceAbove >= calendarHeight) {
+      setPosition("up");
+    } else {
+      setPosition("center");
+    }
 
   }, [open]);
 
@@ -111,8 +119,10 @@ export default function DatePicker({ value, onChange, todayISO }) {
       {open && (
         <div
           className={[
-            "absolute right-0 z-50 bg-dark-100 border border-gray-800 rounded-custom shadow-2xl p-5 w-[300px]",
-            openUp ? "bottom-full mb-2" : "top-full mt-2"
+            "z-50 bg-dark-100 border border-gray-800 rounded-custom shadow-2xl p-5 w-[300px]",
+            position === "down" && "absolute right-0 top-full mt-2",
+            position === "up" && "absolute right-0 bottom-full mb-2",
+            position === "center" && "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           ].join(' ')}
         >
 
