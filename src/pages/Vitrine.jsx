@@ -231,22 +231,17 @@ function ServicoButtons({ servico, profissional, selecaoProfId, servicosSelecion
   const isSelecionado = servicosSelecionados.some(x => x.id === servico.id);
   const modoSelecaoOn = servicosSelecionados.length > 0;
   const outroProfSel  = modoSelecaoOn && selecaoProfId !== null && selecaoProfId !== profissional.id;
-
-  const agendarDesabilitado   = !!isProfessional || modoSelecaoOn;
+  const agendarDesabilitado    = !!isProfessional || modoSelecaoOn;
   const selecionarDesabilitado = !!isProfessional || outroProfSel;
 
   let selecionarClass;
   if (isProfessional || outroProfSel) {
-    // profissional logado OU outro profissional selecionado → apagado
     selecionarClass = 'bg-vcard2 border-vborder text-vmuted cursor-not-allowed opacity-30';
   } else if (isSelecionado) {
-    // este serviço está selecionado → aceso
     selecionarClass = 'bg-primary/15 border-primary text-primary';
   } else if (modoSelecaoOn) {
-    // modo seleção ativo, mesmo profissional, não selecionado → texto branco visível
     selecionarClass = 'bg-vcard2 border-vborder text-white hover:border-primary hover:text-primary';
   } else {
-    // repouso
     selecionarClass = 'bg-vcard2 border-vborder text-vsub hover:border-primary hover:text-primary';
   }
 
@@ -265,7 +260,6 @@ function ServicoButtons({ servico, profissional, selecaoProfId, servicosSelecion
         <Calendar className="w-3.5 h-3.5" />
         Agendar agora
       </button>
-
       <button
         onClick={() => !selecionarDesabilitado && onToggleSelecao(profissional, servico)}
         disabled={selecionarDesabilitado}
@@ -286,15 +280,11 @@ function ServicoButtons({ servico, profissional, selecaoProfId, servicosSelecion
 function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecionados, isProfessional, onAgendarAgora, onToggleSelecao, emptyMsg }) {
   const [pagina, setPagina] = useState(0);
   const touchStartX = useRef(null);
-
   const totalPaginas = Math.ceil(lista.length / SERVICOS_POR_PAGINA);
   const paginaAtual  = Math.min(pagina, Math.max(0, totalPaginas - 1));
   const itensPagina  = lista.slice(paginaAtual * SERVICOS_POR_PAGINA, paginaAtual * SERVICOS_POR_PAGINA + SERVICOS_POR_PAGINA);
-
   useEffect(() => { setPagina(0); }, [profissional.id]);
-
   const irPara = (idx) => setPagina(Math.max(0, Math.min(idx, totalPaginas - 1)));
-
   const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
   const onTouchEnd   = (e) => {
     if (touchStartX.current === null) return;
@@ -302,9 +292,7 @@ function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecion
     if (Math.abs(diff) > 40) irPara(paginaAtual + (diff > 0 ? 1 : -1));
     touchStartX.current = null;
   };
-
   if (!lista.length) return <p className="text-vmuted font-normal">{emptyMsg}</p>;
-
   return (
     <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <div className="flex flex-col gap-3">
@@ -352,7 +340,6 @@ function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecion
           );
         })}
       </div>
-
       {totalPaginas > 1 && (
         <div className="flex items-center justify-center gap-2 mt-4">
           {Array.from({ length: totalPaginas }).map((_, i) => (
@@ -361,9 +348,7 @@ function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecion
               onClick={() => irPara(i)}
               className={[
                 'rounded-full transition-all',
-                i === paginaAtual
-                  ? 'w-4 h-2 bg-primary'
-                  : 'w-2 h-2 bg-gray-700 hover:bg-gray-500',
+                i === paginaAtual ? 'w-4 h-2 bg-primary' : 'w-2 h-2 bg-gray-700 hover:bg-gray-500',
               ].join(' ')}
               aria-label={`Página ${i + 1}`}
             />
@@ -377,10 +362,8 @@ function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecion
 export default function Vitrine({ user, userType }) {
   const { slug }    = useParams();
   const navigate    = useNavigate();
-
   const vitrineMsgs = ptBR?.vitrine || {};
   const getMsg      = (key, fallback) => vitrineMsgs?.[key] || fallback;
-
   const [negocio,       setNegocio]       = useState(null);
   const [profissionais, setProfissionais] = useState([]);
   const [entregas,      setEntregas]      = useState([]);
@@ -388,33 +371,28 @@ export default function Vitrine({ user, userType }) {
   const [galeriaItems,  setGaleriaItems]  = useState([]);
   const [loading,       setLoading]       = useState(true);
   const [error,         setError]         = useState(null);
-
   const businessGroup   = useMemo(() => getBusinessGroup(negocio?.tipo_negocio), [negocio?.tipo_negocio]);
   const bizV            = vitrineMsgs?.business || {};
   const sectionTitle    = bizV?.section_title?.[businessGroup]  ?? 'Serviços';
   const counterSingular = ptBR?.dashboard?.business?.counter_singular?.[businessGroup] ?? 'serviço';
   const counterPlural   = ptBR?.dashboard?.business?.counter_plural?.[businessGroup]   ?? 'serviços';
   const emptyListMsg    = ptBR?.dashboard?.business?.empty_list?.[businessGroup]       ?? 'Sem serviços para este profissional.';
-
   const [nativeAlertOpen,   setNativeAlertOpen]   = useState(false);
   const [nativeAlertData,   setNativeAlertData]   = useState({ title: '', body: '', buttonText: 'OK' });
   const [nativeConfirmOpen, setNativeConfirmOpen] = useState(false);
   const [nativeConfirmData, setNativeConfirmData] = useState({ title: '', body: '', confirmText: 'CONFIRMAR', cancelText: 'CANCELAR' });
   const confirmResolverRef = useRef(null);
   const alertAfterCloseRef = useRef(null);
-
   const closeAlert = () => {
     setNativeAlertOpen(false);
     const fn = alertAfterCloseRef.current;
     alertAfterCloseRef.current = null;
     if (typeof fn === 'function') fn();
   };
-
   const openAlert = ({ title, body, buttonText }) => {
     setNativeAlertData({ title: title || getMsg('generic_title', 'Aviso'), body: body || '', buttonText: buttonText || 'OK' });
     setNativeAlertOpen(true);
   };
-
   const alertKey = (key, fallbackTitle, fallbackBody, fallbackBtn = 'OK') => {
     const m = vitrineMsgs?.[key];
     if (m && typeof m === 'object') {
@@ -423,7 +401,6 @@ export default function Vitrine({ user, userType }) {
     }
     openAlert({ title: fallbackTitle || getMsg('generic_title', 'Aviso'), body: fallbackBody || '', buttonText: fallbackBtn || 'OK' });
   };
-
   const confirmKey = (key, fallbackTitle, fallbackBody, fallbackConfirm = 'CONFIRMAR', fallbackCancel = 'CANCELAR') => {
     return new Promise((resolve) => {
       confirmResolverRef.current = resolve;
@@ -437,134 +414,80 @@ export default function Vitrine({ user, userType }) {
       setNativeConfirmOpen(true);
     });
   };
-
   const closeConfirm = (value) => {
     setNativeConfirmOpen(false);
     const r = confirmResolverRef.current;
     confirmResolverRef.current = null;
     if (typeof r === 'function') r(!!value);
   };
-
   const [isFavorito,   setIsFavorito]   = useState(false);
   const [calendarLink, setCalendarLink] = useState('');
-
-  const [flow, setFlow] = useState({
-    step: 0,
-    profissional: null,
-    servicosSelecionados: [],
-    lastSlot: null,
-  });
-
+  const [flow, setFlow] = useState({ step: 0, profissional: null, servicosSelecionados: [], lastSlot: null });
   const [selecaoProfId,        setSelecaoProfId]        = useState(null);
   const [servicosSelecionados, setServicosSelecionados] = useState([]);
-
   const todayISO = useMemo(() => getNowSP().date, []);
-
   const [showDepoimento,           setShowDepoimento]           = useState(false);
   const [depoimentoNota,           setDepoimentoNota]           = useState(5);
   const [depoimentoTexto,          setDepoimentoTexto]          = useState('');
   const [depoimentoLoading,        setDepoimentoLoading]        = useState(false);
   const [depoimentoTipo,           setDepoimentoTipo]           = useState('negocio');
   const [depoimentoProfissionalId, setDepoimentoProfissionalId] = useState(null);
-
   const isProfessional = user && userType === 'professional';
-
   useEffect(() => { loadVitrine(); }, [slug]);
-
   useEffect(() => {
     if (user && negocio?.id) checkFavorito();
     else setIsFavorito(false);
   }, [user?.id, userType, negocio?.id]);
 
   const loadVitrine = async () => {
-    setLoading(true);
-    setError(null);
-    const watchdog = setTimeout(() => {
-      setLoading(false);
-      setError(getMsg('load_timeout', 'Demorou demais para carregar. Tente novamente.'));
-    }, 12000);
-
+    setLoading(true); setError(null);
+    const watchdog = setTimeout(() => { setLoading(false); setError(getMsg('load_timeout', 'Demorou demais para carregar. Tente novamente.')); }, 12000);
     try {
-      const { data: negocioData, error: negocioError } = await withTimeout(
-        supabase.from('negocios').select('*').eq('slug', slug).maybeSingle(), 7000, 'negocio'
-      );
+      const { data: negocioData, error: negocioError } = await withTimeout(supabase.from('negocios').select('*').eq('slug', slug).maybeSingle(), 7000, 'negocio');
       if (negocioError) throw negocioError;
-      if (!negocioData) {
-        setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]);
-        return;
-      }
+      if (!negocioData) { setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]); return; }
       setNegocio(negocioData);
-
-      const { data: profissionaisData, error: profErr } = await withTimeout(
-        supabase.from('profissionais').select('*').eq('negocio_id', negocioData.id), 7000, 'profissionais'
-      );
+      const { data: profissionaisData, error: profErr } = await withTimeout(supabase.from('profissionais').select('*').eq('negocio_id', negocioData.id), 7000, 'profissionais');
       if (profErr) throw profErr;
-
       const profs = profissionaisData || [];
       setProfissionais(profs);
       const profissionalIds = profs.map(p => p.id).filter(Boolean);
-
-      const depFilter = profissionalIds.length
-        ? `negocio_id.eq.${negocioData.id},profissional_id.in.(${profissionalIds.join(',')})`
-        : `negocio_id.eq.${negocioData.id}`;
-
+      const depFilter = profissionalIds.length ? `negocio_id.eq.${negocioData.id},profissional_id.in.(${profissionalIds.join(',')})` : `negocio_id.eq.${negocioData.id}`;
       const [entregasResult, galeriaResult, depoimentosResult] = await Promise.all([
-        profissionalIds.length
-          ? withTimeout(supabase.from('entregas').select('*').in('profissional_id', profissionalIds).eq('ativo', true), 7000, 'entregas')
-          : Promise.resolve({ data: [], error: null }),
+        profissionalIds.length ? withTimeout(supabase.from('entregas').select('*').in('profissional_id', profissionalIds).eq('ativo', true), 7000, 'entregas') : Promise.resolve({ data: [], error: null }),
         withTimeout(supabase.from('galerias').select('id, path, ordem').eq('negocio_id', negocioData.id).order('ordem', { ascending: true }).order('created_at', { ascending: true }), 7000, 'galerias'),
         withTimeout(supabase.from('depoimentos').select('id, tipo, negocio_id, profissional_id, cliente_id, nota, comentario, created_at').or(depFilter).order('created_at', { ascending: false }).limit(20), 7000, 'depoimentos'),
       ]);
-
       if (entregasResult.error) throw entregasResult.error;
       if (galeriaResult.error) throw galeriaResult.error;
       if (depoimentosResult.error) throw depoimentosResult.error;
-
       setEntregas(entregasResult.data || []);
       setGaleriaItems(galeriaResult.data || []);
-
       const base = depoimentosResult.data || [];
       const clienteIds = Array.from(new Set(base.map(a => a.cliente_id).filter(Boolean)));
       let usersMap = new Map();
-
       if (clienteIds.length) {
-        const { data: usersDb, error: upErr } = await withTimeout(
-          supabase.from('users').select('id, nome, avatar_path, type').in('id', clienteIds), 7000, 'users'
-        );
+        const { data: usersDb, error: upErr } = await withTimeout(supabase.from('users').select('id, nome, avatar_path, type').in('id', clienteIds), 7000, 'users');
         if (upErr) throw upErr;
         usersMap = new Map((usersDb || []).map(u => [u.id, u]));
       }
-
-      const profMap      = new Map((profs || []).map(p => [p.id, p]));
+      const profMap = new Map((profs || []).map(p => [p.id, p]));
       const negociosNome = negocioData?.nome || null;
-
-      const finalDep = base.map(a => {
+      setDepoimentos(base.map(a => {
         const u = usersMap.get(a.cliente_id) || null;
         const p = profMap.get(a.profissional_id) || null;
-        return {
-          ...a,
-          users: u ? { nome: u.nome, avatar_path: u.avatar_path, type: u.type } : null,
-          profissionais: p ? { nome: p.nome } : null,
-          negocios: { nome: negociosNome },
-        };
-      });
-
-      setDepoimentos(finalDep);
+        return { ...a, users: u ? { nome: u.nome, avatar_path: u.avatar_path, type: u.type } : null, profissionais: p ? { nome: p.nome } : null, negocios: { nome: negociosNome } };
+      }));
     } catch (e) {
       setError(e?.message || getMsg('load_error', 'Erro ao carregar a vitrine.'));
       setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]);
-    } finally {
-      clearTimeout(watchdog);
-      setLoading(false);
-    }
+    } finally { clearTimeout(watchdog); setLoading(false); }
   };
 
   const checkFavorito = async () => {
     if (!user || userType !== 'client' || !negocio?.id) { setIsFavorito(false); return; }
     try {
-      const { data, error: favErr } = await withTimeout(
-        supabase.from('favoritos').select('id').eq('cliente_id', user.id).eq('tipo', 'negocio').eq('negocio_id', negocio.id).maybeSingle(), 6000, 'favorito'
-      );
+      const { data, error: favErr } = await withTimeout(supabase.from('favoritos').select('id').eq('cliente_id', user.id).eq('tipo', 'negocio').eq('negocio_id', negocio.id).maybeSingle(), 6000, 'favorito');
       if (favErr) throw favErr;
       setIsFavorito(!!data);
     } catch { setIsFavorito(false); }
@@ -593,18 +516,13 @@ export default function Vitrine({ user, userType }) {
       if (ok) navigate('/login');
       return false;
     }
-    if (userType !== 'client') {
-      alertKey('schedule_only_client', 'Ação restrita', 'Você está logado como PROFISSIONAL. Para agendar, entre como CLIENTE.', 'ENTENDI');
-      return false;
-    }
+    if (userType !== 'client') { alertKey('schedule_only_client', 'Ação restrita', 'Você está logado como PROFISSIONAL. Para agendar, entre como CLIENTE.', 'ENTENDI'); return false; }
     return true;
   };
 
   const handleAgendarAgora = async (profissional, servicos) => {
     if (!(await requireLogin())) return;
-    setSelecaoProfId(null);
-    setServicosSelecionados([]);
-    setCalendarLink('');
+    setSelecaoProfId(null); setServicosSelecionados([]); setCalendarLink('');
     setFlow({ step: 'booking', profissional, servicosSelecionados: servicos, lastSlot: null });
   };
 
@@ -626,45 +544,24 @@ export default function Vitrine({ user, userType }) {
     const profissional = profissionais.find(p => p.id === selecaoProfId);
     if (!profissional) return;
     setFlow({ step: 'booking', profissional, servicosSelecionados, lastSlot: null });
-    setSelecaoProfId(null);
-    setServicosSelecionados([]);
+    setSelecaoProfId(null); setServicosSelecionados([]);
   };
 
-  const handleLimparSelecao = () => {
-    setSelecaoProfId(null);
-    setServicosSelecionados([]);
-  };
+  const handleLimparSelecao = () => { setSelecaoProfId(null); setServicosSelecionados([]); };
 
   const entregaVirtual = useMemo(() => {
     if (!flow.servicosSelecionados?.length) return null;
     const primeiroServico = flow.servicosSelecionados[0];
     const durTotal = flow.servicosSelecionados.reduce((sum, s) => sum + Number(s?.duracao_minutos || 0), 0);
     const valTotal = flow.servicosSelecionados.reduce((sum, s) => sum + getPrecoFinalServico(s), 0);
-    return {
-      id:                primeiroServico.id,
-      nome:              flow.servicosSelecionados.length === 1
-                           ? primeiroServico.nome
-                           : `${flow.servicosSelecionados.length} ${counterPlural}`,
-      duracao_minutos:   durTotal,
-      preco:             valTotal,
-      preco_promocional: null,
-    };
+    return { id: primeiroServico.id, nome: flow.servicosSelecionados.length === 1 ? primeiroServico.nome : `${flow.servicosSelecionados.length} ${counterPlural}`, duracao_minutos: durTotal, preco: valTotal, preco_promocional: null };
   }, [flow.servicosSelecionados, counterPlural]);
 
   const handleBookingConfirm = (slot) => {
     const primeiroServico = flow.servicosSelecionados?.[0];
     const durTotal = (flow.servicosSelecionados || []).reduce((sum, s) => sum + Number(s?.duracao_minutos || 0), 0);
     const link = gerarLinkGoogle(primeiroServico?.nome || 'Agendamento', slot.inicio, durTotal);
-    if (window.OneSignalDeferred) {
-      window.OneSignalDeferred.push(async function (OneSignal) {
-        await OneSignal.sendTags({
-          ultima_acao: 'agendamento_realizado',
-          servico_nome: primeiroServico?.nome || 'Serviço',
-          data_agendamento: slot.dataISO,
-          horario_agendamento: slot.label,
-        });
-      });
-    }
+    if (window.OneSignalDeferred) { window.OneSignalDeferred.push(async function (OneSignal) { await OneSignal.sendTags({ ultima_acao: 'agendamento_realizado', servico_nome: primeiroServico?.nome || 'Serviço', data_agendamento: slot.dataISO, horario_agendamento: slot.label }); }); }
     setCalendarLink(link);
     setFlow(prev => ({ ...prev, step: 5, lastSlot: slot }));
   };
@@ -684,14 +581,7 @@ export default function Vitrine({ user, userType }) {
     if (!negocio?.id) { alertKey('review_invalid_business', 'Negócio inválido', 'Negócio inválido.', 'ENTENDI'); return; }
     try {
       setDepoimentoLoading(true);
-      const payload = {
-        cliente_id:      user.id,
-        tipo:            depoimentoTipo,
-        nota:            depoimentoNota,
-        comentario:      depoimentoTexto || null,
-        negocio_id:      depoimentoTipo === 'negocio'      ? negocio.id               : null,
-        profissional_id: depoimentoTipo === 'profissional' ? depoimentoProfissionalId : null,
-      };
+      const payload = { cliente_id: user.id, tipo: depoimentoTipo, nota: depoimentoNota, comentario: depoimentoTexto || null, negocio_id: depoimentoTipo === 'negocio' ? negocio.id : null, profissional_id: depoimentoTipo === 'profissional' ? depoimentoProfissionalId : null };
       const { error: depErr } = await withTimeout(supabase.from('depoimentos').insert(payload), 7000, 'enviar-depoimento');
       if (depErr) throw depErr;
       setShowDepoimento(false);
@@ -705,9 +595,7 @@ export default function Vitrine({ user, userType }) {
   const logoUrl      = useMemo(() => getPublicUrl('logos',   negocio?.logo_path), [negocio?.logo_path]);
   const instagramUrl = useMemo(() => resolveInstagram(negocio?.instagram),        [negocio?.instagram]);
   const facebookUrl  = useMemo(() => resolveFacebook(negocio?.facebook),          [negocio?.facebook]);
-
   const getAlmocoRange = (p) => ({ ini: p?.almoco_inicio || null, fim: p?.almoco_fim || null });
-
   const isInLunchNow = (p) => {
     const { ini, fim } = getAlmocoRange(p);
     if (!ini || !fim) return false;
@@ -717,7 +605,6 @@ export default function Vitrine({ user, userType }) {
     if (b < a) return (now.minutes >= a || now.minutes < b);
     return (now.minutes >= a && now.minutes < b);
   };
-
   const getProfStatus = (p) => {
     const ativo = (p?.ativo === undefined) ? true : !!p.ativo;
     if (!ativo) return { label: 'FECHADO', color: 'bg-red-500' };
@@ -733,119 +620,51 @@ export default function Vitrine({ user, userType }) {
     if (isInLunchNow(p)) return { label: 'ALMOÇO', color: 'bg-yellow-400' };
     return { label: 'ABERTO', color: 'bg-green-500' };
   };
-
   const entregasPorProf = useMemo(() => {
     const map = new Map();
     for (const p of profissionais) map.set(p.id, []);
-    for (const s of entregas) {
-      if (!map.has(s.profissional_id)) map.set(s.profissional_id, []);
-      map.get(s.profissional_id).push(s);
-    }
+    for (const s of entregas) { if (!map.has(s.profissional_id)) map.set(s.profissional_id, []); map.get(s.profissional_id).push(s); }
     return map;
   }, [profissionais, entregas]);
-
   const depoimentosPorProf = useMemo(() => {
     const map = new Map();
-    for (const dep of depoimentos) {
-      if (dep.profissional_id) {
-        if (!map.has(dep.profissional_id)) map.set(dep.profissional_id, []);
-        map.get(dep.profissional_id).push(dep);
-      }
-    }
+    for (const dep of depoimentos) { if (dep.profissional_id) { if (!map.has(dep.profissional_id)) map.set(dep.profissional_id, []); map.get(dep.profissional_id).push(dep); } }
     const medias = new Map();
-    for (const [profId, deps] of map.entries()) {
-      const media = deps.length > 0 ? (deps.reduce((sum, d) => sum + d.nota, 0) / deps.length).toFixed(1) : null;
-      medias.set(profId, { media, count: deps.length });
-    }
+    for (const [profId, deps] of map.entries()) { const media = deps.length > 0 ? (deps.reduce((sum, d) => sum + d.nota, 0) / deps.length).toFixed(1) : null; medias.set(profId, { media, count: deps.length }); }
     return medias;
   }, [depoimentos]);
 
-  if (loading) return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
-      <div className="text-primary text-2xl font-normal animate-pulse">CARREGANDO...</div>
-    </div>
-  );
+  if (loading) return (<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-primary text-2xl font-normal animate-pulse">CARREGANDO...</div></div>);
+  if (error) return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="max-w-md w-full bg-dark-100 border border-red-500/40 rounded-custom p-8 text-center"><AlertCircle className="w-14 h-14 text-red-400 mx-auto mb-4" /><h1 className="text-2xl font-normal text-white mb-2">Houve um erro ao carregar</h1><p className="text-gray-400 mb-6">{error}</p><button onClick={loadVitrine} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button font-normal uppercase">Tentar novamente</button></div></div>);
+  if (!negocio) return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="text-center"><h1 className="text-3xl font-normal text-white mb-4">Negócio inexistente.</h1><Link to="/" className="text-primary hover:text-yellow-500 font-normal">Voltar para Home</Link></div></div>);
 
-  if (error) return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-dark-100 border border-red-500/40 rounded-custom p-8 text-center">
-        <AlertCircle className="w-14 h-14 text-red-400 mx-auto mb-4" />
-        <h1 className="text-2xl font-normal text-white mb-2">Houve um erro ao carregar</h1>
-        <p className="text-gray-400 mb-6">{error}</p>
-        <button onClick={loadVitrine} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button font-normal uppercase">Tentar novamente</button>
-      </div>
-    </div>
-  );
-
-  if (!negocio) return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="text-center">
-        <h1 className="text-3xl font-normal text-white mb-4">Negócio inexistente.</h1>
-        <Link to="/" className="text-primary hover:text-yellow-500 font-normal">Voltar para Home</Link>
-      </div>
-    </div>
-  );
-
-  const mediaDepoimentos = depoimentos.length > 0
-    ? (depoimentos.reduce((sum, d) => sum + d.nota, 0) / depoimentos.length).toFixed(1)
-    : '0.0';
-
+  const mediaDepoimentos = depoimentos.length > 0 ? (depoimentos.reduce((sum, d) => sum + d.nota, 0) / depoimentos.length).toFixed(1) : '0.0';
   const nomeNegocioLabel = String(negocio?.nome || '').trim() || 'NEGÓCIO';
   const temaAtivo = negocio?.tema || 'dark';
   const hasSelecao = servicosSelecionados.length > 0;
 
   return (
-    <div className={`min-h-screen bg-vbg text-vtext${temaAtivo === 'light' ? ' vitrine-light' : ''}`}
-         style={hasSelecao ? { paddingBottom: 72 } : undefined}>
-
-      <AlertModal  open={nativeAlertOpen}   onClose={closeAlert}               title={nativeAlertData.title}   body={nativeAlertData.body}   buttonText={nativeAlertData.buttonText} />
+    <div className={`min-h-screen bg-vbg text-vtext${temaAtivo === 'light' ? ' vitrine-light' : ''}`} style={hasSelecao ? { paddingBottom: 72 } : undefined}>
+      <AlertModal  open={nativeAlertOpen}   onClose={closeAlert}                title={nativeAlertData.title}   body={nativeAlertData.body}   buttonText={nativeAlertData.buttonText} />
       <ConfirmModal open={nativeConfirmOpen} onCancel={() => closeConfirm(false)} onConfirm={() => closeConfirm(true)} title={nativeConfirmData.title} body={nativeConfirmData.body} confirmText={nativeConfirmData.confirmText} cancelText={nativeConfirmData.cancelText} />
 
       <div className="bg-primary overflow-hidden relative h-10 flex items-center">
         <div className="announcement-bar-marquee flex whitespace-nowrap">
           <div className="flex animate-marquee-sync">
-            <div className="flex items-center shrink-0">
-              {[...Array(20)].map((_, index) => (
-                <div key={`a-${index}`} className="flex items-center">
-                  <span className="text-black font-normal text-sm uppercase mx-4">É DE MINAS</span>
-                  <span className="text-black text-sm">●</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center shrink-0" aria-hidden="true">
-              {[...Array(20)].map((_, index) => (
-                <div key={`b-${index}`} className="flex items-center">
-                  <span className="text-black font-normal text-sm uppercase mx-4">É DE MINAS</span>
-                  <span className="text-black text-sm">●</span>
-                </div>
-              ))}
-            </div>
+            <div className="flex items-center shrink-0">{[...Array(20)].map((_, i) => (<div key={`a-${i}`} className="flex items-center"><span className="text-black font-normal text-sm uppercase mx-4">É DE MINAS</span><span className="text-black text-sm">●</span></div>))}</div>
+            <div className="flex items-center shrink-0" aria-hidden="true">{[...Array(20)].map((_, i) => (<div key={`b-${i}`} className="flex items-center"><span className="text-black font-normal text-sm uppercase mx-4">É DE MINAS</span><span className="text-black text-sm">●</span></div>))}</div>
           </div>
         </div>
-        <style>{`
-          @keyframes marquee-sync { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-          .animate-marquee-sync { display: flex; animation: marquee-sync 40s linear infinite; }
-          .announcement-bar-marquee:hover .animate-marquee-sync { animation-play-state: paused; }
-          @media (prefers-reduced-motion: reduce) { .animate-marquee-sync { animation: none; } }
-        `}</style>
+        <style>{`@keyframes marquee-sync{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}.animate-marquee-sync{display:flex;animation:marquee-sync 40s linear infinite}.announcement-bar-marquee:hover .animate-marquee-sync{animation-play-state:paused}@media(prefers-reduced-motion:reduce){.animate-marquee-sync{animation:none}}`}</style>
       </div>
 
       <header className="bg-vcard border-b border-vborder sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-vsub hover:text-primary transition-colors uppercase">
-              <ArrowLeft className="w-5 h-5" />
-              <span className="hidden sm:inline">Voltar</span>
-            </button>
+            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-vsub hover:text-primary transition-colors uppercase"><ArrowLeft className="w-5 h-5" /><span className="hidden sm:inline">Voltar</span></button>
             <div className="flex items-center gap-2">
-              <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`flex items-center gap-2 h-9 px-5 rounded-button transition-all bg-vcard2 border uppercase focus:outline-none focus:ring-0 focus:ring-offset-0 ${isProfessional ? 'border-vborder2 text-vmuted cursor-not-allowed' : 'border-vborder text-vsub hover:border-primary'}`}>
-                <StarChar size={18} className="text-primary" />
-                <span className="hidden sm:inline">Depoimento</span>
-              </button>
-              <button onClick={toggleFavorito} disabled={!!isProfessional} className={`h-9 flex items-center gap-2 px-5 rounded-button transition-all uppercase border focus:outline-none focus:ring-0 focus:ring-offset-0 ${isProfessional ? 'bg-vcard2 border-vborder2 text-vmuted cursor-not-allowed' : isFavorito ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-vcard2 border-vborder text-vsub hover:text-red-400'}`}>
-                <HeartIcon filled={isFavorito} size={20} className={isFavorito ? 'text-red-500' : 'text-vsub'} />
-                <span className="hidden sm:inline">{isProfessional ? 'Somente Cliente' : (isFavorito ? 'Favoritado' : 'Favoritar')}</span>
-              </button>
+              <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`flex items-center gap-2 h-9 px-5 rounded-button transition-all bg-vcard2 border uppercase focus:outline-none focus:ring-0 focus:ring-offset-0 ${isProfessional ? 'border-vborder2 text-vmuted cursor-not-allowed' : 'border-vborder text-vsub hover:border-primary'}`}><StarChar size={18} className="text-primary" /><span className="hidden sm:inline">Depoimento</span></button>
+              <button onClick={toggleFavorito} disabled={!!isProfessional} className={`h-9 flex items-center gap-2 px-5 rounded-button transition-all uppercase border focus:outline-none focus:ring-0 focus:ring-offset-0 ${isProfessional ? 'bg-vcard2 border-vborder2 text-vmuted cursor-not-allowed' : isFavorito ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-vcard2 border-vborder text-vsub hover:text-red-400'}`}><HeartIcon filled={isFavorito} size={20} className={isFavorito ? 'text-red-500' : 'text-vsub'} /><span className="hidden sm:inline">{isProfessional ? 'Somente Cliente' : (isFavorito ? 'Favoritado' : 'Favoritar')}</span></button>
             </div>
           </div>
         </div>
@@ -854,79 +673,48 @@ export default function Vitrine({ user, userType }) {
       <section className="relative bg-gradient-to-br from-primary/20 via-vbg to-yellow-600/20 py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row items-start gap-6">
-            {logoUrl ? (
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border border-primary/30 bg-vcard">
-                <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-4xl sm:text-5xl font-normal text-black">
-                {negocio.nome?.[0] || 'N'}
-              </div>
-            )}
+            {logoUrl ? (<div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border border-primary/30 bg-vcard"><img src={logoUrl} alt="Logo" className="w-full h-full object-cover" /></div>) : (<div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-4xl sm:text-5xl font-normal text-black">{negocio.nome?.[0] || 'N'}</div>)}
             <div className="flex-1">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-normal mb-3">{negocio.nome}</h1>
               <p className="text-base sm:text-lg text-vsub mb-4 font-normal">{negocio.descricao}</p>
               <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-                <div className="flex items-center gap-2">
-                  <StarChar size={18} className="text-primary" />
-                  <span className="text-xl font-normal text-primary">{mediaDepoimentos}</span>
-                </div>
-                {negocio.endereco && (
-                  <div className="flex items-center gap-2 text-vsub text-sm">
-                    <MapPin className="w-4 h-4" strokeWidth={1.5} />
-                    <span className="font-normal">{negocio.endereco}</span>
-                  </div>
-                )}
-                {negocio.telefone && (
-                  <a href={`tel:${sanitizeTel(negocio.telefone) || negocio.telefone}`} className="flex items-center gap-2 text-primary hover:text-yellow-500 text-sm font-normal transition-colors">
-                    <Phone className="w-4 h-4" strokeWidth={1.5} />{negocio.telefone}
-                  </a>
-                )}
-                {instagramUrl && (
-                  <a href={instagramUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-primary hover:text-yellow-500 text-sm font-normal transition-colors" aria-label="Instagram">
-                    <Instagram className="w-4 h-4" strokeWidth={1.5} />clique :)
-                  </a>
-                )}
-                {facebookUrl && (
-                  <a href={facebookUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-primary hover:text-yellow-500 text-sm font-normal transition-colors" aria-label="Facebook">
-                    <FacebookIcon className="w-4 h-4" />clique :)
-                  </a>
-                )}
+                <div className="flex items-center gap-2"><StarChar size={18} className="text-primary" /><span className="text-xl font-normal text-primary">{mediaDepoimentos}</span></div>
+                {negocio.endereco && (<div className="flex items-center gap-2 text-vsub text-sm"><MapPin className="w-4 h-4" strokeWidth={1.5} /><span className="font-normal">{negocio.endereco}</span></div>)}
+                {negocio.telefone && (<a href={`tel:${sanitizeTel(negocio.telefone) || negocio.telefone}`} className="flex items-center gap-2 text-primary hover:text-yellow-500 text-sm font-normal transition-colors"><Phone className="w-4 h-4" strokeWidth={1.5} />{negocio.telefone}</a>)}
+                {instagramUrl && (<a href={instagramUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-primary hover:text-yellow-500 text-sm font-normal transition-colors" aria-label="Instagram"><Instagram className="w-4 h-4" strokeWidth={1.5} />clique :)</a>)}
+                {facebookUrl && (<a href={facebookUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-primary hover:text-yellow-500 text-sm font-normal transition-colors" aria-label="Facebook"><FacebookIcon className="w-4 h-4" />clique :)</a>)}
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* ── Profissionais — masonry + chips ── */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-normal mb-6">Profissionais</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 [column-fill:_balance]">
             {profissionais.map(prof => {
               const totalEntregas = (entregasPorProf.get(prof.id) || []).length;
-              const status = getProfStatus(prof);
-              const depInfo = depoimentosPorProf.get(prof.id);
+              const status    = getProfStatus(prof);
+              const depInfo   = depoimentosPorProf.get(prof.id);
               const profissao = String(prof?.profissao ?? '').trim();
               const { ini: almIni, fim: almFim } = getAlmocoRange(prof);
-              const avatarUrl = getPublicUrl('avatars', prof.avatar_path);
+              const avatarUrl  = getPublicUrl('avatars', prof.avatar_path);
+              const horarioIni = String(prof.horario_inicio || '08:00').slice(0, 5);
+              const horarioFim = String(prof.horario_fim    || '18:00').slice(0, 5);
               return (
-                <div key={prof.id} className="bg-vcard border border-vborder rounded-custom p-6 hover:border-primary/50 transition-all">
-                  <div className="flex items-start gap-4">
+                <div key={prof.id} className="mb-6 break-inside-avoid bg-vcard border border-vborder rounded-custom p-6 hover:border-primary/50 transition-all">
+                  <div className="flex items-start gap-4 mb-4">
                     {avatarUrl ? (
-                      <div className="w-14 h-14 rounded-custom overflow-hidden border border-vborder bg-vcard2 shrink-0">
-                        <img src={avatarUrl} alt={prof.nome} className="w-full h-full object-cover" />
-                      </div>
+                      <div className="w-14 h-14 rounded-custom overflow-hidden border border-vborder bg-vcard2 shrink-0"><img src={avatarUrl} alt={prof.nome} className="w-full h-full object-cover" /></div>
                     ) : (
-                      <div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-2xl font-normal text-black shrink-0">
-                        {prof.nome?.[0] || 'P'}
-                      </div>
+                      <div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-2xl font-normal text-black shrink-0">{prof.nome?.[0] || 'P'}</div>
                     )}
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <h3 className="text-lg font-normal">{prof.nome}</h3>
-                        {profissao && (
-                          <span className="inline-block px-2 py-1 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase whitespace-nowrap">{profissao}</span>
-                        )}
+                        {profissao && (<span className="inline-block px-2 py-1 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase whitespace-nowrap shrink-0">{profissao}</span>)}
                       </div>
                       {depInfo?.media && (
                         <div className="flex items-center gap-2 mb-1">
@@ -935,25 +723,25 @@ export default function Vitrine({ user, userType }) {
                           <span className="text-xs text-vmuted">({depInfo.count})</span>
                         </div>
                       )}
+                      {prof.anos_experiencia != null && (<p className="text-sm text-vmuted font-normal">{prof.anos_experiencia} ano(s) de experiência</p>)}
                       <div className="flex items-center gap-2 mt-1">
-                        <span className={`w-2.5 h-2.5 rounded-full ${status.color}`} />
+                        <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${status.color}`} />
                         <span className="text-xs text-vsub font-normal uppercase">{status.label}</span>
                       </div>
-                      {prof.anos_experiencia != null && (
-                        <p className="text-sm text-vmuted font-normal mt-1">{prof.anos_experiencia} ano(s) de experiência</p>
-                      )}
-                      <p className="text-xs text-vmuted font-normal mt-2">
-                        Horário: <span className="text-vsub">{String(prof.horario_inicio || '08:00').slice(0, 5)} - {String(prof.horario_fim || '18:00').slice(0, 5)}</span>
-                      </p>
-                      {(almIni && almFim) && (
-                        <p className="text-xs text-vmuted font-normal mt-1">
-                          Almoço: <span className="text-vsub">{String(almIni).slice(0, 5)} - {String(almFim).slice(0, 5)}</span>
-                        </p>
-                      )}
-                      <p className="text-xs text-vmuted font-normal mt-2">
-                        {totalEntregas} {totalEntregas === 1 ? counterSingular : counterPlural} disponíve{totalEntregas === 1 ? 'l' : 'is'}
-                      </p>
                     </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
+                      {horarioIni} – {horarioFim}
+                    </span>
+                    {almIni && almFim && (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
+                        Almoço {String(almIni).slice(0, 5)} – {String(almFim).slice(0, 5)}
+                      </span>
+                    )}
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
+                      {totalEntregas} {totalEntregas === 1 ? counterSingular : counterPlural}
+                    </span>
                   </div>
                 </div>
               );
@@ -971,14 +759,7 @@ export default function Vitrine({ user, userType }) {
         ) : (
           <div className="space-y-px">
             {profissionais.map(p => {
-              const lista = (entregasPorProf.get(p.id) || [])
-                .slice()
-                .sort((a, b) => {
-                  const pa = Number(getPrecoFinalServico(a) ?? 0);
-                  const pb = Number(getPrecoFinalServico(b) ?? 0);
-                  if (pb !== pa) return pb - pa;
-                  return String(a.nome || '').localeCompare(String(b.nome || ''));
-                });
+              const lista = (entregasPorProf.get(p.id) || []).slice().sort((a, b) => { const pa = Number(getPrecoFinalServico(a) ?? 0); const pb = Number(getPrecoFinalServico(b) ?? 0); if (pb !== pa) return pb - pa; return String(a.nome || '').localeCompare(String(b.nome || '')); });
               return (
                 <div key={p.id} className="bg-vcard border-t border-b border-vborder w-full px-4 sm:px-6 lg:px-8 py-6">
                   <div className="max-w-7xl mx-auto">
@@ -986,16 +767,7 @@ export default function Vitrine({ user, userType }) {
                       <div className="font-normal text-lg">{p.nome}</div>
                       <div className="text-xs text-vmuted font-normal">{lista.length} {lista.length === 1 ? counterSingular : counterPlural}</div>
                     </div>
-                    <ServicosCarousel
-                      lista={lista}
-                      profissional={p}
-                      selecaoProfId={selecaoProfId}
-                      servicosSelecionados={servicosSelecionados}
-                      isProfessional={isProfessional}
-                      onAgendarAgora={handleAgendarAgora}
-                      onToggleSelecao={handleToggleSelecao}
-                      emptyMsg={emptyListMsg}
-                    />
+                    <ServicosCarousel lista={lista} profissional={p} selecaoProfId={selecaoProfId} servicosSelecionados={servicosSelecionados} isProfessional={isProfessional} onAgendarAgora={handleAgendarAgora} onToggleSelecao={handleToggleSelecao} emptyMsg={emptyListMsg} />
                   </div>
                 </div>
               );
@@ -1008,15 +780,7 @@ export default function Vitrine({ user, userType }) {
         <section className="py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 [column-fill:_balance]">
-              {galeriaItems.map((item) => {
-                const url = getPublicUrl('galerias', item.path);
-                if (!url) return null;
-                return (
-                  <div key={item.id} className="mb-3 w-full break-inside-avoid overflow-hidden rounded-custom border border-vborder bg-vcard">
-                    <img src={url} alt="Galeria" className="w-full h-auto object-contain bg-vbg" loading="lazy" />
-                  </div>
-                );
-              })}
+              {galeriaItems.map((item) => { const url = getPublicUrl('galerias', item.path); if (!url) return null; return (<div key={item.id} className="mb-3 w-full break-inside-avoid overflow-hidden rounded-custom border border-vborder bg-vcard"><img src={url} alt="Galeria" className="w-full h-auto object-contain bg-vbg" loading="lazy" /></div>); })}
             </div>
           </div>
         </section>
@@ -1026,9 +790,7 @@ export default function Vitrine({ user, userType }) {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-3 mb-6">
             <h2 className="text-2xl sm:text-3xl font-normal">Depoimentos</h2>
-            <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`px-5 py-2 border rounded-button text-sm transition-all uppercase font-normal ${isProfessional ? 'bg-vcard border-vborder2 text-vmuted cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'}`}>
-              + Depoimento
-            </button>
+            <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`px-5 py-2 border rounded-button text-sm transition-all uppercase font-normal ${isProfessional ? 'bg-vcard border-vborder2 text-vmuted cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'}`}>+ Depoimento</button>
           </div>
           {depoimentos.length > 0 ? (
             <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 [column-fill:_balance]">
@@ -1037,26 +799,11 @@ export default function Vitrine({ user, userType }) {
                 return (
                   <div key={dep.id} className="mb-4 break-inside-avoid bg-vcard border border-vborder rounded-custom p-4 relative">
                     <div className="absolute top-3 right-3">
-                      {dep.profissional_id && dep.profissionais?.nome ? (
-                        <span className="inline-block px-1.5 py-0.5 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase">{dep.profissionais.nome}</span>
-                      ) : (
-                        <span className="inline-block px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded-button text-[10px] text-blue-400 font-normal uppercase">{nomeNegocioLabel}</span>
-                      )}
+                      {dep.profissional_id && dep.profissionais?.nome ? (<span className="inline-block px-1.5 py-0.5 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase">{dep.profissionais.nome}</span>) : (<span className="inline-block px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded-button text-[10px] text-blue-400 font-normal uppercase">{nomeNegocioLabel}</span>)}
                     </div>
                     <div className="flex items-center gap-3 mb-3">
-                      {avatarClienteUrl ? (
-                        <div className="w-10 h-10 rounded-full overflow-hidden border border-vborder bg-vcard2 shrink-0">
-                          <img src={avatarClienteUrl} alt={dep.users?.nome} className="w-full h-full object-cover" />
-                        </div>
-                      ) : (
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-normal shrink-0">
-                          {dep.users?.nome?.[0] || 'A'}
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <p className="text-sm font-normal">{dep.users?.nome || 'Cliente'}</p>
-                        <Stars5Char value={dep.nota} size={14} />
-                      </div>
+                      {avatarClienteUrl ? (<div className="w-10 h-10 rounded-full overflow-hidden border border-vborder bg-vcard2 shrink-0"><img src={avatarClienteUrl} alt={dep.users?.nome} className="w-full h-full object-cover" /></div>) : (<div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-normal shrink-0">{dep.users?.nome?.[0] || 'A'}</div>)}
+                      <div className="flex-1"><p className="text-sm font-normal">{dep.users?.nome || 'Cliente'}</p><Stars5Char value={dep.nota} size={14} /></div>
                     </div>
                     {dep.comentario && <p className="text-sm text-vsub font-normal">{dep.comentario}</p>}
                   </div>
@@ -1067,53 +814,20 @@ export default function Vitrine({ user, userType }) {
         </div>
       </section>
 
-      <SelectionBar
-        itens={servicosSelecionados}
-        counterSingular={counterSingular}
-        counterPlural={counterPlural}
-        onConfirm={handleConfirmarSelecao}
-        onClear={handleLimparSelecao}
-      />
+      <SelectionBar itens={servicosSelecionados} counterSingular={counterSingular} counterPlural={counterPlural} onConfirm={handleConfirmarSelecao} onClear={handleLimparSelecao} />
 
-      {flow.step === 'booking' && entregaVirtual && (
-        <BookingCalendar
-          profissional={flow.profissional}
-          entrega={entregaVirtual}
-          todayISO={todayISO}
-          negocioId={negocio.id}
-          clienteId={user?.id}
-          onConfirm={handleBookingConfirm}
-          onClose={() => setFlow(prev => ({ ...prev, step: 0 }))}
-        />
-      )}
+      {flow.step === 'booking' && entregaVirtual && (<BookingCalendar profissional={flow.profissional} entrega={entregaVirtual} todayISO={todayISO} negocioId={negocio.id} clienteId={user?.id} onConfirm={handleBookingConfirm} onClose={() => setFlow(prev => ({ ...prev, step: 0 }))} />)}
 
       {flow.step === 5 && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full">
             <div className="p-8 text-center">
-              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-10 h-10 text-green-400" />
-              </div>
+              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><Calendar className="w-10 h-10 text-green-400" /></div>
               <h3 className="text-2xl font-normal mb-2 text-white">AGENDADO!</h3>
-              <p className="text-gray-400 font-normal mb-1">
-                {flow.lastSlot?.label && <span className="text-primary font-normal">{flow.lastSlot.label}</span>}
-                {flow.lastSlot?.dataISO && <span className="text-gray-400"> — {formatDateBR(flow.lastSlot.dataISO)}</span>}
-              </p>
+              <p className="text-gray-400 font-normal mb-1">{flow.lastSlot?.label && <span className="text-primary font-normal">{flow.lastSlot.label}</span>}{flow.lastSlot?.dataISO && <span className="text-gray-400"> — {formatDateBR(flow.lastSlot.dataISO)}</span>}</p>
               <p className="text-gray-500 font-normal text-sm mb-6">Salve um lembrete no seu celular para não esquecer.</p>
-              <a
-                href={calendarLink}
-                target="_blank"
-                rel="noreferrer"
-                className="block w-full py-4 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal mb-3"
-              >
-                ADICIONAR À MINHA AGENDA
-              </a>
-              <button
-                onClick={() => { setFlow(prev => ({ ...prev, step: 0 })); navigate('/minha-area'); }}
-                className="w-full py-3 bg-transparent border border-red-500 text-red-500 rounded-button uppercase font-normal hover:bg-red-500/10 transition-colors"
-              >
-                PREFIRO ESQUECER
-              </button>
+              <a href={calendarLink} target="_blank" rel="noreferrer" className="block w-full py-4 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal mb-3">ADICIONAR À MINHA AGENDA</a>
+              <button onClick={() => { setFlow(prev => ({ ...prev, step: 0 })); navigate('/minha-area'); }} className="w-full py-3 bg-transparent border border-red-500 text-red-500 rounded-button uppercase font-normal hover:bg-red-500/10 transition-colors">PREFIRO ESQUECER</button>
             </div>
           </div>
         </div>
@@ -1138,35 +852,24 @@ export default function Vitrine({ user, userType }) {
                 <div className="mb-4">
                   <div className="text-sm text-gray-300 font-normal mb-2">Qual profissional?</div>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {profissionais.map(prof => (
-                      <button key={prof.id} onClick={() => setDepoimentoProfissionalId(prof.id)} className={`w-full text-left px-4 py-3 rounded-custom border transition-all font-normal ${depoimentoProfissionalId === prof.id ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-400 hover:border-primary/30'}`}>{prof.nome}</button>
-                    ))}
+                    {profissionais.map(prof => (<button key={prof.id} onClick={() => setDepoimentoProfissionalId(prof.id)} className={`w-full text-left px-4 py-3 rounded-custom border transition-all font-normal ${depoimentoProfissionalId === prof.id ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-400 hover:border-primary/30'}`}>{prof.nome}</button>))}
                   </div>
                 </div>
               )}
               <div className="mb-4">
                 <div className="text-sm text-gray-300 font-normal mb-2">Nota</div>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map(n => (
-                    <button key={n} onClick={() => setDepoimentoNota(n)} className={`w-12 h-8 rounded-button border transition-all font-normal ${depoimentoNota >= n ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>{n}</button>
-                  ))}
-                </div>
+                <div className="flex gap-2">{[1, 2, 3, 4, 5].map(n => (<button key={n} onClick={() => setDepoimentoNota(n)} className={`w-12 h-8 rounded-button border transition-all font-normal ${depoimentoNota >= n ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>{n}</button>))}</div>
               </div>
               <div className="mb-5">
                 <div className="text-sm text-gray-300 font-normal mb-2">Comentário é opcional</div>
                 <textarea value={depoimentoTexto} onChange={(e) => setDepoimentoTexto(e.target.value)} rows={4} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-500 focus:border-primary focus:outline-none resize-none" placeholder="Conte como foi sua experiência..." />
               </div>
-              <button onClick={enviarDepoimento} disabled={depoimentoLoading || (depoimentoTipo === 'profissional' && !depoimentoProfissionalId)} className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button disabled:opacity-60 uppercase font-normal">
-                {depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}
-              </button>
-              <p className="text-xs text-gray-500 mt-3 font-normal">
-                {depoimentoTipo === 'profissional' && !depoimentoProfissionalId ? 'Selecione um profissional para continuar' : 'Somente clientes logados podem deixar depoimentos.'}
-              </p>
+              <button onClick={enviarDepoimento} disabled={depoimentoLoading || (depoimentoTipo === 'profissional' && !depoimentoProfissionalId)} className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button disabled:opacity-60 uppercase font-normal">{depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}</button>
+              <p className="text-xs text-gray-500 mt-3 font-normal">{depoimentoTipo === 'profissional' && !depoimentoProfissionalId ? 'Selecione um profissional para continuar' : 'Somente clientes logados podem deixar depoimentos.'}</p>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }
