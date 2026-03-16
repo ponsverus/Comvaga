@@ -271,7 +271,7 @@ export default function TimePicker({ value, onChange }) {
           <div style={{
             background: '#1c1c1e',
             border: '1px solid #2a2a2a',
-            borderRadius: 14,
+            borderRadius: 3,
             padding: 12,
             boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
             width: 264,
