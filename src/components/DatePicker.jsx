@@ -130,7 +130,7 @@ export default function DatePicker({ value, onChange, todayISO }) {
             <button
               type="button"
               onClick={prevMonth}
-              className="p-1.5 rounded hover:bg-dark-200 text-gray-400 hover:text-white transition-colors"
+              className="p-1.5 rounded-full hover:bg-dark-200 text-gray-400 hover:text-white transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -142,7 +142,7 @@ export default function DatePicker({ value, onChange, todayISO }) {
             <button
               type="button"
               onClick={nextMonth}
-              className="p-1.5 rounded hover:bg-dark-200 text-gray-400 hover:text-white transition-colors"
+              className="p-1.5 rounded-full hover:bg-dark-200 text-gray-400 hover:text-white transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
