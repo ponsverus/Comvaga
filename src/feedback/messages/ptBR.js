@@ -217,7 +217,7 @@ export const ptBR = {
       },
       counter_plural: {
         servicos:  'serviços',
-        consultas: 'consultas',
+        consultas: 'Honsultas',
         aulas:     'aulas',
       },
 
