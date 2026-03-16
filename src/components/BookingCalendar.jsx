@@ -148,7 +148,7 @@ export default function BookingCalendar({
     setConfirmError(null);
     try {
       const horarioInicio = selectedSlot.hora;
-      const horarioFim    = calcHorarioFim(selectedSlot.hora, entrega.duracao_minutos, FOLGA);
+      const horarioFim = selectedSlot.horario_fim;
 
       const { error } = await supabase.from('agendamentos').insert([{
         negocio_id:      negocioId,
