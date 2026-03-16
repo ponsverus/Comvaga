@@ -205,7 +205,7 @@ export default function BookingCalendar({
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
       <div
         ref={containerRef}
-        className="bg-dark-100 border border-gray-800 rounded-custom w-full max-w-md max-h-[92vh] overflow-y-auto"
+        className="bg-dark-100 border border-gray-800 rounded-button w-full max-w-md max-h-[92vh] overflow-y-auto"
       >
 
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-800">
