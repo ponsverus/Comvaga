@@ -133,7 +133,7 @@ export default function CriarNegocio({ user }) {
 
         <div className="text-center mb-10">
           <h1 className="text-4xl font-normal mb-3 tracking-wide">Novo negócio</h1>
-          <p className="text-gray-500 text-base font-normal">Preencha as informações do <span className="text-primary">segundo negócio</span></p>
+          <p className="text-gray-500 text-base font-normal">Agora, preencha os dados do seu <span className="text-primary">segundo negócio</span></p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
