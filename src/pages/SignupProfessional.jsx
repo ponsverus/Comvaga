@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Award, ArrowLeft, Eye, EyeOff, Mail, Lock, User, Phone, MapPin, FileText, Calendar } from 'lucide-react';
+import { Award, ArrowLeft, Eye, EyeOff, MapPin } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 
@@ -222,10 +222,10 @@ export default function SignupProfessional({ onLogin }) {
     }
   };
 
-  const inputClass = "w-full pl-10 pr-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm";
-  const inputNoIconClass = "w-full px-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm";
-  const labelClass = "block text-sm text-gray-400 mb-2 tracking-wide";
-  const labelSmClass = "block text-xs text-gray-500 mb-2 tracking-wide";
+  const inputClass = 'w-full px-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm';
+  const inputIconClass = 'w-full pl-10 pr-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm';
+  const labelClass = 'block text-sm text-gray-400 mb-2 tracking-wide';
+  const labelSmClass = 'block text-xs text-gray-500 mb-2 tracking-wide';
 
   return (
     <div className="min-h-screen bg-black text-white py-8 px-4 relative overflow-hidden">
@@ -262,32 +262,26 @@ export default function SignupProfessional({ onLogin }) {
           <div className="grid sm:grid-cols-2 gap-5">
             <div>
               <label className={labelClass}>Seu Nome Completo *</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                <input
-                  type="text"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  placeholder="Pedro Gomes"
-                  className={inputClass}
-                  required
-                />
-              </div>
+              <input
+                type="text"
+                value={formData.nome}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                placeholder="Pedro Gomes"
+                className={inputClass}
+                required
+              />
             </div>
 
             <div>
               <label className={labelClass}>Telefone (WhatsApp) *</label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                <input
-                  type="tel"
-                  value={formData.telefone}
-                  onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                  placeholder="(11) 99999 - 9999"
-                  className={inputClass}
-                  required
-                />
-              </div>
+              <input
+                type="tel"
+                value={formData.telefone}
+                onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                placeholder="(11) 99999 - 9999"
+                className={inputClass}
+                required
+              />
             </div>
           </div>
 
@@ -298,7 +292,7 @@ export default function SignupProfessional({ onLogin }) {
               value={formData.nomeNegocio}
               onChange={(e) => handleNegocioNameChange(e.target.value)}
               placeholder="Ex: Elite Barbers"
-              className={inputNoIconClass}
+              className={inputClass}
               required
             />
           </div>
@@ -312,7 +306,7 @@ export default function SignupProfessional({ onLogin }) {
                 value={formData.urlNegocio}
                 onChange={(e) => setFormData({ ...formData, urlNegocio: generateSlug(e.target.value) })}
                 placeholder="elite-barbers"
-                className={inputNoIconClass}
+                className={inputClass}
                 required
                 pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
               />
@@ -327,41 +321,35 @@ export default function SignupProfessional({ onLogin }) {
               value={formData.tipoNegocio}
               onChange={(e) => setFormData({ ...formData, tipoNegocio: e.target.value })}
               placeholder="Ex: barbearia, manicure, clínica..."
-              className={inputNoIconClass}
+              className={inputClass}
               required
             />
           </div>
 
           <div>
             <label className={labelClass}>Anos de Experiência *</label>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-              <input
-                type="number"
-                value={formData.anosExperiencia}
-                onChange={(e) => setFormData({ ...formData, anosExperiencia: e.target.value })}
-                placeholder="5"
-                min="0"
-                max="50"
-                className={inputClass}
-                required
-              />
-            </div>
+            <input
+              type="number"
+              value={formData.anosExperiencia}
+              onChange={(e) => setFormData({ ...formData, anosExperiencia: e.target.value })}
+              placeholder="5"
+              min="0"
+              max="50"
+              className={inputClass}
+              required
+            />
           </div>
 
           <div>
             <label className={labelClass}>Sobre seus Serviços *</label>
-            <div className="relative">
-              <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-600" />
-              <textarea
-                value={formData.descricao}
-                onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                placeholder="Ex: Oferecemos serviços completos de barbearia: do corte clássico ao degradê..."
-                rows={3}
-                className="w-full pl-10 pr-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm resize-none text-sm"
-                required
-              />
-            </div>
+            <textarea
+              value={formData.descricao}
+              onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+              placeholder="Ex: Oferecemos serviços completos de barbearia: do corte clássico ao degradê..."
+              rows={3}
+              className="w-full px-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm resize-none text-sm"
+              required
+            />
           </div>
 
           <div>
@@ -377,7 +365,7 @@ export default function SignupProfessional({ onLogin }) {
                       value={formData.rua}
                       onChange={(e) => setFormData({ ...formData, rua: e.target.value })}
                       placeholder="Rua Serra do Sincorá"
-                      className={inputClass}
+                      className={inputIconClass}
                       required
                     />
                   </div>
@@ -390,7 +378,7 @@ export default function SignupProfessional({ onLogin }) {
                     value={formData.numero}
                     onChange={(e) => setFormData({ ...formData, numero: e.target.value })}
                     placeholder="1038"
-                    className={inputNoIconClass}
+                    className={inputClass}
                     required
                   />
                 </div>
@@ -402,7 +390,7 @@ export default function SignupProfessional({ onLogin }) {
                     value={formData.bairro}
                     onChange={(e) => setFormData({ ...formData, bairro: e.target.value })}
                     placeholder="Centro"
-                    className={inputNoIconClass}
+                    className={inputClass}
                   />
                 </div>
 
@@ -413,7 +401,7 @@ export default function SignupProfessional({ onLogin }) {
                     value={formData.cidade}
                     onChange={(e) => setFormData({ ...formData, cidade: e.target.value })}
                     placeholder="Belo Horizonte"
-                    className={inputNoIconClass}
+                    className={inputClass}
                     required
                   />
                 </div>
@@ -425,7 +413,7 @@ export default function SignupProfessional({ onLogin }) {
                     value={formData.estado}
                     onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
                     placeholder="Minas Gerais"
-                    className={inputNoIconClass}
+                    className={inputClass}
                     required
                   />
                 </div>
@@ -444,29 +432,25 @@ export default function SignupProfessional({ onLogin }) {
 
           <div>
             <label className={labelClass}>Email *</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="seu@email.com"
-                className={inputClass}
-                required
-              />
-            </div>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="seu@email.com"
+              className={inputClass}
+              required
+            />
           </div>
 
           <div>
             <label className={labelClass}>Senha *</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="Mínimo 6 caracteres"
-                className="w-full pl-10 pr-12 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm"
+                className="w-full px-4 pr-12 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm"
                 required
                 minLength={6}
               />
