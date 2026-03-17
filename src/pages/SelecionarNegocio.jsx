@@ -34,9 +34,13 @@ export default function SelecionarNegocio({ user, onLogout }) {
 
   useEffect(() => {
     if (!loading && negocios.length === 1) {
-      navigate('/dashboard');
+      navigate('/dashboard', { state: { negocioId: negocios[0].id }, replace: true });
     }
-  }, [loading, negocios.length]);
+  }, [loading, negocios]);
+
+  const handleSelecionar = (negocioId) => {
+    navigate('/dashboard', { state: { negocioId }, replace: true });
+  };
 
   if (loading) {
     return (
@@ -89,7 +93,7 @@ export default function SelecionarNegocio({ user, onLogout }) {
               <button
                 key={neg.id}
                 type="button"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => handleSelecionar(neg.id)}
                 className="w-full flex items-center gap-4 p-4 bg-dark-100 border border-gray-800 hover:border-primary/50 hover:bg-dark-100/80 rounded-custom transition-all text-left group"
               >
                 <div className="w-12 h-12 rounded-custom overflow-hidden border border-gray-700 bg-dark-200 shrink-0 flex items-center justify-center">
