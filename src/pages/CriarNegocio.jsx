@@ -215,7 +215,7 @@ export default function CriarNegocio({ user }) {
                       type="text"
                       value={formData.rua}
                       onChange={(e) => setFormData(prev => ({ ...prev, rua: e.target.value }))}
-                      placeholder="Rua das Flores"
+                      placeholder="Rua dos Caetés"
                       className={inputIconClass}
                       required
                     />
@@ -227,7 +227,7 @@ export default function CriarNegocio({ user }) {
                     type="text"
                     value={formData.numero}
                     onChange={(e) => setFormData(prev => ({ ...prev, numero: e.target.value }))}
-                    placeholder="45"
+                    placeholder="200"
                     className={inputClass}
                     required
                   />
