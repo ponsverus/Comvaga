@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Plus, X, Eye, Calendar,
   Users, TrendingUp, Award, LogOut, AlertCircle, Clock,
@@ -220,6 +220,7 @@ const g = (map, group) => map[group] ?? map['servicos'];
 
 export default function Dashboard({ user, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const feedback = useFeedback?.();
 
   const uiAlert = async (key, variant = 'info') => {
@@ -447,9 +448,9 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const reloadNegocio = useCallback(async () => {
-    if (!user?.id) return;
+    if (!negocio?.id) return;
     const { data, error: err } = await supabase
-      .from(VIEWS.negocios).select('*').eq('owner_id', user.id).maybeSingle();
+      .from(VIEWS.negocios).select('*').eq('id', negocio.id).eq('owner_id', user.id).maybeSingle();
     if (err || !data) return;
     setNegocio(data);
     setFormInfo({
@@ -458,7 +459,7 @@ export default function Dashboard({ user, onLogout }) {
       instagram: data.instagram || '', facebook: data.facebook || '',
       tema: data.tema || 'dark',
     });
-  }, [user?.id]);
+  }, [negocio?.id, user?.id]);
 
   const reloadProfissionais = useCallback(async (negocioId) => {
     const id = negocioId || negocio?.id;
@@ -522,13 +523,23 @@ export default function Dashboard({ user, onLogout }) {
       catch (e) { dataRef = String(serverNow?.date || hoje || ''); }
     }
     try {
-      const { data: negocioData, error: negocioError } = await supabase
-        .from(VIEWS.negocios).select('*').eq('owner_id', user.id).maybeSingle();
-      if (negocioError) throw negocioError;
-      if (!negocioData) {
+      const negocioIdFromState = location?.state?.negocioId || null;
+      let negocioQuery = supabase.from(VIEWS.negocios).select('*').eq('owner_id', user.id);
+      if (negocioIdFromState) {
+        negocioQuery = negocioQuery.eq('id', negocioIdFromState);
+      }
+      const negocioResult = await negocioQuery.order('created_at', { ascending: true });
+      if (negocioResult.error) throw negocioResult.error;
+      const negociosList = negocioResult.data || [];
+      if (negociosList.length === 0) {
         setNegocio(null); setProfissionais([]); setEntregas([]); setAgendamentos([]);
         setError('Nenhum negocio cadastrado.'); setLoading(false); return;
       }
+      if (negociosList.length > 1 && !negocioIdFromState) {
+        navigate('/selecionar-negocio', { replace: true });
+        setLoading(false); return;
+      }
+      const negocioData = negociosList[0];
       setNegocio(negocioData);
       setFormInfo({
         nome: negocioData.nome || '', descricao: negocioData.descricao || '',
@@ -1062,7 +1073,13 @@ export default function Dashboard({ user, onLogout }) {
               </div>
               <div>
                 <h1 className="text-xl font-normal">{negocio.nome}</h1>
-                <p className="text-xs text-gray-500 -mt-0.5">DASHBOARD</p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/selecionar-negocio')}
+                  className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block"
+                >
+                  TROCAR NEGÓCIO
+                </button>
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
@@ -1192,11 +1209,7 @@ export default function Dashboard({ user, onLogout }) {
                     <h3 className="text-lg font-normal flex items-center gap-2 uppercase">
                       <span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="font-normal text-2xl">$</span>FATURAMENTO
                     </h3>
-                    <DatePicker
-                      value={faturamentoData}
-                      onChange={(iso) => setFaturamentoData(iso)}
-                      todayISO={hoje}
-                    />
+                    <DatePicker value={faturamentoData} onChange={(iso) => setFaturamentoData(iso)} todayISO={hoje} />
                   </div>
                   <div className="text-3xl font-normal text-white mb-2">
                     {metricsLoadingDia ? <span className="text-gray-500 text-xl">...</span> : <>R$ {Number(metricsDia?.selected_day?.faturamento || 0).toFixed(2)}</>}
@@ -1232,14 +1245,10 @@ export default function Dashboard({ user, onLogout }) {
                       ))}
                     </div>
                   )}
-
                   <div className="mt-2 bg-dark-100 border border-gray-800 rounded-custom p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                       <div className="text-xs text-gray-500 uppercase tracking-wide">FATURAMENTO POR PERÍODO</div>
-                      <PeriodoSelect
-                        value={faturamentoPeriodo}
-                        onChange={setFaturamentoPeriodo}
-                      />
+                      <PeriodoSelect value={faturamentoPeriodo} onChange={setFaturamentoPeriodo} />
                     </div>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       <div className="bg-dark-200 border border-gray-800 rounded-custom p-4">
@@ -1359,11 +1368,7 @@ export default function Dashboard({ user, onLogout }) {
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                   <h2 className="text-2xl font-normal">Histórico</h2>
-                  <DatePicker
-                    value={historicoData}
-                    onChange={(iso) => setHistoricoData(iso)}
-                    todayISO={hoje}
-                  />
+                  <DatePicker value={historicoData} onChange={(iso) => setHistoricoData(iso)} todayISO={hoje} />
                 </div>
                 {agendamentosDiaSelecionado.length > 0 ? (
                   <div className="space-y-3">
@@ -1425,9 +1430,7 @@ export default function Dashboard({ user, onLogout }) {
                         <div key={p.id} className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                           <div className="flex items-center justify-between mb-4">
                             <div className="font-normal text-lg">{p.nome}</div>
-                            <div className="text-xs text-gray-500">
-                              {lista.length} {lista.length === 1 ? counterSingular : counterPlural}
-                            </div>
+                            <div className="text-xs text-gray-500">{lista.length} {lista.length === 1 ? counterSingular : counterPlural}</div>
                           </div>
                           {lista.length ? (
                             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1506,9 +1509,7 @@ export default function Dashboard({ user, onLogout }) {
                             {p.anos_experiencia != null && <p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIÊNCIA</p>}
                           </div>
                         </div>
-                        <div className="text-sm text-gray-400 mb-3">
-                          {entregas.filter(s => s.profissional_id === p.id).length} {counterPlural}
-                        </div>
+                        <div className="text-sm text-gray-400 mb-3">{entregas.filter(s => s.profissional_id === p.id).length} {counterPlural}</div>
                         <div className="text-xs text-gray-500 mb-3">
                           <Clock className="w-4 h-4 inline mr-1" />{p.horario_inicio} - {p.horario_fim}
                           {p.almoco_inicio && p.almoco_fim && <span className="ml-2 text-yellow-300">• {p.almoco_inicio} - {p.almoco_fim}</span>}
@@ -1576,19 +1577,13 @@ export default function Dashboard({ user, onLogout }) {
 
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                   <div className="text-sm text-white-600 tracking-wide mb-1">Parceiros</div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Selecione um profissional e informe o email para receber avisos de novo agendamento.
-                  </p>
+                  <p className="text-sm text-gray-600 mb-4">Selecione um profissional e informe o email para receber avisos de novo agendamento.</p>
                   <div className="grid sm:grid-cols-2 gap-3 mb-3">
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">PROFISSIONAL</label>
                       <ProfissionalSelect
                         value={parceiroSelected}
-                        onChange={(id) => {
-                          setParceiroSelected(id);
-                          const prof = profissionais.find(p => p.id === id);
-                          setParceiroEmail(prof?.email || '');
-                        }}
+                        onChange={(id) => { setParceiroSelected(id); const prof = profissionais.find(p => p.id === id); setParceiroEmail(prof?.email || ''); }}
                         profissionais={profissionais}
                         placeholder="Selecionar profissional..."
                         apenasAtivos={true}
@@ -1596,21 +1591,10 @@ export default function Dashboard({ user, onLogout }) {
                     </div>
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">EMAIL DO PARCEIRO</label>
-                      <input
-                        type="email"
-                        value={parceiroEmail}
-                        onChange={(e) => setParceiroEmail(e.target.value)}
-                        className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white"
-                        placeholder="parceiro@email.com"
-                      />
+                      <input type="email" value={parceiroEmail} onChange={(e) => setParceiroEmail(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="parceiro@email.com" />
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    disabled={parceiroSaving || !parceiroSelected || !parceiroEmail.trim()}
-                    onClick={saveParceiroEmail}
-                    className="mb-5 px-5 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
+                  <button type="button" disabled={parceiroSaving || !parceiroSelected || !parceiroEmail.trim()} onClick={saveParceiroEmail} className="mb-5 px-5 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-50 disabled:cursor-not-allowed">
                     {parceiroSaving ? 'SALVANDO...' : 'SALVAR EMAIL'}
                   </button>
                   {profissionais.filter(p => p.email).length > 0 ? (
@@ -1621,18 +1605,11 @@ export default function Dashboard({ user, onLogout }) {
                             <div className="text-sm font-normal text-white">{p.nome}</div>
                             <div className="text-xs text-gray-500">{p.email}</div>
                           </div>
-                          <button
-                            onClick={() => removeParceiroEmail(p.id)}
-                            className="text-red-400 hover:text-red-300 text-xs uppercase font-normal border border-red-500/30 rounded-button px-3 py-1"
-                          >
-                            REMOVER
-                          </button>
+                          <button onClick={() => removeParceiroEmail(p.id)} className="text-red-400 hover:text-red-300 text-xs uppercase font-normal border border-red-500/30 rounded-button px-3 py-1">REMOVER</button>
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <p className="text-gray-600 text-sm">Nenhum parceiro com email cadastrado ainda.</p>
-                  )}
+                  ) : <p className="text-gray-600 text-sm">Nenhum parceiro com email cadastrado ainda.</p>}
                 </div>
 
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
@@ -1684,7 +1661,6 @@ export default function Dashboard({ user, onLogout }) {
                     + CRIAR OUTRO NEGÓCIO
                   </button>
                 </div>
-
               </div>
             )}
 
@@ -1702,13 +1678,7 @@ export default function Dashboard({ user, onLogout }) {
             <form onSubmit={editingEntregaId ? updateEntrega : createEntrega} className="space-y-4">
               <div>
                 <label className="block text-sm mb-2">Profissional</label>
-                <ProfissionalSelect
-                  value={formEntrega.profissional_id}
-                  onChange={(id) => setFormEntrega({ ...formEntrega, profissional_id: id })}
-                  profissionais={profissionais}
-                  placeholder="Selecione"
-                  apenasAtivos={true}
-                />
+                <ProfissionalSelect value={formEntrega.profissional_id} onChange={(id) => setFormEntrega({ ...formEntrega, profissional_id: id })} profissionais={profissionais} placeholder="Selecione" apenasAtivos={true} />
               </div>
               <div>
                 <label className="block text-sm mb-2">Nome</label>
@@ -1758,37 +1728,21 @@ export default function Dashboard({ user, onLogout }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm mb-2">Das</label>
-                  <TimePicker
-                    value={formProfissional.horario_inicio}
-                    onChange={(v) => setFormProfissional({ ...formProfissional, horario_inicio: v })}
-                    step={30}
-                  />
+                  <TimePicker value={formProfissional.horario_inicio} onChange={(v) => setFormProfissional({ ...formProfissional, horario_inicio: v })} step={30} />
                 </div>
                 <div>
                   <label className="block text-sm mb-2">Até</label>
-                  <TimePicker
-                    value={formProfissional.horario_fim}
-                    onChange={(v) => setFormProfissional({ ...formProfissional, horario_fim: v })}
-                    step={30}
-                  />
+                  <TimePicker value={formProfissional.horario_fim} onChange={(v) => setFormProfissional({ ...formProfissional, horario_fim: v })} step={30} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm mb-2">Almoço (Início)</label>
-                  <TimePicker
-                    value={formProfissional.almoco_inicio}
-                    onChange={(v) => setFormProfissional({ ...formProfissional, almoco_inicio: v })}
-                    step={15}
-                  />
+                  <TimePicker value={formProfissional.almoco_inicio} onChange={(v) => setFormProfissional({ ...formProfissional, almoco_inicio: v })} step={15} />
                 </div>
                 <div>
                   <label className="block text-sm mb-2">Almoço (Fim)</label>
-                  <TimePicker
-                    value={formProfissional.almoco_fim}
-                    onChange={(v) => setFormProfissional({ ...formProfissional, almoco_fim: v })}
-                    step={15}
-                  />
+                  <TimePicker value={formProfissional.almoco_fim} onChange={(v) => setFormProfissional({ ...formProfissional, almoco_fim: v })} step={15} />
                 </div>
               </div>
               <div>
