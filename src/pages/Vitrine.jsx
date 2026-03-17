@@ -11,6 +11,7 @@ import {
   Instagram,
   Check,
   ChevronRight,
+  ChevronLeft,
   ShoppingBag,
 } from 'lucide-react';
 import { supabase } from '../supabase';
@@ -20,6 +21,7 @@ import BookingCalendar from '../components/BookingCalendar';
 
 const FOLGA_MINUTOS = 5;
 const SERVICOS_POR_PAGINA = 4;
+const DEPOIMENTOS_POR_PAGINA = 10;
 
 function timeToMinutes(t) {
   if (!t) return 0;
@@ -432,6 +434,75 @@ function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecion
   );
 }
 
+function DepoimentosPaginados({ depoimentos, nomeNegocioLabel }) {
+  const [pagina, setPagina] = useState(0);
+  const totalPaginas = Math.ceil(depoimentos.length / DEPOIMENTOS_POR_PAGINA);
+  const inicio = pagina * DEPOIMENTOS_POR_PAGINA;
+  const itens  = depoimentos.slice(inicio, inicio + DEPOIMENTOS_POR_PAGINA);
+
+  if (!depoimentos.length) return <p className="text-vmuted font-normal">Nenhum depoimento ainda</p>;
+
+  return (
+    <div>
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 [column-fill:_balance]">
+        {itens.map(dep => {
+          const avatarClienteUrl = getPublicUrl('avatars', dep.users?.avatar_path);
+          return (
+            <div key={dep.id} className="mb-4 break-inside-avoid bg-vcard border border-vborder rounded-custom p-4 relative">
+              <div className="absolute top-3 right-3">
+                {dep.profissional_id && dep.profissionais?.nome
+                  ? <span className="inline-block px-1.5 py-0.5 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase">{dep.profissionais.nome}</span>
+                  : <span className="inline-block px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded-button text-[10px] text-blue-400 font-normal uppercase">{nomeNegocioLabel}</span>
+                }
+              </div>
+              <div className="flex items-center gap-3 mb-3">
+                {avatarClienteUrl
+                  ? <div className="w-10 h-10 rounded-full overflow-hidden border border-vborder bg-vcard2 shrink-0"><img src={avatarClienteUrl} alt={dep.users?.nome} className="w-full h-full object-cover" /></div>
+                  : <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-normal shrink-0">{dep.users?.nome?.[0] || 'A'}</div>
+                }
+                <div className="flex-1">
+                  <p className="text-sm font-normal">{dep.users?.nome || 'Cliente'}</p>
+                  <Stars5Char value={dep.nota} size={14} />
+                </div>
+              </div>
+              {dep.comentario && <p className="text-sm text-vsub font-normal">{dep.comentario}</p>}
+            </div>
+          );
+        })}
+      </div>
+      {totalPaginas > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-6">
+          <button
+            onClick={() => setPagina(p => Math.max(0, p - 1))}
+            disabled={pagina === 0}
+            className="p-1.5 rounded hover:bg-vcard2 text-vsub hover:text-vtext transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          {Array.from({ length: totalPaginas }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setPagina(i)}
+              className={[
+                'rounded-full transition-all duration-300',
+                i === pagina ? 'w-4 h-2 bg-primary' : 'w-2 h-2 bg-gray-700 hover:bg-gray-500',
+              ].join(' ')}
+              aria-label={`Página ${i + 1}`}
+            />
+          ))}
+          <button
+            onClick={() => setPagina(p => Math.min(totalPaginas - 1, p + 1))}
+            disabled={pagina === totalPaginas - 1}
+            className="p-1.5 rounded hover:bg-vcard2 text-vsub hover:text-vtext transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Vitrine({ user, userType }) {
   const { slug }    = useParams();
   const navigate    = useNavigate();
@@ -529,7 +600,7 @@ export default function Vitrine({ user, userType }) {
       const [entregasResult, galeriaResult, depoimentosResult] = await Promise.all([
         profissionalIds.length ? withTimeout(supabase.from('entregas').select('*').in('profissional_id', profissionalIds).eq('ativo', true), 7000, 'entregas') : Promise.resolve({ data: [], error: null }),
         withTimeout(supabase.from('galerias').select('id, path, ordem').eq('negocio_id', negocioData.id).order('ordem', { ascending: true }).order('created_at', { ascending: true }), 7000, 'galerias'),
-        withTimeout(supabase.from('depoimentos').select('id, tipo, negocio_id, profissional_id, cliente_id, nota, comentario, created_at').or(depFilter).order('created_at', { ascending: false }).limit(20), 7000, 'depoimentos'),
+        withTimeout(supabase.from('depoimentos').select('id, tipo, negocio_id, profissional_id, cliente_id, nota, comentario, created_at').or(depFilter).order('created_at', { ascending: false }).limit(200), 7000, 'depoimentos'),
       ]);
       if (entregasResult.error) throw entregasResult.error;
       if (galeriaResult.error) throw galeriaResult.error;
@@ -803,12 +874,12 @@ export default function Vitrine({ user, userType }) {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
-                      HORÁRIO {horarioIni} – {horarioFim}
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
+                      <Clock className="w-3 h-3 shrink-0" />{horarioIni} – {horarioFim}
                     </span>
                     {almIni && almFim && (
                       <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
-                        PAUSA {String(almIni).slice(0, 5)} – {String(almFim).slice(0, 5)}
+                        PAUSA <span className="text-yellow-400 ml-1">{String(almIni).slice(0, 5)} – {String(almFim).slice(0, 5)}</span>
                       </span>
                     )}
                     <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
@@ -876,25 +947,7 @@ export default function Vitrine({ user, userType }) {
             <h2 className="text-2xl sm:text-3xl font-normal">Depoimentos</h2>
             <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`px-5 py-2 border rounded-button text-sm transition-all uppercase font-normal ${isProfessional ? 'bg-vcard border-vborder2 text-vmuted cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'}`}>+ Depoimento</button>
           </div>
-          {depoimentos.length > 0 ? (
-            <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 [column-fill:_balance]">
-              {depoimentos.map(dep => {
-                const avatarClienteUrl = getPublicUrl('avatars', dep.users?.avatar_path);
-                return (
-                  <div key={dep.id} className="mb-4 break-inside-avoid bg-vcard border border-vborder rounded-custom p-4 relative">
-                    <div className="absolute top-3 right-3">
-                      {dep.profissional_id && dep.profissionais?.nome ? (<span className="inline-block px-1.5 py-0.5 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase">{dep.profissionais.nome}</span>) : (<span className="inline-block px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded-button text-[10px] text-blue-400 font-normal uppercase">{nomeNegocioLabel}</span>)}
-                    </div>
-                    <div className="flex items-center gap-3 mb-3">
-                      {avatarClienteUrl ? (<div className="w-10 h-10 rounded-full overflow-hidden border border-vborder bg-vcard2 shrink-0"><img src={avatarClienteUrl} alt={dep.users?.nome} className="w-full h-full object-cover" /></div>) : (<div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-normal shrink-0">{dep.users?.nome?.[0] || 'A'}</div>)}
-                      <div className="flex-1"><p className="text-sm font-normal">{dep.users?.nome || 'Cliente'}</p><Stars5Char value={dep.nota} size={14} /></div>
-                    </div>
-                    {dep.comentario && <p className="text-sm text-vsub font-normal">{dep.comentario}</p>}
-                  </div>
-                );
-              })}
-            </div>
-          ) : <p className="text-vmuted font-normal">Nenhum depoimento ainda</p>}
+          <DepoimentosPaginados depoimentos={depoimentos} nomeNegocioLabel={nomeNegocioLabel} />
         </div>
       </section>
 
