@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, ArrowLeft, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { User, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 
@@ -78,6 +78,8 @@ export default function SignupClient({ onLogin }) {
     }
   };
 
+  const inputClass = 'w-full px-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-blue-500/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm';
+
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -112,44 +114,37 @@ export default function SignupClient({ onLogin }) {
           <div className="space-y-5">
             <div>
               <label className="block text-sm text-gray-400 mb-2 tracking-wide">Nome Completo</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                <input
-                  type="text"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  placeholder="Seu nome completo"
-                  className="w-full pl-10 pr-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-blue-500/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm"
-                  required
-                />
-              </div>
+              <input
+                type="text"
+                value={formData.nome}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                placeholder="Seu nome completo"
+                className={inputClass}
+                required
+              />
             </div>
 
             <div>
               <label className="block text-sm text-gray-400 mb-2 tracking-wide">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="seu@email.com"
-                  className="w-full pl-10 pr-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-blue-500/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm"
-                  required
-                />
-              </div>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="seu@email.com"
+                className={inputClass}
+                required
+              />
             </div>
 
             <div>
               <label className="block text-sm text-gray-400 mb-2 tracking-wide">Senha</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Mínimo 6 caracteres"
-                  className="w-full pl-10 pr-12 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-blue-500/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm"
+                  className="w-full px-4 pr-12 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-blue-500/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm"
                   required
                   minLength={6}
                 />
