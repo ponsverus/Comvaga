@@ -320,7 +320,7 @@ export default function SignupProfessional({ onLogin }) {
               type="text"
               value={formData.tipoNegocio}
               onChange={(e) => setFormData({ ...formData, tipoNegocio: e.target.value })}
-              placeholder="Ex: barbearia, manicure, clínica..."
+              placeholder="Ex: barbearia, estúdio, manicure..."
               className={inputClass}
               required
             />
