@@ -389,7 +389,7 @@ export default function SignupProfessional({ onLogin }) {
                     type="text"
                     value={formData.bairro}
                     onChange={(e) => setFormData({ ...formData, bairro: e.target.value })}
-                    placeholder="Centro"
+                    placeholder="Ribeiro de Abreu"
                     className={inputClass}
                   />
                 </div>
