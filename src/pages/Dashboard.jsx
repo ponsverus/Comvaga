@@ -199,15 +199,15 @@ const LABEL_MODAL_EDIT = {
 };
 
 const LABEL_COUNTER_SINGULAR = {
-  servicos:  'serviço',
-  consultas: 'consulta',
-  aulas:     'aula',
+  servicos:  'SERVIÇO',
+  consultas: 'CONSULTA',
+  aulas:     'AULA',
 };
 
 const LABEL_COUNTER_PLURAL = {
-  servicos:  'serviços',
-  consultas: 'consultas',
-  aulas:     'aulas',
+  servicos:  'SERVIÇOS',
+  consultas: 'CONSULTAS',
+  aulas:     'AULAS',
 };
 
 const LABEL_EMPTY_LIST = {
