@@ -266,6 +266,19 @@ export default function ClientArea({ user, onLogout }) {
     if (user?.id) loadData();
   }, [user?.id]);
 
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`agendamentos_cliente:${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'agendamentos', filter: `cliente_id=eq.${user.id}` },
+        () => { loadData(); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user?.id]);
+
   const openFilePicker = () => fileInputRef.current?.click();
 
   const onPickAvatar = async (e) => {
