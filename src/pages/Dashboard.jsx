@@ -1300,8 +1300,8 @@ export default function Dashboard({ user, onLogout }) {
                                       : <div className="px-3 py-1 rounded-button text-xs bg-blue-500/20 text-blue-400">AGENDADO</div>}
                                   </div>
                                 </div>
-                                <p className="text-xs text-gray-500 truncate mb-0.5">{a.profissionais?.nome || '—'}</p>
-                                <p className="text-xs text-primary truncate mb-3">{a.entregas?.nome || '—'}</p>
+                                <p className="text-xs text-gray-500 truncate mb-0.5">PROF:{a.profissionais?.nome || '—'}</p>
+                                <p className="text-xs text-primary truncate mb-3">SERV:{a.entregas?.nome || '—'}</p>
                                 <div className="grid grid-cols-3 gap-4 mb-4">
                                   <div><div className="text-xs text-gray-500">DATA</div><div className="text-sm">{formatDateBRFromISO(getAgDate(a))}</div></div>
                                   <div><div className="text-xs text-gray-500">HORÁRIO</div><div className="text-sm">{getAgInicio(a)}</div></div>
