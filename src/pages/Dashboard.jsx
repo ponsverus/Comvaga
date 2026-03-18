@@ -1291,20 +1291,20 @@ export default function Dashboard({ user, onLogout }) {
                             const valorReal = getValorAgendamento(a);
                             return (
                               <div key={a.id} className="bg-dark-200 border border-gray-800 rounded-custom p-4">
-                                <div className="flex justify-between items-start mb-3">
-                                  <div className="flex items-center gap-3 min-w-0">
-                                    <ClienteAvatar cliente={a.cliente} />
-                                    <div className="min-w-0">
-                                      <p className="font-normal text-lg truncate">{a.cliente?.nome || '—'}</p>
-                                      <p className="text-sm text-gray-400 truncate">{a.entregas?.nome} • {a.profissionais?.nome}</p>
-                                    </div>
+                                <div className="flex items-center gap-3 mb-1">
+                                  <ClienteAvatar cliente={a.cliente} />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p>
                                   </div>
-                                  <div className="flex items-center gap-2 shrink-0 ml-2">
+                                  <div className="shrink-0">
                                     {isCancel ? <div className="px-3 py-1 rounded-button text-xs bg-red-500/20 text-red-300">CANCELADO</div>
                                       : isDone ? <div className="px-3 py-1 rounded-button text-xs bg-green-500/20 text-green-400">CONCLUÍDO</div>
                                       : isFuturo ? <div className="px-3 py-1 rounded-button text-xs bg-yellow-500/20 text-yellow-300">FUTURO</div>
                                       : <div className="px-3 py-1 rounded-button text-xs bg-blue-500/20 text-blue-400">AGENDADO</div>}
                                   </div>
+                                </div>
+                                <div className="pl-12 mb-3">
+                                  <p className="text-xs text-gray-500 truncate">{a.entregas?.nome} · {a.profissionais?.nome}</p>
                                 </div>
                                 <div className="grid grid-cols-3 gap-4 mb-4">
                                   <div><div className="text-xs text-gray-500">DATA</div><div className="text-sm">{formatDateBRFromISO(getAgDate(a))}</div></div>
@@ -1341,15 +1341,15 @@ export default function Dashboard({ user, onLogout }) {
                       const valorReal = getValorAgendamento(a);
                       return (
                         <div key={a.id} className="bg-dark-200 border border-red-500/30 rounded-custom p-4">
-                          <div className="flex justify-between items-start mb-3">
-                            <div className="flex items-center gap-3 min-w-0">
-                              <ClienteAvatar cliente={a.cliente} />
-                              <div className="min-w-0">
-                                <p className="font-normal text-lg text-white truncate">{a.cliente?.nome || '—'}</p>
-                                <p className="text-sm text-gray-400 truncate">{a.entregas?.nome} • {a.profissionais?.nome}</p>
-                              </div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <ClienteAvatar cliente={a.cliente} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p>
                             </div>
-                            <div className="px-3 py-1 rounded-button text-xs bg-red-500/20 border border-red-500/50 text-red-400 shrink-0 ml-2">CANCELADO</div>
+                            <div className="px-3 py-1 rounded-button text-xs bg-red-500/20 border border-red-500/50 text-red-400 shrink-0">CANCELADO</div>
+                          </div>
+                          <div className="pl-12 mb-3">
+                            <p className="text-xs text-gray-500 truncate">{a.entregas?.nome} · {a.profissionais?.nome}</p>
                           </div>
                           <div className="grid grid-cols-3 gap-4 text-sm">
                             <div><div className="text-xs text-gray-500">DATA</div><div className="text-white">{formatDateBRFromISO(getAgDate(a))}</div></div>
@@ -1379,17 +1379,17 @@ export default function Dashboard({ user, onLogout }) {
                       const valorReal = getValorAgendamento(a);
                       return (
                         <div key={a.id} className={`bg-dark-200 border rounded-custom p-4 ${isCancel ? 'border-red-500/30' : 'border-gray-800'}`}>
-                          <div className="flex justify-between items-start mb-3">
-                            <div className="flex items-center gap-3 min-w-0">
-                              <ClienteAvatar cliente={a.cliente} />
-                              <div className="min-w-0">
-                                <p className="font-normal text-lg truncate">{a.cliente?.nome || '—'}</p>
-                                <p className="text-sm text-gray-400 truncate">{a.entregas?.nome} • {a.profissionais?.nome}</p>
-                              </div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <ClienteAvatar cliente={a.cliente} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p>
                             </div>
-                            <div className={`px-3 py-1 rounded-button text-xs shrink-0 ml-2 ${isCancel ? 'bg-red-500/20 border border-red-500/50 text-red-300' : isDone ? 'bg-green-500/20 border border-green-500/50 text-green-300' : 'bg-blue-500/20 border border-blue-500/50 text-blue-300'}`}>
+                            <div className={`px-3 py-1 rounded-button text-xs shrink-0 ${isCancel ? 'bg-red-500/20 border border-red-500/50 text-red-300' : isDone ? 'bg-green-500/20 border border-green-500/50 text-green-300' : 'bg-blue-500/20 border border-blue-500/50 text-blue-300'}`}>
                               {isCancel ? 'CANCELADO' : isDone ? 'CONCLUÍDO' : 'AGENDADO'}
                             </div>
+                          </div>
+                          <div className="pl-12 mb-3">
+                            <p className="text-xs text-gray-500 truncate">{a.entregas?.nome} · {a.profissionais?.nome}</p>
                           </div>
                           <div className="grid grid-cols-3 gap-4 mb-4">
                             <div><div className="text-xs text-gray-500">DATA</div><div className="text-sm">{formatDateBRFromISO(getAgDate(a))}</div></div>
