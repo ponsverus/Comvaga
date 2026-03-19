@@ -33,9 +33,11 @@ const VIEWS = {
   agendamentos: 'agendamentos',
 };
 
+// FIX 1: parseFloat + toFixed(2) evita imprecisão de ponto flutuante
+// Ex: Number("60") pode gerar 59.999... em alguns contextos; toFixed(2) garante arredondamento correto
 const toNumberOrNull = (v) => {
   if (v === '' || v == null) return null;
-  const n = Number(v);
+  const n = parseFloat(Number(v).toFixed(2));
   return Number.isFinite(n) ? n : null;
 };
 
@@ -270,6 +272,8 @@ export default function Dashboard({ user, onLogout }) {
 
   const [showNovaEntrega, setShowNovaEntrega] = useState(false);
   const [showNovoProfissional, setShowNovoProfissional] = useState(false);
+  // FIX 2: estado para prevenir duplo clique no formulário de entrega
+  const [submittingEntrega, setSubmittingEntrega] = useState(false);
 
   const [editingEntregaId, setEditingEntregaId] = useState(null);
   const [editingProfissional, setEditingProfissional] = useState(null);
@@ -702,7 +706,9 @@ export default function Dashboard({ user, onLogout }) {
 
   const createEntrega = async (e) => {
     e.preventDefault();
+    if (submittingEntrega) return;
     try {
+      setSubmittingEntrega(true);
       if (!negocio?.id) throw new Error('Erro ao carregar o negocio');
       const preco = toNumberOrNull(formEntrega.preco);
       const promo = toNumberOrNull(formEntrega.preco_promocional);
@@ -730,12 +736,16 @@ export default function Dashboard({ user, onLogout }) {
       else if (msg.includes('Duracao')) await uiAlert('dashboard.service_duration_invalid', 'error');
       else if (msg.includes('Selecione')) await uiAlert(`dashboard.business.${businessGroup}.service_prof_required`, 'error');
       else await uiAlert(`dashboard.business.${businessGroup}.service_create_error`, 'error');
+    } finally {
+      setSubmittingEntrega(false);
     }
   };
 
   const updateEntrega = async (e) => {
     e.preventDefault();
+    if (submittingEntrega) return;
     try {
+      setSubmittingEntrega(true);
       const preco = toNumberOrNull(formEntrega.preco);
       const promo = toNumberOrNull(formEntrega.preco_promocional);
       if (!toUpperClean(formEntrega.nome)) throw new Error('Nome da entrega e obrigatorio.');
@@ -761,6 +771,8 @@ export default function Dashboard({ user, onLogout }) {
       else if (msg.includes('Duracao')) await uiAlert('dashboard.service_duration_invalid', 'error');
       else if (msg.includes('Selecione')) await uiAlert(`dashboard.business.${businessGroup}.service_prof_required`, 'error');
       else await uiAlert(`dashboard.business.${businessGroup}.service_update_error`, 'error');
+    } finally {
+      setSubmittingEntrega(false);
     }
   };
 
@@ -1697,8 +1709,12 @@ export default function Dashboard({ user, onLogout }) {
                 <input type="number" step="0.01" value={formEntrega.preco_promocional} onChange={(e) => setFormEntrega({ ...formEntrega, preco_promocional: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" placeholder="Apenas se houver oferta" />
                 <p className="text-[12px] text-gray-500 mt-2">O preço de oferta deve ser menor que o preço normal.</p>
               </div>
-              <button type="submit" className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase">
-                {editingEntregaId ? 'SALVAR' : `CRIAR ${btnAddLabel}`}
+              <button
+                type="submit"
+                disabled={submittingEntrega}
+                className={`w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase ${submittingEntrega ? 'opacity-60 cursor-not-allowed' : ''}`}
+              >
+                {submittingEntrega ? 'SALVANDO...' : editingEntregaId ? 'SALVAR' : `CRIAR ${btnAddLabel}`}
               </button>
             </form>
           </div>
