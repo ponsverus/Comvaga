@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Award, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
+import { isPasswordRecoveryUrl } from '../utils/auth';
 
 const PROFILE_TABLE = 'users';
 const isValidType = (t) => t === 'client' || t === 'professional';
@@ -16,19 +17,6 @@ async function fetchProfileType(userId) {
 
   if (error || !data) return null;
   return isValidType(data.type) ? data.type : null;
-}
-
-function isPasswordRecoveryUrl() {
-  const href = window.location.href || '';
-  const hash = window.location.hash || '';
-  const search = window.location.search || '';
-  return (
-    href.includes('type=recovery') ||
-    search.includes('type=recovery') ||
-    hash.includes('type=recovery') ||
-    search.includes('code=') ||
-    hash.includes('access_token=')
-  );
 }
 
 export default function Login({ onLogin }) {
