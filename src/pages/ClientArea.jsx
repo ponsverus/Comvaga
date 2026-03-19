@@ -11,19 +11,6 @@ function formatDateBRFromISO(dateStr) {
   return `${d}.${m}.${y}`;
 }
 
-function getNowSP_localFallback() {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Sao_Paulo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour12: false
-  }).formatToParts(new Date());
-
-  const get = (type) => parts.find(p => p.type === type)?.value;
-  return { date: `${get('year')}-${get('month')}-${get('day')}`, source: 'local' };
-}
-
 const moneyBR = (v) => {
   const n = Number(v ?? 0);
   if (!Number.isFinite(n)) return '0,00';
