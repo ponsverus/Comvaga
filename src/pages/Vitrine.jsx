@@ -625,7 +625,7 @@ export default function Vitrine({ user, userType }) {
       const clienteIds = Array.from(new Set(base.map(a => a.cliente_id).filter(Boolean)));
       let usersMap = new Map();
       if (clienteIds.length) {
-        const { data: usersDb, error: upErr } = await withTimeout(supabase.from('users').select('id, nome, avatar_path, type').in('id', clienteIds), 7000, 'users');
+        const { data: usersDb, error: upErr } = await withTimeout(supabase.from('users_public').select('id, nome, avatar_path, type').in('id', clienteIds), 7000, 'users_public');
         if (upErr) throw upErr;
         usersMap = new Map((usersDb || []).map(u => [u.id, u]));
       }
