@@ -897,7 +897,7 @@ export default function Vitrine({ user, userType }) {
                     </span>
                     {almIni && almFim && (
                       <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
-                        PAUSA <span className="text-yellow-400 ml-1"> • {String(almIni).slice(0, 5)} – {String(almFim).slice(0, 5)}</span>
+                        <span className="text-yellow-400 ml-1"> • {String(almIni).slice(0, 5)} – {String(almFim).slice(0, 5)}</span>
                       </span>
                     )}
                     <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
