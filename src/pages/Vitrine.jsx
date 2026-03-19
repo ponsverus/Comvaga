@@ -875,6 +875,10 @@ export default function Vitrine({ user, userType }) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <h3 className="text-lg font-normal">{prof.nome}</h3>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${status.color}`} />
+                        <span className="text-xs text-vsub font-normal uppercase">{status.label}</span>
+                      </div> 
                         {profissao && (<span className="inline-block px-2 py-1 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase whitespace-nowrap shrink-0">{profissao}</span>)}
                       </div>
                       {depInfo?.media && (
@@ -884,11 +888,7 @@ export default function Vitrine({ user, userType }) {
                           <span className="text-xs text-vmuted">({depInfo.count})</span>
                         </div>
                       )}
-                      {prof.anos_experiencia != null && (<p className="text-sm text-vmuted font-normal">{prof.anos_experiencia} ano(s) de experiência</p>)}
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${status.color}`} />
-                        <span className="text-xs text-vsub font-normal uppercase">{status.label}</span>
-                      </div>
+                      {prof.anos_experiencia != null && (<p className="text-sm text-vmuted font-normal">{prof.anos_experiencia} ano(s) de experiência</p>)}              
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
