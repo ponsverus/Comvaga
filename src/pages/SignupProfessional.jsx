@@ -53,7 +53,6 @@ export default function SignupProfessional({ onLogin }) {
     descricao: '',
     rua: '',
     numero: '',
-    bairro: '',
     cidade: '',
     estado: '',
   });
@@ -380,17 +379,6 @@ export default function SignupProfessional({ onLogin }) {
                     placeholder="1038"
                     className={inputClass}
                     required
-                  />
-                </div>
-
-                <div>
-                  <label className={labelSmClass}>Bairro (opcional)</label>
-                  <input
-                    type="text"
-                    value={formData.bairro}
-                    onChange={(e) => setFormData({ ...formData, bairro: e.target.value })}
-                    placeholder="Ribeiro de Abreu"
-                    className={inputClass}
                   />
                 </div>
 
