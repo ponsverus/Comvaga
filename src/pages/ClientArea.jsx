@@ -25,30 +25,6 @@ const getPrecoFinalEntrega = (e) => {
   return temPromo ? promo : preco;
 };
 
-function toYMD_SP(ts) {
-  if (!ts) return '';
-  try {
-    return new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'America/Sao_Paulo',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }).format(new Date(ts));
-  } catch { return ''; }
-}
-
-function toHHMM_SP(ts) {
-  if (!ts) return '';
-  try {
-    return new Intl.DateTimeFormat('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    }).format(new Date(ts));
-  } catch { return ''; }
-}
-
 function HeartIcon({ filled = false, className = '', size = 20 }) {
   return (
     <svg
@@ -71,9 +47,13 @@ function HeartIcon({ filled = false, className = '', size = 20 }) {
 
 function getPublicUrl(bucket, path) {
   if (!path) return null;
-  const stripped = path.replace(new RegExp(`^${bucket}/`), '');
-  const { data } = supabase.storage.from(bucket).getPublicUrl(stripped);
-  return data?.publicUrl || null;
+  try {
+    const stripped = path.replace(new RegExp(`^${bucket}/`), '');
+    const { data } = supabase.storage.from(bucket).getPublicUrl(stripped);
+    return data?.publicUrl || null;
+  } catch {
+    return null;
+  }
 }
 
 export default function ClientArea({ user, onLogout }) {
@@ -88,12 +68,12 @@ export default function ClientArea({ user, onLogout }) {
     return window.confirm('Confirmar?');
   };
 
-  const [activeTab,      setActiveTab]      = useState('agendamentos');
-  const [agendamentos,   setAgendamentos]   = useState([]);
-  const [favoritos,      setFavoritos]      = useState([]);
-  const [loading,        setLoading]        = useState(true);
+  const [activeTab,       setActiveTab]       = useState('agendamentos');
+  const [agendamentos,    setAgendamentos]    = useState([]);
+  const [favoritos,       setFavoritos]       = useState([]);
+  const [loading,         setLoading]         = useState(true);
 
-  const [avatarPath,     setAvatarPath]     = useState(null);
+  const [avatarPath,      setAvatarPath]      = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -109,71 +89,54 @@ export default function ClientArea({ user, onLogout }) {
 
   useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
 
-  const uniq = (arr) => Array.from(new Set((arr || []).filter(Boolean)));
-
-  const fetchAgendamentosRaw = async () => {
-    const { data, error } = await supabase
-      .from('agendamentos')
-      .select('*')
-      .eq('cliente_id', user.id)
-      .order('data',           { ascending: false })
-      .order('horario_inicio', { ascending: false })
-      .order('id',             { ascending: false });
+  const fetchAgendamentos = async () => {
+    const { data, error } = await supabase.rpc('get_agendamentos_cliente', { p_cliente_id: user.id });
     if (error) throw error;
-    return data || [];
+    return (data || []).map(a => ({
+      ...a,
+      data:        String(a.data || ''),
+      hora_inicio: a.horario_inicio ? String(a.horario_inicio).slice(0, 5) : '',
+      hora_fim:    a.horario_fim    ? String(a.horario_fim).slice(0, 5)    : '',
+      entregas: {
+        nome:             a.entrega_nome,
+        preco:            a.entrega_preco,
+        preco_promocional: a.entrega_promo,
+      },
+      profissionais: {
+        nome:    a.profissional_nome,
+        negocios: {
+          nome:      a.negocio_nome,
+          slug:      a.negocio_slug,
+          logo_path: a.negocio_logo_path,
+          tipo_negocio: a.negocio_tipo,
+        },
+      },
+    }));
   };
 
-  const montarAgendamentosComMaps = async (agList) => {
-    const list = agList || [];
+  const fetchFavoritos = async () => {
+    const { data, error } = await supabase.rpc('get_favoritos_cliente', { p_cliente_id: user.id });
+    if (error) throw error;
+    return (data || []).map(f => ({
+      ...f,
+      negocios: f.tipo === 'negocio' && f.negocio_nome
+        ? { nome: f.negocio_nome, slug: f.negocio_slug, logo_path: f.negocio_logo_path, tipo_negocio: f.negocio_tipo }
+        : null,
+      profissionais: f.tipo === 'profissional' && f.profissional_nome
+        ? { nome: f.profissional_nome, negocios: f.profissional_negocio_slug ? { slug: f.profissional_negocio_slug } : null }
+        : null,
+    }));
+  };
 
-    const entregaIds = uniq(list.map(a => a.entrega_id));
-    const profIds    = uniq(list.map(a => a.profissional_id));
-
-    let entregasMap = new Map();
-    if (entregaIds.length) {
-      const { data, error } = await supabase
-        .from('entregas')
-        .select('id, nome, preco, preco_promocional')
-        .in('id', entregaIds);
-      if (error) throw error;
-      for (const e of (data || [])) entregasMap.set(e.id, e);
-    }
-
-    let profissionaisMap = new Map();
-    let negocioIds = [];
-    if (profIds.length) {
-      const { data, error } = await supabase
-        .from('profissionais')
-        .select('id, nome, negocio_id, ativo')
-        .in('id', profIds);
-      if (error) throw error;
-      negocioIds = uniq((data || []).map(p => p.negocio_id));
-      for (const p of (data || [])) profissionaisMap.set(p.id, p);
-    }
-
-    let negociosMap = new Map();
-    if (negocioIds.length) {
-      const { data, error } = await supabase
-        .from('negocios')
-        .select('id, nome, slug, logo_path, tipo_negocio')
-        .in('id', negocioIds);
-      if (error) throw error;
-      for (const n of (data || [])) negociosMap.set(n.id, n);
-    }
-
-    return list.map(a => {
-      const entrega = entregasMap.get(a.entrega_id) || null;
-      const prof    = profissionaisMap.get(a.profissional_id) || null;
-      const neg     = prof?.negocio_id ? (negociosMap.get(prof.negocio_id) || null) : null;
-      return {
-        ...a,
-        data:         a.data || toYMD_SP(a.inicio),
-        hora_inicio:  a.horario_inicio ? String(a.horario_inicio).slice(0, 5) : toHHMM_SP(a.inicio),
-        hora_fim:     a.horario_fim    ? String(a.horario_fim).slice(0, 5)    : toHHMM_SP(a.fim),
-        entregas:     entrega,
-        profissionais: prof ? { ...prof, negocios: neg } : null,
-      };
-    });
+  const loadPerfil = async () => {
+    const { data, error } = await supabase
+      .from('users')
+      .select('nome, avatar_path')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (error) throw error;
+    setNomePerfil(String(data?.nome || '').trim());
+    setAvatarPath(data?.avatar_path || null);
   };
 
   const loadData = async () => {
@@ -181,63 +144,13 @@ export default function ClientArea({ user, onLogout }) {
     setLoadError('');
     setLoading(true);
     try {
-      const { data: uRow, error: uErr } = await supabase
-        .from('users')
-        .select('nome, avatar_path')
-        .eq('id', user.id)
-        .maybeSingle();
-      if (uErr) throw uErr;
-
-      setNomePerfil(String(uRow?.nome || '').trim());
-      setAvatarPath(uRow?.avatar_path || null);
-
-      const agRaw   = await fetchAgendamentosRaw();
-      const agFinal = await montarAgendamentosComMaps(agRaw);
-      setAgendamentos(agFinal);
-
-      const { data: favRaw, error: favErr } = await supabase
-        .from('favoritos').select('*').eq('cliente_id', user.id);
-      if (favErr) throw favErr;
-
-      const favList    = favRaw || [];
-      const favNegIds  = uniq(favList.filter(f => f.tipo === 'negocio').map(f => f.negocio_id));
-      const favProfIds = uniq(favList.filter(f => f.tipo === 'profissional').map(f => f.profissional_id));
-
-      let favProfMap = new Map();
-      let favNegFromProf = [];
-      if (favProfIds.length) {
-        const { data, error } = await supabase
-          .from('profissionais')
-          .select('id, nome, negocio_id, ativo, avatar_path')
-          .in('id', favProfIds);
-        if (error) throw error;
-        favNegFromProf = uniq((data || []).map(p => p.negocio_id));
-        for (const p of (data || [])) favProfMap.set(p.id, p);
-      }
-
-      const allFavNegIds = uniq([...favNegIds, ...favNegFromProf]);
-      let favNegMap = new Map();
-      if (allFavNegIds.length) {
-        const { data, error } = await supabase
-          .from('negocios')
-          .select('id, nome, slug, logo_path, tipo_negocio')
-          .in('id', allFavNegIds);
-        if (error) throw error;
-        for (const n of (data || [])) favNegMap.set(n.id, n);
-      }
-
-      const favFinal = favList.map(f => {
-        const prof        = f.tipo === 'profissional' ? (favProfMap.get(f.profissional_id) || null) : null;
-        const negDirect   = f.tipo === 'negocio'      ? (favNegMap.get(f.negocio_id)       || null) : null;
-        const negFromProf = prof?.negocio_id          ? (favNegMap.get(prof.negocio_id)    || null) : null;
-        return {
-          ...f,
-          negocios:      negDirect,
-          profissionais: prof ? { ...prof, negocios: negFromProf } : null,
-        };
-      });
-
-      setFavoritos(favFinal);
+      const [, ags, favs] = await Promise.all([
+        loadPerfil(),
+        fetchAgendamentos(),
+        fetchFavoritos(),
+      ]);
+      setAgendamentos(ags);
+      setFavoritos(favs);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       setLoadError(error?.message || 'Erro ao carregar dados.');
@@ -260,7 +173,14 @@ export default function ClientArea({ user, onLogout }) {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'agendamentos', filter: `cliente_id=eq.${user.id}` },
-        () => { loadData(); }
+        async () => {
+          try {
+            const ags = await fetchAgendamentos();
+            setAgendamentos(ags);
+          } catch (e) {
+            console.error('Realtime reload error:', e);
+          }
+        }
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
@@ -303,7 +223,6 @@ export default function ClientArea({ user, onLogout }) {
       const { error: metaErr } = await supabase.auth.updateUser({ data: { nome } });
       if (metaErr) console.warn('metaErr:', metaErr);
       await uiAlert('clientArea.profile_name_updated', 'success');
-      await loadData();
     } catch (e) {
       console.error('Erro ao salvar nome:', e);
       await uiAlert('clientArea.profile_name_update_error', 'error');
@@ -320,7 +239,6 @@ export default function ClientArea({ user, onLogout }) {
       const { error } = await supabase.auth.updateUser({ email });
       if (error) throw error;
       await uiAlert('clientArea.account_email_update_sent', 'success');
-      await loadData();
     } catch (e) {
       console.error('Erro ao alterar email:', e);
       await uiAlert('clientArea.account_email_update_error', 'error');
@@ -356,7 +274,8 @@ export default function ClientArea({ user, onLogout }) {
       const { error } = await supabase.rpc('cancelar_agendamento', { p_agendamento_id: agendamentoId });
       if (error) throw error;
       await uiAlert('clientArea.booking_canceled', 'danger');
-      loadData();
+      const ags = await fetchAgendamentos();
+      setAgendamentos(ags);
     } catch (error) {
       console.error('Erro ao cancelar:', error);
       await uiAlert('clientArea.booking_cancel_error', 'error');
@@ -367,7 +286,7 @@ export default function ClientArea({ user, onLogout }) {
     try {
       const { error } = await supabase.from('favoritos').delete().eq('id', favoritoId).eq('cliente_id', user.id);
       if (error) throw error;
-      setFavoritos(favoritos.filter(f => f.id !== favoritoId));
+      setFavoritos(prev => prev.filter(f => f.id !== favoritoId));
       await uiAlert('clientArea.favorite_removed', 'success');
     } catch (error) {
       console.error('Erro ao remover favorito:', error);
@@ -519,7 +438,7 @@ export default function ClientArea({ user, onLogout }) {
           <h2 className="text-3xl sm:text-4xl font-normal mb-2">Olá {nomeCabecalho} :)</h2>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 items-start">
           <Link to="/" className="bg-gradient-to-r from-primary to-yellow-600 rounded-custom p-6 hover:shadow-lg hover:shadow-primary/50 transition-all">
             <Calendar className="w-8 h-8 text-black mb-3" />
             <h3 className="text-lg font-normal text-black mb-1">NOVO AGENDAMENTO</h3>
@@ -573,7 +492,7 @@ export default function ClientArea({ user, onLogout }) {
             {activeTab === 'favoritos' && (
               <div>
                 {favoritos.length > 0 ? (
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
                     {favoritos.map(fav => {
                       const isNegocio   = fav.tipo === 'negocio';
                       const nomeFav     = isNegocio ? (fav.negocios?.nome || '—') : (fav.profissionais?.nome || '—');
