@@ -196,7 +196,7 @@ export default function CriarNegocio({ user }) {
               type="tel"
               value={formData.telefone}
               onChange={(e) => setFormData(prev => ({ ...prev, telefone: e.target.value }))}
-              placeholder="(11) 99999-9999"
+              placeholder="(31) 90000-0000"
               className={inputClass}
               required
             />
@@ -242,7 +242,7 @@ export default function CriarNegocio({ user }) {
                     required
                   />
                 </div>
-                <div className="sm:col-span-2">
+                <div>
                   <label className={labelSmClass}>Estado *</label>
                   <input
                     type="text"
