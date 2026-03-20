@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Award, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { isPasswordRecoveryUrl } from '../utils/auth';
 
 const PROFILE_TABLE = 'users';
 const isValidType = (t) => t === 'client' || t === 'professional';
@@ -19,7 +18,7 @@ async function fetchProfileType(userId) {
   return isValidType(data.type) ? data.type : null;
 }
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
   const [step, setStep] = useState(1);
   const [userType, setUserType] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +27,7 @@ export default function Login({ onLogin }) {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
-  const [isRecovery, setIsRecovery] = useState(false);
+  const [isRecovery, setIsRecovery] = useState(inRecoveryProp);
   const [recoveryLoading, setRecoveryLoading] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [newPassword2, setNewPassword2] = useState('');
@@ -38,11 +37,13 @@ export default function Login({ onLogin }) {
   const { showMessage } = useFeedback();
 
   useEffect(() => {
-    if (isPasswordRecoveryUrl()) {
+    if (inRecoveryProp) {
       setIsRecovery(true);
       setStep(2);
     }
+  }, [inRecoveryProp]);
 
+  useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         setIsRecovery(true);
@@ -236,7 +237,7 @@ export default function Login({ onLogin }) {
                     SALVANDO...
                   </span>
                 ) : (
-                  'SAVLVAR NOVA SENHA'
+                  'Salvar nova senha'
                 )}
               </button>
             </form>
