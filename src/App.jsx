@@ -185,6 +185,8 @@ export default function App() {
 
       try {
 
+        // Se é URL de recovery, não processa como login normal
+        // O onAuthStateChange vai disparar PASSWORD_RECOVERY e cuidar do fluxo
         if (isPasswordRecoveryUrl()) {
           safeSet(() => {
             setInRecovery(true);
@@ -232,6 +234,7 @@ export default function App() {
 
         if (!aliveRef.current) return;
 
+        // Intercepta o evento de recovery — não trata como login normal
         if (event === 'PASSWORD_RECOVERY') {
           safeSet(() => setInRecovery(true));
           return;
