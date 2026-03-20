@@ -365,11 +365,9 @@ function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecion
   const paginaAlvo     = pagina;
   const itensAntigos = lista.slice(paginaAnterior * SERVICOS_POR_PAGINA, paginaAnterior * SERVICOS_POR_PAGINA + SERVICOS_POR_PAGINA);
   const itensNovos   = lista.slice(paginaAlvo    * SERVICOS_POR_PAGINA, paginaAlvo    * SERVICOS_POR_PAGINA + SERVICOS_POR_PAGINA);
-
   const itensMostrados = animando ? itensAntigos : itensNovos;
-
-  const translateSaindo = animDir === 'left' ? '-100%' : animDir === 'right' ? '100%' : '0%';
-  const translateEntrando = animDir === 'left' ? '100%' : animDir === 'right' ? '-100%' : '0%';
+  const translateSaindo   = animDir === 'left' ? '-100%' : animDir === 'right' ? '100%' : '0%';
+  const translateEntrando = animDir === 'left' ? '100%'  : animDir === 'right' ? '-100%' : '0%';
 
   return (
     <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
@@ -521,6 +519,7 @@ export default function Vitrine({ user, userType }) {
   const navigate    = useNavigate();
   const vitrineMsgs = ptBR?.vitrine || {};
   const getMsg      = (key, fallback) => vitrineMsgs?.[key] || fallback;
+
   const [negocio,       setNegocio]       = useState(null);
   const [profissionais, setProfissionais] = useState([]);
   const [entregas,      setEntregas]      = useState([]);
@@ -528,28 +527,27 @@ export default function Vitrine({ user, userType }) {
   const [galeriaItems,  setGaleriaItems]  = useState([]);
   const [loading,       setLoading]       = useState(true);
   const [error,         setError]         = useState(null);
+
   const businessGroup   = useMemo(() => getBusinessGroup(negocio?.tipo_negocio), [negocio?.tipo_negocio]);
   const bizV            = vitrineMsgs?.business || {};
   const sectionTitle    = bizV?.section_title?.[businessGroup]  ?? 'Serviços';
   const counterSingular = ptBR?.dashboard?.business?.counter_singular?.[businessGroup] ?? 'serviço';
   const counterPlural   = ptBR?.dashboard?.business?.counter_plural?.[businessGroup]   ?? 'serviços';
   const emptyListMsg    = ptBR?.dashboard?.business?.empty_list?.[businessGroup]       ?? 'Sem serviços para este profissional.';
+
   const [nativeAlertOpen,   setNativeAlertOpen]   = useState(false);
   const [nativeAlertData,   setNativeAlertData]   = useState({ title: '', body: '', buttonText: 'OK' });
   const [nativeConfirmOpen, setNativeConfirmOpen] = useState(false);
   const [nativeConfirmData, setNativeConfirmData] = useState({ title: '', body: '', confirmText: 'CONFIRMAR', cancelText: 'CANCELAR' });
   const confirmResolverRef = useRef(null);
-  const alertAfterCloseRef = useRef(null);
-  const closeAlert = () => {
-    setNativeAlertOpen(false);
-    const fn = alertAfterCloseRef.current;
-    alertAfterCloseRef.current = null;
-    if (typeof fn === 'function') fn();
-  };
+
+  const closeAlert = () => setNativeAlertOpen(false);
+
   const openAlert = ({ title, body, buttonText }) => {
     setNativeAlertData({ title: title || getMsg('generic_title', 'Aviso'), body: body || '', buttonText: buttonText || 'OK' });
     setNativeAlertOpen(true);
   };
+
   const alertKey = (key, fallbackTitle, fallbackBody, fallbackBtn = 'OK') => {
     const m = vitrineMsgs?.[key];
     if (m && typeof m === 'object') {
@@ -558,6 +556,7 @@ export default function Vitrine({ user, userType }) {
     }
     openAlert({ title: fallbackTitle || getMsg('generic_title', 'Aviso'), body: fallbackBody || '', buttonText: fallbackBtn || 'OK' });
   };
+
   const confirmKey = (key, fallbackTitle, fallbackBody, fallbackConfirm = 'CONFIRMAR', fallbackCancel = 'CANCELAR') => {
     return new Promise((resolve) => {
       confirmResolverRef.current = resolve;
@@ -571,80 +570,111 @@ export default function Vitrine({ user, userType }) {
       setNativeConfirmOpen(true);
     });
   };
+
   const closeConfirm = (value) => {
     setNativeConfirmOpen(false);
     const r = confirmResolverRef.current;
     confirmResolverRef.current = null;
     if (typeof r === 'function') r(!!value);
   };
+
   const [isFavorito,   setIsFavorito]   = useState(false);
   const [calendarLink, setCalendarLink] = useState('');
-  const [flow, setFlow] = useState({ step: 0, profissional: null, servicosSelecionados: [], lastSlot: null });
+  const [flow, setFlow] = useState({ step: 'idle', profissional: null, servicosSelecionados: [], lastSlot: null });
   const [selecaoProfId,        setSelecaoProfId]        = useState(null);
   const [servicosSelecionados, setServicosSelecionados] = useState([]);
+
   const todayISO = useMemo(() => getNowSP().date, []);
+
   const [showDepoimento,           setShowDepoimento]           = useState(false);
   const [depoimentoNota,           setDepoimentoNota]           = useState(5);
   const [depoimentoTexto,          setDepoimentoTexto]          = useState('');
   const [depoimentoLoading,        setDepoimentoLoading]        = useState(false);
   const [depoimentoTipo,           setDepoimentoTipo]           = useState('negocio');
   const [depoimentoProfissionalId, setDepoimentoProfissionalId] = useState(null);
+
   const isProfessional = user && userType === 'professional';
+
   useEffect(() => { loadVitrine(); }, [slug]);
+
   useEffect(() => {
     if (user && negocio?.id) checkFavorito();
     else setIsFavorito(false);
   }, [user?.id, userType, negocio?.id]);
 
+  const loadDepoimentos = async (negocioId) => {
+    const { data, error: rpcErr } = await withTimeout(
+      supabase.rpc('get_depoimentos_vitrine', { p_negocio_id: negocioId }),
+      7000,
+      'depoimentos'
+    );
+    if (rpcErr) throw rpcErr;
+    return (data || []).map(d => ({
+      ...d,
+      users:        d.cliente_nome ? { nome: d.cliente_nome, avatar_path: d.cliente_avatar_path, type: d.cliente_type } : null,
+      profissionais: d.profissional_nome ? { nome: d.profissional_nome } : null,
+    }));
+  };
+
   const loadVitrine = async () => {
     setLoading(true); setError(null);
     const watchdog = setTimeout(() => { setLoading(false); setError(getMsg('load_timeout', 'Demorou demais para carregar. Tente novamente.')); }, 12000);
     try {
-      const { data: negocioData, error: negocioError } = await withTimeout(supabase.from('negocios').select('*').eq('slug', slug).maybeSingle(), 7000, 'negocio');
+      const { data: negocioData, error: negocioError } = await withTimeout(
+        supabase.from('negocios').select('*').eq('slug', slug).maybeSingle(),
+        7000, 'negocio'
+      );
       if (negocioError) throw negocioError;
-      if (!negocioData) { setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]); return; }
+      if (!negocioData) {
+        setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]);
+        return;
+      }
       setNegocio(negocioData);
-      const { data: profissionaisData, error: profErr } = await withTimeout(supabase.from('profissionais').select('*').eq('negocio_id', negocioData.id).eq('ativo', true), 7000, 'profissionais');
+
+      const { data: profissionaisData, error: profErr } = await withTimeout(
+        supabase.from('profissionais').select('*').eq('negocio_id', negocioData.id).eq('ativo', true),
+        7000, 'profissionais'
+      );
       if (profErr) throw profErr;
       const profs = profissionaisData || [];
       setProfissionais(profs);
+
       const profissionalIds = profs.map(p => p.id).filter(Boolean);
-      const depFilter = profissionalIds.length ? `negocio_id.eq.${negocioData.id},profissional_id.in.(${profissionalIds.join(',')})` : `negocio_id.eq.${negocioData.id}`;
-      const [entregasResult, galeriaResult, depoimentosResult] = await Promise.all([
-        profissionalIds.length ? withTimeout(supabase.from('entregas').select('*').in('profissional_id', profissionalIds).eq('ativo', true), 7000, 'entregas') : Promise.resolve({ data: [], error: null }),
-        withTimeout(supabase.from('galerias').select('id, path, ordem').eq('negocio_id', negocioData.id).order('ordem', { ascending: true }).order('created_at', { ascending: true }), 7000, 'galerias'),
-        withTimeout(supabase.from('depoimentos').select('id, tipo, negocio_id, profissional_id, cliente_id, nota, comentario, created_at').or(depFilter).order('created_at', { ascending: false }).limit(200), 7000, 'depoimentos'),
+
+      const [entregasResult, galeriaResult, deps] = await Promise.all([
+        profissionalIds.length
+          ? withTimeout(supabase.from('entregas').select('*').in('profissional_id', profissionalIds).eq('ativo', true), 7000, 'entregas')
+          : Promise.resolve({ data: [], error: null }),
+        withTimeout(
+          supabase.from('galerias').select('id, path, ordem').eq('negocio_id', negocioData.id)
+            .order('ordem', { ascending: true }).order('created_at', { ascending: true }),
+          7000, 'galerias'
+        ),
+        loadDepoimentos(negocioData.id),
       ]);
+
       if (entregasResult.error) throw entregasResult.error;
-      if (galeriaResult.error) throw galeriaResult.error;
-      if (depoimentosResult.error) throw depoimentosResult.error;
+      if (galeriaResult.error)  throw galeriaResult.error;
+
       setEntregas(entregasResult.data || []);
       setGaleriaItems(galeriaResult.data || []);
-      const base = depoimentosResult.data || [];
-      const clienteIds = Array.from(new Set(base.map(a => a.cliente_id).filter(Boolean)));
-      let usersMap = new Map();
-      if (clienteIds.length) {
-        const { data: usersDb, error: upErr } = await withTimeout(supabase.from('users_public').select('id, nome, avatar_path, type').in('id', clienteIds), 7000, 'users_public');
-        if (upErr) throw upErr;
-        usersMap = new Map((usersDb || []).map(u => [u.id, u]));
-      }
-      const profMap = new Map((profs || []).map(p => [p.id, p]));
-      const negociosNome = negocioData?.nome || null;
-      setDepoimentos(base.map(a => {
-        const u = usersMap.get(a.cliente_id) || null;
-        const p = profMap.get(a.profissional_id) || null;
-        return { ...a, users: u ? { nome: u.nome, avatar_path: u.avatar_path, type: u.type } : null, profissionais: p ? { nome: p.nome } : null, negocios: { nome: negociosNome } };
-      }));
+      setDepoimentos(deps);
     } catch (e) {
       setError(e?.message || getMsg('load_error', 'Erro ao carregar a vitrine.'));
       setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]);
-    } finally { clearTimeout(watchdog); setLoading(false); }
+    } finally {
+      clearTimeout(watchdog);
+      setLoading(false);
+    }
   };
 
   const checkFavorito = async () => {
     if (!user || userType !== 'client' || !negocio?.id) { setIsFavorito(false); return; }
     try {
-      const { data, error: favErr } = await withTimeout(supabase.from('favoritos').select('id').eq('cliente_id', user.id).eq('tipo', 'negocio').eq('negocio_id', negocio.id).maybeSingle(), 6000, 'favorito');
+      const { data, error: favErr } = await withTimeout(
+        supabase.from('favoritos').select('id').eq('cliente_id', user.id).eq('tipo', 'negocio').eq('negocio_id', negocio.id).maybeSingle(),
+        6000, 'favorito'
+      );
       if (favErr) throw favErr;
       setIsFavorito(!!data);
     } catch { setIsFavorito(false); }
@@ -711,16 +741,26 @@ export default function Vitrine({ user, userType }) {
     const primeiroServico = flow.servicosSelecionados[0];
     const durTotal = flow.servicosSelecionados.reduce((sum, s) => sum + Number(s?.duracao_minutos || 0), 0);
     const valTotal = flow.servicosSelecionados.reduce((sum, s) => sum + getPrecoFinalServico(s), 0);
-    return { id: primeiroServico.id, nome: flow.servicosSelecionados.length === 1 ? primeiroServico.nome : `${flow.servicosSelecionados.length} ${counterPlural}`, duracao_minutos: durTotal, preco: valTotal, preco_promocional: null };
+    return {
+      id: primeiroServico.id,
+      nome: flow.servicosSelecionados.length === 1 ? primeiroServico.nome : `${flow.servicosSelecionados.length} ${counterPlural}`,
+      duracao_minutos: durTotal,
+      preco: valTotal,
+      preco_promocional: null,
+    };
   }, [flow.servicosSelecionados, counterPlural]);
 
   const handleBookingConfirm = (slot) => {
     const primeiroServico = flow.servicosSelecionados?.[0];
     const durTotal = (flow.servicosSelecionados || []).reduce((sum, s) => sum + Number(s?.duracao_minutos || 0), 0);
     const link = gerarLinkGoogle(primeiroServico?.nome || 'Agendamento', `${slot.dataISO}T${slot.inicio}`, durTotal);
-    if (window.OneSignalDeferred) { window.OneSignalDeferred.push(async function (OneSignal) { await OneSignal.sendTags({ ultima_acao: 'agendamento_realizado', servico_nome: primeiroServico?.nome || 'Serviço', data_agendamento: slot.dataISO, horario_agendamento: slot.label }); }); }
+    if (window.OneSignalDeferred) {
+      window.OneSignalDeferred.push(async function (OneSignal) {
+        await OneSignal.sendTags({ ultima_acao: 'agendamento_realizado', servico_nome: primeiroServico?.nome || 'Serviço', data_agendamento: slot.dataISO, horario_agendamento: slot.label });
+      });
+    }
     setCalendarLink(link);
-    setFlow(prev => ({ ...prev, step: 5, lastSlot: slot }));
+    setFlow(prev => ({ ...prev, step: 'confirmado', lastSlot: slot }));
   };
 
   const abrirDepoimento = async () => {
@@ -738,61 +778,89 @@ export default function Vitrine({ user, userType }) {
     if (!negocio?.id) { alertKey('review_invalid_business', 'Negócio inválido', 'Negócio inválido.', 'ENTENDI'); return; }
     try {
       setDepoimentoLoading(true);
-      const payload = { cliente_id: user.id, tipo: depoimentoTipo, nota: depoimentoNota, comentario: depoimentoTexto || null, negocio_id: depoimentoTipo === 'negocio' ? negocio.id : null, profissional_id: depoimentoTipo === 'profissional' ? depoimentoProfissionalId : null };
+      const payload = {
+        cliente_id:      user.id,
+        tipo:            depoimentoTipo,
+        nota:            depoimentoNota,
+        comentario:      depoimentoTexto || null,
+        negocio_id:      depoimentoTipo === 'negocio'      ? negocio.id              : null,
+        profissional_id: depoimentoTipo === 'profissional' ? depoimentoProfissionalId : null,
+      };
       const { error: depErr } = await withTimeout(supabase.from('depoimentos').insert(payload), 7000, 'enviar-depoimento');
       if (depErr) throw depErr;
       setShowDepoimento(false);
-      await loadVitrine();
+      const deps = await loadDepoimentos(negocio.id);
+      setDepoimentos(deps);
       alertKey('review_sent', 'Depoimento registrado', 'Seu depoimento foi entregue com sucesso!', 'OK');
     } catch (e) {
-      openAlert({ title: getMsg('review_send_error_title', 'Erro ao enviar depoimento'), body: `${getMsg('review_send_error_body', 'Erro ao enviar depoimento:')} ${e?.message || ''}`, buttonText: getMsg('common_ok', 'ENTENDI') });
+      openAlert({
+        title:      getMsg('review_send_error_title', 'Erro ao enviar depoimento'),
+        body:       `${getMsg('review_send_error_body', 'Erro ao enviar depoimento:')} ${e?.message || ''}`,
+        buttonText: getMsg('common_ok', 'ENTENDI'),
+      });
     } finally { setDepoimentoLoading(false); }
   };
 
   const logoUrl      = useMemo(() => getPublicUrl('logos',   negocio?.logo_path), [negocio?.logo_path]);
   const instagramUrl = useMemo(() => resolveInstagram(negocio?.instagram),        [negocio?.instagram]);
   const facebookUrl  = useMemo(() => resolveFacebook(negocio?.facebook),          [negocio?.facebook]);
+
+  const nowSP = useMemo(() => getNowSP(), []);
+
   const getAlmocoRange = (p) => ({ ini: p?.almoco_inicio || null, fim: p?.almoco_fim || null });
+
   const isInLunchNow = (p) => {
     const { ini, fim } = getAlmocoRange(p);
     if (!ini || !fim) return false;
-    const now = getNowSP();
     const a = timeToMinutes(ini), b = timeToMinutes(fim);
     if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
-    if (b < a) return (now.minutes >= a || now.minutes < b);
-    return (now.minutes >= a && now.minutes < b);
+    if (b < a) return (nowSP.minutes >= a || nowSP.minutes < b);
+    return (nowSP.minutes >= a && nowSP.minutes < b);
   };
+
   const getProfStatus = (p) => {
     const ativo = (p?.ativo === undefined) ? true : !!p.ativo;
     if (!ativo) return { label: 'FECHADO', color: 'bg-red-500' };
-    const now = getNowSP();
     const ini = timeToMinutes(p?.horario_inicio || '08:00');
     const fim = timeToMinutes(p?.horario_fim    || '18:00');
     const dias = normalizeDiasTrabalho(p?.dias_trabalho);
     const diasEfetivos = dias.length ? dias : [0, 1, 2, 3, 4, 5, 6];
-    const hojeDow = getDowFromDateSP(now.date);
+    const hojeDow = getDowFromDateSP(nowSP.date);
     const trabalhaHoje = hojeDow == null ? true : diasEfetivos.includes(hojeDow);
-    const dentroHorario = now.minutes >= ini && now.minutes < fim;
+    const dentroHorario = nowSP.minutes >= ini && nowSP.minutes < fim;
     if (!(trabalhaHoje && dentroHorario)) return { label: 'FECHADO', color: 'bg-red-500' };
     if (isInLunchNow(p)) return { label: 'ALMOÇO', color: 'bg-yellow-400' };
     return { label: 'ABERTO', color: 'bg-green-500' };
   };
+
   const entregasPorProf = useMemo(() => {
     const map = new Map();
     for (const p of profissionais) map.set(p.id, []);
-    for (const s of entregas) { if (!map.has(s.profissional_id)) map.set(s.profissional_id, []); map.get(s.profissional_id).push(s); }
+    for (const s of entregas) {
+      if (!map.has(s.profissional_id)) map.set(s.profissional_id, []);
+      map.get(s.profissional_id).push(s);
+    }
     return map;
   }, [profissionais, entregas]);
+
   const depoimentosPorProf = useMemo(() => {
     const map = new Map();
-    for (const dep of depoimentos) { if (dep.profissional_id) { if (!map.has(dep.profissional_id)) map.set(dep.profissional_id, []); map.get(dep.profissional_id).push(dep); } }
+    for (const dep of depoimentos) {
+      if (dep.profissional_id) {
+        if (!map.has(dep.profissional_id)) map.set(dep.profissional_id, []);
+        map.get(dep.profissional_id).push(dep);
+      }
+    }
     const medias = new Map();
-    for (const [profId, deps] of map.entries()) { const media = deps.length > 0 ? (deps.reduce((sum, d) => sum + d.nota, 0) / deps.length).toFixed(1) : null; medias.set(profId, { media, count: deps.length }); }
+    for (const [profId, deps] of map.entries()) {
+      const media = deps.length > 0 ? (deps.reduce((sum, d) => sum + d.nota, 0) / deps.length).toFixed(1) : null;
+      medias.set(profId, { media, count: deps.length });
+    }
     return medias;
   }, [depoimentos]);
 
   if (loading) return (<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-primary text-2xl font-normal animate-pulse">CARREGANDO...</div></div>);
-  if (error) return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="max-w-md w-full bg-dark-100 border border-red-500/40 rounded-custom p-8 text-center"><AlertCircle className="w-14 h-14 text-red-400 mx-auto mb-4" /><h1 className="text-2xl font-normal text-white mb-2">Houve um erro ao carregar</h1><p className="text-gray-400 mb-6">{error}</p><button onClick={loadVitrine} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button font-normal uppercase">Tentar novamente</button></div></div>);
+  if (error)   return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="max-w-md w-full bg-dark-100 border border-red-500/40 rounded-custom p-8 text-center"><AlertCircle className="w-14 h-14 text-red-400 mx-auto mb-4" /><h1 className="text-2xl font-normal text-white mb-2">Houve um erro ao carregar</h1><p className="text-gray-400 mb-6">{error}</p><button onClick={loadVitrine} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button font-normal uppercase">Tentar novamente</button></div></div>);
   if (!negocio) return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="text-center"><h1 className="text-3xl font-normal text-white mb-4">Negócio inexistente.</h1><Link to="/" className="text-primary hover:text-yellow-500 font-normal">Voltar para Home</Link></div></div>);
 
   const depoimentosNegocio = depoimentos.filter(d => d.tipo === 'negocio');
@@ -834,7 +902,10 @@ export default function Vitrine({ user, userType }) {
       <section className="relative bg-gradient-to-br from-primary/20 via-vbg to-yellow-600/20 py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row items-start gap-6">
-            {logoUrl ? (<div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border border-primary/30 bg-vcard"><img src={logoUrl} alt="Logo" className="w-full h-full object-cover" /></div>) : (<div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-4xl sm:text-5xl font-normal text-black">{negocio.nome?.[0] || 'N'}</div>)}
+            {logoUrl
+              ? (<div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border border-primary/30 bg-vcard"><img src={logoUrl} alt="Logo" className="w-full h-full object-cover" /></div>)
+              : (<div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-4xl sm:text-5xl font-normal text-black">{negocio.nome?.[0] || 'N'}</div>)
+            }
             <div className="flex-1">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-normal mb-3">{negocio.nome}</h1>
               <p className="text-base sm:text-lg text-vsub mb-4 font-normal">{negocio.descricao}</p>
@@ -866,20 +937,19 @@ export default function Vitrine({ user, userType }) {
               return (
                 <div key={prof.id} className="mb-6 break-inside-avoid bg-vcard border border-vborder rounded-custom p-6 hover:border-primary/50 transition-all">
                   <div className="flex items-start gap-4 mb-4">
-                    {avatarUrl ? (
-                      <div className="w-14 h-14 rounded-custom overflow-hidden border border-vborder bg-vcard2 shrink-0"><img src={avatarUrl} alt={prof.nome} className="w-full h-full object-cover" /></div>
-                    ) : (
-                      <div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-2xl font-normal text-black shrink-0">{prof.nome?.[0] || 'P'}</div>
-                    )}
+                    {avatarUrl
+                      ? (<div className="w-14 h-14 rounded-custom overflow-hidden border border-vborder bg-vcard2 shrink-0"><img src={avatarUrl} alt={prof.nome} className="w-full h-full object-cover" /></div>)
+                      : (<div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-2xl font-normal text-black shrink-0">{prof.nome?.[0] || 'P'}</div>)
+                    }
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="text-lg font-normal">{prof.nome}</h3>                    
+                        <h3 className="text-lg font-normal">{prof.nome}</h3>
                         {profissao && (<span className="inline-block px-2 py-1 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase whitespace-nowrap shrink-0">{profissao}</span>)}
                       </div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${status.color}`} />
                         <span className="text-xs text-vsub font-normal uppercase">{status.label}</span>
-                      </div> 
+                      </div>
                       {depInfo?.media && (
                         <div className="flex items-center gap-2 mb-1">
                           <StarChar size={16} className="text-primary" />
@@ -887,7 +957,7 @@ export default function Vitrine({ user, userType }) {
                           <span className="text-xs text-vmuted">({depInfo.count})</span>
                         </div>
                       )}
-                      {prof.anos_experiencia != null && (<p className="text-sm text-vmuted font-normal">{prof.anos_experiencia} ano(s) de experiência</p>)}              
+                      {prof.anos_experiencia != null && (<p className="text-sm text-vmuted font-normal">{prof.anos_experiencia} ano(s) de experiência</p>)}
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -952,7 +1022,15 @@ export default function Vitrine({ user, userType }) {
         <section className="py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 [column-fill:_balance]">
-              {galeriaItems.map((item) => { const url = getPublicUrl('galerias', item.path); if (!url) return null; return (<div key={item.id} className="mb-3 w-full break-inside-avoid overflow-hidden rounded-custom border border-vborder bg-vcard"><img src={url} alt="Galeria" className="w-full h-auto object-contain bg-vbg" loading="lazy" /></div>); })}
+              {galeriaItems.map((item) => {
+                const url = getPublicUrl('galerias', item.path);
+                if (!url) return null;
+                return (
+                  <div key={item.id} className="mb-3 w-full break-inside-avoid overflow-hidden rounded-custom border border-vborder bg-vcard">
+                    <img src={url} alt="Galeria" className="w-full h-auto object-contain bg-vbg" loading="lazy" />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -970,18 +1048,31 @@ export default function Vitrine({ user, userType }) {
 
       <SelectionBar itens={servicosSelecionados} counterSingular={counterSingular} counterPlural={counterPlural} onConfirm={handleConfirmarSelecao} onClear={handleLimparSelecao} />
 
-      {flow.step === 'booking' && entregaVirtual && (<BookingCalendar profissional={flow.profissional} entrega={entregaVirtual} todayISO={todayISO} negocioId={negocio.id} clienteId={user?.id} onConfirm={handleBookingConfirm} onClose={() => setFlow(prev => ({ ...prev, step: 0 }))} />)}
+      {flow.step === 'booking' && entregaVirtual && (
+        <BookingCalendar
+          profissional={flow.profissional}
+          entrega={entregaVirtual}
+          todayISO={todayISO}
+          negocioId={negocio.id}
+          clienteId={user?.id}
+          onConfirm={handleBookingConfirm}
+          onClose={() => setFlow(prev => ({ ...prev, step: 'idle' }))}
+        />
+      )}
 
-      {flow.step === 5 && (
+      {flow.step === 'confirmado' && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full">
             <div className="p-8 text-center">
               <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><Calendar className="w-10 h-10 text-green-400" /></div>
               <h3 className="text-2xl font-normal mb-2 text-white">AGENDADO :)</h3>
-              <p className="text-gray-400 font-normal mb-1">{flow.lastSlot?.label && <span className="text-primary font-normal">{flow.lastSlot.label}</span>}{flow.lastSlot?.dataISO && <span className="text-gray-400"> — {formatDateBR(flow.lastSlot.dataISO)}</span>}</p>
+              <p className="text-gray-400 font-normal mb-1">
+                {flow.lastSlot?.label && <span className="text-primary font-normal">{flow.lastSlot.label}</span>}
+                {flow.lastSlot?.dataISO && <span className="text-gray-400"> — {formatDateBR(flow.lastSlot.dataISO)}</span>}
+              </p>
               <p className="text-gray-500 font-normal text-sm mb-6">Crie um lembrete no seu celular para assegurar o compromisso.</p>
               <a href={calendarLink} target="_blank" rel="noreferrer" className="block w-full py-4 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal mb-3">ADICIONAR À MINHA AGENDA</a>
-              <button onClick={() => { setFlow(prev => ({ ...prev, step: 0 })); navigate('/minha-area'); }} className="w-full py-3 bg-transparent border border-red-500 text-red-500 rounded-button uppercase font-normal hover:bg-red-500/10 transition-colors">PREFIRO ESQUECER</button>
+              <button onClick={() => { setFlow(prev => ({ ...prev, step: 'idle' })); navigate('/minha-area'); }} className="w-full py-3 bg-transparent border border-red-500 text-red-500 rounded-button uppercase font-normal hover:bg-red-500/10 transition-colors">PREFIRO ESQUECER</button>
             </div>
           </div>
         </div>
@@ -1006,13 +1097,19 @@ export default function Vitrine({ user, userType }) {
                 <div className="mb-4">
                   <div className="text-sm text-gray-300 font-normal mb-2">Qual profissional?</div>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {profissionais.map(prof => (<button key={prof.id} onClick={() => setDepoimentoProfissionalId(prof.id)} className={`w-full text-left px-4 py-3 rounded-custom border transition-all font-normal ${depoimentoProfissionalId === prof.id ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-400 hover:border-primary/30'}`}>{prof.nome}</button>))}
+                    {profissionais.map(prof => (
+                      <button key={prof.id} onClick={() => setDepoimentoProfissionalId(prof.id)} className={`w-full text-left px-4 py-3 rounded-custom border transition-all font-normal ${depoimentoProfissionalId === prof.id ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-400 hover:border-primary/30'}`}>{prof.nome}</button>
+                    ))}
                   </div>
                 </div>
               )}
               <div className="mb-4">
                 <div className="text-sm text-gray-300 font-normal mb-2">Nota</div>
-                <div className="flex gap-2">{[1, 2, 3, 4, 5].map(n => (<button key={n} onClick={() => setDepoimentoNota(n)} className={`w-12 h-8 rounded-button border transition-all font-normal ${depoimentoNota >= n ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>{n}</button>))}</div>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map(n => (
+                    <button key={n} onClick={() => setDepoimentoNota(n)} className={`w-12 h-8 rounded-button border transition-all font-normal ${depoimentoNota >= n ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>{n}</button>
+                  ))}
+                </div>
               </div>
               <div className="mb-5">
                 <div className="text-sm text-gray-300 font-normal mb-2">Comentário é opcional</div>
