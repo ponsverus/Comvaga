@@ -277,7 +277,7 @@ export default function SignupProfessional({ onLogin }) {
                 type="tel"
                 value={formData.telefone}
                 onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                placeholder="(11) 90000 - 0000"
+                placeholder="(31) 90000 - 0000"
                 className={inputClass}
                 required
               />
