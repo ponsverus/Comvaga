@@ -220,9 +220,14 @@ export default function App() {
     bootAuth();
 
     const { data: { subscription } } =
-      supabase.auth.onAuthStateChange(async (_event, session) => {
+      supabase.auth.onAuthStateChange(async (event, session) => {
 
         if (!aliveRef.current) return;
+
+        if (event === 'PASSWORD_RECOVERY') {
+          safeSet(() => setInRecovery(true));
+          return;
+        }
 
         const sessionUser = session?.user || null;
 
