@@ -185,6 +185,14 @@ export default function App() {
 
       try {
 
+        if (isPasswordRecoveryUrl()) {
+          safeSet(() => {
+            setInRecovery(true);
+            setBooting(false);
+          });
+          return;
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
 
         if (!aliveRef.current) return;
