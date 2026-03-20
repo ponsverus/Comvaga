@@ -237,7 +237,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
                     SALVANDO...
                   </span>
                 ) : (
-                  'Salvar nova senha'
+                  'SALVAR NOVA SENHA'
                 )}
               </button>
             </form>
