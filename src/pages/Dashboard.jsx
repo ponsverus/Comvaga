@@ -1651,10 +1651,9 @@ export default function Dashboard({ user, onLogout }) {
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="text-lg font-normal">GALERIA</h3>
-                    {/* Desktop: botão fica no header alinhado ao título */}
-                    <label className="hidden sm:inline-block">
+                    <label className="inline-block">
                       <input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} />
-                      <span className={`inline-flex items-center gap-2 rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-4 py-2 text-sm`}>
+                      <span className={`inline-flex items-center gap-2 rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm`}>
                         <Plus className="w-4 h-4" />{galleryUploading ? 'ENVIANDO...' : 'ADICIONAR'}
                       </span>
                     </label>
@@ -1671,13 +1670,6 @@ export default function Dashboard({ user, onLogout }) {
                       ))}
                     </div>
                   ) : <div className="text-gray-500">Nenhuma imagem ainda.</div>}
-                  {/* Mobile: botão no rodapé, largura total */}
-                  <label className="sm:hidden mt-4 block">
-                    <input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} />
-                    <span className={`flex items-center justify-center gap-2 w-full rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-4 py-2 text-sm`}>
-                      <Plus className="w-4 h-4" />{galleryUploading ? 'ENVIANDO...' : 'ADICIONAR'}
-                    </span>
-                  </label>
                 </div>
 
                 <div className="pt-2 pb-4">
