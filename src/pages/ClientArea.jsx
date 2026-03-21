@@ -268,7 +268,9 @@ export default function ClientArea({ user, onLogout }) {
   };
 
   const cancelarAgendamento = async (agendamentoId) => {
+    console.log('cancelar chamado', agendamentoId);
     const ok = await uiConfirm('clientArea.booking_cancel_confirm', 'warning');
+    console.log('uiConfirm retornou:', ok);
     if (!ok) return;
     try {
       const { error } = await supabase.rpc('cancelar_agendamento', { p_agendamento_id: agendamentoId });
