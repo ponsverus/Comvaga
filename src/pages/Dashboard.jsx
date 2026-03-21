@@ -28,7 +28,7 @@ const AG_PAGE_SIZE = 15;
 
 const toNumberOrNull = (v) => {
   if (v === '' || v == null) return null;
-  const n = parseFloat(Number(v).toFixed(2));
+  const n = Math.round(Number(v) * 100) / 100;
   return Number.isFinite(n) ? n : null;
 };
 
@@ -43,7 +43,7 @@ function timeToMinutes(t) {
 const getAgDate = (a) => String(a?.data ?? '');
 
 const getAgInicio = (a) => {
-  const v = a?.horario_inicio ?? a?.inicio ?? '';
+  const v = a?.horario_inicio ?? '';
   return String(v || '').slice(0, 5);
 };
 
@@ -99,7 +99,6 @@ function getPublicUrl(bucket, path) {
     return null;
   }
 }
-
 
 function TemaToggle({ value, onChange, loading }) {
   const isLight = value === 'light';
@@ -302,7 +301,7 @@ export default function Dashboard({ user, onLogout }) {
   const fetchNowFromDb = async () => {
     const { data, error: rpcErr } = await supabase.rpc('now_sp');
     if (rpcErr) throw rpcErr;
-    const payload = data?.[0]?.now_sp || data?.now_sp || data?.[0] || data;
+    const payload = data?.[0] ?? data;
     if (!payload || !payload.date) throw new Error('now_sp vazio');
     setServerNow(payload);
     setHoje(String(payload.date));
@@ -335,9 +334,6 @@ export default function Dashboard({ user, onLogout }) {
     setFaturamentoData(prev => (prev ? prev : hoje));
   }, [hoje]);
 
-  const extractRpcPayload = (data, key) =>
-    data?.[key] || data?.[0]?.[key] || data?.payload || data?.[0]?.payload || data;
-
   const loadHoje = async (negocioId) => {
     const id = negocioId || negocio?.id;
     if (!id) return;
@@ -345,7 +341,7 @@ export default function Dashboard({ user, onLogout }) {
       setMetricsHojeLoading(true);
       const { data, error } = await supabase.rpc('get_dashboard_today', { p_negocio_id: id });
       if (error) throw error;
-      setMetricsHoje(extractRpcPayload(data, 'get_dashboard_today'));
+      setMetricsHoje(data);
     } catch (e) { console.error('loadHoje error:', e); setMetricsHoje(null); }
     finally { setMetricsHojeLoading(false); }
   };
@@ -358,7 +354,7 @@ export default function Dashboard({ user, onLogout }) {
       setMetricsDiaLoading(true);
       const { data, error } = await supabase.rpc('get_dashboard_day', { p_negocio_id: id, p_date: date });
       if (error) throw error;
-      setMetricsDia(extractRpcPayload(data, 'get_dashboard_day'));
+      setMetricsDia(data);
     } catch (e) { console.error('loadDia error:', e); setMetricsDia(null); }
     finally { setMetricsDiaLoading(false); }
   };
@@ -372,7 +368,7 @@ export default function Dashboard({ user, onLogout }) {
       setMetricsPeriodoLoading(true);
       const { data, error } = await supabase.rpc('get_dashboard_period', { p_negocio_id: id, p_ref_date: refDate, p_periodo: per });
       if (error) throw error;
-      setMetricsPeriodoData(extractRpcPayload(data, 'get_dashboard_period'));
+      setMetricsPeriodoData(data);
     } catch (e) { console.error('loadPeriodo error:', e); setMetricsPeriodoData(null); }
     finally { setMetricsPeriodoLoading(false); }
   };
@@ -391,7 +387,6 @@ export default function Dashboard({ user, onLogout }) {
     if (!negocio?.id || !hoje) return;
     loadPeriodo(negocio.id, hoje, faturamentoPeriodo);
   }, [negocio?.id, hoje, faturamentoPeriodo]);
-
 
   const fetchHistoricoPage = useCallback(async ({ negocioId, profIds, date, page, append }) => {
     const from = page * AG_PAGE_SIZE;
@@ -412,8 +407,8 @@ export default function Dashboard({ user, onLogout }) {
     const rows = (data || []).map(a => ({
       ...a,
       data: a?.data ?? null,
-      horario_inicio: a?.horario_inicio ?? a?.inicio ?? null,
-      horario_fim: a?.horario_fim ?? a?.fim ?? null,
+      horario_inicio: a?.horario_inicio ?? null,
+      horario_fim: a?.horario_fim ?? null,
     }));
     setHistoricoAgendamentos(prev => {
       const next = append ? [...prev, ...rows] : rows;
@@ -495,8 +490,8 @@ export default function Dashboard({ user, onLogout }) {
     setAgendamentos((data || []).map(a => ({
       ...a,
       data: a?.data ?? null,
-      horario_inicio: a?.horario_inicio ?? a?.inicio ?? null,
-      horario_fim: a?.horario_fim ?? a?.fim ?? null,
+      horario_inicio: a?.horario_inicio ?? null,
+      horario_fim: a?.horario_fim ?? null,
     })));
   }, [negocio?.id, agProfIds, hoje]);
 
@@ -574,8 +569,8 @@ export default function Dashboard({ user, onLogout }) {
       const agRows = (agendamentosResult.data || []).map(a => ({
         ...a,
         data: a?.data ?? null,
-        horario_inicio: a?.horario_inicio ?? a?.inicio ?? null,
-        horario_fim: a?.horario_fim ?? a?.fim ?? null,
+        horario_inicio: a?.horario_inicio ?? null,
+        horario_fim: a?.horario_fim ?? null,
       }));
       setAgendamentos(agRows);
     } catch (e) {
@@ -668,8 +663,6 @@ export default function Dashboard({ user, onLogout }) {
     const ok = await uiConfirm('dashboard.gallery_remove_confirm', 'warning');
     if (!ok) return;
     try {
-      const pathNoPrefix = String(item.path || '').replace('galerias/', '');
-      await supabase.storage.from('galerias').remove([pathNoPrefix]);
       const { error: dbErr } = await supabase.from('galerias').delete().eq('id', item.id);
       if (dbErr) throw dbErr;
       setGaleriaItems(prev => prev.filter(x => x.id !== item.id));
@@ -950,12 +943,9 @@ export default function Dashboard({ user, onLogout }) {
     return futuros[0] || null;
   }, [hojeValidos, serverNow?.minutes]);
 
-  const agendamentosDiaSelecionado = useMemo(() => historicoAgendamentos, [historicoAgendamentos]);
-  const agendamentosHojeEFuturos = useMemo(() => agendamentos, [agendamentos]);
-
   const agendamentosAgrupadosPorProfissional = useMemo(() => {
     const map = new Map();
-    for (const a of agendamentosHojeEFuturos) {
+    for (const a of agendamentos) {
       const pid = a.profissional_id || a.profissionais?.id || 'sem-prof';
       const nome = a.profissionais?.nome || 'PROFISSIONAL';
       if (!map.has(pid)) map.set(pid, { pid, nome, itens: [] });
@@ -974,7 +964,7 @@ export default function Dashboard({ user, onLogout }) {
     const ordem = new Map((profissionais || []).map((p, idx) => [p.id, idx]));
     grupos.sort((a, b) => (ordem.get(a.pid) ?? 9999) - (ordem.get(b.pid) ?? 9999));
     return grupos;
-  }, [agendamentosHojeEFuturos, profissionais]);
+  }, [agendamentos, profissionais]);
 
   const entregasPorProf = useMemo(() => {
     const map = new Map();
@@ -1014,10 +1004,7 @@ export default function Dashboard({ user, onLogout }) {
     return pairs;
   }, [metricsDia]);
 
-  const tabs = [
-    { key: 'visao-geral' }, { key: 'agendamentos' }, { key: 'cancelados' },
-    { key: 'historico' }, { key: 'entregas' }, { key: 'profissionais' }, { key: 'info-negocio' },
-  ];
+  const tabs = ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'entregas', 'profissionais', 'info-negocio'];
 
   const TAB_LABELS = {
     'visao-geral':   'GERAL',
@@ -1049,7 +1036,6 @@ export default function Dashboard({ user, onLogout }) {
       </div>
     </div>
   );
-
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -1153,10 +1139,10 @@ export default function Dashboard({ user, onLogout }) {
 
         <div className="bg-dark-100 border border-gray-800 rounded-custom overflow-hidden">
           <div className="flex overflow-x-auto border-b border-gray-800">
-            {tabs.map(t => t.key).map(tab => (
+            {tabs.map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)}
                 className={`flex-shrink-0 px-6 py-4 text-sm transition-all uppercase font-normal ${activeTab === tab ? 'bg-primary/20 text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}>
-                {TAB_LABELS[tab] || tab.replace('-', ' ').toUpperCase()}
+                {TAB_LABELS[tab]}
               </button>
             ))}
           </div>
@@ -1358,9 +1344,9 @@ export default function Dashboard({ user, onLogout }) {
                   <h2 className="text-2xl font-normal">Histórico</h2>
                   <DatePicker value={historicoData} onChange={(iso) => setHistoricoData(iso)} todayISO={hoje} />
                 </div>
-                {agendamentosDiaSelecionado.length > 0 ? (
+                {historicoAgendamentos.length > 0 ? (
                   <div className="space-y-3">
-                    {agendamentosDiaSelecionado.map(a => {
+                    {historicoAgendamentos.map(a => {
                       const st = computeStatusFromDb(a);
                       const isCancel = isCancelStatus(st);
                       const isDone = isDoneStatus(st);
@@ -1565,7 +1551,6 @@ export default function Dashboard({ user, onLogout }) {
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                   <div className="flex items-center justify-between mb-1">
                     <div className="text-sm font-normal text-white tracking-wide">GALERIA</div>
-
                     <label className="hidden sm:inline-block">
                       <input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} />
                       <span className={`inline-flex items-center gap-2 rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-4 py-2 text-sm`}>
@@ -1584,7 +1569,6 @@ export default function Dashboard({ user, onLogout }) {
                       ))}
                     </div>
                   ) : <div className="text-gray-500">Nenhuma imagem ainda.</div>}
-
                   <label className="sm:hidden mt-4 block">
                     <input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} />
                     <span className={`w-full inline-flex items-center justify-center gap-2 rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-4 py-3 text-sm`}>
