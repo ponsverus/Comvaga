@@ -196,7 +196,7 @@ const g = (map, group) => map[group] ?? map['servicos'];
 export default function Dashboard({ user, onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const feedback = useFeedback?.();
+  const feedback = useFeedback();
 
   const uiAlert = async (key, variant = 'info') => {
     if (feedback?.showMessage) return feedback.showMessage(key, { variant });
@@ -489,7 +489,7 @@ export default function Dashboard({ user, onLogout }) {
       .order('created_at', { ascending: false });
     if (err) return;
     setEntregas(data || []);
-  }, [negocio?.id, agProfIds]);
+  }, [negocio?.id, agProfIds, hoje]);
 
   const reloadAgendamentos = useCallback(async (negocioId, profIds, dataHoje) => {
     const id = negocioId || negocio?.id;
@@ -521,7 +521,7 @@ export default function Dashboard({ user, onLogout }) {
     setGaleriaItems(data || []);
   }, [negocio?.id]);
 
-  const loadData = async (dataRef) => {
+  const loadData = useCallback(async (dataRef) => {
     if (!user?.id) { setError('Sessao invalida. Faca login novamente.'); setLoading(false); return; }
     setLoading(true);
     setError(null);
@@ -595,7 +595,7 @@ export default function Dashboard({ user, onLogout }) {
       console.error('Erro ao carregar:', e);
       setError(e?.message || 'Erro inesperado.');
     } finally { setLoading(false); }
-  };
+  }, [user?.id, location?.state?.negocioId, serverNow, hoje]);
 
   const uploadLogoNegocio = async (file) => {
     if (!file) return;
