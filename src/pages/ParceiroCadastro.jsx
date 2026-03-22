@@ -7,13 +7,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 export default function ParceiroCadastro({ suppressAuthRef }) {
   const navigate = useNavigate();
 
-  const [nome,    setNome]    = useState('');
-  const [email,   setEmail]   = useState('');
-  const [senha,   setSenha]   = useState('');
-  const [slug,    setSlug]    = useState('');
-  const [loading, setLoading] = useState(false);
-  const [erro,    setErro]    = useState('');
-  const [sucesso, setSucesso] = useState(false);
+  const [nome,      setNome]      = useState('');
+  const [email,     setEmail]     = useState('');
+  const [senha,     setSenha]     = useState('');
+  const [slug,      setSlug]      = useState('');
+  const [loading,   setLoading]   = useState(false);
+  const [erro,      setErro]      = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMsg,  setAlertMsg]  = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,10 +24,10 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
     const emailClean = email.trim().toLowerCase();
     const slugClean  = slug.trim().toLowerCase();
 
-    if (!nomeClean)                              return setErro('Informe seu nome.');
+    if (!nomeClean)                               return setErro('Informe seu nome.');
     if (!emailClean || !emailClean.includes('@')) return setErro('Email inválido.');
-    if (senha.length < 6)                        return setErro('Senha deve ter ao menos 6 caracteres.');
-    if (!slugClean)                              return setErro('Informe o slug do negócio.');
+    if (senha.length < 6)                         return setErro('Senha deve ter ao menos 6 caracteres.');
+    if (!slugClean)                               return setErro('Informe o slug do negócio.');
 
     setLoading(true);
     if (suppressAuthRef) suppressAuthRef.current = true;
@@ -40,19 +41,6 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
 
       if (negErr) throw negErr;
       if (!negocio) return setErro('Negócio não encontrado. Verifique o slug informado.');
-
-      const { data: profExiste } = await supabase
-        .from('profissionais')
-        .select('id, status')
-        .eq('negocio_id', negocio.id)
-        .eq('email', emailClean)
-        .maybeSingle();
-
-      if (profExiste) {
-        if (profExiste.status === 'pendente') return setErro('Você já tem um cadastro aguardando aprovação neste negócio.');
-        if (profExiste.status === 'ativo')    return setErro('Você já está cadastrado. Use a página de login.');
-        if (profExiste.status === 'inativo')  return setErro('Seu acesso está inativo. Entre em contato com o responsável.');
-      }
 
       const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
         email: emailClean,
@@ -78,11 +66,24 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
         await sleep(400);
       }
 
+      const { data: profExiste } = await supabase
+        .from('profissionais')
+        .select('id, status')
+        .eq('negocio_id', negocio.id)
+        .eq('user_id', uid)
+        .maybeSingle();
+
+      if (profExiste) {
+        await supabase.auth.signOut();
+        if (profExiste.status === 'pendente') return setErro('Você já tem um cadastro aguardando aprovação neste negócio.');
+        if (profExiste.status === 'ativo')    return setErro('Você já está cadastrado. Use a página de login.');
+        if (profExiste.status === 'inativo')  return setErro('Seu acesso está inativo. Entre em contato com o responsável.');
+      }
+
       const { error: profErr } = await supabase.from('profissionais').insert({
         negocio_id:     negocio.id,
         user_id:        uid,
         nome:           nomeClean,
-        email:          emailClean,
         status:         'pendente',
         ativo:          false,
         horario_inicio: '08:00',
@@ -94,7 +95,8 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
 
       await supabase.auth.signOut();
 
-      setSucesso(true);
+      setAlertMsg('Aguarde a aprovação do responsável pelo negócio para acessar o painel.');
+      setShowAlert(true);
 
     } catch (e) {
       console.error('ParceiroCadastro error:', e);
@@ -106,25 +108,20 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
     }
   };
 
-  if (sucesso) {
+  if (showAlert) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <div className="w-full max-w-md text-center">
           <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-green-400 text-4xl">✓</span>
           </div>
-          <h1 className="text-3xl font-normal text-white uppercase mb-3">Cadastro enviado!</h1>
-          <p className="text-gray-400 mb-2 font-normal">
-            Seu cadastro foi registrado com sucesso.
-          </p>
-          <p className="text-gray-500 text-sm mb-8 font-normal">
-            Aguarde a aprovação do responsável pelo negócio. Quando aprovado, acesse pelo link de login de parceiros.
-          </p>
+          <h1 className="text-3xl font-normal text-white uppercase mb-4">Cadastro enviado!</h1>
+          <p className="text-gray-400 font-normal mb-8">{alertMsg}</p>
           <button
             onClick={() => navigate('/')}
             className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase"
           >
-            VOLTAR PARA HOME
+            OK
           </button>
         </div>
       </div>
