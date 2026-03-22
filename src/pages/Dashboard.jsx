@@ -213,6 +213,20 @@ export default function Dashboard({ user, onLogout }) {
     return null;
   };
 
+  // ---------- PARCEIRO ----------
+  // Profissional vinculado ao user logado (null = admin/dono)
+  const [parceiroProfissional, setParceiroProfissional] = useState(null);
+
+  // Verifica se a ação é permitida para o parceiro.
+  // Retorna true se permitido, false (+ dispara alerta) se proibido.
+  const checarPermissao = useCallback(async (profissionalId) => {
+    if (!parceiroProfissional) return true; // admin: tudo permitido
+    if (parceiroProfissional.id === profissionalId) return true;
+    await uiAlert('dashboard.parceiro_acao_proibida', 'warning');
+    return false;
+  }, [parceiroProfissional]);
+  // ----------------------------------
+
   const [activeTab, setActiveTab] = useState('agendamentos');
 
   const [negocio, setNegocio] = useState(null);
@@ -458,7 +472,7 @@ export default function Dashboard({ user, onLogout }) {
   const reloadNegocio = useCallback(async () => {
     if (!negocio?.id) return;
     const { data, error: err } = await supabase
-      .from('negocios').select('*').eq('id', negocio.id).eq('owner_id', user.id).maybeSingle();
+      .from('negocios').select('*').eq('id', negocio.id).maybeSingle();
     if (err || !data) return;
     setNegocio(data);
     setFormInfo({
@@ -467,7 +481,7 @@ export default function Dashboard({ user, onLogout }) {
       instagram: data.instagram || '', facebook: data.facebook || '',
       tema: data.tema || 'dark',
     });
-  }, [negocio?.id, user?.id]);
+  }, [negocio?.id]);
 
   const reloadProfissionais = useCallback(async (negocioId) => {
     const id = negocioId || negocio?.id;
@@ -489,7 +503,7 @@ export default function Dashboard({ user, onLogout }) {
       .order('created_at', { ascending: false });
     if (err) return;
     setEntregas(data || []);
-  }, [negocio?.id, agProfIds, hoje]);
+  }, [negocio?.id, agProfIds]);
 
   const reloadAgendamentos = useCallback(async (negocioId, profIds, dataHoje) => {
     const id = negocioId || negocio?.id;
@@ -566,6 +580,11 @@ export default function Dashboard({ user, onLogout }) {
       if (profissionaisResult.error) throw profissionaisResult.error;
       const profs = profissionaisResult.data || [];
       setProfissionais(profs);
+
+      // Identificar se o usuário logado é parceiro (não dono)
+      const meuProfissional = profs.find(p => p.user_id === user.id) || null;
+      setParceiroProfissional(meuProfissional);
+
       if (profs.length === 0) { setEntregas([]); setAgendamentos([]); setLoading(false); return; }
       const ids = profs.map(p => p.id);
       const dataHoje = (typeof dataRef === 'string' && dataRef) ? dataRef : String(serverNow?.date || hoje || '');
@@ -603,6 +622,7 @@ export default function Dashboard({ user, onLogout }) {
     if (!file) return;
     if (!user?.id) return uiAlert('alerts.session_invalid', 'error');
     if (!negocio?.id) return uiAlert('alerts.business_not_loaded', 'error');
+    if (parceiroProfissional) return uiAlert('dashboard.parceiro_acao_proibida', 'warning');
     try {
       setLogoUploading(true);
       const filePath = `${negocio.id}/logo.webp`;
@@ -618,6 +638,7 @@ export default function Dashboard({ user, onLogout }) {
 
   const salvarInfoNegocio = async () => {
     if (!negocio?.id) return uiAlert('alerts.business_not_loaded', 'error');
+    if (parceiroProfissional) return uiAlert('dashboard.parceiro_acao_proibida', 'warning');
     try {
       setInfoSaving(true);
       const endereco = String(formInfo.endereco || '').trim();
@@ -642,6 +663,7 @@ export default function Dashboard({ user, onLogout }) {
 
   const salvarTema = async (novoTema) => {
     if (!negocio?.id) return;
+    if (parceiroProfissional) return uiAlert('dashboard.parceiro_acao_proibida', 'warning');
     setFormInfo(prev => ({ ...prev, tema: novoTema }));
     try {
       setTemaSaving(true);
@@ -658,6 +680,7 @@ export default function Dashboard({ user, onLogout }) {
   const uploadGaleria = async (files) => {
     if (!files?.length) return;
     if (!negocio?.id) return uiAlert('alerts.business_not_loaded', 'error');
+    if (parceiroProfissional) return uiAlert('dashboard.parceiro_acao_proibida', 'warning');
     const maxMb = 4;
     const okTypes = ['image/png', 'image/jpeg', 'image/webp'];
     try {
@@ -680,6 +703,7 @@ export default function Dashboard({ user, onLogout }) {
 
   const removerImagemGaleria = async (item) => {
     if (!negocio?.id) return;
+    if (parceiroProfissional) return uiAlert('dashboard.parceiro_acao_proibida', 'warning');
     const ok = await uiConfirm('dashboard.gallery_remove_confirm', 'warning');
     if (!ok) return;
     try {
@@ -696,12 +720,15 @@ export default function Dashboard({ user, onLogout }) {
     try {
       setSubmittingEntrega(true);
       if (!negocio?.id) throw new Error('Erro ao carregar o negocio');
+      const profId = formEntrega.profissional_id;
+      const permitido = await checarPermissao(profId);
+      if (!permitido) return;
       const preco = toNumberOrNull(formEntrega.preco);
       const promo = toNumberOrNull(formEntrega.preco_promocional);
       if (preco == null) throw new Error('Preco invalido.');
       if (promo != null && promo >= preco) throw new Error('Preco de oferta deve ser menor.');
       const payload = {
-        nome: toUpperClean(formEntrega.nome), profissional_id: formEntrega.profissional_id,
+        nome: toUpperClean(formEntrega.nome), profissional_id: profId,
         duracao_minutos: toNumberOrNull(formEntrega.duracao_minutos),
         preco, preco_promocional: promo, ativo: true, negocio_id: negocio.id,
       };
@@ -732,16 +759,19 @@ export default function Dashboard({ user, onLogout }) {
     if (submittingEntrega) return;
     try {
       setSubmittingEntrega(true);
+      const profId = formEntrega.profissional_id;
+      const permitido = await checarPermissao(profId);
+      if (!permitido) return;
       const preco = toNumberOrNull(formEntrega.preco);
       const promo = toNumberOrNull(formEntrega.preco_promocional);
       if (!toUpperClean(formEntrega.nome)) throw new Error('Nome da entrega e obrigatorio.');
-      if (!formEntrega.profissional_id) throw new Error('Selecione um profissional.');
+      if (!profId) throw new Error('Selecione um profissional.');
       if (!toNumberOrNull(formEntrega.duracao_minutos)) throw new Error('Duracao invalida.');
       if (preco == null) throw new Error('Preco invalido.');
       if (promo != null && promo >= preco) throw new Error('Preco de oferta deve ser menor.');
       const payload = {
         nome: toUpperClean(formEntrega.nome), duracao_minutos: toNumberOrNull(formEntrega.duracao_minutos),
-        preco, preco_promocional: promo, profissional_id: formEntrega.profissional_id
+        preco, preco_promocional: promo, profissional_id: profId
       };
       const { error: updErr } = await supabase.from('entregas').update(payload).eq('id', editingEntregaId).eq('negocio_id', negocio.id);
       if (updErr) throw updErr;
@@ -762,11 +792,13 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
-  const deleteEntrega = async (id) => {
+  const deleteEntrega = async (entrega) => {
+    const permitido = await checarPermissao(entrega.profissional_id);
+    if (!permitido) return;
     const ok = await uiConfirm(`dashboard.business.${businessGroup}.service_delete_confirm`, 'warning');
     if (!ok) return;
     try {
-      const { error: delErr } = await supabase.from('entregas').delete().eq('id', id).eq('negocio_id', negocio.id);
+      const { error: delErr } = await supabase.from('entregas').delete().eq('id', entrega.id).eq('negocio_id', negocio.id);
       if (delErr) throw delErr;
       await uiAlert(`dashboard.business.${businessGroup}.service_deleted`, 'success');
       await reloadEntregas();
@@ -778,6 +810,7 @@ export default function Dashboard({ user, onLogout }) {
 
   const createProfissional = async (e) => {
     e.preventDefault();
+    if (parceiroProfissional) return uiAlert('dashboard.parceiro_acao_proibida', 'warning');
     try {
       if (!negocio?.id) throw new Error('Erro ao carregar o negocio');
       const dias = normalizeDiasTrabalho(formProfissional.dias_trabalho);
@@ -805,6 +838,8 @@ export default function Dashboard({ user, onLogout }) {
     e.preventDefault();
     try {
       if (!editingProfissional?.id) throw new Error('Profissional invalido.');
+      const permitido = await checarPermissao(editingProfissional.id);
+      if (!permitido) return;
       const dias = normalizeDiasTrabalho(formProfissional.dias_trabalho);
       const payload = {
         nome: toUpperClean(formProfissional.nome), profissao: toUpperClean(formProfissional.profissao) || null,
@@ -829,6 +864,8 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const toggleAtivoProfissional = async (p) => {
+    const permitido = await checarPermissao(p.id);
+    if (!permitido) return;
     try {
       if (p.ativo === undefined) { await uiAlert('dashboard.professional_missing_active_column', 'error'); return; }
       const novoAtivo = !p.ativo;
@@ -848,6 +885,8 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const excluirProfissional = async (p) => {
+    const permitido = await checarPermissao(p.id);
+    if (!permitido) return;
     const ok = await uiConfirm('dashboard.professional_delete_confirm', 'warning');
     if (!ok) return;
     try {
@@ -860,9 +899,11 @@ export default function Dashboard({ user, onLogout }) {
     } catch (e) { console.error('excluirProfissional:', e); await uiAlert('dashboard.professional_delete_error', 'error'); }
   };
 
-  const confirmarAtendimento = async (id) => {
+  const confirmarAtendimento = async (agendamento) => {
+    const permitido = await checarPermissao(agendamento.profissional_id);
+    if (!permitido) return;
     try {
-      const { error: updErr } = await supabase.from('agendamentos').update({ status: 'concluido' }).eq('id', id).eq('negocio_id', negocio.id);
+      const { error: updErr } = await supabase.from('agendamentos').update({ status: 'concluido' }).eq('id', agendamento.id).eq('negocio_id', negocio.id);
       if (updErr) throw updErr;
       await uiAlert('dashboard.booking_confirmed', 'success');
       await reloadAgendamentos();
@@ -870,11 +911,13 @@ export default function Dashboard({ user, onLogout }) {
     } catch (e2) { console.error('confirmarAtendimento error:', e2); await uiAlert('dashboard.booking_confirm_error', 'error'); }
   };
 
-  const cancelarAgendamentoProfissional = async (id) => {
+  const cancelarAgendamentoProfissional = async (agendamento) => {
+    const permitido = await checarPermissao(agendamento.profissional_id);
+    if (!permitido) return;
     const ok = await uiConfirm('dashboard.booking_cancel_confirm', 'warning');
     if (!ok) return;
     try {
-      const { error } = await supabase.rpc('cancelar_agendamento_profissional', { p_agendamento_id: id });
+      const { error } = await supabase.rpc('cancelar_agendamento_profissional', { p_agendamento_id: agendamento.id });
       if (error) throw error;
       await uiAlert('dashboard.booking_canceled', 'error');
       await reloadAgendamentos();
@@ -882,7 +925,25 @@ export default function Dashboard({ user, onLogout }) {
     } catch (e) { console.error('cancelarAgendamentoProfissional:', e); await uiAlert('dashboard.booking_cancel_error', 'error'); }
   };
 
+  const aprovarParceiro = async (prof) => {
+    if (parceiroProfissional) return uiAlert('dashboard.parceiro_acao_proibida', 'warning');
+    try {
+      const { error } = await supabase
+        .from('profissionais')
+        .update({ status: 'ativo', ativo: true })
+        .eq('id', prof.id)
+        .eq('negocio_id', negocio.id);
+      if (error) throw error;
+      await uiAlert('dashboard.professional_approved', 'success');
+      await reloadProfissionais();
+    } catch (e) {
+      console.error('aprovarParceiro:', e);
+      await uiAlert('dashboard.partner_approve_error', 'error');
+    }
+  };
+
   const saveParceiroEmail = async () => {
+    if (parceiroProfissional) return uiAlert('dashboard.parceiro_acao_proibida', 'warning');
     const email = String(parceiroEmail || '').trim();
     if (!parceiroSelected) { await uiAlert('dashboard.parceiro_selecione_prof', 'error'); return; }
     if (!email || !email.includes('@')) { await uiAlert('dashboard.parceiro_email_invalid', 'error'); return; }
@@ -907,6 +968,7 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const removeParceiroEmail = async (profId) => {
+    if (parceiroProfissional) return uiAlert('dashboard.parceiro_acao_proibida', 'warning');
     try {
       const { error } = await supabase
         .from('profissionais')
@@ -1024,7 +1086,10 @@ export default function Dashboard({ user, onLogout }) {
     return pairs;
   }, [metricsDia]);
 
-  const tabs = ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'entregas', 'profissionais', 'info-negocio'];
+  // Tabs: parceiro não vê info-negocio
+  const tabs = parceiroProfissional
+    ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'entregas', 'profissionais']
+    : ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'entregas', 'profissionais', 'info-negocio'];
 
   const TAB_LABELS = {
     'visao-geral':   'GERAL',
@@ -1075,26 +1140,33 @@ export default function Dashboard({ user, onLogout }) {
               </div>
               <div>
                 <h1 className="text-xl font-normal">{negocio.nome}</h1>
-                <button
-                  type="button"
-                  onClick={() => navigate('/selecionar-negocio')}
-                  className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block"
-                >
-                  TROCAR NEGÓCIO
-                </button>
+                {!parceiroProfissional && (
+                  <button
+                    type="button"
+                    onClick={() => navigate('/selecionar-negocio')}
+                    className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block"
+                  >
+                    TROCAR NEGÓCIO
+                  </button>
+                )}
+                {parceiroProfissional && (
+                  <span className="text-xs text-primary -mt-0.5 block">{parceiroProfissional.nome}</span>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
               <Link to={`/v/${negocio.slug}`} target="_blank" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-dark-200 border border-gray-800 hover:border-primary rounded-button text-sm font-normal uppercase">
                 <Eye className="w-4 h-4" />VER VITRINE
               </Link>
-              <label className="inline-block">
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadLogoNegocio(e.target.files?.[0])} disabled={logoUploading} />
-                <span className={`inline-flex items-center justify-center text-center rounded-button font-normal border transition-all uppercase focus:outline-none focus:ring-0 focus:ring-offset-0 ${logoUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/10 hover:bg-primary/20 border-primary/30 text-primary cursor-pointer'} px-3 py-2 text-[11px] sm:px-4 sm:py-2 sm:text-sm`}>
-                  <span className="sm:hidden">{logoUploading ? '...' : 'LOGO'}</span>
-                  <span className="hidden sm:inline">{logoUploading ? 'ENVIANDO...' : 'ALTERAR LOGO'}</span>
-                </span>
-              </label>
+              {!parceiroProfissional && (
+                <label className="inline-block">
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadLogoNegocio(e.target.files?.[0])} disabled={logoUploading} />
+                  <span className={`inline-flex items-center justify-center text-center rounded-button font-normal border transition-all uppercase focus:outline-none focus:ring-0 focus:ring-offset-0 ${logoUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/10 hover:bg-primary/20 border-primary/30 text-primary cursor-pointer'} px-3 py-2 text-[11px] sm:px-4 sm:py-2 sm:text-sm`}>
+                    <span className="sm:hidden">{logoUploading ? '...' : 'LOGO'}</span>
+                    <span className="hidden sm:inline">{logoUploading ? 'ENVIANDO...' : 'ALTERAR LOGO'}</span>
+                  </span>
+                </label>
+              )}
               <button onClick={onLogout} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-button text-sm font-normal uppercase">
                 <LogOut className="w-4 h-4" /><span className="hidden sm:inline">SAIR</span>
               </button>
@@ -1328,11 +1400,11 @@ export default function Dashboard({ user, onLogout }) {
                                 {!isDone && !isCancel && (
                                   isHoje ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                      <button onClick={() => confirmarAtendimento(a.id)} className="w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">CONFIRMAR ATENDIMENTO</button>
-                                      <button onClick={() => cancelarAgendamentoProfissional(a.id)} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">CANCELAR</button>
+                                      <button onClick={() => confirmarAtendimento(a)} className="w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">CONFIRMAR ATENDIMENTO</button>
+                                      <button onClick={() => cancelarAgendamentoProfissional(a)} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">CANCELAR</button>
                                     </div>
                                   ) : (
-                                    <button onClick={() => cancelarAgendamentoProfissional(a.id)} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">CANCELAR</button>
+                                    <button onClick={() => cancelarAgendamentoProfissional(a)} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">CANCELAR</button>
                                   )
                                 )}
                               </div>
@@ -1421,7 +1493,12 @@ export default function Dashboard({ user, onLogout }) {
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-normal">{sectionTitle}</h2>
                   <button
-                    onClick={() => { setShowNovaEntrega(true); setEditingEntregaId(null); setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' }); }}
+                    onClick={() => {
+                      const profId = parceiroProfissional ? parceiroProfissional.id : '';
+                      setShowNovaEntrega(true);
+                      setEditingEntregaId(null);
+                      setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: profId });
+                    }}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-button font-normal uppercase border bg-gradient-to-r from-primary to-yellow-600 text-black border-transparent">
                     <Plus className="w-5 h-5" />{btnAddLabel}
                   </button>
@@ -1462,7 +1539,7 @@ export default function Dashboard({ user, onLogout }) {
                                       <button
                                         onClick={() => { setEditingEntregaId(s.id); setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: String(s.preco_promocional ?? ''), profissional_id: s.profissional_id || '' }); setShowNovaEntrega(true); }}
                                         className="flex-1 py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
-                                      <button onClick={() => deleteEntrega(s.id)} className="flex-1 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
+                                      <button onClick={() => deleteEntrega(s)} className="flex-1 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
                                     </div>
                                   </div>
                                 );
@@ -1483,11 +1560,13 @@ export default function Dashboard({ user, onLogout }) {
               <div>
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-normal">Profissionais</h2>
-                  <button
-                    onClick={() => { setShowNovoProfissional(true); setEditingProfissional(null); setFormProfissional({ nome: '', profissao: '', anos_experiencia: '', horario_inicio: '08:00', horario_fim: '18:00', almoco_inicio: '', almoco_fim: '', dias_trabalho: [1, 2, 3, 4, 5, 6] }); }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-button font-normal uppercase border bg-gradient-to-r from-primary to-yellow-600 text-black border-transparent">
-                    <Plus className="w-5 h-5" />ADICIONAR
-                  </button>
+                  {!parceiroProfissional && (
+                    <button
+                      onClick={() => { setShowNovoProfissional(true); setEditingProfissional(null); setFormProfissional({ nome: '', profissao: '', anos_experiencia: '', horario_inicio: '08:00', horario_fim: '18:00', almoco_inicio: '', almoco_fim: '', dias_trabalho: [1, 2, 3, 4, 5, 6] }); }}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-button font-normal uppercase border bg-gradient-to-r from-primary to-yellow-600 text-black border-transparent">
+                      <Plus className="w-5 h-5" />ADICIONAR
+                    </button>
+                  )}
                 </div>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
                   {profissionais.map(p => {
@@ -1497,25 +1576,10 @@ export default function Dashboard({ user, onLogout }) {
                     const isAtivo    = profStatus === 'ativo';
                     const label      = normalizeKey(p.status_label);
                     const dotClass   = STATUS_COLOR_CLASS[label] || 'bg-gray-500';
-
-                    const aprovarParceiro = async (prof) => {
-                      try {
-                        const { error } = await supabase
-                          .from('profissionais')
-                          .update({ status: 'ativo', ativo: true })
-                          .eq('id', prof.id)
-                          .eq('negocio_id', negocio.id);
-                        if (error) throw error;
-                        await uiAlert('dashboard.professional_approved', 'success');
-                        await reloadProfissionais();
-                      } catch (e) {
-                        console.error('aprovarParceiro:', e);
-                        await uiAlert('dashboard.partner_approve_error', 'error');
-                      }
-                    };
+                    const isEuMesmo  = parceiroProfissional?.id === p.id;
 
                     return (
-                      <div key={p.id} className={`relative bg-dark-200 border rounded-custom p-5 ${isPendente ? 'border-yellow-500/40' : 'border-gray-800'}`}>
+                      <div key={p.id} className={`relative bg-dark-200 border rounded-custom p-5 ${isPendente ? 'border-yellow-500/40' : isEuMesmo ? 'border-primary/30' : 'border-gray-800'}`}>
 
                         {isPendente && (
                           <div className="absolute top-3 right-3 text-[10px] px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 font-normal uppercase">
@@ -1538,7 +1602,6 @@ export default function Dashboard({ user, onLogout }) {
                               </span>
                             </div>
                             {p.profissao && <p className="text-xs text-gray-500 mt-1">{p.profissao}</p>}
-                            {p.email && <p className="text-xs text-gray-600 mt-1">{p.email}</p>}
                             {!isPendente && p.anos_experiencia != null && (<p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIÊNCIA</p>)}
                           </div>
                         </div>
@@ -1553,34 +1616,28 @@ export default function Dashboard({ user, onLogout }) {
                           </>
                         )}
 
-                        {isPendente && (
+                        {isPendente && !parceiroProfissional && (
                           <div className="flex gap-2 mt-4">
-                            <button
-                              onClick={() => aprovarParceiro(p)}
-                              className="flex-1 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">
-                              APROVAR
-                            </button>
-                            <button
-                              onClick={() => excluirProfissional(p)}
-                              className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">
-                              EXCLUIR
-                            </button>
+                            <button onClick={() => aprovarParceiro(p)} className="flex-1 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">APROVAR</button>
+                            <button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
                           </div>
                         )}
 
-                        {!isPendente && (
+                        {!isPendente && (isEuMesmo || !parceiroProfissional) && (
                           <>
                             {isInativo && p.motivo_inativo && (
                               <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-custom p-2 mb-3">
                                 INATIVO {p.motivo_inativo ? `• ${p.motivo_inativo}` : ''}
                               </div>
                             )}
-                            <div className="flex gap-2 mb-3">
-                              <button onClick={() => toggleAtivoProfissional(p)} className={`flex-1 py-2 rounded-button text-sm border font-normal uppercase ${isAtivo ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300' : 'bg-green-500/10 border-green-500/30 text-green-300'}`}>
-                                {isAtivo ? 'INATIVAR' : 'ATIVAR'}
-                              </button>
-                              <button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
-                            </div>
+                            {!parceiroProfissional && (
+                              <div className="flex gap-2 mb-3">
+                                <button onClick={() => toggleAtivoProfissional(p)} className={`flex-1 py-2 rounded-button text-sm border font-normal uppercase ${isAtivo ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300' : 'bg-green-500/10 border-green-500/30 text-green-300'}`}>
+                                  {isAtivo ? 'INATIVAR' : 'ATIVAR'}
+                                </button>
+                                <button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
+                              </div>
+                            )}
                             <button
                               onClick={() => { setEditingProfissional(p); setFormProfissional({ nome: p.nome || '', profissao: p.profissao || '', anos_experiencia: String(p.anos_experiencia ?? ''), horario_inicio: p.horario_inicio || '08:00', horario_fim: p.horario_fim || '18:00', almoco_inicio: p.almoco_inicio || '', almoco_fim: p.almoco_fim || '', dias_trabalho: Array.isArray(p.dias_trabalho) && p.dias_trabalho.length ? p.dias_trabalho : [1, 2, 3, 4, 5, 6] }); setShowNovoProfissional(true); }}
                               className="w-full py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
@@ -1594,7 +1651,7 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             )}
 
-            {activeTab === 'info-negocio' && (
+            {activeTab === 'info-negocio' && !parceiroProfissional && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-2xl font-normal">Info do Negócio</h2>
@@ -1751,7 +1808,13 @@ export default function Dashboard({ user, onLogout }) {
             <form onSubmit={editingEntregaId ? updateEntrega : createEntrega} className="space-y-4">
               <div>
                 <label className="block text-sm mb-2">Profissional</label>
-                <ProfissionalSelect value={formEntrega.profissional_id} onChange={(id) => setFormEntrega({ ...formEntrega, profissional_id: id })} profissionais={profissionais} placeholder="Selecione" apenasAtivos={true} />
+                <ProfissionalSelect
+                  value={formEntrega.profissional_id}
+                  onChange={(id) => setFormEntrega({ ...formEntrega, profissional_id: id })}
+                  profissionais={parceiroProfissional ? profissionais.filter(p => p.id === parceiroProfissional.id) : profissionais}
+                  placeholder="Selecione"
+                  apenasAtivos={true}
+                />
               </div>
               <div>
                 <label className="block text-sm mb-2">Nome</label>
