@@ -97,8 +97,8 @@ function HeartIcon({ filled = false, className = '', size = 20 }) {
   );
 }
 
-function StarChar({ size = 18, className = 'text-primary' }) {
-  return <span className={className} style={{ fontSize: size, lineHeight: 1 }} aria-hidden="true">★</span>;
+function StarChar({ size = 18, className = '' }) {
+  return <span className={className || 'text-primary'} style={{ fontSize: size, lineHeight: 1 }} aria-hidden="true">★</span>;
 }
 
 function Stars5Char({ value = 0, size = 14 }) {
@@ -106,7 +106,7 @@ function Stars5Char({ value = 0, size = 14 }) {
   return (
     <div className="flex items-center gap-1" aria-label={`Nota ${v} de 5`}>
       {[1, 2, 3, 4, 5].map(i => (
-        <span key={i} style={{ fontSize: size, lineHeight: 1 }} className={i <= v ? 'text-primary' : 'text-gray-700'} aria-hidden="true">★</span>
+        <span key={i} style={{ fontSize: size, lineHeight: 1 }} className={i <= v ? 'text-primary' : 'text-gray-300'} aria-hidden="true">★</span>
       ))}
     </div>
   );
@@ -147,17 +147,22 @@ function sanitizeTel(raw) {
   return v.replace(/[^\d+]/g, '');
 }
 
-function AlertModal({ open, onClose, title, body, buttonText }) {
+function AlertModal({ open, onClose, title, body, buttonText, isLight }) {
   if (!open) return null;
+  const bg      = isLight ? 'bg-white border-gray-200'  : 'bg-dark-100 border-gray-800';
+  const titleCl = isLight ? 'text-gray-900'              : 'text-white';
+  const bodyCl  = isLight ? 'text-gray-600'              : 'text-gray-300';
+  const closeCl = isLight ? 'text-gray-400 hover:text-gray-700' : 'text-gray-400 hover:text-white';
+  const btnCl   = isLight ? 'bg-gray-900 text-white hover:bg-gray-700' : 'bg-gradient-to-r from-primary to-yellow-600 text-black';
   return (
-    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
-      <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-6">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+      <div className={`border rounded-custom max-w-md w-full p-6 ${bg}`}>
         <div className="flex justify-between items-start gap-3 mb-3">
-          <h3 className="text-xl font-normal text-white">{title}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-white"><X className="w-6 h-6" /></button>
+          <h3 className={`text-xl font-normal ${titleCl}`}>{title}</h3>
+          <button onClick={onClose} className={closeCl}><X className="w-6 h-6" /></button>
         </div>
-        {body && <p className="text-gray-300 font-normal whitespace-pre-line">{body}</p>}
-        <button onClick={onClose} className="mt-5 w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal">
+        {body && <p className={`font-normal whitespace-pre-line ${bodyCl}`}>{body}</p>}
+        <button onClick={onClose} className={`mt-5 w-full py-3 rounded-button uppercase font-normal transition-colors ${btnCl}`}>
           {buttonText || 'OK'}
         </button>
       </div>
@@ -165,59 +170,70 @@ function AlertModal({ open, onClose, title, body, buttonText }) {
   );
 }
 
-function ConfirmModal({ open, onCancel, onConfirm, title, body, confirmText, cancelText }) {
+function ConfirmModal({ open, onCancel, onConfirm, title, body, confirmText, cancelText, isLight }) {
   if (!open) return null;
+  const bg       = isLight ? 'bg-white border-gray-200'  : 'bg-dark-100 border-gray-800';
+  const titleCl  = isLight ? 'text-gray-900'              : 'text-white';
+  const bodyCl   = isLight ? 'text-gray-600'              : 'text-gray-300';
+  const closeCl  = isLight ? 'text-gray-400 hover:text-gray-700' : 'text-gray-400 hover:text-white';
+  const cancelCl = isLight ? 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200' : 'bg-dark-200 border-gray-800 text-gray-200';
+  const confirmCl= isLight ? 'bg-gray-900 text-white hover:bg-gray-700' : 'bg-gradient-to-r from-primary to-yellow-600 text-black';
   return (
-    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
-      <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-6">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+      <div className={`border rounded-custom max-w-md w-full p-6 ${bg}`}>
         <div className="flex justify-between items-start gap-3 mb-3">
-          <h3 className="text-xl font-normal text-white">{title}</h3>
-          <button onClick={onCancel} className="text-gray-400 hover:text-white"><X className="w-6 h-6" /></button>
+          <h3 className={`text-xl font-normal ${titleCl}`}>{title}</h3>
+          <button onClick={onCancel} className={closeCl}><X className="w-6 h-6" /></button>
         </div>
-        {body && <p className="text-gray-300 font-normal whitespace-pre-line">{body}</p>}
+        {body && <p className={`font-normal whitespace-pre-line ${bodyCl}`}>{body}</p>}
         <div className="mt-5 flex gap-3">
-          <button onClick={onCancel} className="flex-1 py-3 bg-dark-200 border border-gray-800 rounded-button uppercase font-normal text-gray-200">{cancelText || 'CANCELAR'}</button>
-          <button onClick={onConfirm} className="flex-1 py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal">{confirmText || 'CONFIRMAR'}</button>
+          <button onClick={onCancel}  className={`flex-1 py-3 border rounded-button uppercase font-normal transition-colors ${cancelCl}`}>{cancelText || 'CANCELAR'}</button>
+          <button onClick={onConfirm} className={`flex-1 py-3 rounded-button uppercase font-normal transition-colors ${confirmCl}`}>{confirmText || 'CONFIRMAR'}</button>
         </div>
       </div>
     </div>
   );
 }
 
-function SelectionBar({ itens, counterSingular, counterPlural, onConfirm, onClear }) {
+function SelectionBar({ itens, counterSingular, counterPlural, onConfirm, onClear, isLight }) {
   const qtd = itens.length;
   if (qtd === 0) return null;
   const durTotal = itens.reduce((s, x) => s + Number(x.duracao_minutos || 0), 0);
   const valTotal = itens.reduce((s, x) => s + getPrecoFinalServico(x), 0);
   const label    = qtd === 1 ? counterSingular : counterPlural;
+  const bg       = isLight ? 'rgba(255,255,255,0.97)' : 'rgba(10,10,10,0.97)';
+  const border   = isLight ? 'rgba(24,24,27,0.15)'    : 'rgba(212,160,23,0.25)';
+  const textMain = isLight ? 'text-gray-900'           : 'text-white';
+  const textSub  = isLight ? 'text-gray-500'           : 'text-gray-500';
+  const clearBtn = isLight ? 'text-gray-400 hover:text-gray-600' : 'text-gray-600 hover:text-gray-400';
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-[60]"
-      style={{ background: 'rgba(10,10,10,0.97)', borderTop: '1px solid rgba(212,160,23,0.25)' }}
+      style={{ background: bg, borderTop: `1px solid ${border}` }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
           <div
-            className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-black text-xs font-normal shrink-0"
+            className="w-8 h-8 rounded-full bg-vprimary flex items-center justify-center text-vprimary-text text-xs font-normal shrink-0"
             style={{ fontVariantNumeric: 'tabular-nums' }}
           >
             {qtd}
           </div>
           <div className="min-w-0">
-            <div className="text-white text-sm font-normal truncate">
+            <div className={`text-sm font-normal truncate ${textMain}`}>
               {qtd} {label} selecionado{qtd > 1 ? 's' : ''}
             </div>
-            <div className="text-gray-500 text-xs font-normal">
+            <div className={`text-xs font-normal ${textSub}`}>
               {durTotal} min &nbsp;·&nbsp; R$ {valTotal.toFixed(2)}
             </div>
           </div>
-          <button onClick={onClear} className="text-gray-600 hover:text-gray-400 shrink-0 ml-1" title="Limpar seleção">
+          <button onClick={onClear} className={`shrink-0 ml-1 ${clearBtn}`} title="Limpar seleção">
             <X className="w-4 h-4" />
           </button>
         </div>
         <button
           onClick={onConfirm}
-          className="shrink-0 flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-full text-sm font-normal uppercase whitespace-nowrap"
+          className="shrink-0 flex items-center gap-2 px-5 py-2.5 bg-vprimary text-vprimary-text rounded-full text-sm font-normal uppercase whitespace-nowrap transition-opacity hover:opacity-80"
         >
           <Calendar className="w-4 h-4" />
           Escolher data
@@ -228,7 +244,7 @@ function SelectionBar({ itens, counterSingular, counterPlural, onConfirm, onClea
   );
 }
 
-function ServicoButtons({ servico, profissional, selecaoProfId, servicosSelecionados, isProfessional, onAgendarAgora, onToggleSelecao }) {
+function ServicoButtons({ servico, profissional, selecaoProfId, servicosSelecionados, isProfessional, onAgendarAgora, onToggleSelecao, isLight }) {
   const isSelecionado = servicosSelecionados.some(x => x.id === servico.id);
   const modoSelecaoOn = servicosSelecionados.length > 0;
   const outroProfSel  = modoSelecaoOn && selecaoProfId !== null && selecaoProfId !== profissional.id;
@@ -239,24 +255,31 @@ function ServicoButtons({ servico, profissional, selecaoProfId, servicosSelecion
   if (isProfessional || outroProfSel) {
     selecionarClass = 'bg-vcard2 border-vborder text-vmuted cursor-not-allowed opacity-30';
   } else if (isSelecionado) {
-    selecionarClass = 'bg-primary/15 border-primary text-primary';
+    selecionarClass = isLight
+      ? 'bg-gray-900/10 border-gray-900 text-gray-900'
+      : 'bg-primary/15 border-primary text-primary';
   } else if (modoSelecaoOn) {
-    selecionarClass = 'bg-vcard2 border-vborder text-white hover:border-primary hover:text-primary';
+    selecionarClass = isLight
+      ? 'bg-white border-gray-300 text-gray-700 hover:border-gray-900 hover:text-gray-900'
+      : 'bg-vcard2 border-vborder text-white hover:border-primary hover:text-primary';
   } else {
-    selecionarClass = 'bg-vcard2 border-vborder text-vsub hover:border-primary hover:text-primary';
+    selecionarClass = isLight
+      ? 'bg-white border-gray-300 text-gray-600 hover:border-gray-900 hover:text-gray-900'
+      : 'bg-vcard2 border-vborder text-vsub hover:border-primary hover:text-primary';
   }
+
+  const agendarClass = agendarDesabilitado
+    ? 'bg-vcard2 border border-vborder text-vmuted cursor-not-allowed opacity-40'
+    : isLight
+      ? 'bg-gray-900 text-white hover:bg-gray-700'
+      : 'bg-gradient-to-r from-primary to-yellow-600 text-black hover:opacity-90';
 
   return (
     <div className="flex gap-2 mt-3">
       <button
         onClick={() => !agendarDesabilitado && onAgendarAgora(profissional, [servico])}
         disabled={agendarDesabilitado}
-        className={[
-          'flex-1 py-2.5 rounded-button text-sm font-normal uppercase transition-all flex items-center justify-center gap-1.5',
-          agendarDesabilitado
-            ? 'bg-vcard2 border border-vborder text-vmuted cursor-not-allowed opacity-40'
-            : 'bg-gradient-to-r from-primary to-yellow-600 text-black hover:opacity-90',
-        ].join(' ')}
+        className={`flex-1 py-2.5 rounded-button text-sm font-normal uppercase transition-all flex items-center justify-center gap-1.5 ${agendarClass}`}
       >
         <Calendar className="w-3.5 h-3.5" />
         Agendar agora
@@ -264,10 +287,7 @@ function ServicoButtons({ servico, profissional, selecaoProfId, servicosSelecion
       <button
         onClick={() => !selecionarDesabilitado && onToggleSelecao(profissional, servico)}
         disabled={selecionarDesabilitado}
-        className={[
-          'flex-1 py-2.5 rounded-button text-sm font-normal uppercase transition-all flex items-center justify-center gap-1.5 border',
-          selecionarClass,
-        ].join(' ')}
+        className={`flex-1 py-2.5 rounded-button text-sm font-normal uppercase transition-all flex items-center justify-center gap-1.5 border ${selecionarClass}`}
       >
         {isSelecionado
           ? <><Check className="w-3.5 h-3.5" /> Selecionado</>
@@ -278,7 +298,7 @@ function ServicoButtons({ servico, profissional, selecaoProfId, servicosSelecion
   );
 }
 
-function ServicoCard({ s, profissional, selecaoProfId, servicosSelecionados, isProfessional, onAgendarAgora, onToggleSelecao }) {
+function ServicoCard({ s, profissional, selecaoProfId, servicosSelecionados, isProfessional, onAgendarAgora, onToggleSelecao, isLight }) {
   const preco      = Number(s.preco ?? 0);
   const promo      = Number(s.preco_promocional ?? 0);
   const temPromo   = Number.isFinite(promo) && promo > 0 && promo < preco;
@@ -289,20 +309,32 @@ function ServicoCard({ s, profissional, selecaoProfId, servicosSelecionados, isP
         <>
           <div className="flex items-start justify-between gap-3">
             <div className="font-normal text-sm leading-tight">{s.nome}</div>
-            <span className="inline-block px-1.5 py-0.5 bg-green-500/20 border border-green-500/40 rounded-button text-[9px] text-green-400 font-normal uppercase shrink-0">OFERTA</span>
+            <span
+              className="inline-block px-1.5 py-0.5 rounded-button text-[9px] font-normal uppercase shrink-0"
+              style={{
+                background: 'var(--voferta-bg)',
+                border: '1px solid var(--voferta-border)',
+                color: 'var(--voferta-text)',
+              }}
+            >OFERTA</span>
           </div>
           <div className="flex items-center justify-between gap-3 mt-2">
             <div className="flex items-center gap-1 text-xs text-vmuted font-normal">
               <Clock className="w-3 h-3 shrink-0" />{s.duracao_minutos} MIN
             </div>
-            <div className="text-green-400 font-normal text-base shrink-0">R$ {precoFinal.toFixed(2)}</div>
+            <div className="font-normal text-base shrink-0" style={{ color: 'var(--vpromo-text)' }}>
+              R$ {precoFinal.toFixed(2)}
+            </div>
+          </div>
+          <div className="text-xs mt-1 line-through" style={{ color: 'var(--verror-text)' }}>
+            R$ {preco.toFixed(2)}
           </div>
         </>
       ) : (
         <>
           <div className="flex items-start justify-between gap-3">
             <div className="font-normal text-sm leading-tight">{s.nome}</div>
-            <div className="text-primary font-normal text-base shrink-0">R$ {precoFinal.toFixed(2)}</div>
+            <div className="text-vprimary font-normal text-base shrink-0">R$ {precoFinal.toFixed(2)}</div>
           </div>
           <div className="flex items-center gap-1 mt-2 text-xs text-vmuted font-normal">
             <Clock className="w-3 h-3 shrink-0" />{s.duracao_minutos} MIN
@@ -317,12 +349,13 @@ function ServicoCard({ s, profissional, selecaoProfId, servicosSelecionados, isP
         isProfessional={isProfessional}
         onAgendarAgora={onAgendarAgora}
         onToggleSelecao={onToggleSelecao}
+        isLight={isLight}
       />
     </div>
   );
 }
 
-function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecionados, isProfessional, onAgendarAgora, onToggleSelecao, emptyMsg }) {
+function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecionados, isProfessional, onAgendarAgora, onToggleSelecao, emptyMsg, isLight }) {
   const [pagina, setPagina]     = useState(0);
   const [animDir, setAnimDir]   = useState(null);
   const [exibindo, setExibindo] = useState(0);
@@ -369,74 +402,35 @@ function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecion
   const translateSaindo   = animDir === 'left' ? '-100%' : animDir === 'right' ? '100%' : '0%';
   const translateEntrando = animDir === 'left' ? '100%'  : animDir === 'right' ? '-100%' : '0%';
 
+  const dotInactive = isLight ? 'bg-gray-300 hover:bg-gray-400' : 'bg-gray-700 hover:bg-gray-500';
+  const navBtnCl    = isLight ? 'hover:bg-gray-100 text-gray-500 hover:text-gray-800' : 'hover:bg-vcard2 text-vsub hover:text-vtext';
+
   return (
     <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <div style={{ overflow: 'hidden', position: 'relative' }}>
         {animando && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0, left: 0, right: 0,
-              transform: `translateX(${translateSaindo})`,
-              transition: 'transform 320ms cubic-bezier(0.4, 0, 0.2, 1)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-            }}
-          >
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, transform: `translateX(${translateSaindo})`, transition: 'transform 320ms cubic-bezier(0.4, 0, 0.2, 1)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {itensAntigos.map(s => (
-              <ServicoCard
-                key={s.id} s={s} profissional={profissional}
-                selecaoProfId={selecaoProfId} servicosSelecionados={servicosSelecionados}
-                isProfessional={isProfessional} onAgendarAgora={onAgendarAgora} onToggleSelecao={onToggleSelecao}
-              />
+              <ServicoCard key={s.id} s={s} profissional={profissional} selecaoProfId={selecaoProfId} servicosSelecionados={servicosSelecionados} isProfessional={isProfessional} onAgendarAgora={onAgendarAgora} onToggleSelecao={onToggleSelecao} isLight={isLight} />
             ))}
           </div>
         )}
-        <div
-          style={{
-            transform: animando ? `translateX(${translateEntrando})` : 'translateX(0%)',
-            transition: animando ? 'transform 320ms cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-          }}
-        >
+        <div style={{ transform: animando ? `translateX(${translateEntrando})` : 'translateX(0%)', transition: animando ? 'transform 320ms cubic-bezier(0.4, 0, 0.2, 1)' : 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {(animando ? itensNovos : itensMostrados).map(s => (
-            <ServicoCard
-              key={s.id} s={s} profissional={profissional}
-              selecaoProfId={selecaoProfId} servicosSelecionados={servicosSelecionados}
-              isProfessional={isProfessional} onAgendarAgora={onAgendarAgora} onToggleSelecao={onToggleSelecao}
-            />
+            <ServicoCard key={s.id} s={s} profissional={profissional} selecaoProfId={selecaoProfId} servicosSelecionados={servicosSelecionados} isProfessional={isProfessional} onAgendarAgora={onAgendarAgora} onToggleSelecao={onToggleSelecao} isLight={isLight} />
           ))}
         </div>
       </div>
 
       {totalPaginas > 1 && (
         <div className="flex items-center justify-center gap-3 mt-4">
-          <button
-            onClick={() => irPara(pagina - 1)}
-            disabled={pagina === 0}
-            className="p-1.5 rounded hover:bg-vcard2 text-vsub hover:text-vtext transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          >
+          <button onClick={() => irPara(pagina - 1)} disabled={pagina === 0} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}>
             <ChevronLeft className="w-4 h-4" />
           </button>
           {Array.from({ length: totalPaginas }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => irPara(i)}
-              className={[
-                'rounded-full transition-all duration-300',
-                i === pagina ? 'w-4 h-2 bg-primary' : 'w-2 h-2 bg-gray-700 hover:bg-gray-500',
-              ].join(' ')}
-              aria-label={`Página ${i + 1}`}
-            />
+            <button key={i} onClick={() => irPara(i)} className={['rounded-full transition-all duration-300', i === pagina ? 'w-4 h-2 bg-vprimary' : `w-2 h-2 ${dotInactive}`].join(' ')} aria-label={`Página ${i + 1}`} />
           ))}
-          <button
-            onClick={() => irPara(pagina + 1)}
-            disabled={pagina === totalPaginas - 1}
-            className="p-1.5 rounded hover:bg-vcard2 text-vsub hover:text-vtext transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          >
+          <button onClick={() => irPara(pagina + 1)} disabled={pagina === totalPaginas - 1} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -445,11 +439,14 @@ function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecion
   );
 }
 
-function DepoimentosPaginados({ depoimentos, nomeNegocioLabel }) {
+function DepoimentosPaginados({ depoimentos, nomeNegocioLabel, isLight }) {
   const [pagina, setPagina] = useState(0);
   const totalPaginas = Math.ceil(depoimentos.length / DEPOIMENTOS_POR_PAGINA);
   const inicio = pagina * DEPOIMENTOS_POR_PAGINA;
   const itens  = depoimentos.slice(inicio, inicio + DEPOIMENTOS_POR_PAGINA);
+  const navBtnCl  = isLight ? 'hover:bg-gray-100 text-gray-500 hover:text-gray-800' : 'hover:bg-vcard2 text-vsub hover:text-vtext';
+  const dotInact  = isLight ? 'bg-gray-300 hover:bg-gray-400' : 'bg-gray-700 hover:bg-gray-500';
+  const comentCl  = isLight ? 'text-gray-600' : 'text-vsub';
 
   if (!depoimentos.length) return <p className="text-vmuted font-normal">Nenhum depoimento ainda</p>;
 
@@ -462,8 +459,8 @@ function DepoimentosPaginados({ depoimentos, nomeNegocioLabel }) {
             <div key={dep.id} className="mb-4 break-inside-avoid bg-vcard border border-vborder rounded-custom p-4 relative">
               <div className="absolute top-3 right-3">
                 {dep.profissional_id && dep.profissionais?.nome
-                  ? <span className="inline-block px-1.5 py-0.5 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase">{dep.profissionais.nome}</span>
-                  : <span className="inline-block px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded-button text-[10px] text-blue-400 font-normal uppercase">{nomeNegocioLabel}</span>
+                  ? <span className="inline-block px-1.5 py-0.5 bg-vprimary/10 border border-vprimary/30 rounded-button text-[10px] text-vprimary font-normal uppercase">{dep.profissionais.nome}</span>
+                  : <span className="inline-block px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded-button text-[10px] text-blue-500 font-normal uppercase">{nomeNegocioLabel}</span>
                 }
               </div>
               <div className="flex items-center gap-3 mb-3">
@@ -476,36 +473,20 @@ function DepoimentosPaginados({ depoimentos, nomeNegocioLabel }) {
                   <Stars5Char value={dep.nota} size={14} />
                 </div>
               </div>
-              {dep.comentario && <p className="text-sm text-vsub font-normal">{dep.comentario}</p>}
+              {dep.comentario && <p className={`text-sm font-normal ${comentCl}`}>{dep.comentario}</p>}
             </div>
           );
         })}
       </div>
       {totalPaginas > 1 && (
         <div className="flex items-center justify-center gap-3 mt-6">
-          <button
-            onClick={() => setPagina(p => Math.max(0, p - 1))}
-            disabled={pagina === 0}
-            className="p-1.5 rounded hover:bg-vcard2 text-vsub hover:text-vtext transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          >
+          <button onClick={() => setPagina(p => Math.max(0, p - 1))} disabled={pagina === 0} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}>
             <ChevronLeft className="w-4 h-4" />
           </button>
           {Array.from({ length: totalPaginas }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setPagina(i)}
-              className={[
-                'rounded-full transition-all duration-300',
-                i === pagina ? 'w-4 h-2 bg-primary' : 'w-2 h-2 bg-gray-700 hover:bg-gray-500',
-              ].join(' ')}
-              aria-label={`Página ${i + 1}`}
-            />
+            <button key={i} onClick={() => setPagina(i)} className={['rounded-full transition-all duration-300', i === pagina ? 'w-4 h-2 bg-vprimary' : `w-2 h-2 ${dotInact}`].join(' ')} aria-label={`Página ${i + 1}`} />
           ))}
-          <button
-            onClick={() => setPagina(p => Math.min(totalPaginas - 1, p + 1))}
-            disabled={pagina === totalPaginas - 1}
-            className="p-1.5 rounded hover:bg-vcard2 text-vsub hover:text-vtext transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          >
+          <button onClick={() => setPagina(p => Math.min(totalPaginas - 1, p + 1))} disabled={pagina === totalPaginas - 1} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -605,13 +586,12 @@ export default function Vitrine({ user, userType }) {
   const loadDepoimentos = async (negocioId) => {
     const { data, error: rpcErr } = await withTimeout(
       supabase.rpc('get_depoimentos_vitrine', { p_negocio_id: negocioId }),
-      7000,
-      'depoimentos'
+      7000, 'depoimentos'
     );
     if (rpcErr) throw rpcErr;
     return (data || []).map(d => ({
       ...d,
-      users:        d.cliente_nome ? { nome: d.cliente_nome, avatar_path: d.cliente_avatar_path, type: d.cliente_type } : null,
+      users:         d.cliente_nome     ? { nome: d.cliente_nome, avatar_path: d.cliente_avatar_path, type: d.cliente_type } : null,
       profissionais: d.profissional_nome ? { nome: d.profissional_nome } : null,
     }));
   };
@@ -783,8 +763,8 @@ export default function Vitrine({ user, userType }) {
         tipo:            depoimentoTipo,
         nota:            depoimentoNota,
         comentario:      depoimentoTexto || null,
-        negocio_id:      depoimentoTipo === 'negocio'      ? negocio.id              : null,
-        profissional_id: depoimentoTipo === 'profissional' ? depoimentoProfissionalId : null,
+        negocio_id:      depoimentoTipo === 'negocio'      ? negocio.id               : null,
+        profissional_id: depoimentoTipo === 'profissional' ? depoimentoProfissionalId  : null,
       };
       const { error: depErr } = await withTimeout(supabase.from('depoimentos').insert(payload), 7000, 'enviar-depoimento');
       if (depErr) throw depErr;
@@ -870,12 +850,62 @@ export default function Vitrine({ user, userType }) {
 
   const nomeNegocioLabel = String(negocio?.nome || '').trim() || 'NEGÓCIO';
   const temaAtivo = negocio?.tema || 'dark';
+  const isLight   = temaAtivo === 'light';
   const hasSelecao = servicosSelecionados.length > 0;
 
+  const headerVoltar    = isLight ? 'text-gray-600 hover:text-gray-900' : 'text-vsub hover:text-primary';
+  const depoimentoBtn   = isLight
+    ? (isProfessional ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50' : 'border-gray-300 text-gray-600 hover:border-gray-900 bg-white')
+    : (isProfessional ? 'border-vborder2 text-vmuted cursor-not-allowed bg-vcard2' : 'border-vborder text-vsub hover:border-primary bg-vcard2');
+  const favoritoBtn     = isLight
+    ? (isProfessional ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed' : isFavorito ? 'bg-red-50 border-red-300 text-red-500' : 'bg-white border-gray-300 text-gray-600 hover:text-red-500')
+    : (isProfessional ? 'bg-vcard2 border-vborder2 text-vmuted cursor-not-allowed' : isFavorito ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-vcard2 border-vborder text-vsub hover:text-red-400');
+  const socialIconCl    = isLight
+    ? 'border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 hover:border-gray-500'
+    : 'border-white/20 bg-white/7 text-white/80 hover:bg-white/15 hover:border-white/35';
+  const heroBg          = isLight
+    ? 'bg-gradient-to-br from-gray-100 via-white to-gray-50'
+    : 'bg-gradient-to-br from-primary/20 via-vbg to-yellow-600/20';
+  const telClass        = isLight ? 'text-gray-900 hover:text-gray-600' : 'text-primary hover:text-yellow-500';
+  const addrClass       = isLight ? 'text-gray-600'                     : 'text-vsub';
+  const mediaColor      = isLight ? 'text-gray-900'                     : 'text-primary';
+  const profissaoTag    = isLight ? 'bg-gray-100 border-gray-300 text-gray-700' : 'bg-primary/20 border-primary/30 text-primary';
+  const almocoBadge     = isLight ? 'text-amber-700'                    : 'text-yellow-400';
+  const depBtn          = isLight
+    ? (isProfessional ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-700')
+    : (isProfessional ? 'bg-vcard border-vborder2 text-vmuted cursor-not-allowed'      : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary');
+  const depoModalBg     = isLight ? 'bg-white border-gray-200'         : 'bg-dark-100 border-gray-800';
+  const depoModalTitle  = isLight ? 'text-gray-900'                    : 'text-white';
+  const depoModalClose  = isLight ? 'text-gray-400 hover:text-gray-700': 'text-gray-400 hover:text-white';
+  const depoModalLabel  = isLight ? 'text-gray-600'                    : 'text-gray-300';
+  const depoNegBtn      = (t) => t === 'negocio'
+    ? (isLight ? 'bg-blue-50 border-blue-400 text-blue-700' : 'bg-blue-500/20 border-blue-500/50 text-blue-400')
+    : (isLight ? 'bg-gray-50 border-gray-300 text-gray-600 hover:border-gray-500' : 'bg-dark-200 border-gray-800 text-gray-400');
+  const depoProfBtn     = (t) => t === 'profissional'
+    ? (isLight ? 'bg-gray-900 border-gray-900 text-white' : 'bg-primary/20 border-primary/50 text-primary')
+    : (isLight ? 'bg-gray-50 border-gray-300 text-gray-600 hover:border-gray-500' : 'bg-dark-200 border-gray-800 text-gray-400');
+  const depoProfItem    = (sel) => sel
+    ? (isLight ? 'bg-gray-900 border-gray-900 text-white' : 'bg-primary/20 border-primary/50 text-primary')
+    : (isLight ? 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-500' : 'bg-dark-200 border-gray-800 text-gray-400 hover:border-primary/30');
+  const depoNotaBtn     = (n) => depoimentoNota >= n
+    ? (isLight ? 'bg-gray-900 border-gray-900 text-white' : 'bg-primary/20 border-primary/50 text-primary')
+    : (isLight ? 'bg-gray-50 border-gray-300 text-gray-400' : 'bg-dark-200 border-gray-800 text-gray-500');
+  const depoTextarea    = isLight
+    ? 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-gray-900'
+    : 'bg-dark-200 border-gray-800 text-white placeholder-gray-500 focus:border-primary';
+  const depoSendBtn     = isLight ? 'bg-gray-900 text-white hover:bg-gray-700' : 'bg-gradient-to-r from-primary to-yellow-600 text-black';
+  const depoHintCl      = isLight ? 'text-gray-400' : 'text-gray-500';
+  const confirmadoBg    = isLight ? 'bg-white border-gray-200'  : 'bg-dark-100 border-gray-800';
+  const confirmadoTitle = isLight ? 'text-gray-900'              : 'text-white';
+  const confirmadoSub   = isLight ? 'text-gray-500'              : 'text-gray-500';
+  const confirmadoHora  = isLight ? 'text-gray-900 font-bold'    : 'text-primary';
+  const confirmadoData  = isLight ? 'text-gray-600'              : 'text-gray-400';
+  const confirmadoAgBtn = isLight ? 'bg-gray-900 text-white hover:bg-gray-700' : 'bg-gradient-to-r from-primary to-yellow-600 text-black';
+
   return (
-    <div className={`min-h-screen bg-vbg text-vtext${temaAtivo === 'light' ? ' vitrine-light' : ''}`} style={hasSelecao ? { paddingBottom: 72 } : undefined}>
-      <AlertModal  open={nativeAlertOpen}   onClose={closeAlert}                title={nativeAlertData.title}   body={nativeAlertData.body}   buttonText={nativeAlertData.buttonText} />
-      <ConfirmModal open={nativeConfirmOpen} onCancel={() => closeConfirm(false)} onConfirm={() => closeConfirm(true)} title={nativeConfirmData.title} body={nativeConfirmData.body} confirmText={nativeConfirmData.confirmText} cancelText={nativeConfirmData.cancelText} />
+    <div className={`min-h-screen bg-vbg text-vtext${isLight ? ' vitrine-light' : ''}`} style={hasSelecao ? { paddingBottom: 72 } : undefined}>
+      <AlertModal  open={nativeAlertOpen}   onClose={closeAlert}                title={nativeAlertData.title}   body={nativeAlertData.body}   buttonText={nativeAlertData.buttonText} isLight={isLight} />
+      <ConfirmModal open={nativeConfirmOpen} onCancel={() => closeConfirm(false)} onConfirm={() => closeConfirm(true)} title={nativeConfirmData.title} body={nativeConfirmData.body} confirmText={nativeConfirmData.confirmText} cancelText={nativeConfirmData.cancelText} isLight={isLight} />
 
       <div className="bg-primary overflow-hidden relative h-10 flex items-center">
         <div className="announcement-bar-marquee flex whitespace-nowrap">
@@ -890,50 +920,58 @@ export default function Vitrine({ user, userType }) {
       <header className="bg-vcard border-b border-vborder sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-vsub hover:text-primary transition-colors uppercase"><ArrowLeft className="w-5 h-5" /><span className="hidden sm:inline">Voltar</span></button>
+            <button onClick={() => navigate(-1)} className={`flex items-center gap-2 transition-colors uppercase ${headerVoltar}`}>
+              <ArrowLeft className="w-5 h-5" /><span className="hidden sm:inline">Voltar</span>
+            </button>
             <div className="flex items-center gap-2">
-              <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`flex items-center gap-2 h-9 px-5 rounded-button transition-all bg-vcard2 border uppercase focus:outline-none focus:ring-0 focus:ring-offset-0 ${isProfessional ? 'border-vborder2 text-vmuted cursor-not-allowed' : 'border-vborder text-vsub hover:border-primary'}`}><StarChar size={18} className="text-primary" /><span className="hidden sm:inline">Depoimento</span></button>
-              <button onClick={toggleFavorito} disabled={!!isProfessional} className={`h-9 flex items-center gap-2 px-5 rounded-button transition-all uppercase border focus:outline-none focus:ring-0 focus:ring-offset-0 ${isProfessional ? 'bg-vcard2 border-vborder2 text-vmuted cursor-not-allowed' : isFavorito ? 'bg-red-500/20 border-red-500/50 text-red-400' : 'bg-vcard2 border-vborder text-vsub hover:text-red-400'}`}><HeartIcon filled={isFavorito} size={20} className={isFavorito ? 'text-red-500' : 'text-vsub'} /><span className="hidden sm:inline">{isProfessional ? 'Somente Cliente' : (isFavorito ? 'Favoritado' : 'Favoritar')}</span></button>
+              <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`flex items-center gap-2 h-9 px-5 rounded-button transition-all border uppercase focus:outline-none focus:ring-0 ${depoimentoBtn}`}>
+                <StarChar size={18} className="text-primary" /><span className="hidden sm:inline">Depoimento</span>
+              </button>
+              <button onClick={toggleFavorito} disabled={!!isProfessional} className={`h-9 flex items-center gap-2 px-5 rounded-button transition-all uppercase border focus:outline-none focus:ring-0 ${favoritoBtn}`}>
+                <HeartIcon filled={isFavorito} size={20} className={isFavorito ? 'text-red-500' : ''} />
+                <span className="hidden sm:inline">{isProfessional ? 'Somente Cliente' : (isFavorito ? 'Favoritado' : 'Favoritar')}</span>
+              </button>
             </div>
           </div>
         </div>
       </header>
 
-      <section className="relative bg-gradient-to-br from-primary/20 via-vbg to-yellow-600/20 py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
+      <section className={`relative py-12 sm:py-16 px-4 sm:px-6 lg:px-8 ${heroBg}`}>
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row items-start gap-6">
             {logoUrl
-              ? (<div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border border-primary/30 bg-vcard"><img src={logoUrl} alt="Logo" className="w-full h-full object-cover" /></div>)
-              : (<div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-4xl sm:text-5xl font-normal text-black">{negocio.nome?.[0] || 'N'}</div>)
+              ? (<div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border border-vborder bg-vcard"><img src={logoUrl} alt="Logo" className="w-full h-full object-cover" /></div>)
+              : (<div className="w-20 h-20 sm:w-24 sm:h-24 bg-vprimary rounded-custom flex items-center justify-center text-4xl sm:text-5xl font-normal text-vprimary-text">{negocio.nome?.[0] || 'N'}</div>)
             }
             <div className="flex-1">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-normal mb-3">{negocio.nome}</h1>
               <p className="text-base sm:text-lg text-vsub mb-4 font-normal">{negocio.descricao}</p>
               <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-                <div className="flex items-center gap-2"><StarChar size={18} className="text-primary" /><span className="text-xl font-normal text-primary">{mediaDepoimentos}</span></div>
-                {negocio.endereco && (<div className="flex items-center gap-2 text-vsub text-sm"><MapPin className="w-4 h-4" strokeWidth={1.5} /><span className="font-normal">{negocio.endereco}</span></div>)}
-                {negocio.telefone && (<a href={`tel:${sanitizeTel(negocio.telefone) || negocio.telefone}`} className="flex items-center gap-2 text-primary hover:text-yellow-500 text-sm font-normal transition-colors"><Phone className="w-4 h-4" strokeWidth={1.5} />{negocio.telefone}</a>)}
+                <div className="flex items-center gap-2">
+                  <StarChar size={18} className="text-primary" />
+                  <span className={`text-xl font-normal ${mediaColor}`}>{mediaDepoimentos}</span>
+                </div>
+                {negocio.endereco && (
+                  <div className={`flex items-center gap-2 text-sm ${addrClass}`}>
+                    <MapPin className="w-4 h-4" strokeWidth={1.5} /><span className="font-normal">{negocio.endereco}</span>
+                  </div>
+                )}
+                {negocio.telefone && (
+                  <a href={`tel:${sanitizeTel(negocio.telefone) || negocio.telefone}`} className={`flex items-center gap-2 text-sm font-normal transition-colors ${telClass}`}>
+                    <Phone className="w-4 h-4" strokeWidth={1.5} />{negocio.telefone}
+                  </a>
+                )}
                 {(instagramUrl || facebookUrl) && (
                   <div className="flex items-center gap-2">
                     {instagramUrl && (
-                      <a
-                        href={instagramUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="Instagram"
-                        className="flex items-center justify-center w-9 h-9 rounded-full border border-white/20 bg-white/7 text-white/80 hover:bg-white/15 hover:border-white/35 transition-all"
-                      >
+                      <a href={instagramUrl} target="_blank" rel="noreferrer" aria-label="Instagram"
+                        className={`flex items-center justify-center w-9 h-9 rounded-full border transition-all ${socialIconCl}`}>
                         <Instagram className="w-[18px] h-[18px]" strokeWidth={1.5} />
                       </a>
                     )}
                     {facebookUrl && (
-                      <a
-                        href={facebookUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="Facebook"
-                        className="flex items-center justify-center w-9 h-9 rounded-full border border-white/20 bg-white/7 text-white/80 hover:bg-white/15 hover:border-white/35 transition-all"
-                      >
+                      <a href={facebookUrl} target="_blank" rel="noreferrer" aria-label="Facebook"
+                        className={`flex items-center justify-center w-9 h-9 rounded-full border transition-all ${socialIconCl}`}>
                         <FacebookIcon size={18} />
                       </a>
                     )}
@@ -959,16 +997,16 @@ export default function Vitrine({ user, userType }) {
               const horarioIni = String(prof.horario_inicio || '08:00').slice(0, 5);
               const horarioFim = String(prof.horario_fim    || '18:00').slice(0, 5);
               return (
-                <div key={prof.id} className="mb-6 break-inside-avoid bg-vcard border border-vborder rounded-custom p-6 hover:border-primary/50 transition-all">
+                <div key={prof.id} className="mb-6 break-inside-avoid bg-vcard border border-vborder rounded-custom p-6 hover:border-vprimary/50 transition-all">
                   <div className="flex items-start gap-4 mb-4">
                     {avatarUrl
                       ? (<div className="w-14 h-14 rounded-custom overflow-hidden border border-vborder bg-vcard2 shrink-0"><img src={avatarUrl} alt={prof.nome} className="w-full h-full object-cover" /></div>)
-                      : (<div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-2xl font-normal text-black shrink-0">{prof.nome?.[0] || 'P'}</div>)
+                      : (<div className="w-14 h-14 bg-vprimary rounded-custom flex items-center justify-center text-2xl font-normal text-vprimary-text shrink-0">{prof.nome?.[0] || 'P'}</div>)
                     }
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <h3 className="text-lg font-normal">{prof.nome}</h3>
-                        {profissao && (<span className="inline-block px-2 py-1 bg-primary/20 border border-primary/30 rounded-button text-[10px] text-primary font-normal uppercase whitespace-nowrap shrink-0">{profissao}</span>)}
+                        {profissao && (<span className={`inline-block px-2 py-1 rounded-button text-[10px] font-normal uppercase whitespace-nowrap shrink-0 border ${profissaoTag}`}>{profissao}</span>)}
                       </div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${status.color}`} />
@@ -977,7 +1015,7 @@ export default function Vitrine({ user, userType }) {
                       {depInfo?.media && (
                         <div className="flex items-center gap-2 mb-1">
                           <StarChar size={16} className="text-primary" />
-                          <span className="text-lg font-normal text-primary">{depInfo.media}</span>
+                          <span className={`text-lg font-normal ${mediaColor}`}>{depInfo.media}</span>
                           <span className="text-xs text-vmuted">({depInfo.count})</span>
                         </div>
                       )}
@@ -990,7 +1028,7 @@ export default function Vitrine({ user, userType }) {
                     </span>
                     {almIni && almFim && (
                       <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
-                        <span className="text-yellow-400 ml-1"> • {String(almIni).slice(0, 5)} – {String(almFim).slice(0, 5)}</span>
+                        <span className={`ml-1 ${almocoBadge}`}> • {String(almIni).slice(0, 5)} – {String(almFim).slice(0, 5)}</span>
                       </span>
                     )}
                     <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
@@ -1019,7 +1057,7 @@ export default function Vitrine({ user, userType }) {
                   return String(a.nome || '').localeCompare(String(b.nome || ''));
                 });
                 return (
-                  <div key={p.id} className="bg-vcard border border-vborder rounded-custom p-6 hover:border-primary/50 transition-all">
+                  <div key={p.id} className="bg-vcard border border-vborder rounded-custom p-6 hover:border-vprimary/50 transition-all">
                     <div className="flex items-center justify-between mb-4">
                       <div className="font-normal text-lg">{p.nome}</div>
                       <div className="text-xs text-vmuted font-normal">{lista.length} {lista.length === 1 ? counterSingular : counterPlural}</div>
@@ -1033,6 +1071,7 @@ export default function Vitrine({ user, userType }) {
                       onAgendarAgora={handleAgendarAgora}
                       onToggleSelecao={handleToggleSelecao}
                       emptyMsg={emptyListMsg}
+                      isLight={isLight}
                     />
                   </div>
                 );
@@ -1064,13 +1103,13 @@ export default function Vitrine({ user, userType }) {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-3 mb-6">
             <h2 className="text-2xl sm:text-3xl font-normal">Depoimentos</h2>
-            <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`px-5 py-2 border rounded-button text-sm transition-all uppercase font-normal ${isProfessional ? 'bg-vcard border-vborder2 text-vmuted cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'}`}>+ Depoimento</button>
+            <button onClick={abrirDepoimento} disabled={!!isProfessional} className={`px-5 py-2 border rounded-button text-sm transition-all uppercase font-normal ${depBtn}`}>+ Depoimento</button>
           </div>
-          <DepoimentosPaginados depoimentos={depoimentos} nomeNegocioLabel={nomeNegocioLabel} />
+          <DepoimentosPaginados depoimentos={depoimentos} nomeNegocioLabel={nomeNegocioLabel} isLight={isLight} />
         </div>
       </section>
 
-      <SelectionBar itens={servicosSelecionados} counterSingular={counterSingular} counterPlural={counterPlural} onConfirm={handleConfirmarSelecao} onClear={handleLimparSelecao} />
+      <SelectionBar itens={servicosSelecionados} counterSingular={counterSingular} counterPlural={counterPlural} onConfirm={handleConfirmarSelecao} onClear={handleLimparSelecao} isLight={isLight} />
 
       {flow.step === 'booking' && entregaVirtual && (
         <BookingCalendar
@@ -1081,66 +1120,80 @@ export default function Vitrine({ user, userType }) {
           clienteId={user?.id}
           onConfirm={handleBookingConfirm}
           onClose={() => setFlow(prev => ({ ...prev, step: 'idle' }))}
+          temaAtivo={temaAtivo}
         />
       )}
 
       {flow.step === 'confirmado' && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className={`border rounded-custom max-w-md w-full ${confirmadoBg}`}>
             <div className="p-8 text-center">
-              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><Calendar className="w-10 h-10 text-green-400" /></div>
-              <h3 className="text-2xl font-normal mb-2 text-white">AGENDADO :)</h3>
-              <p className="text-gray-400 font-normal mb-1">
-                {flow.lastSlot?.label && <span className="text-primary font-normal">{flow.lastSlot.label}</span>}
-                {flow.lastSlot?.dataISO && <span className="text-gray-400"> — {formatDateBR(flow.lastSlot.dataISO)}</span>}
+              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-10 h-10 text-green-500" />
+              </div>
+              <h3 className={`text-2xl font-normal mb-2 ${confirmadoTitle}`}>AGENDADO :)</h3>
+              <p className="font-normal mb-1">
+                {flow.lastSlot?.label && <span className={`font-normal ${confirmadoHora}`}>{flow.lastSlot.label}</span>}
+                {flow.lastSlot?.dataISO && <span className={confirmadoData}> — {formatDateBR(flow.lastSlot.dataISO)}</span>}
               </p>
-              <p className="text-gray-500 font-normal text-sm mb-6">Crie um lembrete no seu celular para assegurar o compromisso.</p>
-              <a href={calendarLink} target="_blank" rel="noreferrer" className="block w-full py-4 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button uppercase font-normal mb-3">ADICIONAR À MINHA AGENDA</a>
-              <button onClick={() => { setFlow(prev => ({ ...prev, step: 'idle' })); navigate('/minha-area'); }} className="w-full py-3 bg-transparent border border-red-500 text-red-500 rounded-button uppercase font-normal hover:bg-red-500/10 transition-colors">PREFIRO ESQUECER</button>
+              <p className={`font-normal text-sm mb-6 ${confirmadoSub}`}>Crie um lembrete no seu celular para assegurar o compromisso.</p>
+              <a href={calendarLink} target="_blank" rel="noreferrer" className={`block w-full py-4 rounded-button uppercase font-normal mb-3 transition-colors ${confirmadoAgBtn}`}>
+                ADICIONAR À MINHA AGENDA
+              </a>
+              <button
+                onClick={() => { setFlow(prev => ({ ...prev, step: 'idle' })); navigate('/minha-area'); }}
+                className="w-full py-3 bg-transparent border border-red-500 text-red-500 rounded-button uppercase font-normal hover:bg-red-500/10 transition-colors"
+              >
+                PREFIRO ESQUECER
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {showDepoimento && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className={`border rounded-custom max-w-md w-full max-h-[90vh] flex flex-col ${depoModalBg}`}>
             <div className="flex justify-between items-center p-6 pb-4 shrink-0">
-              <h3 className="text-2xl font-normal text-white">DEPOIMENTO</h3>
-              <button onClick={() => setShowDepoimento(false)} className="text-gray-400 hover:text-white"><X className="w-6 h-6" /></button>
+              <h3 className={`text-2xl font-normal ${depoModalTitle}`}>DEPOIMENTO</h3>
+              <button onClick={() => setShowDepoimento(false)} className={depoModalClose}><X className="w-6 h-6" /></button>
             </div>
             <div className="overflow-y-auto px-6 pb-6 flex-1">
               <div className="mb-4">
-                <div className="text-sm text-gray-300 font-normal mb-2">Você está deixando um depoimento sobre</div>
+                <div className={`text-sm font-normal mb-2 ${depoModalLabel}`}>Você está deixando um depoimento sobre</div>
                 <div className="grid grid-cols-2 gap-2">
-                  <button onClick={() => { setDepoimentoTipo('negocio'); setDepoimentoProfissionalId(null); }} className={`px-4 py-3 rounded-custom border transition-all font-normal ${depoimentoTipo === 'negocio' ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-dark-200 border-gray-800 text-gray-400'}`}>{nomeNegocioLabel}</button>
-                  <button onClick={() => setDepoimentoTipo('profissional')} className={`px-4 py-3 rounded-custom border transition-all font-normal ${depoimentoTipo === 'profissional' ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-400'}`}>PROFISSIONAL</button>
+                  <button onClick={() => { setDepoimentoTipo('negocio'); setDepoimentoProfissionalId(null); }} className={`px-4 py-3 rounded-custom border transition-all font-normal ${depoNegBtn(depoimentoTipo)}`}>{nomeNegocioLabel}</button>
+                  <button onClick={() => setDepoimentoTipo('profissional')} className={`px-4 py-3 rounded-custom border transition-all font-normal ${depoProfBtn(depoimentoTipo)}`}>PROFISSIONAL</button>
                 </div>
               </div>
               {depoimentoTipo === 'profissional' && (
                 <div className="mb-4">
-                  <div className="text-sm text-gray-300 font-normal mb-2">Qual profissional?</div>
+                  <div className={`text-sm font-normal mb-2 ${depoModalLabel}`}>Qual profissional?</div>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
                     {profissionais.map(prof => (
-                      <button key={prof.id} onClick={() => setDepoimentoProfissionalId(prof.id)} className={`w-full text-left px-4 py-3 rounded-custom border transition-all font-normal ${depoimentoProfissionalId === prof.id ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-400 hover:border-primary/30'}`}>{prof.nome}</button>
+                      <button key={prof.id} onClick={() => setDepoimentoProfissionalId(prof.id)} className={`w-full text-left px-4 py-3 rounded-custom border transition-all font-normal ${depoProfItem(depoimentoProfissionalId === prof.id)}`}>{prof.nome}</button>
                     ))}
                   </div>
                 </div>
               )}
               <div className="mb-4">
-                <div className="text-sm text-gray-300 font-normal mb-2">Nota</div>
+                <div className={`text-sm font-normal mb-2 ${depoModalLabel}`}>Nota</div>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map(n => (
-                    <button key={n} onClick={() => setDepoimentoNota(n)} className={`w-12 h-8 rounded-button border transition-all font-normal ${depoimentoNota >= n ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>{n}</button>
+                    <button key={n} onClick={() => setDepoimentoNota(n)} className={`w-12 h-8 rounded-button border transition-all font-normal ${depoNotaBtn(n)}`}>{n}</button>
                   ))}
                 </div>
               </div>
               <div className="mb-5">
-                <div className="text-sm text-gray-300 font-normal mb-2">Comentário é opcional</div>
-                <textarea value={depoimentoTexto} onChange={(e) => setDepoimentoTexto(e.target.value)} rows={4} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-500 focus:border-primary focus:outline-none resize-none" placeholder="Conte como foi sua experiência..." />
+                <div className={`text-sm font-normal mb-2 ${depoModalLabel}`}>Comentário é opcional</div>
+                <textarea value={depoimentoTexto} onChange={(e) => setDepoimentoTexto(e.target.value)} rows={4} className={`w-full px-4 py-3 border rounded-custom focus:outline-none resize-none font-normal ${depoTextarea}`} placeholder="Conte como foi sua experiência..." />
               </div>
-              <button onClick={enviarDepoimento} disabled={depoimentoLoading || (depoimentoTipo === 'profissional' && !depoimentoProfissionalId)} className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button disabled:opacity-60 uppercase font-normal">{depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}</button>
-              <p className="text-xs text-gray-500 mt-3 font-normal">{depoimentoTipo === 'profissional' && !depoimentoProfissionalId ? 'Selecione um profissional para continuar' : 'Somente clientes logados podem deixar depoimentos.'}</p>
+              <button onClick={enviarDepoimento} disabled={depoimentoLoading || (depoimentoTipo === 'profissional' && !depoimentoProfissionalId)} className={`w-full py-3 rounded-button disabled:opacity-60 uppercase font-normal transition-colors ${depoSendBtn}`}>
+                {depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}
+              </button>
+              <p className={`text-xs mt-3 font-normal ${depoHintCl}`}>
+                {depoimentoTipo === 'profissional' && !depoimentoProfissionalId ? 'Selecione um profissional para continuar' : 'Somente clientes logados podem deixar depoimentos.'}
+              </p>
             </div>
           </div>
         </div>
