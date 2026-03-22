@@ -913,27 +913,31 @@ export default function Vitrine({ user, userType }) {
                 <div className="flex items-center gap-2"><StarChar size={18} className="text-primary" /><span className="text-xl font-normal text-primary">{mediaDepoimentos}</span></div>
                 {negocio.endereco && (<div className="flex items-center gap-2 text-vsub text-sm"><MapPin className="w-4 h-4" strokeWidth={1.5} /><span className="font-normal">{negocio.endereco}</span></div>)}
                 {negocio.telefone && (<a href={`tel:${sanitizeTel(negocio.telefone) || negocio.telefone}`} className="flex items-center gap-2 text-primary hover:text-yellow-500 text-sm font-normal transition-colors"><Phone className="w-4 h-4" strokeWidth={1.5} />{negocio.telefone}</a>)}
-                {instagramUrl && (
-                  <a
-                    href={instagramUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label="Instagram"
-                    className="flex items-center justify-center w-9 h-9 rounded-full border border-white/20 bg-white/7 text-white/80 hover:bg-white/15 hover:border-white/35 transition-all"
-                  >
-                    <Instagram className="w-[18px] h-[18px]" strokeWidth={1.5} />
-                  </a>
-                )}  
-                {facebookUrl && (
-                  <a
-                    href={facebookUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label="Facebook"
-                    className="flex items-center justify-center w-9 h-9 rounded-full border border-white/20 bg-white/7 text-white/80 hover:bg-white/15 hover:border-white/35 transition-all"
-                  >
-                    <FacebookIcon size={18} />
-                  </a>
+                {(instagramUrl || facebookUrl) && (
+                  <div className="flex items-center gap-2">
+                    {instagramUrl && (
+                      <a
+                        href={instagramUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label="Instagram"
+                        className="flex items-center justify-center w-9 h-9 rounded-full border border-white/20 bg-white/7 text-white/80 hover:bg-white/15 hover:border-white/35 transition-all"
+                      >
+                        <Instagram className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                      </a>
+                    )}
+                    {facebookUrl && (
+                      <a
+                        href={facebookUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label="Facebook"
+                        className="flex items-center justify-center w-9 h-9 rounded-full border border-white/20 bg-white/7 text-white/80 hover:bg-white/15 hover:border-white/35 transition-all"
+                      >
+                        <FacebookIcon size={18} />
+                      </a>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
