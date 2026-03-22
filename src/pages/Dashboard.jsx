@@ -242,7 +242,6 @@ export default function Dashboard({ user, onLogout }) {
     setFaturamentoData(prev => prev ? prev : hoje);
   }, [hoje]);
 
-  // Recebem profId como parâmetro explícito para evitar race condition com setState
   const loadHoje = async (negocioId, profId = null) => {
     const id = negocioId || negocio?.id; if (!id) return;
     try {
@@ -287,7 +286,6 @@ export default function Dashboard({ user, onLogout }) {
     finally { setMetricsPeriodoLoading(false); }
   };
 
-  // useEffects reativos usam parceiroProfissional?.id do state (para mudanças pós-carregamento)
   useEffect(() => { if (!negocio?.id || !hoje) return; loadHoje(negocio.id, parceiroProfissional?.id ?? null); }, [negocio?.id, hoje, parceiroProfissional?.id]);
   useEffect(() => { if (!negocio?.id || !faturamentoData) return; loadDia(negocio.id, faturamentoData, parceiroProfissional?.id ?? null); }, [negocio?.id, faturamentoData, parceiroProfissional?.id]);
   useEffect(() => { if (!negocio?.id || !hoje) return; loadPeriodo(negocio.id, hoje, faturamentoPeriodo, parceiroProfissional?.id ?? null); }, [negocio?.id, hoje, faturamentoPeriodo, parceiroProfissional?.id]);
@@ -380,11 +378,11 @@ export default function Dashboard({ user, onLogout }) {
       if (profissionaisResult.error) throw profissionaisResult.error;
       const profs = profissionaisResult.data || [];
       setProfissionais(profs);
-      // souDono garante que dono nunca é tratado como parceiro
+
       const souDono = negocioData.owner_id === user.id;
       const meuProfissional = souDono ? null : (profs.find(p => p.user_id === user.id) || null);
       setParceiroProfissional(meuProfissional);
-      // profId calculado localmente — não depende do setState assíncrono
+
       const profId = meuProfissional?.id ?? null;
       if (profs.length === 0) { setEntregas([]); setAgendamentos([]); setLoading(false); return; }
       const ids = profs.map(p => p.id);
@@ -402,7 +400,7 @@ export default function Dashboard({ user, onLogout }) {
       setEntregas(entregasResult.data || []);
       if (agendamentosResult.error) throw agendamentosResult.error;
       setAgendamentos((agendamentosResult.data || []).map(a => ({ ...a, data: a?.data ?? null, horario_inicio: a?.horario_inicio ?? null, horario_fim: a?.horario_fim ?? null })));
-      // Métricas chamadas com profId local — garante valor correto independente de setState
+
       if (dataHoje) {
         loadHoje(negocioData.id, profId);
         loadDia(negocioData.id, dataHoje, profId);
@@ -834,7 +832,7 @@ export default function Dashboard({ user, onLogout }) {
                   <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-2">CONCLUÍDOS HOJE</div><div className="text-3xl font-normal text-white">{Number(metricsHoje?.today?.concluidos || 0)}</div><div className="text-xs text-gray-300 mt-1">TICKET MÉDIO: <span className="text-primary">R$ {Number(metricsHoje?.today?.ticket_medio || 0).toFixed(2)}</span></div></div>
                   <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-2">PRÓXIMO AGENDAMENTO</div>{proximoAgendamento ? (<><div className="text-3xl font-normal text-primary">{getAgInicio(proximoAgendamento)}</div><div className="text-sm text-gray-300 mt-1">{proximoAgendamento.cliente?.nome || '—'} • {proximoAgendamento.profissionais?.nome}</div><div className="text-xs text-gray-500 mt-1">{proximoAgendamento.entregas?.nome}</div></>) : <div className="text-sm text-gray-500">:(</div>}</div>
                 </div>
-                {/* Faturamento por profissional: somente admin */}
+
                 {!parceiroProfissional && faturamentoPorProfissionalHoje.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">{faturamentoPorProfissionalHoje.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}</div>)}
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-5">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"><h3 className="text-lg font-normal flex items-center gap-2 uppercase"><span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="font-normal text-2xl">$</span>FATURAMENTO</h3><DatePicker value={faturamentoData} onChange={(iso) => setFaturamentoData(iso)} todayISO={hoje} /></div>
@@ -845,7 +843,7 @@ export default function Dashboard({ user, onLogout }) {
                     <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">FECHAMENTO</div><div className="text-xl font-normal text-white">{Number(metricsDia?.selected_day?.taxa_conversao || 0).toFixed(1)}%</div><div className="text-xs text-gray-500 mt-1">sobre {Number(metricsDia?.selected_day?.total || 0)} agendamento(s)</div></div>
                     <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">TICKET MÉDIO</div><div className="text-xl font-normal text-primary">R$ {Number(metricsDia?.selected_day?.ticket_medio || 0).toFixed(2)}</div></div>
                   </div>
-                  {/* Faturamento por profissional no filtro: somente admin */}
+
                   {!parceiroProfissional && faturamentoPorProfissionalFiltro.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4 items-start">{faturamentoPorProfissionalFiltro.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}</div>)}
                   <div className="mt-2 bg-dark-100 border border-gray-800 rounded-custom p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3"><div className="text-xs text-gray-500 uppercase tracking-wide">FATURAMENTO POR PERÍODO</div><PeriodoSelect value={faturamentoPeriodo} onChange={setFaturamentoPeriodo} /></div>
@@ -1011,7 +1009,7 @@ export default function Dashboard({ user, onLogout }) {
                                     <h3 className="text-sm font-normal text-white mb-0.5">{s.nome}</h3>
                                     <p className="text-xs text-gray-500 mb-4">{p.nome}</p>
                                     <div className="flex gap-2">
-                                      {/* PONTO 2: botão editar também verifica permissão */}
+
                                       <button onClick={async () => {
                                         if (!await checarPermissao(s.profissional_id)) return;
                                         setEditingEntregaId(s.id);
