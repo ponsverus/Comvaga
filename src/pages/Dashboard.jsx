@@ -40,20 +40,15 @@ function timeToMinutes(t) {
   return (h * 60) + (m || 0);
 }
 
-const getAgDate = (a) => String(a?.data ?? '');
-
-const getAgInicio = (a) => {
-  const v = a?.horario_inicio ?? '';
-  return String(v || '').slice(0, 5);
-};
+const getAgDate  = (a) => String(a?.data ?? '');
+const getAgInicio = (a) => String(a?.horario_inicio ?? '').slice(0, 5);
 
 const normalizeStatus = (s) =>
   String(s || '').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
 const isCancelStatus = (s) => normalizeStatus(s).includes('cancelado');
-const isDoneStatus = (s) => normalizeStatus(s) === 'concluido';
-
-function computeStatusFromDb(a) { return String(a?.status || ''); }
+const isDoneStatus   = (s) => normalizeStatus(s) === 'concluido';
+const computeStatusFromDb = (a) => String(a?.status || '');
 
 const WEEKDAYS = [
   { i: 0, label: 'DOM' }, { i: 1, label: 'SEG' }, { i: 2, label: 'TER' },
@@ -62,7 +57,7 @@ const WEEKDAYS = [
 
 function normalizeDiasTrabalho(arr) {
   const base = Array.isArray(arr) ? arr : [];
-  const cleaned = base.map(n => Number(n)).filter(n => Number.isFinite(n)).map(n => (n === 7 ? 0 : n)).filter(n => n >= 0 && n <= 6);
+  const cleaned = base.map(n => Number(n)).filter(n => Number.isFinite(n)).map(n => n === 7 ? 0 : n).filter(n => n >= 0 && n <= 6);
   return Array.from(new Set(cleaned)).sort((a, b) => a - b);
 }
 
@@ -115,21 +110,25 @@ function getValorAgendamento(a) {
 
 const normalizeKey = (s) => String(s || '').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-const LABEL_TAB      = { servicos: 'SERVIÇOS',  consultas: 'CONSULTAS',  aulas: 'AULAS'  };
-const LABEL_SECTION  = { servicos: 'Serviços',  consultas: 'Consultas',  aulas: 'Aulas'  };
-const LABEL_BTN_ADD  = { servicos: 'SERVIÇO',   consultas: 'CONSULTA',   aulas: 'AULA'   };
-const LABEL_MODAL_NEW  = { servicos: 'NOVO SERVIÇO',    consultas: 'NOVA CONSULTA',    aulas: 'NOVA AULA'    };
-const LABEL_MODAL_EDIT = { servicos: 'EDITAR SERVIÇO',  consultas: 'EDITAR CONSULTA',  aulas: 'EDITAR AULA'  };
+const LABEL_TAB            = { servicos: 'SERVIÇOS',  consultas: 'CONSULTAS',  aulas: 'AULAS'  };
+const LABEL_SECTION        = { servicos: 'Serviços',  consultas: 'Consultas',  aulas: 'Aulas'  };
+const LABEL_BTN_ADD        = { servicos: 'SERVIÇO',   consultas: 'CONSULTA',   aulas: 'AULA'   };
+const LABEL_MODAL_NEW      = { servicos: 'NOVO SERVIÇO',   consultas: 'NOVA CONSULTA',   aulas: 'NOVA AULA'   };
+const LABEL_MODAL_EDIT     = { servicos: 'EDITAR SERVIÇO', consultas: 'EDITAR CONSULTA', aulas: 'EDITAR AULA' };
 const LABEL_COUNTER_SINGULAR = { servicos: 'serviço',  consultas: 'consulta',  aulas: 'aula'  };
 const LABEL_COUNTER_PLURAL   = { servicos: 'serviços', consultas: 'consultas', aulas: 'aulas' };
-const LABEL_EMPTY_LIST = { servicos: 'Sem serviços para este profissional.', consultas: 'Sem consultas para este profissional.', aulas: 'Sem aulas para este profissional.' };
+const LABEL_EMPTY_LIST = {
+  servicos:  'Sem serviços para este profissional.',
+  consultas: 'Sem consultas para este profissional.',
+  aulas:     'Sem aulas para este profissional.',
+};
 
 const g = (map, group) => map[group] ?? map['servicos'];
 
 export default function Dashboard({ user, onLogout }) {
-  const navigate  = useNavigate();
-  const location  = useLocation();
-  const feedback  = useFeedback();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const feedback = useFeedback();
 
   const uiAlert   = async (key, variant = 'info') => { if (feedback?.showMessage) return feedback.showMessage(key, { variant }); return Promise.resolve(); };
   const uiConfirm = async (key, variant = 'warning') => { if (feedback?.confirm) return !!(await feedback.confirm(key, { variant })); return false; };
@@ -137,6 +136,7 @@ export default function Dashboard({ user, onLogout }) {
 
   // ---------- PARCEIRO ----------
   const [parceiroProfissional, setParceiroProfissional] = useState(null);
+
   const checarPermissao = useCallback(async (profissionalId) => {
     if (!parceiroProfissional) return true;
     if (parceiroProfissional.id === profissionalId) return true;
@@ -146,58 +146,59 @@ export default function Dashboard({ user, onLogout }) {
   // ------------------------------
 
   const [activeTab, setActiveTab] = useState('agendamentos');
-  const [negocio, setNegocio] = useState(null);
+  const [negocio, setNegocio]           = useState(null);
   const [profissionais, setProfissionais] = useState([]);
-  const [entregas, setEntregas] = useState([]);
+  const [entregas, setEntregas]         = useState([]);
   const [agendamentos, setAgendamentos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [serverNow, setServerNow] = useState(() => ({ ts: null, dow: 0, date: '', source: 'db', minutes: 0 }));
-  const [hoje, setHoje] = useState(() => '');
+  const [loading, setLoading]           = useState(true);
+  const [error, setError]               = useState(null);
+  const [serverNow, setServerNow]       = useState(() => ({ ts: null, dow: 0, date: '', source: 'db', minutes: 0 }));
+  const [hoje, setHoje]                 = useState(() => '');
+
   const agProfIds = useMemo(() => profissionais.map(p => p.id), [profissionais]);
 
   const [historicoAgendamentos, setHistoricoAgendamentos] = useState([]);
-  const [historicoPage, setHistoricoPage] = useState(0);
-  const [historicoHasMore, setHistoricoHasMore] = useState(false);
-  const [historicoLoadingMore, setHistoricoLoadingMore] = useState(false);
-  const [historicoData, setHistoricoData] = useState('');
-  const [faturamentoData, setFaturamentoData] = useState('');
-  const [faturamentoPeriodo, setFaturamentoPeriodo] = useState('7d');
+  const [historicoPage, setHistoricoPage]                 = useState(0);
+  const [historicoHasMore, setHistoricoHasMore]           = useState(false);
+  const [historicoLoadingMore, setHistoricoLoadingMore]   = useState(false);
+  const [historicoData, setHistoricoData]                 = useState('');
+  const [faturamentoData, setFaturamentoData]             = useState('');
+  const [faturamentoPeriodo, setFaturamentoPeriodo]       = useState('7d');
 
-  const [metricsHoje, setMetricsHoje] = useState(null);
-  const [metricsDia, setMetricsDia] = useState(null);
+  const [metricsHoje, setMetricsHoje]               = useState(null);
+  const [metricsDia, setMetricsDia]                 = useState(null);
   const [metricsPeriodoData, setMetricsPeriodoData] = useState(null);
-  const [metricsHojeLoading, setMetricsHojeLoading] = useState(false);
-  const [metricsDiaLoading, setMetricsDiaLoading] = useState(false);
+  const [metricsHojeLoading, setMetricsHojeLoading]     = useState(false);
+  const [metricsDiaLoading, setMetricsDiaLoading]       = useState(false);
   const [metricsPeriodoLoading, setMetricsPeriodoLoading] = useState(false);
 
-  const [showNovaEntrega, setShowNovaEntrega] = useState(false);
+  const [showNovaEntrega, setShowNovaEntrega]         = useState(false);
   const [showNovoProfissional, setShowNovoProfissional] = useState(false);
-  const [submittingEntrega, setSubmittingEntrega] = useState(false);
-  const [editingEntregaId, setEditingEntregaId] = useState(null);
+  const [submittingEntrega, setSubmittingEntrega]     = useState(false);
+  const [editingEntregaId, setEditingEntregaId]       = useState(null);
   const [editingProfissional, setEditingProfissional] = useState(null);
-  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoUploading, setLogoUploading]             = useState(false);
 
   const [formEntrega, setFormEntrega] = useState({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' });
   const [formProfissional, setFormProfissional] = useState({ nome: '', profissao: '', anos_experiencia: '', horario_inicio: '08:00', horario_fim: '18:00', almoco_inicio: '', almoco_fim: '', dias_trabalho: [1, 2, 3, 4, 5, 6] });
 
-  const [infoSaving, setInfoSaving] = useState(false);
+  const [infoSaving, setInfoSaving]           = useState(false);
   const [galleryUploading, setGalleryUploading] = useState(false);
-  const [galeriaItems, setGaleriaItems] = useState([]);
+  const [galeriaItems, setGaleriaItems]       = useState([]);
   const [formInfo, setFormInfo] = useState({ nome: '', descricao: '', telefone: '', endereco: '', instagram: '', facebook: '', tema: 'dark' });
-  const [temaSaving, setTemaSaving] = useState(false);
+  const [temaSaving, setTemaSaving]           = useState(false);
 
-  const [novoEmail, setNovoEmail] = useState(user?.email || '');
-  const [novaSenha, setNovaSenha] = useState('');
+  const [novoEmail, setNovoEmail]         = useState(user?.email || '');
+  const [novaSenha, setNovaSenha]         = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [savingDados, setSavingDados] = useState(false);
+  const [savingDados, setSavingDados]     = useState(false);
 
   const [notifAgendamentos, setNotifAgendamentos] = useState(0);
-  const [notifCancelados, setNotifCancelados] = useState(0);
+  const [notifCancelados, setNotifCancelados]     = useState(0);
 
   useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
 
-  const businessGroup  = useMemo(() => getBusinessGroup(negocio?.tipo_negocio), [negocio?.tipo_negocio]);
+  const businessGroup    = useMemo(() => getBusinessGroup(negocio?.tipo_negocio), [negocio?.tipo_negocio]);
   const tabEntregasLabel = g(LABEL_TAB, businessGroup);
   const sectionTitle     = g(LABEL_SECTION, businessGroup);
   const btnAddLabel      = g(LABEL_BTN_ADD, businessGroup);
@@ -212,7 +213,8 @@ export default function Dashboard({ user, onLogout }) {
     if (rpcErr) throw rpcErr;
     const payload = data?.[0] ?? data;
     if (!payload || !payload.date) throw new Error('now_sp vazio');
-    setServerNow(payload); setHoje(String(payload.date));
+    setServerNow(payload);
+    setHoje(String(payload.date));
     return String(payload.date);
   };
 
@@ -230,7 +232,10 @@ export default function Dashboard({ user, onLogout }) {
     return () => { supabase.removeChannel(channel); };
   }, [negocio?.id, agProfIds, hoje]);
 
-  useEffect(() => { setHistoricoData(prev => prev ? prev : hoje); setFaturamentoData(prev => prev ? prev : hoje); }, [hoje]);
+  useEffect(() => {
+    setHistoricoData(prev => prev ? prev : hoje);
+    setFaturamentoData(prev => prev ? prev : hoje);
+  }, [hoje]);
 
   const loadHoje = async (negocioId) => {
     const id = negocioId || negocio?.id; if (!id) return;
@@ -257,12 +262,15 @@ export default function Dashboard({ user, onLogout }) {
   const fetchHistoricoPage = useCallback(async ({ negocioId, profIds, date, page, append }) => {
     const from = page * AG_PAGE_SIZE; const to = from + AG_PAGE_SIZE - 1;
     const { data, error: qErr } = await supabase.from('agendamentos')
-      .select(`*, preco_final, data, horario_inicio, horario_fim, entregas (nome, preco, preco_promocional), profissionais (id, nome), cliente:users!agendamentos_cliente_id_fkey (id, nome, avatar_path, type)`)
+      .select(`*, preco_final, data, horario_inicio, horario_fim,
+        entregas (nome, preco, preco_promocional),
+        profissionais (id, nome),
+        cliente:users!agendamentos_cliente_id_fkey (id, nome, avatar_path, type)`)
       .eq('negocio_id', negocioId).in('profissional_id', profIds).eq('data', date)
       .order('horario_inicio', { ascending: true }).order('id', { ascending: true }).range(from, to);
     if (qErr) throw qErr;
     const rows = (data || []).map(a => ({ ...a, data: a?.data ?? null, horario_inicio: a?.horario_inicio ?? null, horario_fim: a?.horario_fim ?? null }));
-    setHistoricoAgendamentos(prev => { const next = append ? [...prev, ...rows] : rows; const seen = new Set(); return next.filter(a => (seen.has(a.id) ? false : (seen.add(a.id), true))); });
+    setHistoricoAgendamentos(prev => { const next = append ? [...prev, ...rows] : rows; const seen = new Set(); return next.filter(a => seen.has(a.id) ? false : (seen.add(a.id), true)); });
     setHistoricoHasMore(rows.length === AG_PAGE_SIZE);
   }, []);
 
@@ -301,7 +309,10 @@ export default function Dashboard({ user, onLogout }) {
   const reloadAgendamentos = useCallback(async (negocioId, profIds, dataHoje) => {
     const id = negocioId || negocio?.id; const ids = profIds || agProfIds; const dh = dataHoje || hoje; if (!id || !ids?.length || !dh) return;
     const { data, error: err } = await supabase.from('agendamentos')
-      .select(`*, preco_final, data, horario_inicio, horario_fim, entregas (nome, preco, preco_promocional), profissionais (id, nome), cliente:users!agendamentos_cliente_id_fkey (id, nome, avatar_path, type)`)
+      .select(`*, preco_final, data, horario_inicio, horario_fim,
+        entregas (nome, preco, preco_promocional),
+        profissionais (id, nome),
+        cliente:users!agendamentos_cliente_id_fkey (id, nome, avatar_path, type)`)
       .eq('negocio_id', id).in('profissional_id', ids).gte('data', dh)
       .order('data', { ascending: true }).order('horario_inicio', { ascending: true }).order('id', { ascending: true });
     if (err) return;
@@ -340,7 +351,6 @@ export default function Dashboard({ user, onLogout }) {
       if (profissionaisResult.error) throw profissionaisResult.error;
       const profs = profissionaisResult.data || [];
       setProfissionais(profs);
-      // Identificar parceiro
       const meuProfissional = profs.find(p => p.user_id === user.id) || null;
       setParceiroProfissional(meuProfissional);
       if (profs.length === 0) { setEntregas([]); setAgendamentos([]); setLoading(false); return; }
@@ -350,7 +360,10 @@ export default function Dashboard({ user, onLogout }) {
         supabase.from('entregas').select('*, profissionais (id, nome)').eq('negocio_id', negocioData.id).in('profissional_id', ids).order('created_at', { ascending: false }),
         dataHoje
           ? supabase.from('agendamentos')
-              .select(`*, preco_final, data, horario_inicio, horario_fim, entregas (nome, preco, preco_promocional), profissionais (id, nome), cliente:users!agendamentos_cliente_id_fkey (id, nome, avatar_path, type)`)
+              .select(`*, preco_final, data, horario_inicio, horario_fim,
+                entregas (nome, preco, preco_promocional),
+                profissionais (id, nome),
+                cliente:users!agendamentos_cliente_id_fkey (id, nome, avatar_path, type)`)
               .eq('negocio_id', negocioData.id).in('profissional_id', ids).gte('data', dataHoje)
               .order('data', { ascending: true }).order('horario_inicio', { ascending: true }).order('id', { ascending: true })
           : Promise.resolve({ data: [], error: null })
@@ -375,7 +388,7 @@ export default function Dashboard({ user, onLogout }) {
       const { error: dbErr } = await supabase.from('negocios').update({ logo_path: `logos/${filePath}` }).eq('id', negocio.id).eq('owner_id', user.id);
       if (dbErr) throw dbErr;
       await uiAlert('dashboard.logo_updated', 'success'); await reloadNegocio();
-    } catch (e) { console.error('Erro ao atualizar logo:', e); await uiAlert('dashboard.logo_update_error', 'error'); }
+    } catch (e) { await uiAlert('dashboard.logo_update_error', 'error'); }
     finally { setLogoUploading(false); }
   };
 
@@ -386,12 +399,11 @@ export default function Dashboard({ user, onLogout }) {
       setInfoSaving(true);
       const endereco = String(formInfo.endereco || '').trim();
       if (endereco && !isEnderecoPadrao(endereco)) throw new Error('Endereco fora do padrao.');
-      const payload = { nome: String(formInfo.nome || '').trim(), descricao: String(formInfo.descricao || '').trim(), telefone: String(formInfo.telefone || '').trim(), endereco, instagram: (String(formInfo.instagram || '').trim() || null), facebook: (String(formInfo.facebook || '').trim() || null), tema: formInfo.tema || 'dark' };
+      const payload = { nome: String(formInfo.nome || '').trim(), descricao: String(formInfo.descricao || '').trim(), telefone: String(formInfo.telefone || '').trim(), endereco, instagram: String(formInfo.instagram || '').trim() || null, facebook: String(formInfo.facebook || '').trim() || null, tema: formInfo.tema || 'dark' };
       const { error: updErr } = await supabase.from('negocios').update(payload).eq('id', negocio.id).eq('owner_id', user.id);
       if (updErr) throw updErr;
       await uiAlert('dashboard.business_info_updated', 'success'); await reloadNegocio();
     } catch (e) {
-      console.error('Erro ao salvar info:', e);
       if (String(e?.message || '').includes('padrao')) await uiAlert('dashboard.address_format_invalid', 'error');
       else await uiAlert('dashboard.business_info_update_error', 'error');
     } finally { setInfoSaving(false); }
@@ -406,7 +418,7 @@ export default function Dashboard({ user, onLogout }) {
       const { error: updErr } = await supabase.from('negocios').update({ tema: novoTema }).eq('id', negocio.id).eq('owner_id', user.id);
       if (updErr) throw updErr;
       setNegocio(prev => prev ? { ...prev, tema: novoTema } : prev);
-    } catch (e) { console.error('Erro ao salvar tema:', e); setFormInfo(prev => ({ ...prev, tema: negocio?.tema || 'dark' })); await uiAlert('dashboard.business_info_update_error', 'error'); }
+    } catch (e) { setFormInfo(prev => ({ ...prev, tema: negocio?.tema || 'dark' })); await uiAlert('dashboard.business_info_update_error', 'error'); }
     finally { setTemaSaving(false); }
   };
 
@@ -583,6 +595,29 @@ export default function Dashboard({ user, onLogout }) {
     } catch (e) { await uiAlert('dashboard.partner_approve_error', 'error'); }
   };
 
+  const confirmarAtendimento = async (a) => {
+    if (!await checarPermissao(a.profissional_id)) return;
+    try {
+      const { error: updErr } = await supabase.from('agendamentos').update({ status: 'concluido' }).eq('id', a.id).eq('negocio_id', negocio.id);
+      if (updErr) throw updErr;
+      await uiAlert('dashboard.booking_confirmed', 'success');
+      await reloadAgendamentos();
+      loadHoje(negocio.id);
+    } catch (e2) { await uiAlert('dashboard.booking_confirm_error', 'error'); }
+  };
+
+  const cancelarAgendamento = async (a) => {
+    if (!await checarPermissao(a.profissional_id)) return;
+    const ok = await uiConfirm('dashboard.booking_cancel_confirm', 'warning'); if (!ok) return;
+    try {
+      const { error } = await supabase.rpc('cancelar_agendamento_profissional', { p_agendamento_id: a.id });
+      if (error) throw error;
+      await uiAlert('dashboard.booking_canceled', 'error');
+      await reloadAgendamentos();
+      loadHoje(negocio.id);
+    } catch (e) { await uiAlert('dashboard.booking_cancel_error', 'error'); }
+  };
+
   const salvarEmail = async () => {
     const email = String(novoEmail || '').trim();
     if (!email || !email.includes('@')) { await uiAlert('dashboard.account_email_invalid', 'error'); return; }
@@ -598,9 +633,9 @@ export default function Dashboard({ user, onLogout }) {
     catch (e) { await uiAlert('dashboard.account_password_update_error', 'error'); } finally { setSavingDados(false); }
   };
 
-  const agendamentosHoje = useMemo(() => agendamentos.filter(a => sameDay(getAgDate(a), hoje)), [agendamentos, hoje]);
-  const hojeValidos = useMemo(() => agendamentosHoje.filter(a => !isCancelStatus(a.status)), [agendamentosHoje]);
-  const hojeCancelados = useMemo(() => agendamentosHoje.filter(a => isCancelStatus(a.status)), [agendamentosHoje]);
+  const agendamentosHoje  = useMemo(() => agendamentos.filter(a => sameDay(getAgDate(a), hoje)), [agendamentos, hoje]);
+  const hojeValidos       = useMemo(() => agendamentosHoje.filter(a => !isCancelStatus(a.status)), [agendamentosHoje]);
+  const hojeCancelados    = useMemo(() => agendamentosHoje.filter(a => isCancelStatus(a.status)), [agendamentosHoje]);
 
   const proximoAgendamento = useMemo(() => {
     const nowMin = Number(serverNow?.minutes || 0);
@@ -610,7 +645,7 @@ export default function Dashboard({ user, onLogout }) {
   const agendamentosAgrupadosPorProfissional = useMemo(() => {
     const map = new Map();
     for (const a of agendamentos) { const pid = a.profissional_id || a.profissionais?.id || 'sem-prof'; const nome = a.profissionais?.nome || 'PROFISSIONAL'; if (!map.has(pid)) map.set(pid, { pid, nome, itens: [] }); map.get(pid).itens.push(a); }
-    const grupos = Array.from(map.values()).map(g => ({ ...g, itens: g.itens.slice().sort((a, b) => { const d = String(getAgDate(a) || '').localeCompare(String(getAgDate(b) || '')); if (d !== 0) return d; const h = String(getAgInicio(a) || '').localeCompare(String(getAgInicio(b) || '')); if (h !== 0) return h; return String(a.id || '').localeCompare(String(b.id || '')); }) }));
+    const grupos = Array.from(map.values()).map(gr => ({ ...gr, itens: gr.itens.slice().sort((a, b) => { const d = String(getAgDate(a) || '').localeCompare(String(getAgDate(b) || '')); if (d !== 0) return d; const h = String(getAgInicio(a) || '').localeCompare(String(getAgInicio(b) || '')); if (h !== 0) return h; return String(a.id || '').localeCompare(String(b.id || '')); }) }));
     const ordem = new Map((profissionais || []).map((p, idx) => [p.id, idx]));
     grupos.sort((a, b) => (ordem.get(a.pid) ?? 9999) - (ordem.get(b.pid) ?? 9999));
     return grupos;
@@ -629,34 +664,62 @@ export default function Dashboard({ user, onLogout }) {
 
   const TAB_LABELS = { 'visao-geral': 'GERAL', 'agendamentos': 'AGENDAMENTOS', 'cancelados': 'CANCELADOS', 'historico': 'HISTÓRICO', 'entregas': tabEntregasLabel, 'profissionais': 'PROFISSIONAIS', 'info-negocio': 'INFO DO NEGÓCIO' };
 
-  if (loading) return (<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-center"><div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div><div className="text-primary text-xl">CARREGANDO...</div></div></div>);
-  if (error || !negocio) return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="max-w-md w-full bg-dark-100 border border-red-500/50 rounded-custom p-8 text-center"><AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" /><h1 className="text-2xl font-normal text-white mb-2">Erro ao carregar</h1><p className="text-gray-400 mb-6">{error || 'Negocio inexistente'}</p><button onClick={() => loadData(true)} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button mb-3 font-normal uppercase">TENTAR NOVAMENTE</button><button onClick={onLogout} className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-button font-normal uppercase">SAIR</button></div></div>);
+  if (loading) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="text-primary text-xl">CARREGANDO...</div>
+      </div>
+    </div>
+  );
+
+  if (error || !negocio) return (
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-dark-100 border border-red-500/50 rounded-custom p-8 text-center">
+        <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+        <h1 className="text-2xl font-normal text-white mb-2">Erro ao carregar</h1>
+        <p className="text-gray-400 mb-6">{error || 'Negocio inexistente'}</p>
+        <button onClick={() => loadData(true)} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button mb-3 font-normal uppercase">TENTAR NOVAMENTE</button>
+        <button onClick={onLogout} className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-button font-normal uppercase">SAIR</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-black text-white">
+
       <header className="bg-dark-100 border-b border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-800 bg-dark-200 flex items-center justify-center shrink-0">
-                {negocio.logo_path ? (<img src={getPublicUrl('logos', negocio.logo_path)} alt="Logo" className="w-full h-full object-cover" />) : (<div className="w-12 h-12 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center"><Award className="w-7 h-7 text-black" /></div>)}
+                {negocio.logo_path
+                  ? <img src={getPublicUrl('logos', negocio.logo_path)} alt="Logo" className="w-full h-full object-cover" />
+                  : <div className="w-12 h-12 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center"><Award className="w-7 h-7 text-black" /></div>}
               </div>
               <div>
                 <h1 className="text-xl font-normal">{negocio.nome}</h1>
-                {!parceiroProfissional ? (<button type="button" onClick={() => navigate('/selecionar-negocio')} className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block">TROCAR NEGÓCIO</button>) : (<span className="text-xs text-primary -mt-0.5 block">{parceiroProfissional.nome}</span>)}
+                {!parceiroProfissional
+                  ? <button type="button" onClick={() => navigate('/selecionar-negocio')} className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block">TROCAR NEGÓCIO</button>
+                  : <span className="text-xs text-primary -mt-0.5 block">{parceiroProfissional.nome}</span>}
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
-              <Link to={`/v/${negocio.slug}`} target="_blank" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-dark-200 border border-gray-800 hover:border-primary rounded-button text-sm font-normal uppercase"><Eye className="w-4 h-4" />VER VITRINE</Link>
+              <Link to={`/v/${negocio.slug}`} target="_blank" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-dark-200 border border-gray-800 hover:border-primary rounded-button text-sm font-normal uppercase">
+                <Eye className="w-4 h-4" />VER VITRINE
+              </Link>
               {!parceiroProfissional && (
                 <label className="inline-block">
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadLogoNegocio(e.target.files?.[0])} disabled={logoUploading} />
                   <span className={`inline-flex items-center justify-center text-center rounded-button font-normal border transition-all uppercase focus:outline-none ${logoUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/10 hover:bg-primary/20 border-primary/30 text-primary cursor-pointer'} px-3 py-2 text-[11px] sm:px-4 sm:py-2 sm:text-sm`}>
-                    <span className="sm:hidden">{logoUploading ? '...' : 'LOGO'}</span><span className="hidden sm:inline">{logoUploading ? 'ENVIANDO...' : 'ALTERAR LOGO'}</span>
+                    <span className="sm:hidden">{logoUploading ? '...' : 'LOGO'}</span>
+                    <span className="hidden sm:inline">{logoUploading ? 'ENVIANDO...' : 'ALTERAR LOGO'}</span>
                   </span>
                 </label>
               )}
-              <button onClick={onLogout} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-button text-sm font-normal uppercase"><LogOut className="w-4 h-4" /><span className="hidden sm:inline">SAIR</span></button>
+              <button onClick={onLogout} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-button text-sm font-normal uppercase">
+                <LogOut className="w-4 h-4" /><span className="hidden sm:inline">SAIR</span>
+              </button>
             </div>
           </div>
         </div>
@@ -664,7 +727,15 @@ export default function Dashboard({ user, onLogout }) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 items-start">
-          <div className="bg-gradient-to-br from-green-500/20 to-emerald-600/20 border border-green-500/30 rounded-custom p-6"><div className="mb-2 flex items-center gap-2"><span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="text-green-400 font-normal text-3xl leading-none">$</span><span className="text-sm text-gray-500">FATURAMENTO HOJE</span></div><div className="text-3xl font-normal text-white mb-1">{metricsHojeLoading ? <span className="text-gray-500 text-xl">...</span> : <>R$ {Number(metricsHoje?.today?.faturamento || 0).toFixed(2)}</>}</div></div>
+          <div className="bg-gradient-to-br from-green-500/20 to-emerald-600/20 border border-green-500/30 rounded-custom p-6">
+            <div className="mb-2 flex items-center gap-2">
+              <span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="text-green-400 font-normal text-3xl leading-none">$</span>
+              <span className="text-sm text-gray-500">FATURAMENTO HOJE</span>
+            </div>
+            <div className="text-3xl font-normal text-white mb-1">
+              {metricsHojeLoading ? <span className="text-gray-500 text-xl">...</span> : <>R$ {Number(metricsHoje?.today?.faturamento || 0).toFixed(2)}</>}
+            </div>
+          </div>
           <div className="bg-dark-100 border border-gray-800 rounded-custom p-6"><Calendar className="w-8 h-8 text-blue-400 mb-2" /><div className="text-3xl font-normal text-white mb-1">{hojeValidos.length}</div><div className="text-sm text-gray-400">AGENDAMENTOS HOJE</div></div>
           <div className="bg-dark-100 border border-gray-800 rounded-custom p-6"><Users className="w-8 h-8 text-purple-400 mb-2" /><div className="text-3xl font-normal text-white mb-1">{profissionais.length}</div><div className="text-sm text-gray-400">PROFISSIONAIS</div></div>
           <div className="bg-dark-100 border border-gray-800 rounded-custom p-6"><TrendingUp className="w-8 h-8 text-primary mb-2" /><div className="text-3xl font-normal text-white mb-1">{entregas.length}</div><div className="text-sm text-gray-400">{tabEntregasLabel}</div></div>
@@ -672,14 +743,43 @@ export default function Dashboard({ user, onLogout }) {
 
         <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen bg-yellow-400 border-y border-yellow-300/50 mb-8 overflow-hidden h-10 flex items-center">
           <div className="announcement-bar-wrapper flex">
-            {[1, 2].map((i) => (<div key={i} className="announcement-bar-track flex items-center shrink-0 whitespace-nowrap" aria-hidden={i === 2}>{[...Array(12)].map((_, index) => (<div key={index} className="flex items-center"><span className="text-black font-bold text-sm uppercase mx-4">CLIQUE PARA IR</span><span className="text-black mx-4">●</span><Link to={`/v/${negocio.slug}`} target="_blank" className="text-black font-normal text-sm uppercase hover:underline underline-offset-4 transition-all mx-4">VER VITRINE</Link><span className="text-black mx-4">●</span><a href={SUPORTE_HREF} target="_blank" rel="noreferrer" className="text-black font-normal text-sm uppercase hover:underline underline-offset-4 transition-all mx-4">SUPORTE</a><span className="text-black mx-4">●</span></div>))}</div>))}
+            {[1, 2].map((i) => (
+              <div key={i} className="announcement-bar-track flex items-center shrink-0 whitespace-nowrap" aria-hidden={i === 2}>
+                {[...Array(12)].map((_, index) => (
+                  <div key={index} className="flex items-center">
+                    <span className="text-black font-bold text-sm uppercase mx-4">CLIQUE PARA IR</span>
+                    <span className="text-black mx-4">●</span>
+                    <Link to={`/v/${negocio.slug}`} target="_blank" className="text-black font-normal text-sm uppercase hover:underline underline-offset-4 transition-all mx-4">VER VITRINE</Link>
+                    <span className="text-black mx-4">●</span>
+                    <a href={SUPORTE_HREF} target="_blank" rel="noreferrer" className="text-black font-normal text-sm uppercase hover:underline underline-offset-4 transition-all mx-4">SUPORTE</a>
+                    <span className="text-black mx-4">●</span>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
-          <style>{`@keyframes announcement-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}.announcement-bar-wrapper{display:flex;width:max-content;animation:announcement-scroll 50s linear infinite}.announcement-bar-wrapper:hover{animation-play-state:paused}.announcement-bar-track a{position:relative;z-index:10;cursor:pointer;display:inline-block}@media(prefers-reduced-motion:reduce){.announcement-bar-wrapper{animation:none}}`}</style>
+          <style>{`
+            @keyframes announcement-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+            .announcement-bar-wrapper { display: flex; width: max-content; animation: announcement-scroll 50s linear infinite; }
+            .announcement-bar-wrapper:hover { animation-play-state: paused; }
+            .announcement-bar-track a { position: relative; z-index: 10; cursor: pointer; display: inline-block; }
+            @media (prefers-reduced-motion: reduce) { .announcement-bar-wrapper { animation: none; } }
+          `}</style>
         </div>
 
         <div className="bg-dark-100 border border-gray-800 rounded-custom overflow-hidden">
           <div className="flex overflow-x-auto border-b border-gray-800">
-            {tabs.map(tab => { const notif = tab === 'agendamentos' ? notifAgendamentos : tab === 'cancelados' ? notifCancelados : 0; return (<button key={tab} onClick={() => { setActiveTab(tab); if (tab === 'agendamentos') setNotifAgendamentos(0); if (tab === 'cancelados') setNotifCancelados(0); }} className={`relative flex-shrink-0 px-6 py-4 text-sm transition-all uppercase font-normal ${activeTab === tab ? 'bg-primary/20 text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}>{TAB_LABELS[tab]}{notif > 0 && (<span className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-black text-[10px] font-bold flex items-center justify-center leading-none">{notif > 99 ? '99+' : notif}</span>)}</button>); })}
+            {tabs.map(tab => {
+              const notif = tab === 'agendamentos' ? notifAgendamentos : tab === 'cancelados' ? notifCancelados : 0;
+              return (
+                <button key={tab}
+                  onClick={() => { setActiveTab(tab); if (tab === 'agendamentos') setNotifAgendamentos(0); if (tab === 'cancelados') setNotifCancelados(0); }}
+                  className={`relative flex-shrink-0 px-6 py-4 text-sm transition-all uppercase font-normal ${activeTab === tab ? 'bg-primary/20 text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}>
+                  {TAB_LABELS[tab]}
+                  {notif > 0 && (<span className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-black text-[10px] font-bold flex items-center justify-center leading-none">{notif > 99 ? '99+' : notif}</span>)}
+                </button>
+              );
+            })}
           </div>
 
           <div className="p-6">
@@ -691,9 +791,16 @@ export default function Dashboard({ user, onLogout }) {
                   <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-2">CONCLUÍDOS HOJE</div><div className="text-3xl font-normal text-white">{Number(metricsHoje?.today?.concluidos || 0)}</div><div className="text-xs text-gray-300 mt-1">TICKET MÉDIO: <span className="text-primary">R$ {Number(metricsHoje?.today?.ticket_medio || 0).toFixed(2)}</span></div></div>
                   <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-2">PRÓXIMO AGENDAMENTO</div>{proximoAgendamento ? (<><div className="text-3xl font-normal text-primary">{getAgInicio(proximoAgendamento)}</div><div className="text-sm text-gray-300 mt-1">{proximoAgendamento.cliente?.nome || '—'} • {proximoAgendamento.profissionais?.nome}</div><div className="text-xs text-gray-500 mt-1">{proximoAgendamento.entregas?.nome}</div></>) : <div className="text-sm text-gray-500">:(</div>}</div>
                 </div>
-                {faturamentoPorProfissionalHoje.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">{faturamentoPorProfissionalHoje.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}</div>)}
+                {faturamentoPorProfissionalHoje.length > 0 && (
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
+                    {faturamentoPorProfissionalHoje.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}
+                  </div>
+                )}
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"><h3 className="text-lg font-normal flex items-center gap-2 uppercase"><span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="font-normal text-2xl">$</span>FATURAMENTO</h3><DatePicker value={faturamentoData} onChange={(iso) => setFaturamentoData(iso)} todayISO={hoje} /></div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    <h3 className="text-lg font-normal flex items-center gap-2 uppercase"><span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="font-normal text-2xl">$</span>FATURAMENTO</h3>
+                    <DatePicker value={faturamentoData} onChange={(iso) => setFaturamentoData(iso)} todayISO={hoje} />
+                  </div>
                   <div className="text-3xl font-normal text-white mb-2">{metricsDiaLoading ? <span className="text-gray-500 text-xl">...</span> : <>R$ {Number(metricsDia?.selected_day?.faturamento || 0).toFixed(2)}</>}</div>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4 items-start">
                     <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">CONCLUÍDOS</div><div className="text-xl font-normal text-green-400">{Number(metricsDia?.selected_day?.concluidos || 0)}</div></div>
@@ -701,7 +808,11 @@ export default function Dashboard({ user, onLogout }) {
                     <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">FECHAMENTO</div><div className="text-xl font-normal text-white">{Number(metricsDia?.selected_day?.taxa_conversao || 0).toFixed(1)}%</div><div className="text-xs text-gray-500 mt-1">sobre {Number(metricsDia?.selected_day?.total || 0)} agendamento(s)</div></div>
                     <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">TICKET MÉDIO</div><div className="text-xl font-normal text-primary">R$ {Number(metricsDia?.selected_day?.ticket_medio || 0).toFixed(2)}</div></div>
                   </div>
-                  {faturamentoPorProfissionalFiltro.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4 items-start">{faturamentoPorProfissionalFiltro.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}</div>)}
+                  {faturamentoPorProfissionalFiltro.length > 0 && (
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4 items-start">
+                      {faturamentoPorProfissionalFiltro.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}
+                    </div>
+                  )}
                   <div className="mt-2 bg-dark-100 border border-gray-800 rounded-custom p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3"><div className="text-xs text-gray-500 uppercase tracking-wide">FATURAMENTO POR PERÍODO</div><PeriodoSelect value={faturamentoPeriodo} onChange={setFaturamentoPeriodo} /></div>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
@@ -716,7 +827,10 @@ export default function Dashboard({ user, onLogout }) {
 
             {activeTab === 'agendamentos' && (
               <div>
-                <div className="flex items-center justify-between mb-6"><h2 className="text-2xl font-normal">Agendamentos</h2><button onClick={() => reloadAgendamentos()} className="px-4 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase">ATUALIZAR</button></div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-normal">Agendamentos</h2>
+                  <button onClick={() => reloadAgendamentos()} className="px-4 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase">ATUALIZAR</button>
+                </div>
                 {agendamentosAgrupadosPorProfissional.length > 0 ? (
                   <div className="space-y-8">
                     {agendamentosAgrupadosPorProfissional.map(grupo => (
@@ -724,11 +838,24 @@ export default function Dashboard({ user, onLogout }) {
                         <div className="text-sm text-gray-400 uppercase tracking-wide">{grupo.nome}</div>
                         <div className="space-y-4">
                           {grupo.itens.map(a => {
-                            const dataA = getAgDate(a); const isFuturo = dataA > String(hoje || ''); const isHoje = dataA === String(hoje || '');
-                            const st = computeStatusFromDb(a); const isCancel = isCancelStatus(st); const isDone = isDoneStatus(st); const valorReal = getValorAgendamento(a);
+                            const dataA    = getAgDate(a);
+                            const isFuturo = dataA > String(hoje || '');
+                            const isHoje   = dataA === String(hoje || '');
+                            const st       = computeStatusFromDb(a);
+                            const isCancel = isCancelStatus(st);
+                            const isDone   = isDoneStatus(st);
+                            const valorReal = getValorAgendamento(a);
                             return (
                               <div key={a.id} className="bg-dark-200 border border-gray-800 rounded-custom p-4">
-                                <div className="flex items-start justify-between gap-2 mb-1"><p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p><div className="shrink-0">{isCancel ? <div className="px-3 py-1 rounded-button text-xs bg-red-500/20 text-red-300">CANCELADO</div> : isDone ? <div className="px-3 py-1 rounded-button text-xs bg-green-500/20 text-green-400">CONCLUÍDO</div> : isFuturo ? <div className="px-3 py-1 rounded-button text-xs bg-yellow-500/20 text-yellow-300">FUTURO</div> : <div className="px-3 py-1 rounded-button text-xs bg-blue-500/20 text-blue-400">AGENDADO</div>}</div></div>
+                                <div className="flex items-start justify-between gap-2 mb-1">
+                                  <p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p>
+                                  <div className="shrink-0">
+                                    {isCancel ? <div className="px-3 py-1 rounded-button text-xs bg-red-500/20 text-red-300">CANCELADO</div>
+                                      : isDone ? <div className="px-3 py-1 rounded-button text-xs bg-green-500/20 text-green-400">CONCLUÍDO</div>
+                                      : isFuturo ? <div className="px-3 py-1 rounded-button text-xs bg-yellow-500/20 text-yellow-300">FUTURO</div>
+                                      : <div className="px-3 py-1 rounded-button text-xs bg-blue-500/20 text-blue-400">AGENDADO</div>}
+                                  </div>
+                                </div>
                                 <p className="text-xs text-gray-500 truncate mb-0.5">PROF: {a.profissionais?.nome || '—'}</p>
                                 <p className="text-xs text-primary truncate mb-3">{a.entregas?.nome || '—'}</p>
                                 <div className="grid grid-cols-3 gap-4 mb-4">
@@ -736,14 +863,28 @@ export default function Dashboard({ user, onLogout }) {
                                   <div><div className="text-xs text-gray-500">HORÁRIO</div><div className="text-sm">{getAgInicio(a)}</div></div>
                                   <div><div className="text-xs text-gray-500">VALOR</div><div className="text-sm">R$ {Number(valorReal).toFixed(2)}</div></div>
                                 </div>
-                                {!isDone && !isCancel && (isHoje ? (
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <button onClick={() => checarPermissao(a.profissional_id).then(ok => ok && (async () => { try { const { error: updErr } = await supabase.from('agendamentos').update({ status: 'concluido' }).eq('id', a.id).eq('negocio_id', negocio.id); if (updErr) throw updErr; await uiAlert('dashboard.booking_confirmed', 'success'); await reloadAgendamentos(); loadHoje(negocio.id); } catch (e2) { await uiAlert('dashboard.booking_confirm_error', 'error'); } })()} className="w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">CONFIRMAR ATENDIMENTO</button>
-                                    <button onClick={() => checarPermissao(a.profissional_id).then(ok => ok && uiConfirm('dashboard.booking_cancel_confirm', 'warning').then(c => c && supabase.rpc('cancelar_agendamento_profissional', { p_agendamento_id: a.id }).then(({ error }) => { if (error) return uiAlert('dashboard.booking_cancel_error', 'error'); return uiAlert('dashboard.booking_canceled', 'error').then(() => { reloadAgendamentos(); loadHoje(negocio.id); }); })))} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">CANCELAR</button>
-                                  </div>
-                                ) : (
-                                  <button onClick={() => checarPermissao(a.profissional_id).then(ok => ok && uiConfirm('dashboard.booking_cancel_confirm', 'warning').then(c => c && supabase.rpc('cancelar_agendamento_profissional', { p_agendamento_id: a.id }).then(({ error }) => { if (error) return uiAlert('dashboard.booking_cancel_error', 'error'); return uiAlert('dashboard.booking_canceled', 'error').then(() => { reloadAgendamentos(); loadHoje(negocio.id); }); })))} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">CANCELAR</button>
-                                ))}
+                                {!isDone && !isCancel && (
+                                  isHoje ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                      <button
+                                        onClick={() => confirmarAtendimento(a)}
+                                        className="w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">
+                                        CONFIRMAR ATENDIMENTO
+                                      </button>
+                                      <button
+                                        onClick={() => cancelarAgendamento(a)}
+                                        className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">
+                                        CANCELAR
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => cancelarAgendamento(a)}
+                                      className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">
+                                      CANCELAR
+                                    </button>
+                                  )
+                                )}
                               </div>
                             );
                           })}
@@ -762,7 +903,18 @@ export default function Dashboard({ user, onLogout }) {
                   <div className="space-y-4">
                     {hojeCancelados.sort((a, b) => String(getAgInicio(a)).localeCompare(String(getAgInicio(b)))).map(a => {
                       const valorReal = getValorAgendamento(a);
-                      return (<div key={a.id} className="bg-dark-200 border border-red-500/30 rounded-custom p-4"><div className="flex items-start justify-between gap-2 mb-1"><p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p><div className="px-3 py-1 rounded-button text-xs bg-red-500/20 border border-red-500/50 text-red-400 shrink-0">CANCELADO</div></div><p className="text-xs text-gray-500 truncate mb-0.5">PROF: {a.profissionais?.nome || '—'}</p><p className="text-xs text-primary truncate mb-3">{a.entregas?.nome || '—'}</p><div className="grid grid-cols-3 gap-4 text-sm"><div><div className="text-xs text-gray-500">DATA</div><div className="text-white">{formatDateBRFromISO(getAgDate(a))}</div></div><div><div className="text-xs text-gray-500">HORÁRIO</div><div className="text-white">{getAgInicio(a)}</div></div><div><div className="text-xs text-gray-500">VALOR</div><div className="text-white">R$ {Number(valorReal).toFixed(2)}</div></div></div></div>);
+                      return (
+                        <div key={a.id} className="bg-dark-200 border border-red-500/30 rounded-custom p-4">
+                          <div className="flex items-start justify-between gap-2 mb-1"><p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p><div className="px-3 py-1 rounded-button text-xs bg-red-500/20 border border-red-500/50 text-red-400 shrink-0">CANCELADO</div></div>
+                          <p className="text-xs text-gray-500 truncate mb-0.5">PROF: {a.profissionais?.nome || '—'}</p>
+                          <p className="text-xs text-primary truncate mb-3">{a.entregas?.nome || '—'}</p>
+                          <div className="grid grid-cols-3 gap-4 text-sm">
+                            <div><div className="text-xs text-gray-500">DATA</div><div className="text-white">{formatDateBRFromISO(getAgDate(a))}</div></div>
+                            <div><div className="text-xs text-gray-500">HORÁRIO</div><div className="text-white">{getAgInicio(a)}</div></div>
+                            <div><div className="text-xs text-gray-500">VALOR</div><div className="text-white">R$ {Number(valorReal).toFixed(2)}</div></div>
+                          </div>
+                        </div>
+                      );
                     })}
                   </div>
                 ) : <p className="text-gray-500 text-center py-12">Nenhum cancelamento hoje.</p>}
@@ -771,16 +923,39 @@ export default function Dashboard({ user, onLogout }) {
 
             {activeTab === 'historico' && (
               <div>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"><h2 className="text-2xl font-normal">Histórico</h2><DatePicker value={historicoData} onChange={(iso) => setHistoricoData(iso)} todayISO={hoje} /></div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                  <h2 className="text-2xl font-normal">Histórico</h2>
+                  <DatePicker value={historicoData} onChange={(iso) => setHistoricoData(iso)} todayISO={hoje} />
+                </div>
                 {historicoAgendamentos.length > 0 ? (
                   <div className="space-y-3">
                     {historicoAgendamentos.map(a => {
                       const st = computeStatusFromDb(a); const isCancel = isCancelStatus(st); const isDone = isDoneStatus(st); const valorReal = getValorAgendamento(a);
-                      return (<div key={a.id} className={`bg-dark-200 border rounded-custom p-4 ${isCancel ? 'border-red-500/30' : 'border-gray-800'}`}><div className="flex items-start justify-between gap-2 mb-1"><p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p><div className={`px-3 py-1 rounded-button text-xs shrink-0 ${isCancel ? 'bg-red-500/20 border border-red-500/50 text-red-300' : isDone ? 'bg-green-500/20 border border-green-500/50 text-green-300' : 'bg-blue-500/20 border border-blue-500/50 text-blue-300'}`}>{isCancel ? 'CANCELADO' : isDone ? 'CONCLUÍDO' : 'AGENDADO'}</div></div><p className="text-xs text-gray-500 truncate mb-0.5">PROF: {a.profissionais?.nome || '—'}</p><p className="text-xs text-primary truncate mb-3">{a.entregas?.nome || '—'}</p><div className="grid grid-cols-3 gap-4 mb-4"><div><div className="text-xs text-gray-500">DATA</div><div className="text-sm">{formatDateBRFromISO(getAgDate(a))}</div></div><div><div className="text-xs text-gray-500">HORÁRIO</div><div className="text-sm">{getAgInicio(a)}</div></div><div><div className="text-xs text-gray-500">VALOR</div><div className="text-sm">R$ {Number(valorReal).toFixed(2)}</div></div></div></div>);
+                      return (
+                        <div key={a.id} className={`bg-dark-200 border rounded-custom p-4 ${isCancel ? 'border-red-500/30' : 'border-gray-800'}`}>
+                          <div className="flex items-start justify-between gap-2 mb-1">
+                            <p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p>
+                            <div className={`px-3 py-1 rounded-button text-xs shrink-0 ${isCancel ? 'bg-red-500/20 border border-red-500/50 text-red-300' : isDone ? 'bg-green-500/20 border border-green-500/50 text-green-300' : 'bg-blue-500/20 border border-blue-500/50 text-blue-300'}`}>
+                              {isCancel ? 'CANCELADO' : isDone ? 'CONCLUÍDO' : 'AGENDADO'}
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 truncate mb-0.5">PROF: {a.profissionais?.nome || '—'}</p>
+                          <p className="text-xs text-primary truncate mb-3">{a.entregas?.nome || '—'}</p>
+                          <div className="grid grid-cols-3 gap-4 mb-4">
+                            <div><div className="text-xs text-gray-500">DATA</div><div className="text-sm">{formatDateBRFromISO(getAgDate(a))}</div></div>
+                            <div><div className="text-xs text-gray-500">HORÁRIO</div><div className="text-sm">{getAgInicio(a)}</div></div>
+                            <div><div className="text-xs text-gray-500">VALOR</div><div className="text-sm">R$ {Number(valorReal).toFixed(2)}</div></div>
+                          </div>
+                        </div>
+                      );
                     })}
                   </div>
                 ) : <div className="text-gray-500 text-center py-12">Nenhum agendamento carregado para essa data.</div>}
-                {historicoHasMore && (<button onClick={loadMoreHistorico} disabled={historicoLoadingMore} className="mt-4 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-60">{historicoLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}</button>)}
+                {historicoHasMore && (
+                  <button onClick={loadMoreHistorico} disabled={historicoLoadingMore} className="mt-4 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-60">
+                    {historicoLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
+                  </button>
+                )}
               </div>
             )}
 
@@ -788,27 +963,50 @@ export default function Dashboard({ user, onLogout }) {
               <div>
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-normal">{sectionTitle}</h2>
-                  <button onClick={() => { const profId = parceiroProfissional ? parceiroProfissional.id : ''; setShowNovaEntrega(true); setEditingEntregaId(null); setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: profId }); }} className="flex items-center gap-2 px-5 py-2.5 rounded-button font-normal uppercase border bg-gradient-to-r from-primary to-yellow-600 text-black border-transparent"><Plus className="w-5 h-5" />{btnAddLabel}</button>
+                  <button
+                    onClick={() => {
+                      const profId = parceiroProfissional ? parceiroProfissional.id : '';
+                      setShowNovaEntrega(true); setEditingEntregaId(null);
+                      setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: profId });
+                    }}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-button font-normal uppercase border bg-gradient-to-r from-primary to-yellow-600 text-black border-transparent">
+                    <Plus className="w-5 h-5" />{btnAddLabel}
+                  </button>
                 </div>
-                {profissionais.length === 0 ? <div className="text-gray-500">Nenhum profissional cadastrado.</div> : (
+                {profissionais.length === 0 ? (
+                  <div className="text-gray-500">Nenhum profissional cadastrado.</div>
+                ) : (
                   <div className="space-y-4">
                     {profissionais.map(p => {
                       const lista = (entregasPorProf.get(p.id) || []).slice().sort((a, b) => Number(b.preco || 0) - Number(a.preco || 0));
                       return (
                         <div key={p.id} className="bg-dark-200 border border-gray-800 rounded-custom p-6">
-                          <div className="flex items-center justify-between mb-4"><div className="font-normal text-lg">{p.nome}</div><div className="text-xs text-gray-500">{lista.length} {lista.length === 1 ? counterSingular : counterPlural}</div></div>
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="font-normal text-lg">{p.nome}</div>
+                            <div className="text-xs text-gray-500">{lista.length} {lista.length === 1 ? counterSingular : counterPlural}</div>
+                          </div>
                           {lista.length ? (
                             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
                               {lista.map(s => {
-                                const preco = Number(s.preco ?? 0); const promo = (s.preco_promocional == null) ? null : Number(s.preco_promocional);
+                                const preco = Number(s.preco ?? 0);
+                                const promo = s.preco_promocional == null ? null : Number(s.preco_promocional);
                                 return (
                                   <div key={s.id} className="bg-dark-100 border border-gray-800 rounded-custom p-5">
-                                    <div className="flex justify-between items-start mb-3">{promo != null && promo > 0 && promo < preco ? (<div><div className="text-xl font-normal text-green-400">R$ {promo.toFixed(2)}</div><div className="text-xs font-normal text-red-400 line-through">R$ {preco.toFixed(2)}</div></div>) : (<div className="text-xl font-normal text-primary">R$ {preco.toFixed(2)}</div>)}<span className="text-xs text-gray-500">{s.duracao_minutos} MIN</span></div>
+                                    <div className="flex justify-between items-start mb-3">
+                                      {promo != null && promo > 0 && promo < preco
+                                        ? (<div><div className="text-xl font-normal text-green-400">R$ {promo.toFixed(2)}</div><div className="text-xs font-normal text-red-400 line-through">R$ {preco.toFixed(2)}</div></div>)
+                                        : (<div className="text-xl font-normal text-primary">R$ {preco.toFixed(2)}</div>)}
+                                      <span className="text-xs text-gray-500">{s.duracao_minutos} MIN</span>
+                                    </div>
                                     <h3 className="text-sm font-normal text-white mb-0.5">{s.nome}</h3>
                                     <p className="text-xs text-gray-500 mb-4">{p.nome}</p>
                                     <div className="flex gap-2">
-                                      <button onClick={() => { setEditingEntregaId(s.id); setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: String(s.preco_promocional ?? ''), profissional_id: s.profissional_id || '' }); setShowNovaEntrega(true); }} className="flex-1 py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
-                                      <button onClick={() => deleteEntrega(s)} className="flex-1 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
+                                      <button
+                                        onClick={() => { setEditingEntregaId(s.id); setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: String(s.preco_promocional ?? ''), profissional_id: s.profissional_id || '' }); setShowNovaEntrega(true); }}
+                                        className="flex-1 py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
+                                      <button
+                                        onClick={() => deleteEntrega(s)}
+                                        className="flex-1 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
                                     </div>
                                   </div>
                                 );
@@ -827,7 +1025,13 @@ export default function Dashboard({ user, onLogout }) {
               <div>
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-normal">Profissionais</h2>
-                  {!parceiroProfissional && (<button onClick={() => { setShowNovoProfissional(true); setEditingProfissional(null); setFormProfissional({ nome: '', profissao: '', anos_experiencia: '', horario_inicio: '08:00', horario_fim: '18:00', almoco_inicio: '', almoco_fim: '', dias_trabalho: [1, 2, 3, 4, 5, 6] }); }} className="flex items-center gap-2 px-5 py-2.5 rounded-button font-normal uppercase border bg-gradient-to-r from-primary to-yellow-600 text-black border-transparent"><Plus className="w-5 h-5" />ADICIONAR</button>)}
+                  {!parceiroProfissional && (
+                    <button
+                      onClick={() => { setShowNovoProfissional(true); setEditingProfissional(null); setFormProfissional({ nome: '', profissao: '', anos_experiencia: '', horario_inicio: '08:00', horario_fim: '18:00', almoco_inicio: '', almoco_fim: '', dias_trabalho: [1, 2, 3, 4, 5, 6] }); }}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-button font-normal uppercase border bg-gradient-to-r from-primary to-yellow-600 text-black border-transparent">
+                      <Plus className="w-5 h-5" />ADICIONAR
+                    </button>
+                  )}
                 </div>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
                   {profissionais.map(p => {
@@ -846,18 +1050,43 @@ export default function Dashboard({ user, onLogout }) {
                           <div className="w-12 h-12 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-normal font-normal text-xl shrink-0">{p.nome?.[0] || 'P'}</div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-normal pr-24">{p.nome}</h3>
-                            <div className="flex items-center gap-2 mt-1"><span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isPendente ? 'bg-yellow-400' : dotClass}`} /><span className={`text-xs ${isPendente ? 'text-yellow-400' : 'text-gray-400'}`}>{isPendente ? 'PENDENTE' : (p.status_label || '—')}</span></div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isPendente ? 'bg-yellow-400' : dotClass}`} />
+                              <span className={`text-xs ${isPendente ? 'text-yellow-400' : 'text-gray-400'}`}>{isPendente ? 'PENDENTE' : (p.status_label || '—')}</span>
+                            </div>
                             {p.profissao && <p className="text-xs text-gray-500 mt-1">{p.profissao}</p>}
                             {!isPendente && p.anos_experiencia != null && (<p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIÊNCIA</p>)}
                           </div>
                         </div>
-                        {!isPendente && (<><div className="text-sm text-gray-400 mb-3">{entregas.filter(s => s.profissional_id === p.id).length} {counterPlural}</div><div className="text-xs text-gray-500 mb-3"><Clock className="w-4 h-4 inline mr-1" />{p.horario_inicio} - {p.horario_fim}{p.almoco_inicio && p.almoco_fim && <span className="ml-2 text-yellow-300">• {p.almoco_inicio} - {p.almoco_fim}</span>}</div></>)}
-                        {isPendente && !parceiroProfissional && (<div className="flex gap-2 mt-4"><button onClick={() => aprovarParceiro(p)} className="flex-1 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">APROVAR</button><button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button></div>)}
+                        {!isPendente && (
+                          <>
+                            <div className="text-sm text-gray-400 mb-3">{entregas.filter(s => s.profissional_id === p.id).length} {counterPlural}</div>
+                            <div className="text-xs text-gray-500 mb-3">
+                              <Clock className="w-4 h-4 inline mr-1" />{p.horario_inicio} - {p.horario_fim}
+                              {p.almoco_inicio && p.almoco_fim && <span className="ml-2 text-yellow-300">• {p.almoco_inicio} - {p.almoco_fim}</span>}
+                            </div>
+                          </>
+                        )}
+                        {isPendente && !parceiroProfissional && (
+                          <div className="flex gap-2 mt-4">
+                            <button onClick={() => aprovarParceiro(p)} className="flex-1 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">APROVAR</button>
+                            <button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
+                          </div>
+                        )}
                         {!isPendente && (isEuMesmo || !parceiroProfissional) && (
                           <>
                             {isInativo && p.motivo_inativo && (<div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-custom p-2 mb-3">INATIVO {p.motivo_inativo ? `• ${p.motivo_inativo}` : ''}</div>)}
-                            {!parceiroProfissional && (<div className="flex gap-2 mb-3"><button onClick={() => toggleAtivoProfissional(p)} className={`flex-1 py-2 rounded-button text-sm border font-normal uppercase ${isAtivo ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300' : 'bg-green-500/10 border-green-500/30 text-green-300'}`}>{isAtivo ? 'INATIVAR' : 'ATIVAR'}</button><button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button></div>)}
-                            <button onClick={() => { setEditingProfissional(p); setFormProfissional({ nome: p.nome || '', profissao: p.profissao || '', anos_experiencia: String(p.anos_experiencia ?? ''), horario_inicio: p.horario_inicio || '08:00', horario_fim: p.horario_fim || '18:00', almoco_inicio: p.almoco_inicio || '', almoco_fim: p.almoco_fim || '', dias_trabalho: Array.isArray(p.dias_trabalho) && p.dias_trabalho.length ? p.dias_trabalho : [1, 2, 3, 4, 5, 6] }); setShowNovoProfissional(true); }} className="w-full py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
+                            {!parceiroProfissional && (
+                              <div className="flex gap-2 mb-3">
+                                <button onClick={() => toggleAtivoProfissional(p)} className={`flex-1 py-2 rounded-button text-sm border font-normal uppercase ${isAtivo ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300' : 'bg-green-500/10 border-green-500/30 text-green-300'}`}>
+                                  {isAtivo ? 'INATIVAR' : 'ATIVAR'}
+                                </button>
+                                <button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
+                              </div>
+                            )}
+                            <button
+                              onClick={() => { setEditingProfissional(p); setFormProfissional({ nome: p.nome || '', profissao: p.profissao || '', anos_experiencia: String(p.anos_experiencia ?? ''), horario_inicio: p.horario_inicio || '08:00', horario_fim: p.horario_fim || '18:00', almoco_inicio: p.almoco_inicio || '', almoco_fim: p.almoco_fim || '', dias_trabalho: Array.isArray(p.dias_trabalho) && p.dias_trabalho.length ? p.dias_trabalho : [1, 2, 3, 4, 5, 6] }); setShowNovoProfissional(true); }}
+                              className="w-full py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
                           </>
                         )}
                       </div>
@@ -871,7 +1100,10 @@ export default function Dashboard({ user, onLogout }) {
               <div className="space-y-6">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-2xl font-normal">Info do Negócio</h2>
-                  <button onClick={salvarInfoNegocio} disabled={infoSaving} className={`px-5 py-2.5 rounded-button font-normal border flex items-center gap-2 uppercase ${infoSaving ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'}`}><Save className="w-4 h-4" />{infoSaving ? 'SALVANDO...' : 'SALVAR'}</button>
+                  <button onClick={salvarInfoNegocio} disabled={infoSaving}
+                    className={`px-5 py-2.5 rounded-button font-normal border flex items-center gap-2 uppercase ${infoSaving ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'}`}>
+                    <Save className="w-4 h-4" />{infoSaving ? 'SALVANDO...' : 'SALVAR'}
+                  </button>
                 </div>
                 <div className="flex justify-start"><TemaToggle value={formInfo.tema} onChange={salvarTema} loading={temaSaving} /></div>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -889,21 +1121,51 @@ export default function Dashboard({ user, onLogout }) {
                   </div>
                 </div>
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
-                  <div className="flex items-center justify-between mb-1"><div className="text-sm font-normal text-white tracking-wide">GALERIA</div>
-                    <label className="hidden sm:inline-block"><input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} /><span className={`inline-flex items-center gap-2 rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-4 py-2 text-sm`}><Plus className="w-4 h-4" />{galleryUploading ? 'ENVIANDO...' : 'ADICIONAR'}</span></label>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="text-sm font-normal text-white tracking-wide">GALERIA</div>
+                    <label className="hidden sm:inline-block">
+                      <input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} />
+                      <span className={`inline-flex items-center gap-2 rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-4 py-2 text-sm`}><Plus className="w-4 h-4" />{galleryUploading ? 'ENVIANDO...' : 'ADICIONAR'}</span>
+                    </label>
                   </div>
                   <p className="text-sm text-gray-500 mb-4">Adicione fotos do seu espaço e serviços. Elas aparecem na sua vitrine pública para atrair novos clientes.</p>
-                  {galeriaItems.length > 0 ? (<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">{galeriaItems.map((item) => (<div key={item.id || item.path} className="relative bg-dark-100 border border-gray-800 rounded-custom overflow-hidden"><img src={getPublicUrl('galerias', item.path)} alt="Galeria" className="w-full h-28 object-cover" /><button onClick={() => removerImagemGaleria(item)} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 sm:left-2 sm:top-2 sm:right-auto sm:transform-none px-3 py-1 rounded-full bg-black/60 border border-gray-700 hover:border-red-400 text-[12px] text-red-200 font-normal uppercase">REMOVER</button></div>))}</div>) : <div className="text-gray-500">Nenhuma imagem ainda.</div>}
-                  <label className="sm:hidden mt-4 block"><input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} /><span className={`w-full inline-flex items-center justify-center gap-2 rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-4 py-3 text-sm`}><Plus className="w-4 h-4" />{galleryUploading ? 'ENVIANDO...' : 'ADICIONAR FOTOS'}</span></label>
+                  {galeriaItems.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {galeriaItems.map((item) => (
+                        <div key={item.id || item.path} className="relative bg-dark-100 border border-gray-800 rounded-custom overflow-hidden">
+                          <img src={getPublicUrl('galerias', item.path)} alt="Galeria" className="w-full h-28 object-cover" />
+                          <button onClick={() => removerImagemGaleria(item)} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 sm:left-2 sm:top-2 sm:right-auto sm:transform-none px-3 py-1 rounded-full bg-black/60 border border-gray-700 hover:border-red-400 text-[12px] text-red-200 font-normal uppercase">REMOVER</button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : <div className="text-gray-500">Nenhuma imagem ainda.</div>}
+                  <label className="sm:hidden mt-4 block">
+                    <input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} />
+                    <span className={`w-full inline-flex items-center justify-center gap-2 rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-4 py-3 text-sm`}><Plus className="w-4 h-4" />{galleryUploading ? 'ENVIANDO...' : 'ADICIONAR FOTOS'}</span>
+                  </label>
                 </div>
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
                   <div className="text-xs text-gray-500 uppercase tracking-wide mb-4">DADOS DA CONTA</div>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div><label className="block text-sm mb-2">EMAIL</label><input type="email" value={novoEmail} onChange={(e) => setNovoEmail(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="seu@email.com" /><button type="button" disabled={savingDados} onClick={salvarEmail} className="mt-3 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed uppercase font-normal">SALVAR NOVO EMAIL</button></div>
-                    <div><label className="block text-sm mb-2">NOVA SENHA</label><input type="password" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="••••••••" /><label className="block text-sm mb-2 mt-3">CONFIRMAR SENHA</label><input type="password" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="••••••••" /><button type="button" disabled={savingDados} onClick={salvarSenha} className="mt-3 w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed uppercase font-normal">SALVAR NOVA SENHA</button></div>
+                    <div>
+                      <label className="block text-sm mb-2">EMAIL</label>
+                      <input type="email" value={novoEmail} onChange={(e) => setNovoEmail(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="seu@email.com" />
+                      <button type="button" disabled={savingDados} onClick={salvarEmail} className="mt-3 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed uppercase font-normal">SALVAR NOVO EMAIL</button>
+                    </div>
+                    <div>
+                      <label className="block text-sm mb-2">NOVA SENHA</label>
+                      <input type="password" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="••••••••" />
+                      <label className="block text-sm mb-2 mt-3">CONFIRMAR SENHA</label>
+                      <input type="password" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="••••••••" />
+                      <button type="button" disabled={savingDados} onClick={salvarSenha} className="mt-3 w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed uppercase font-normal">SALVAR NOVA SENHA</button>
+                    </div>
                   </div>
                 </div>
-                <div className="pt-2 pb-4"><button type="button" onClick={() => navigate('/criar-negocio')} className="w-full py-4 rounded-full border border-primary/40 bg-primary/10 text-primary text-sm font-normal uppercase tracking-normal hover:border-primary/70 hover:bg-primary/20 transition-all">+ CRIAR OUTRO NEGÓCIO</button></div>
+                <div className="pt-2 pb-4">
+                  <button type="button" onClick={() => navigate('/criar-negocio')} className="w-full py-4 rounded-full border border-primary/40 bg-primary/10 text-primary text-sm font-normal uppercase tracking-normal hover:border-primary/70 hover:bg-primary/20 transition-all">
+                    + CRIAR OUTRO NEGÓCIO
+                  </button>
+                </div>
               </div>
             )}
 
@@ -914,14 +1176,32 @@ export default function Dashboard({ user, onLogout }) {
       {showNovaEntrega && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6"><h3 className="text-2xl font-normal">{editingEntregaId ? modalEditLabel : modalNewLabel}</h3><button onClick={() => { setShowNovaEntrega(false); setEditingEntregaId(null); setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' }); }}><X className="w-6 h-6" /></button></div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-normal">{editingEntregaId ? modalEditLabel : modalNewLabel}</h3>
+              <button onClick={() => { setShowNovaEntrega(false); setEditingEntregaId(null); setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' }); }}><X className="w-6 h-6" /></button>
+            </div>
             <form onSubmit={editingEntregaId ? updateEntrega : createEntrega} className="space-y-4">
-              <div><label className="block text-sm mb-2">Profissional</label><ProfissionalSelect value={formEntrega.profissional_id} onChange={(id) => setFormEntrega({ ...formEntrega, profissional_id: id })} profissionais={parceiroProfissional ? profissionais.filter(p => p.id === parceiroProfissional.id) : profissionais} placeholder="Selecione" apenasAtivos={true} /></div>
+              <div>
+                <label className="block text-sm mb-2">Profissional</label>
+                <ProfissionalSelect
+                  value={formEntrega.profissional_id}
+                  onChange={(id) => setFormEntrega({ ...formEntrega, profissional_id: id })}
+                  profissionais={parceiroProfissional ? profissionais.filter(p => p.id === parceiroProfissional.id) : profissionais}
+                  placeholder="Selecione"
+                  apenasAtivos={true}
+                />
+              </div>
               <div><label className="block text-sm mb-2">Nome</label><input type="text" value={formEntrega.nome} onChange={(e) => setFormEntrega({ ...formEntrega, nome: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" required /></div>
               <div><label className="block text-sm mb-2">Tempo estimado (min)</label><input type="number" value={formEntrega.duracao_minutos} onChange={(e) => setFormEntrega({ ...formEntrega, duracao_minutos: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" required /></div>
               <div><label className="block text-sm mb-2">Preço (R$)</label><input type="number" step="0.01" value={formEntrega.preco} onChange={(e) => setFormEntrega({ ...formEntrega, preco: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" required /></div>
-              <div><label className="block text-sm mb-2">Preço de OFERTA (opcional)</label><input type="number" step="0.01" value={formEntrega.preco_promocional} onChange={(e) => setFormEntrega({ ...formEntrega, preco_promocional: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" placeholder="Apenas se houver oferta" /><p className="text-[12px] text-gray-500 mt-2">O preço de oferta deve ser menor que o preço normal.</p></div>
-              <button type="submit" disabled={submittingEntrega} className={`w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase ${submittingEntrega ? 'opacity-60 cursor-not-allowed' : ''}`}>{submittingEntrega ? 'SALVANDO...' : editingEntregaId ? 'SALVAR' : `CRIAR ${btnAddLabel}`}</button>
+              <div>
+                <label className="block text-sm mb-2">Preço de OFERTA (opcional)</label>
+                <input type="number" step="0.01" value={formEntrega.preco_promocional} onChange={(e) => setFormEntrega({ ...formEntrega, preco_promocional: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" placeholder="Apenas se houver oferta" />
+                <p className="text-[12px] text-gray-500 mt-2">O preço de oferta deve ser menor que o preço normal.</p>
+              </div>
+              <button type="submit" disabled={submittingEntrega} className={`w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase ${submittingEntrega ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                {submittingEntrega ? 'SALVANDO...' : editingEntregaId ? 'SALVAR' : `CRIAR ${btnAddLabel}`}
+              </button>
             </form>
           </div>
         </div>
@@ -930,19 +1210,45 @@ export default function Dashboard({ user, onLogout }) {
       {showNovoProfissional && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
           <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6"><h3 className="text-2xl font-normal">{editingProfissional ? 'EDITAR PROFISSIONAL' : 'NOVO PROFISSIONAL'}</h3><button onClick={() => { setShowNovoProfissional(false); setEditingProfissional(null); setFormProfissional({ nome: '', profissao: '', anos_experiencia: '', horario_inicio: '08:00', horario_fim: '18:00', almoco_inicio: '', almoco_fim: '', dias_trabalho: [1, 2, 3, 4, 5, 6] }); }}><X className="w-6 h-6" /></button></div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-normal">{editingProfissional ? 'EDITAR PROFISSIONAL' : 'NOVO PROFISSIONAL'}</h3>
+              <button onClick={() => { setShowNovoProfissional(false); setEditingProfissional(null); setFormProfissional({ nome: '', profissao: '', anos_experiencia: '', horario_inicio: '08:00', horario_fim: '18:00', almoco_inicio: '', almoco_fim: '', dias_trabalho: [1, 2, 3, 4, 5, 6] }); }}><X className="w-6 h-6" /></button>
+            </div>
             <form onSubmit={editingProfissional ? updateProfissional : createProfissional} className="space-y-4">
               <div><label className="block text-sm mb-2">Nome</label><input type="text" value={formProfissional.nome} onChange={(e) => setFormProfissional({ ...formProfissional, nome: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" required /></div>
               <div><label className="block text-sm mb-2">Como te chamamos?</label><input type="text" value={formProfissional.profissao} onChange={(e) => setFormProfissional({ ...formProfissional, profissao: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" placeholder="Ex: Barbeiro, Manicure..." /></div>
               <div><label className="block text-sm mb-2">Anos de experiência</label><input type="number" value={formProfissional.anos_experiencia} onChange={(e) => setFormProfissional({ ...formProfissional, anos_experiencia: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" /></div>
-              <div className="grid grid-cols-2 gap-4"><div><label className="block text-sm mb-2">Das</label><TimePicker value={formProfissional.horario_inicio} onChange={(v) => setFormProfissional({ ...formProfissional, horario_inicio: v })} step={30} /></div><div><label className="block text-sm mb-2">Até</label><TimePicker value={formProfissional.horario_fim} onChange={(v) => setFormProfissional({ ...formProfissional, horario_fim: v })} step={30} /></div></div>
-              <div className="grid grid-cols-2 gap-4"><div><label className="block text-sm mb-2">Almoço (Início)</label><TimePicker value={formProfissional.almoco_inicio} onChange={(v) => setFormProfissional({ ...formProfissional, almoco_inicio: v })} step={15} /></div><div><label className="block text-sm mb-2">Almoço (Fim)</label><TimePicker value={formProfissional.almoco_fim} onChange={(v) => setFormProfissional({ ...formProfissional, almoco_fim: v })} step={15} /></div></div>
-              <div><label className="block text-sm mb-2">Dias de trabalho</label><div className="grid grid-cols-5 sm:grid-cols-7 gap-2">{WEEKDAYS.map(d => { const active = (formProfissional.dias_trabalho || []).includes(d.i); return (<button type="button" key={d.i} onClick={() => { const cur = Array.isArray(formProfissional.dias_trabalho) ? [...formProfissional.dias_trabalho] : []; const next = active ? cur.filter(x => x !== d.i) : [...cur, d.i]; setFormProfissional(prev => ({ ...prev, dias_trabalho: normalizeDiasTrabalho(next) })); }} className={`py-2 rounded-button border font-normal text-xs transition-all ${active ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>{d.label}</button>); })}</div></div>
-              <button type="submit" className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase">{editingProfissional ? 'SALVAR' : 'ADICIONAR'}</button>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="block text-sm mb-2">Das</label><TimePicker value={formProfissional.horario_inicio} onChange={(v) => setFormProfissional({ ...formProfissional, horario_inicio: v })} step={30} /></div>
+                <div><label className="block text-sm mb-2">Até</label><TimePicker value={formProfissional.horario_fim} onChange={(v) => setFormProfissional({ ...formProfissional, horario_fim: v })} step={30} /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="block text-sm mb-2">Almoço (Início)</label><TimePicker value={formProfissional.almoco_inicio} onChange={(v) => setFormProfissional({ ...formProfissional, almoco_inicio: v })} step={15} /></div>
+                <div><label className="block text-sm mb-2">Almoço (Fim)</label><TimePicker value={formProfissional.almoco_fim} onChange={(v) => setFormProfissional({ ...formProfissional, almoco_fim: v })} step={15} /></div>
+              </div>
+              <div>
+                <label className="block text-sm mb-2">Dias de trabalho</label>
+                <div className="grid grid-cols-5 sm:grid-cols-7 gap-2">
+                  {WEEKDAYS.map(d => {
+                    const active = (formProfissional.dias_trabalho || []).includes(d.i);
+                    return (
+                      <button type="button" key={d.i}
+                        onClick={() => { const cur = Array.isArray(formProfissional.dias_trabalho) ? [...formProfissional.dias_trabalho] : []; const next = active ? cur.filter(x => x !== d.i) : [...cur, d.i]; setFormProfissional(prev => ({ ...prev, dias_trabalho: normalizeDiasTrabalho(next) })); }}
+                        className={`py-2 rounded-button border font-normal text-xs transition-all ${active ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>
+                        {d.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <button type="submit" className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase">
+                {editingProfissional ? 'SALVAR' : 'ADICIONAR'}
+              </button>
             </form>
           </div>
         </div>
       )}
+
     </div>
   );
 }
