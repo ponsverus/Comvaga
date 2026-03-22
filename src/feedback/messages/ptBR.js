@@ -569,6 +569,27 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    parceiro_acao_proibida: {
+      title: 'Ação não permitida',
+      body: 'Você só pode gerenciar itens referentes a você.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    professional_approved: {
+      title: 'Parceiro aprovado',
+      body: 'O acesso do profissional foi liberado com sucesso.',
+      variant: 'success',
+      screen: 'light',
+      buttonText: 'OK',
+    },
+    partner_approve_error: {
+      title: 'Erro ao aprovar',
+      body: 'Não foi possível aprovar o parceiro. Tente novamente.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
   },
 
   clientArea: {
