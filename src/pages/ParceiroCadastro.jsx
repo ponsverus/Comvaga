@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-export default function ParceiroCadastro({ onLogin }) {
+export default function ParceiroCadastro({ suppressAuthRef }) {
   const navigate = useNavigate();
 
-  const [nome,   setNome]   = useState('');
-  const [email,  setEmail]  = useState('');
-  const [senha,  setSenha]  = useState('');
-  const [slug,   setSlug]   = useState('');
+  const [nome,    setNome]    = useState('');
+  const [email,   setEmail]   = useState('');
+  const [senha,   setSenha]   = useState('');
+  const [slug,    setSlug]    = useState('');
   const [loading, setLoading] = useState(false);
-  const [erro,   setErro]   = useState('');
+  const [erro,    setErro]    = useState('');
+  const [sucesso, setSucesso] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,12 +23,14 @@ export default function ParceiroCadastro({ onLogin }) {
     const emailClean = email.trim().toLowerCase();
     const slugClean  = slug.trim().toLowerCase();
 
-    if (!nomeClean)  return setErro('Informe seu nome.');
+    if (!nomeClean)                              return setErro('Informe seu nome.');
     if (!emailClean || !emailClean.includes('@')) return setErro('Email inválido.');
-    if (senha.length < 6) return setErro('Senha deve ter ao menos 6 caracteres.');
-    if (!slugClean)  return setErro('Informe o slug do negócio.');
+    if (senha.length < 6)                        return setErro('Senha deve ter ao menos 6 caracteres.');
+    if (!slugClean)                              return setErro('Informe o slug do negócio.');
 
     setLoading(true);
+    if (suppressAuthRef) suppressAuthRef.current = true;
+
     try {
       const { data: negocio, error: negErr } = await supabase
         .from('negocios')
@@ -38,38 +41,17 @@ export default function ParceiroCadastro({ onLogin }) {
       if (negErr) throw negErr;
       if (!negocio) return setErro('Negócio não encontrado. Verifique o slug informado.');
 
-      const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
-        email: emailClean,
-        password: senha,
-      });
+      const { data: profExiste } = await supabase
+        .from('profissionais')
+        .select('id, status')
+        .eq('negocio_id', negocio.id)
+        .eq('email', emailClean)
+        .maybeSingle();
 
-      let uid;
-
-      if (!signInErr && signInData?.user) {
-        uid = signInData.user.id;
-        const { data: prof } = await supabase
-          .from('profissionais')
-          .select('id, status')
-          .eq('negocio_id', negocio.id)
-          .eq('user_id', uid)
-          .maybeSingle();
-
-        if (!prof) {
-          await supabase.auth.signOut();
-          return setErro('Você não é parceiro deste negócio.');
-        }
-        if (prof.status === 'pendente') {
-          await supabase.auth.signOut();
-          return setErro('Seu acesso ainda não foi aprovado pelo responsável do negócio.');
-        }
-        if (prof.status === 'inativo') {
-          await supabase.auth.signOut();
-          return setErro('Seu acesso está inativo. Entre em contato com o responsável.');
-        }
-
-        onLogin(signInData.user, 'professional');
-        navigate('/dashboard', { state: { negocioId: negocio.id } });
-        return;
+      if (profExiste) {
+        if (profExiste.status === 'pendente') return setErro('Você já tem um cadastro aguardando aprovação neste negócio.');
+        if (profExiste.status === 'ativo')    return setErro('Você já está cadastrado. Use a página de login.');
+        if (profExiste.status === 'inativo')  return setErro('Seu acesso está inativo. Entre em contato com o responsável.');
       }
 
       const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
@@ -77,55 +59,77 @@ export default function ParceiroCadastro({ onLogin }) {
         password: senha,
       });
 
-      if (signUpErr) throw signUpErr;
-      uid = signUpData?.user?.id;
+      if (signUpErr) {
+        if (String(signUpErr.message || '').toLowerCase().includes('already')) {
+          return setErro('Este email já possui uma conta. Use a página de login de parceiro.');
+        }
+        throw signUpErr;
+      }
+
+      const uid = signUpData?.user?.id;
       if (!uid) throw new Error('Falha ao criar conta. Tente novamente.');
 
-      let perfil = null;
-      for (let i = 0; i < 5; i++) {
-        const { data } = await supabase
-          .from('users')
-          .select('id, type')
-          .eq('id', uid)
-          .maybeSingle();
-        if (data?.id) { perfil = data; break; }
+      for (let i = 0; i < 6; i++) {
+        const { data } = await supabase.from('users').select('id, type').eq('id', uid).maybeSingle();
+        if (data?.id) {
+          await supabase.from('users').update({ nome: nomeClean, type: 'professional' }).eq('id', uid);
+          break;
+        }
         await sleep(400);
       }
 
-      if (perfil && perfil.type !== 'professional') {
-        await supabase.from('users').update({ type: 'professional', nome: nomeClean }).eq('id', uid);
-      } else if (perfil) {
-        await supabase.from('users').update({ nome: nomeClean }).eq('id', uid);
-      }
-
       const { error: profErr } = await supabase.from('profissionais').insert({
-        negocio_id:      negocio.id,
-        user_id:         uid,
-        nome:            nomeClean,
-        email:           emailClean,
-        status:          'pendente',
-        ativo:           false,
-        horario_inicio:  '08:00',
-        horario_fim:     '18:00',
-        dias_trabalho:   [1, 2, 3, 4, 5, 6],
+        negocio_id:     negocio.id,
+        user_id:        uid,
+        nome:           nomeClean,
+        email:          emailClean,
+        status:         'pendente',
+        ativo:          false,
+        horario_inicio: '08:00',
+        horario_fim:    '18:00',
+        dias_trabalho:  [1, 2, 3, 4, 5, 6],
       });
 
-      if (profErr) {
-        if (!String(profErr.message || '').includes('duplicate')) throw profErr;
-      }
+      if (profErr) throw profErr;
 
       await supabase.auth.signOut();
-      setErro('');
-      setNome(''); setEmail(''); setSenha(''); setSlug('');
-      alert('Solicitação enviada! Aguarde a aprovação do responsável pelo negócio.');
+
+      setSucesso(true);
 
     } catch (e) {
       console.error('ParceiroCadastro error:', e);
       setErro(e?.message || 'Erro inesperado. Tente novamente.');
+      await supabase.auth.signOut();
     } finally {
+      if (suppressAuthRef) suppressAuthRef.current = false;
       setLoading(false);
     }
   };
+
+  if (sucesso) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="w-full max-w-md text-center">
+          <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-green-400 text-4xl">✓</span>
+          </div>
+          <h1 className="text-3xl font-normal text-white uppercase mb-3">Cadastro enviado!</h1>
+          <p className="text-gray-400 mb-2 font-normal">
+            Seu cadastro foi registrado com sucesso.
+          </p>
+          <p className="text-gray-500 text-sm mb-8 font-normal">
+            Aguarde a aprovação do responsável pelo negócio. Quando aprovado, acesse pelo link de login de parceiros.
+          </p>
+          <button
+            onClick={() => navigate('/')}
+            className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase"
+          >
+            VOLTAR PARA HOME
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
@@ -135,10 +139,8 @@ export default function ParceiroCadastro({ onLogin }) {
           <div className="w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center mx-auto mb-4">
             <span className="text-black text-2xl font-normal">C</span>
           </div>
-          <h1 className="text-3xl font-normal text-white uppercase">Acesso Parceiro</h1>
-          <p className="text-gray-500 text-sm mt-2">
-            Cadastro e login em uma só etapa
-          </p>
+          <h1 className="text-3xl font-normal text-white uppercase">Cadastro Parceiro</h1>
+          <p className="text-gray-500 text-sm mt-2 font-normal">Solicite acesso ao negócio</p>
         </div>
 
         <div className="bg-dark-100 border border-gray-800 rounded-custom p-8">
@@ -151,7 +153,7 @@ export default function ParceiroCadastro({ onLogin }) {
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
                 placeholder="Nome completo"
-                className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors"
+                className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors font-normal"
                 required
               />
             </div>
@@ -163,19 +165,19 @@ export default function ParceiroCadastro({ onLogin }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
-                className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors"
+                className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors font-normal"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs text-gray-400 uppercase mb-2">Senha</label>
+              <label className="block text-xs text-gray-400 uppercase mb-2">Crie uma senha</label>
               <input
                 type="password"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 placeholder="Mínimo 6 caracteres"
-                className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors"
+                className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors font-normal"
                 required
               />
             </div>
@@ -187,14 +189,14 @@ export default function ParceiroCadastro({ onLogin }) {
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 placeholder="ex: barbearia-do-ze"
-                className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors"
+                className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors font-normal"
                 required
               />
-              <p className="text-xs text-gray-600 mt-1">Fornecido pelo responsável do negócio</p>
+              <p className="text-xs text-gray-600 mt-1 font-normal">Fornecido pelo responsável do negócio</p>
             </div>
 
             {erro && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-custom px-4 py-3 text-red-400 text-sm">
+              <div className="bg-red-500/10 border border-red-500/30 rounded-custom px-4 py-3 text-red-400 text-sm font-normal">
                 {erro}
               </div>
             )}
@@ -202,16 +204,19 @@ export default function ParceiroCadastro({ onLogin }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase disabled:opacity-60 disabled:cursor-not-allowed transition-opacity"
+              className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? 'VERIFICANDO...' : 'ENTRAR / CADASTRAR'}
+              {loading ? 'ENVIANDO...' : 'SOLICITAR ACESSO'}
             </button>
 
           </form>
         </div>
 
-        <p className="text-center text-xs text-gray-600 mt-6">
-          Se for a primeira vez, seu cadastro será enviado para aprovação.
+        <p className="text-center text-sm text-gray-600 mt-6 font-normal">
+          Já aprovado?{' '}
+          <Link to="/parceiro/login" className="text-primary hover:text-yellow-500 transition-colors">
+            Fazer login
+          </Link>
         </p>
 
       </div>
