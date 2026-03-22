@@ -342,7 +342,9 @@ export default function Dashboard({ user, onLogout }) {
       if (profissionaisResult.error) throw profissionaisResult.error;
       const profs = profissionaisResult.data || [];
       setProfissionais(profs);
-      const meuProfissional = profs.find(p => p.user_id === user.id) || null;
+      const souDono = negocioData.owner_id === user.id;
+      const meuProfissional = souDono ? null : (profs.find(p => p.user_id === user.id) || null);
+      setParceiroProfissional(meuProfissional);
       setParceiroProfissional(meuProfissional);
       if (profs.length === 0) { setEntregas([]); setAgendamentos([]); setLoading(false); return; }
       const ids = profs.map(p => p.id);
