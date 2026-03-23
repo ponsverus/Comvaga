@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Calendar,
@@ -472,7 +472,8 @@ export default function Vitrine({ user, userType }) {
   const [selecaoProfId,        setSelecaoProfId]        = useState(null);
   const [servicosSelecionados, setServicosSelecionados] = useState([]);
 
-  const todayISO = useMemo(() => getNowSP().date, []);
+  const nowSP    = useMemo(() => getNowSP(), []);
+  const todayISO = nowSP.date;
 
   const [showDepoimento,           setShowDepoimento]           = useState(false);
   const [depoimentoNota,           setDepoimentoNota]           = useState(5);
@@ -483,14 +484,7 @@ export default function Vitrine({ user, userType }) {
 
   const isProfessional = user && userType === 'professional';
 
-  useEffect(() => { loadVitrine(); }, [slug]);
-
-  useEffect(() => {
-    if (user && negocio?.id) checkFavorito();
-    else setIsFavorito(false);
-  }, [user?.id, userType, negocio?.id]);
-
-  const loadDepoimentos = async (negocioId) => {
+  const loadDepoimentos = useCallback(async (negocioId) => {
     const { data, error: rpcErr } = await withTimeout(supabase.rpc('get_depoimentos_vitrine', { p_negocio_id: negocioId }), 7000, 'depoimentos');
     if (rpcErr) throw rpcErr;
     return (data || []).map(d => ({
@@ -498,9 +492,9 @@ export default function Vitrine({ user, userType }) {
       users:         d.cliente_nome     ? { nome: d.cliente_nome, avatar_path: d.cliente_avatar_path, type: d.cliente_type } : null,
       profissionais: d.profissional_nome ? { nome: d.profissional_nome } : null,
     }));
-  };
+  }, []);
 
-  const loadVitrine = async () => {
+  const loadVitrine = useCallback(async () => {
     setLoading(true); setError(null);
     const watchdog = setTimeout(() => { setLoading(false); setError(getMsg('load_timeout', 'Demorou demais para carregar. Tente novamente.')); }, 12000);
     try {
@@ -540,16 +534,23 @@ export default function Vitrine({ user, userType }) {
       clearTimeout(watchdog);
       setLoading(false);
     }
-  };
+  }, [slug, loadDepoimentos]);
 
-  const checkFavorito = async () => {
+  const checkFavorito = useCallback(async () => {
     if (!user || userType !== 'client' || !negocio?.id) { setIsFavorito(false); return; }
     try {
       const { data, error: favErr } = await withTimeout(supabase.from('favoritos').select('id').eq('cliente_id', user.id).eq('tipo', 'negocio').eq('negocio_id', negocio.id).maybeSingle(), 6000, 'favorito');
       if (favErr) throw favErr;
       setIsFavorito(!!data);
     } catch { setIsFavorito(false); }
-  };
+  }, [user, userType, negocio?.id]);
+
+  useEffect(() => { loadVitrine(); }, [loadVitrine]);
+
+  useEffect(() => {
+    if (user && negocio?.id) checkFavorito();
+    else setIsFavorito(false);
+  }, [checkFavorito]);
 
   const toggleFavorito = async () => {
     if (!user) { alertKey('favorite_need_login', 'Login necessário', 'Faça login para favoritar.', 'ENTENDI'); return; }
@@ -658,7 +659,6 @@ export default function Vitrine({ user, userType }) {
   const logoUrl      = useMemo(() => getPublicUrl('logos',   negocio?.logo_path), [negocio?.logo_path]);
   const instagramUrl = useMemo(() => resolveInstagram(negocio?.instagram),        [negocio?.instagram]);
   const facebookUrl  = useMemo(() => resolveFacebook(negocio?.facebook),          [negocio?.facebook]);
-  const nowSP        = useMemo(() => getNowSP(), []);
 
   const getAlmocoRange = (p) => ({ ini: p?.almoco_inicio || null, fim: p?.almoco_fim || null });
 
