@@ -1075,15 +1075,33 @@ export const ptBR = {
     business: {
 
       label_button: {
-        servicos:  'AGENDAR SERVIÇO',
+        servicos:  'AGENDAR SERVIÇu',
         consultas: 'AGENDAR CONSULTA',
         aulas:     'AGENDAR AULA',
       },
 
       section_title: {
-        servicos:  'Serviços',
+        servicos:  'Serviçus',
         consultas: 'Consultas',
         aulas:     'Aulas',
+      },
+
+      counter_singular: {
+        servicos:  'serviçu',
+        consultas: 'consulta',
+        aulas:     'aula',
+      },
+
+      counter_plural: {
+        servicos:  'serviçus',
+        consultas: 'consultas',
+        aulas:     'aulas',
+      },
+
+      empty_list: {
+        servicos:  'Sem serviços para este profissional.',
+        consultas: 'Sem consultas para este profissional.',
+        aulas:     'Sem aulas para este profissional.',
       },
     },
 
