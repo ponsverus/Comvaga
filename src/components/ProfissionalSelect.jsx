@@ -1,17 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 
-/**
- * ProfissionalSelect
- *
- * Props:
- *   value        — id do profissional selecionado (string)
- *   onChange     — (id: string) => void
- *   profissionais — array de { id, nome, profissao?, ativo? }
- *   placeholder  — string (default: "Selecione")
- *   apenasAtivos — boolean (default: true) — filtra apenas ativos
- *   required     — boolean
- */
 export default function ProfissionalSelect({
   value,
   onChange,
@@ -25,7 +14,7 @@ export default function ProfissionalSelect({
   const listRef = useRef(null);
 
   const lista = apenasAtivos
-    ? (profissionais || []).filter(p => p.ativo === undefined ? true : !!p.ativo)
+    ? (profissionais || []).filter(p => p.status === 'ativo')
     : (profissionais || []);
 
   const selected = lista.find(p => p.id === value) || null;
