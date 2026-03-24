@@ -1,28 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { ptBR } from '../feedback/messages/ptBR';
 
 const msgs = ptBR.parceiroLogin;
 
-export default function ParceiroLogin({ onLogin, suppressAuthRef }) {
+export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: inRecoveryProp = false }) {
   const navigate = useNavigate();
 
-  const [email,      setEmail]      = useState('');
-  const [senha,      setSenha]      = useState('');
-  const [slug,       setSlug]       = useState('');
-  const [loading,    setLoading]    = useState(false);
-  const [erro,       setErro]       = useState('');
+  const [email,        setEmail]        = useState('');
+  const [senha,        setSenha]        = useState('');
+  const [slug,         setSlug]         = useState('');
+  const [loading,      setLoading]      = useState(false);
+  const [erro,         setErro]         = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const [isRecovery,      setIsRecovery]      = useState(false);
+  const [isRecovery,      setIsRecovery]      = useState(inRecoveryProp);
   const [newPassword,     setNewPassword]     = useState('');
   const [newPassword2,    setNewPassword2]    = useState('');
   const [recoveryLoading, setRecoveryLoading] = useState(false);
   const [recoveryErro,    setRecoveryErro]    = useState('');
 
   const [resetLoading, setResetLoading] = useState(false);
+
+  useEffect(() => {
+    if (inRecoveryProp) setIsRecovery(true);
+  }, [inRecoveryProp]);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
@@ -135,8 +139,8 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef }) {
     if (recoveryLoading) return;
     setRecoveryErro('');
 
-    if (newPassword.length < 6)        return setRecoveryErro(msgs.recovery_password_too_short.body);
-    if (newPassword !== newPassword2)  return setRecoveryErro(msgs.recovery_password_mismatch.body);
+    if (newPassword.length < 6)       return setRecoveryErro(msgs.recovery_password_too_short.body);
+    if (newPassword !== newPassword2) return setRecoveryErro(msgs.recovery_password_mismatch.body);
 
     setRecoveryLoading(true);
     try {
