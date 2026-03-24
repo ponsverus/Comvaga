@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
+import { ptBR } from '../feedback/messages/ptBR';
+
+const msgs = ptBR.parceiroLogin;
 
 export default function ParceiroLogin({ onLogin, suppressAuthRef }) {
   const navigate = useNavigate();
@@ -18,9 +21,9 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef }) {
     const emailClean = email.trim().toLowerCase();
     const slugClean  = slug.trim().toLowerCase();
 
-    if (!emailClean || !emailClean.includes('@')) return setErro('Email inválido.');
-    if (senha.length < 6)                        return setErro('Senha deve ter ao menos 6 caracteres.');
-    if (!slugClean)                              return setErro('Informe o slug do negócio.');
+    if (!emailClean || !emailClean.includes('@')) return setErro(msgs.email_invalid.body);
+    if (senha.length < 6)                        return setErro(msgs.senha_too_short.body);
+    if (!slugClean)                              return setErro(msgs.slug_required.body);
 
     setLoading(true);
     if (suppressAuthRef) suppressAuthRef.current = true;
@@ -33,7 +36,7 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef }) {
         .maybeSingle();
 
       if (negErr) throw negErr;
-      if (!negocio) return setErro('Negócio não encontrado. Verifique o slug informado.');
+      if (!negocio) return setErro(msgs.negocio_not_found.body);
 
       const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
         email: emailClean,
@@ -42,13 +45,13 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef }) {
 
       if (signInErr) {
         if (String(signInErr.message || '').toLowerCase().includes('invalid')) {
-          return setErro('Email ou senha incorretos.');
+          return setErro(msgs.credentials_invalid.body);
         }
         throw signInErr;
       }
 
       const uid = signInData?.user?.id;
-      if (!uid) throw new Error('Falha ao autenticar.');
+      if (!uid) throw new Error(msgs.auth_error.body);
 
       const { data: prof, error: profErr } = await supabase
         .from('profissionais')
@@ -61,15 +64,15 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef }) {
 
       if (!prof) {
         await supabase.auth.signOut();
-        return setErro('Você não é parceiro deste negócio.');
+        return setErro(msgs.not_partner.body);
       }
       if (prof.status === 'pendente') {
         await supabase.auth.signOut();
-        return setErro('Seu acesso ainda não foi aprovado pelo responsável do negócio.');
+        return setErro(msgs.pending_approval.body);
       }
       if (prof.status === 'inativo') {
         await supabase.auth.signOut();
-        return setErro('Seu acesso está inativo. Entre em contato com o responsável.');
+        return setErro(msgs.access_inactive.body);
       }
 
       if (suppressAuthRef) suppressAuthRef.current = false;
@@ -77,8 +80,7 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef }) {
       navigate('/dashboard', { state: { negocioId: negocio.id } });
 
     } catch (e) {
-      console.error('ParceiroLogin error:', e);
-      setErro(e?.message || 'Erro inesperado. Tente novamente.');
+      setErro(e?.message || msgs.unexpected_error.body);
       await supabase.auth.signOut();
     } finally {
       if (suppressAuthRef) suppressAuthRef.current = false;
