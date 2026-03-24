@@ -1046,7 +1046,7 @@ export const ptBR = {
         aulas:     'aulas',
       },
       empty_list: {
-        servicos:  'Sem serviços para este profissional.',
+        servicos:  'Sem serviçoes para este profissional.',
         consultas: 'Sem consultas para este profissional.',
         aulas:     'Sem aulas para este profissional.',
       },
