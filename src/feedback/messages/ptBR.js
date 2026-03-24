@@ -326,25 +326,11 @@ export const ptBR = {
       },
     },
 
-    professional_created: {
-      title: 'Profissional criado',
-      body: 'O profissional foi adicionado.',
-      variant: 'success',
-      screen: 'light',
-      buttonText: 'OK',
-    },
     professional_updated: {
       title: 'Profissional atualizado',
       body: 'Os ajustes foram salvos com sucesso.',
       variant: 'success',
       screen: 'light',
-      buttonText: 'OK',
-    },
-    professional_create_error: {
-      title: 'Erro',
-      body: 'Houve um erro ao criar o profissional. Tente novamente.',
-      variant: 'danger',
-      screen: 'dark',
       buttonText: 'OK',
     },
     professional_update_error: {
@@ -373,13 +359,6 @@ export const ptBR = {
     professional_delete_error: {
       title: 'Erro',
       body: 'Houve um erro ao excluir o profissional. Tente novamente',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
-    professional_missing_active_column: {
-      title: 'Ajuste ausente',
-      body: 'O campo ativo está indisponível para este perfil. Tente novamente.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -415,14 +394,14 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-    professional_lunch_blocked: {
+    professional_almoco_blocked: {
       title: 'Horário de almoço bloqueado',
       body: 'Há horários futuros que entram em conflito com o novo horário de almoço.\n\nCancele esses horários antes de salvar esta mudança.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
-    professional_workday_blocked: {
+    professional_dia_blocked: {
       title: 'Dia de trabalho bloqueado',
       body: 'Existe um agendamento futuro no dia que você está tentando desativar.\n\nCancele ou reagende esse atendimento antes de remover este dia.',
       variant: 'warning',
@@ -518,57 +497,6 @@ export const ptBR = {
       buttonText: 'OK',
     },
 
-    parceiro_selecione_prof: {
-      title: 'Selecione um profissional',
-      body: 'Escolha um profissional antes de salvar o e-mail.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
-    parceiro_email_invalid: {
-      title: 'E-mail inválido',
-      body: 'Informe um e-mail válido para continuar.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
-    parceiro_saved: {
-      title: 'E-mail salvo',
-      body: 'O e-mail do parceiro foi vinculado com sucesso.',
-      variant: 'success',
-      screen: 'light',
-      buttonText: 'OK',
-    },
-    parceiro_save_error: {
-      title: 'Erro ao salvar',
-      body: 'Houve um erro ao salvar o e-mail do parceiro. Tente novamente.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
-    parceiro_delete_confirm: {
-      title: 'Remover parceiro?',
-      body: 'Tem certeza que deseja remover o e-mail deste parceiro?',
-      variant: 'warning',
-      screen: 'dark',
-      confirmText: 'REMOVER',
-      cancelText: 'CANCELAR',
-      buttonText: 'REMOVER',
-    },
-    parceiro_deleted: {
-      title: 'Parceiro removido',
-      body: 'O e-mail do parceiro foi removido com sucesso.',
-      variant: 'success',
-      screen: 'light',
-      buttonText: 'OK',
-    },
-    parceiro_delete_error: {
-      title: 'Erro ao remover',
-      body: 'Houve um erro ao remover o e-mail do parceiro. Tente novamente.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
     parceiro_acao_proibida: {
       title: 'Ação não permitida',
       body: 'Você só pode gerenciar itens referentes a você.',
@@ -590,6 +518,35 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+  },
+
+  parceiroCadastro: {
+    nome_required:       { body: 'Informe seu nome.' },
+    email_invalid:       { body: 'Email inválido.' },
+    senha_too_short:     { body: 'Senha deve ter ao menos 6 caracteres.' },
+    slug_required:       { body: 'Informe o slug do negócio.' },
+    negocio_not_found:   { body: 'Negócio não encontrado. Verifique o slug informado.' },
+    email_already_exists:{ body: 'Este email já possui uma conta. Use a página de login de parceiro.' },
+    account_create_error:{ body: 'Falha ao criar conta. Tente novamente.' },
+    already_pending:     { body: 'Você já tem um cadastro aguardando aprovação neste negócio.' },
+    already_active:      { body: 'Você já está cadastrado. Use a página de login.' },
+    access_inactive:     { body: 'Seu acesso está inativo. Entre em contato com o responsável.' },
+    unexpected_error:    { body: 'Erro inesperado. Tente novamente.' },
+    success_title:       'Cadastro enviado!',
+    success_body:        'Aguarde a aprovação do responsável pelo negócio para acessar o painel.',
+  },
+
+  parceiroLogin: {
+    email_invalid:     { body: 'Email inválido.' },
+    senha_too_short:   { body: 'Senha deve ter ao menos 6 caracteres.' },
+    slug_required:     { body: 'Informe o slug do negócio.' },
+    negocio_not_found: { body: 'Negócio não encontrado. Verifique o slug informado.' },
+    credentials_invalid:{ body: 'Email ou senha incorretos.' },
+    auth_error:        { body: 'Falha ao autenticar.' },
+    not_partner:       { body: 'Você não é parceiro deste negócio.' },
+    pending_approval:  { body: 'Seu acesso ainda não foi aprovado pelo responsável do negócio.' },
+    access_inactive:   { body: 'Seu acesso está inativo. Entre em contato com o responsável.' },
+    unexpected_error:  { body: 'Erro inesperado. Tente novamente.' },
   },
 
   clientArea: {
@@ -1073,31 +1030,21 @@ export const ptBR = {
     },
 
     business: {
-
-      label_button: {
-        servicos:  'AGENDAR SERVIÇO',
-        consultas: 'AGENDAR CONSULTA',
-        aulas:     'AGENDAR AULA',
-      },
-
       section_title: {
         servicos:  'Serviços',
         consultas: 'Consultas',
         aulas:     'Aulas',
       },
-
       counter_singular: {
         servicos:  'serviço',
         consultas: 'consulta',
         aulas:     'aula',
       },
-
       counter_plural: {
         servicos:  'serviços',
         consultas: 'consultas',
         aulas:     'aulas',
       },
-
       empty_list: {
         servicos:  'Sem serviços para este profissional.',
         consultas: 'Sem consultas para este profissional.',
