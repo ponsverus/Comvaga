@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
+import { ptBR } from '../feedback/messages/ptBR';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const msgs = ptBR.parceiroCadastro;
 
 export default function ParceiroCadastro({ suppressAuthRef }) {
   const navigate = useNavigate();
@@ -23,10 +26,10 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
     const emailClean = email.trim().toLowerCase();
     const slugClean  = slug.trim().toLowerCase();
 
-    if (!nomeClean)                               return setErro('Informe seu nome.');
-    if (!emailClean || !emailClean.includes('@')) return setErro('Email inválido.');
-    if (senha.length < 6)                         return setErro('Senha deve ter ao menos 6 caracteres.');
-    if (!slugClean)                               return setErro('Informe o slug do negócio.');
+    if (!nomeClean)                               return setErro(msgs.nome_required.body);
+    if (!emailClean || !emailClean.includes('@')) return setErro(msgs.email_invalid.body);
+    if (senha.length < 6)                         return setErro(msgs.senha_too_short.body);
+    if (!slugClean)                               return setErro(msgs.slug_required.body);
 
     setLoading(true);
     if (suppressAuthRef) suppressAuthRef.current = true;
@@ -39,7 +42,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
         .maybeSingle();
 
       if (negErr) throw negErr;
-      if (!negocio) return setErro('Negócio não encontrado. Verifique o slug informado.');
+      if (!negocio) return setErro(msgs.negocio_not_found.body);
 
       const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
         email: emailClean,
@@ -48,13 +51,13 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
 
       if (signUpErr) {
         if (String(signUpErr.message || '').toLowerCase().includes('already')) {
-          return setErro('Este email já possui uma conta. Use a página de login de parceiro.');
+          return setErro(msgs.email_already_exists.body);
         }
         throw signUpErr;
       }
 
       const uid = signUpData?.user?.id;
-      if (!uid) throw new Error('Falha ao criar conta. Tente novamente.');
+      if (!uid) throw new Error(msgs.account_create_error.body);
 
       const { data: profExiste } = await supabase
         .from('profissionais')
@@ -65,9 +68,9 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
 
       if (profExiste) {
         await supabase.auth.signOut();
-        if (profExiste.status === 'pendente') return setErro('Você já tem um cadastro aguardando aprovação neste negócio.');
-        if (profExiste.status === 'ativo')    return setErro('Você já está cadastrado. Use a página de login.');
-        if (profExiste.status === 'inativo')  return setErro('Seu acesso está inativo. Entre em contato com o responsável.');
+        if (profExiste.status === 'pendente') return setErro(msgs.already_pending.body);
+        if (profExiste.status === 'ativo')    return setErro(msgs.already_active.body);
+        if (profExiste.status === 'inativo')  return setErro(msgs.access_inactive.body);
       }
 
       for (let i = 0; i < 6; i++) {
@@ -96,8 +99,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
       setShowAlert(true);
 
     } catch (e) {
-      console.error('ParceiroCadastro error:', e);
-      setErro(e?.message || 'Erro inesperado. Tente novamente.');
+      setErro(e?.message || msgs.unexpected_error.body);
       await supabase.auth.signOut();
     } finally {
       if (suppressAuthRef) suppressAuthRef.current = false;
@@ -112,10 +114,8 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
           <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-green-400 text-4xl">✓</span>
           </div>
-          <h1 className="text-3xl font-normal text-white uppercase mb-4">Cadastro enviado!</h1>
-          <p className="text-gray-400 font-normal mb-8">
-            Aguarde a aprovação do responsável pelo negócio para acessar o painel.
-          </p>
+          <h1 className="text-3xl font-normal text-white uppercase mb-4">{msgs.success_title}</h1>
+          <p className="text-gray-400 font-normal mb-8">{msgs.success_body}</p>
           <button
             onClick={() => navigate('/')}
             className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase"
