@@ -25,6 +25,12 @@ const getPrecoFinalEntrega = (e) => {
   return temPromo ? promo : preco;
 };
 
+const getValorAgendamento = (a) => {
+  const frozen = Number(a?.preco_final);
+  if (Number.isFinite(frozen) && frozen > 0) return frozen;
+  return getPrecoFinalEntrega(a?.entregas);
+};
+
 function HeartIcon({ filled = false, className = '', size = 20 }) {
   return (
     <svg
@@ -59,8 +65,8 @@ function getPublicUrl(bucket, path) {
 export default function ClientArea({ user, onLogout }) {
   const feedback = useFeedback();
 
-  const uiAlert = async (key, variant = 'info', params = {}) => {
-    if (feedback?.showMessage) { feedback.showMessage(key, { variant, ...params }); return; }
+  const uiAlert = (key, variant = 'info', params = {}) => {
+    if (feedback?.showMessage) feedback.showMessage(key, { variant, ...params });
   };
 
   const uiConfirm = async (key, variant = 'warning') => {
@@ -88,14 +94,15 @@ export default function ClientArea({ user, onLogout }) {
 
   useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
 
-  const fetchAgendamentos = async () => {
+  const fetchAgendamentos = useCallback(async () => {
     const { data, error } = await supabase.rpc('get_agendamentos_cliente', { p_cliente_id: user.id });
     if (error) throw error;
     return (data || []).map(a => ({
       ...a,
-      data:        String(a.data || ''),
-      hora_inicio: a.horario_inicio ? String(a.horario_inicio).slice(0, 5) : '',
-      hora_fim:    a.horario_fim    ? String(a.horario_fim).slice(0, 5)    : '',
+      preco_final:  a.preco_final ?? null,
+      data:         String(a.data || ''),
+      hora_inicio:  a.horario_inicio ? String(a.horario_inicio).slice(0, 5) : '',
+      hora_fim:     a.horario_fim    ? String(a.horario_fim).slice(0, 5)    : '',
       entregas: {
         nome:              a.entrega_nome,
         preco:             a.entrega_preco,
@@ -111,9 +118,9 @@ export default function ClientArea({ user, onLogout }) {
         },
       },
     }));
-  };
+  }, [user.id]);
 
-  const fetchFavoritos = async () => {
+  const fetchFavoritos = useCallback(async () => {
     const { data, error } = await supabase.rpc('get_favoritos_cliente', { p_cliente_id: user.id });
     if (error) throw error;
     return (data || []).map(f => ({
@@ -125,45 +132,48 @@ export default function ClientArea({ user, onLogout }) {
         ? { nome: f.profissional_nome, negocios: f.profissional_negocio_slug ? { slug: f.profissional_negocio_slug } : null }
         : null,
     }));
-  };
+  }, [user.id]);
 
-  const loadPerfil = async () => {
+  const loadPerfil = useCallback(async () => {
     const { data, error } = await supabase
       .from('users')
       .select('nome, avatar_path')
       .eq('id', user.id)
       .maybeSingle();
     if (error) throw error;
-    setNomePerfil(String(data?.nome || '').trim());
-    setAvatarPath(data?.avatar_path || null);
-  };
+    return { nome: String(data?.nome || '').trim(), avatarPath: data?.avatar_path || null };
+  }, [user.id]);
 
   const loadData = useCallback(async () => {
     if (!user?.id) return;
     setLoadError('');
     setLoading(true);
     try {
-      const [, ags, favs] = await Promise.all([
+      const [perfil, ags, favs] = await Promise.all([
         loadPerfil(),
         fetchAgendamentos(),
         fetchFavoritos(),
       ]);
+      setNomePerfil(perfil.nome);
+      setAvatarPath(perfil.avatarPath);
       setAgendamentos(ags);
       setFavoritos(favs);
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
       setLoadError(error?.message || 'Erro ao carregar dados.');
       setAgendamentos([]);
       setFavoritos([]);
-      await uiAlert('alerts.action_failed_support', 'warning');
+      uiAlert('alerts.action_failed_support', 'warning');
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, loadPerfil, fetchAgendamentos, fetchFavoritos]);
 
   useEffect(() => {
     if (user?.id) loadData();
-  }, [user?.id]);
+  }, [loadData]);
+
+  const fetchAgendamentosRef = useRef(fetchAgendamentos);
+  useEffect(() => { fetchAgendamentosRef.current = fetchAgendamentos; }, [fetchAgendamentos]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -174,11 +184,9 @@ export default function ClientArea({ user, onLogout }) {
         { event: '*', schema: 'public', table: 'agendamentos', filter: `cliente_id=eq.${user.id}` },
         async () => {
           try {
-            const ags = await fetchAgendamentos();
+            const ags = await fetchAgendamentosRef.current();
             setAgendamentos(ags);
-          } catch (e) {
-            console.error('Realtime reload error:', e);
-          }
+          } catch { }
         }
       )
       .subscribe();
@@ -193,8 +201,8 @@ export default function ClientArea({ user, onLogout }) {
     e.target.value = '';
     const maxMb   = 3;
     const okTypes = ['image/png', 'image/jpeg', 'image/webp'];
-    if (!okTypes.includes(file.type)) { await uiAlert('clientArea.avatar_invalid_format', 'error'); return; }
-    if (file.size > maxMb * 1024 * 1024) { await uiAlert('clientArea.avatar_too_large', 'error', { maxMb }); return; }
+    if (!okTypes.includes(file.type)) { uiAlert('clientArea.avatar_invalid_format', 'error'); return; }
+    if (file.size > maxMb * 1024 * 1024) { uiAlert('clientArea.avatar_too_large', 'error', { maxMb }); return; }
     try {
       setUploadingAvatar(true);
       const path = `${user.id}/avatar.webp`;
@@ -203,10 +211,9 @@ export default function ClientArea({ user, onLogout }) {
       const { error: updErr } = await supabase.from('users').update({ avatar_path: path }).eq('id', user.id);
       if (updErr) throw updErr;
       setAvatarPath(path);
-      await uiAlert('clientArea.avatar_updated', 'success');
-    } catch (err) {
-      console.error('Erro ao atualizar avatar:', err);
-      await uiAlert('clientArea.avatar_update_error', 'error');
+      uiAlert('clientArea.avatar_updated', 'success');
+    } catch {
+      uiAlert('clientArea.avatar_update_error', 'error');
     } finally {
       setUploadingAvatar(false);
     }
@@ -214,17 +221,16 @@ export default function ClientArea({ user, onLogout }) {
 
   const salvarNome = async () => {
     const nome = String(nomePerfil || '').trim();
-    if (!nome) { await uiAlert('clientArea.profile_name_required', 'error'); return; }
+    if (!nome) { uiAlert('clientArea.profile_name_required', 'error'); return; }
     try {
       setSavingPerfil(true);
       const { error: updErr } = await supabase.from('users').update({ nome }).eq('id', user.id);
       if (updErr) throw updErr;
       const { error: metaErr } = await supabase.auth.updateUser({ data: { nome } });
-      if (metaErr) console.warn('metaErr:', metaErr);
-      await uiAlert('clientArea.profile_name_updated', 'success');
-    } catch (e) {
-      console.error('Erro ao salvar nome:', e);
-      await uiAlert('clientArea.profile_name_update_error', 'error');
+      if (metaErr) { }
+      uiAlert('clientArea.profile_name_updated', 'success');
+    } catch {
+      uiAlert('clientArea.profile_name_update_error', 'error');
     } finally {
       setSavingPerfil(false);
     }
@@ -232,15 +238,14 @@ export default function ClientArea({ user, onLogout }) {
 
   const salvarEmail = async () => {
     const email = String(novoEmail || '').trim();
-    if (!email || !email.includes('@')) { await uiAlert('clientArea.account_email_invalid', 'error'); return; }
+    if (!email || !email.includes('@')) { uiAlert('clientArea.account_email_invalid', 'error'); return; }
     try {
       setSavingDados(true);
       const { error } = await supabase.auth.updateUser({ email });
       if (error) throw error;
-      await uiAlert('clientArea.account_email_update_sent', 'success');
-    } catch (e) {
-      console.error('Erro ao alterar email:', e);
-      await uiAlert('clientArea.account_email_update_error', 'error');
+      uiAlert('clientArea.account_email_update_sent', 'success');
+    } catch {
+      uiAlert('clientArea.account_email_update_error', 'error');
     } finally {
       setSavingDados(false);
     }
@@ -249,18 +254,17 @@ export default function ClientArea({ user, onLogout }) {
   const salvarSenha = async () => {
     const pass = String(novaSenha || '');
     const conf = String(confirmarSenha || '');
-    if (pass.length < 6) { await uiAlert('clientArea.account_password_too_short', 'error'); return; }
-    if (pass !== conf)   { await uiAlert('clientArea.account_password_mismatch',  'error'); return; }
+    if (pass.length < 6) { uiAlert('clientArea.account_password_too_short', 'error'); return; }
+    if (pass !== conf)   { uiAlert('clientArea.account_password_mismatch',  'error'); return; }
     try {
       setSavingDados(true);
       const { error } = await supabase.auth.updateUser({ password: pass });
       if (error) throw error;
       setNovaSenha('');
       setConfirmarSenha('');
-      await uiAlert('clientArea.account_password_updated', 'success');
-    } catch (e) {
-      console.error('Erro ao alterar senha:', e);
-      await uiAlert('clientArea.account_password_update_error', 'error');
+      uiAlert('clientArea.account_password_updated', 'success');
+    } catch {
+      uiAlert('clientArea.account_password_update_error', 'error');
     } finally {
       setSavingDados(false);
     }
@@ -272,12 +276,11 @@ export default function ClientArea({ user, onLogout }) {
     try {
       const { error } = await supabase.rpc('cancelar_agendamento', { p_agendamento_id: agendamentoId });
       if (error) throw error;
-      await uiAlert('clientArea.booking_canceled', 'danger');
+      uiAlert('clientArea.booking_canceled', 'danger');
       const ags = await fetchAgendamentos();
       setAgendamentos(ags);
-    } catch (error) {
-      console.error('Erro ao cancelar:', error);
-      await uiAlert('clientArea.booking_cancel_error', 'error');
+    } catch {
+      uiAlert('clientArea.booking_cancel_error', 'error');
     }
   };
 
@@ -286,10 +289,9 @@ export default function ClientArea({ user, onLogout }) {
       const { error } = await supabase.from('favoritos').delete().eq('id', favoritoId).eq('cliente_id', user.id);
       if (error) throw error;
       setFavoritos(prev => prev.filter(f => f.id !== favoritoId));
-      await uiAlert('clientArea.favorite_removed', 'success');
-    } catch (error) {
-      console.error('Erro ao remover favorito:', error);
-      await uiAlert('clientArea.favorite_remove_error', 'error');
+      uiAlert('clientArea.favorite_removed', 'success');
+    } catch {
+      uiAlert('clientArea.favorite_remove_error', 'error');
     }
   };
 
@@ -369,7 +371,7 @@ export default function ClientArea({ user, onLogout }) {
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 mb-1">VALOR</div>
-                  <div className="text-sm text-white">R$ {moneyBR(getPrecoFinalEntrega(ag.entregas))}</div>
+                  <div className="text-sm text-white">R$ {moneyBR(getValorAgendamento(ag))}</div>
                 </div>
               </div>
               {ag.status === 'agendado' && (
