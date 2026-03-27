@@ -835,7 +835,7 @@ export default function Dashboard({ user, onLogout }) {
                   </span>
                 </label>
               )}
-              <button onClick={onLogout} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-button text-sm font-normal uppercase">
+              <button onClick={onLogout} className="flex items-center gap-2 px-4 py-1.5 sm:py-2 bg-red-600 hover:bg-red-700 rounded-button text-sm font-normal uppercase">
                 <LogOut className="w-4 h-4" /><span className="hidden sm:inline">SAIR</span>
               </button>
             </div>
