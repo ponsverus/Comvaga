@@ -1311,11 +1311,11 @@ export default function Dashboard({ user, onLogout }) {
               </div>
               <div>
                 <label className="block text-sm mb-2">Dias de trabalho</label>
-                <div className="grid grid-cols-5 sm:grid-cols-7 gap-2">
+                <div className="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-7 gap-2">
                   {WEEKDAYS.map(d => (
                     <button key={d.value} type="button"
                       onClick={() => { const dias = formProfissional.dias_trabalho.includes(d.value) ? formProfissional.dias_trabalho.filter(x => x !== d.value) : [...formProfissional.dias_trabalho, d.value].sort(); setFormProfissional({ ...formProfissional, dias_trabalho: dias }); }}
-                      className={`py-2 rounded-button border font-normal text-xs transition-all ${formProfissional.dias_trabalho.includes(d.value) ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>
+                      className={`py-2 sm:py-1.5 px-2 sm:px-3 rounded-full border font-normal text-xs transition-all ${formProfissional.dias_trabalho.includes(d.value) ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>
                       {d.label}
                     </button>
                   ))}
