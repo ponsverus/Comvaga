@@ -39,6 +39,9 @@ export default function BookingCalendar({
   temaAtivo = 'dark',
 }) {
   const isLight = temaAtivo === 'light';
+  const entregaIds = Array.isArray(entrega?.entrega_ids) && entrega.entrega_ids.length
+    ? entrega.entrega_ids.filter(Boolean)
+    : [entrega?.id].filter(Boolean);
 
   const today = parseISO(todayISO);
 
@@ -140,21 +143,30 @@ export default function BookingCalendar({
     setConfirming(true);
     setConfirmError(null);
     try {
-      const { data, error } = await supabase.rpc('rpc_criar_agendamento', {
-        p_negocio_id:      negocioId,
-        p_profissional_id: profissional.id,
-        p_entrega_id:      entrega.id,
-        p_data:            selectedDay,
-        p_horario_inicio:  selectedSlot.hora,
-      });
+      const isMultiplo = entregaIds.length > 1;
+      const { data, error } = isMultiplo
+        ? await supabase.rpc('rpc_criar_agendamentos_multiplos', {
+            p_negocio_id:      negocioId,
+            p_profissional_id: profissional.id,
+            p_entrega_ids:     entregaIds,
+            p_data:            selectedDay,
+            p_horario_inicio:  selectedSlot.hora,
+          })
+        : await supabase.rpc('rpc_criar_agendamento', {
+            p_negocio_id:      negocioId,
+            p_profissional_id: profissional.id,
+            p_entrega_id:      entregaIds[0],
+            p_data:            selectedDay,
+            p_horario_inicio:  selectedSlot.hora,
+          });
 
       if (error) throw error;
 
-      const resultado = data?.[0];
+      const resultado = Array.isArray(data) ? data[data.length - 1] : data?.[0];
 
       onConfirm?.({
-        inicio:  resultado?.inicio  ?? selectedSlot.hora,
-        fim:     resultado?.fim     ?? null,
+        inicio:  resultado?.inicio ?? selectedSlot.hora,
+        fim:     resultado?.fim ?? null,
         label:   selectedSlot.hora,
         dataISO: selectedDay,
       });
