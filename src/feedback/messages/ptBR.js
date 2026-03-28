@@ -1048,9 +1048,9 @@ export const ptBR = {
         aulas:     'aula',
       },
       counter_plural: {
-        servicos:  'serviços',
-        consultas: 'consultas',
-        aulas:     'aulas',
+        servicos:  'SERVIÇOS',
+        consultas: 'CONSULTAS',
+        aulas:     'AULAS',
       },
       empty_list: {
         servicos:  'Sem serviços para este profissional.',
