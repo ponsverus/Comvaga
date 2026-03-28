@@ -122,13 +122,19 @@ export default function Dashboard({ user, onLogout }) {
   const uiPrompt  = async (key, opts = {}) => { if (feedback?.prompt) return await feedback.prompt(key, opts); return null; };
 
   const [parceiroProfissional, setParceiroProfissional] = useState(null);
+  const souDono = negocio?.owner_id === user?.id;
+  const acessoDashboardAutorizado = souDono || !!parceiroProfissional;
 
   const checarPermissao = useCallback(async (profissionalId) => {
+    if (!acessoDashboardAutorizado) {
+      await uiAlert('dashboard.parceiro_acao_proibida', 'warning');
+      return false;
+    }
     if (!parceiroProfissional) return true;
     if (parceiroProfissional.id === profissionalId) return true;
     await uiAlert('dashboard.parceiro_acao_proibida', 'warning');
     return false;
-  }, [parceiroProfissional]);
+  }, [acessoDashboardAutorizado, parceiroProfissional]);
 
   const [activeTab, setActiveTab] = useState('agendamentos');
   const [negocio, setNegocio]             = useState(null);
@@ -426,8 +432,14 @@ export default function Dashboard({ user, onLogout }) {
       if (profissionaisResult.error) throw profissionaisResult.error;
       const profs = profissionaisResult.data || [];
       setProfissionais(profs);
-      const souDono = negocioData.owner_id === user.id;
-      const meuProfissional = souDono ? null : (profs.find(p => p.user_id === user.id) || null);
+      const souDonoDoNegocio = negocioData.owner_id === user.id;
+      const meuProfissional = souDonoDoNegocio ? null : (profs.find(p => p.user_id === user.id) || null);
+      if (!souDonoDoNegocio && !meuProfissional) {
+        setNegocio(null); setParceiroProfissional(null); setProfissionais([]); setEntregas([]); setAgendamentos([]); setGaleriaItems([]);
+        setError('Você não tem acesso a este negócio.');
+        setLoading(false);
+        return;
+      }
       setParceiroProfissional(meuProfissional);
       const profId = meuProfissional?.id ?? null;
       if (profs.length === 0) { setEntregas([]); setAgendamentos([]); setLoading(false); return; }
@@ -774,7 +786,9 @@ export default function Dashboard({ user, onLogout }) {
 
   const tabs = parceiroProfissional
     ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'entregas', 'profissionais']
-    : ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'entregas', 'profissionais', 'info-negocio'];
+    : souDono
+      ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'entregas', 'profissionais', 'info-negocio']
+      : ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'entregas', 'profissionais'];
 
   const TAB_LABELS = { 'visao-geral': 'GERAL', 'agendamentos': 'AGENDAMENTOS', 'cancelados': 'CANCELADOS', 'historico': 'HISTÓRICO', 'entregas': tabEntregasLabel, 'profissionais': 'PROFISSIONAIS', 'info-negocio': 'INFO DO NEGÓCIO' };
 
@@ -799,8 +813,6 @@ export default function Dashboard({ user, onLogout }) {
     </div>
   );
 
-  const souDono = negocio.owner_id === user?.id;
-
   return (
     <div className="min-h-screen bg-black text-white">
 
@@ -815,18 +827,18 @@ export default function Dashboard({ user, onLogout }) {
               </div>
               <div>
                 <h1 className="text-xl font-normal">{negocio.nome}</h1>
-                {!parceiroProfissional
+                {souDono
                   ? ownerBusinessCount > 1
                     ? <button type="button" onClick={() => navigate('/selecionar-negocio')} className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block">TROCAR NEGÓCIO</button>
                     : <span className="text-xs text-gray-500 -mt-0.5 block">DASHBOARD</span>
-                  : <span className="text-xs text-primary -mt-0.5 block">{parceiroProfissional.nome}</span>}
+                  : <span className="text-xs text-primary -mt-0.5 block">{parceiroProfissional?.nome || 'PARCEIRO'}</span>}
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
               <Link to={`/v/${negocio.slug}`} target="_blank" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-dark-200 border border-gray-800 hover:border-primary rounded-button text-sm font-normal uppercase">
                 <Eye className="w-4 h-4" />VER VITRINE
               </Link>
-              {!parceiroProfissional && (
+              {souDono && (
                 <label className="inline-block">
                   <input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => uploadLogoNegocio(e.target.files?.[0])} disabled={logoUploading} />
                   <span className={`inline-flex items-center justify-center text-center rounded-button font-normal border transition-all uppercase focus:outline-none ${logoUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/10 hover:bg-primary/20 border-primary/30 text-primary cursor-pointer'}  px-4 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-sm`}>
@@ -904,7 +916,7 @@ export default function Dashboard({ user, onLogout }) {
                   <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-2">CONCLUÍDOS HOJE</div><div className="text-3xl font-normal text-white">{Number(metricsHoje?.today?.concluidos || 0)}</div><div className="text-xs text-gray-300 mt-1">TICKET MÉDIO: <span className="text-primary">R$ {Number(metricsHoje?.today?.ticket_medio || 0).toFixed(2)}</span></div></div>
                   <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-2">PRÓXIMO AGENDAMENTO</div>{proximoAgendamento ? (<><div className="text-3xl font-normal text-primary">{getAgInicio(proximoAgendamento)}</div><div className="text-sm text-gray-300 mt-1">{proximoAgendamento.cliente?.nome || '—'} • {proximoAgendamento.profissionais?.nome}</div><div className="text-xs text-gray-500 mt-1">{proximoAgendamento.entregas?.nome}</div></>) : <div className="text-sm text-gray-500">:(</div>}</div>
                 </div>
-                {!parceiroProfissional && faturamentoPorProfissionalHoje.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">{faturamentoPorProfissionalHoje.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}</div>)}
+                {souDono && faturamentoPorProfissionalHoje.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">{faturamentoPorProfissionalHoje.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}</div>)}
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-5">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"><h3 className="text-lg font-normal flex items-center gap-2 uppercase"><span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="font-normal text-2xl">$</span>FATURAMENTO</h3><DatePicker value={faturamentoData} onChange={(iso) => setFaturamentoData(iso)} todayISO={hoje} /></div>
                   <div className="text-3xl font-normal text-white mb-2">{metricsDiaLoading ? <span className="text-gray-500 text-xl">...</span> : <>R$ {Number(metricsDia?.selected_day?.faturamento || 0).toFixed(2)}</>}</div>
@@ -914,7 +926,7 @@ export default function Dashboard({ user, onLogout }) {
                     <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">FECHAMENTO</div><div className="text-xl font-normal text-white">{Number(metricsDia?.selected_day?.taxa_conversao || 0).toFixed(1)}%</div><div className="text-xs text-gray-500 mt-1">sobre {Number(metricsDia?.selected_day?.total || 0)} agendamento(s)</div></div>
                     <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">TICKET MÉDIO</div><div className="text-xl font-normal text-primary">R$ {Number(metricsDia?.selected_day?.ticket_medio || 0).toFixed(2)}</div></div>
                   </div>
-                  {!parceiroProfissional && faturamentoPorProfissionalFiltro.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4 items-start">{faturamentoPorProfissionalFiltro.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}</div>)}
+                  {souDono && faturamentoPorProfissionalFiltro.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4 items-start">{faturamentoPorProfissionalFiltro.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}</div>)}
                   <div className="mt-2 bg-dark-100 border border-gray-800 rounded-custom p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3"><div className="text-xs text-gray-500 uppercase tracking-wide">FATURAMENTO POR PERÍODO</div><PeriodoSelect value={faturamentoPeriodo} onChange={setFaturamentoPeriodo} /></div>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
@@ -1148,16 +1160,16 @@ export default function Dashboard({ user, onLogout }) {
                             </div>
                           </>
                         )}
-                        {isPendente && !parceiroProfissional && (
+                        {isPendente && souDono && (
                           <div className="flex gap-2 mt-4">
                             <button onClick={() => aprovarParceiro(p)} className="flex-1 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">APROVAR</button>
                             <button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
                           </div>
                         )}
-                        {!isPendente && (isEuMesmo || !parceiroProfissional) && (
+                        {!isPendente && (isEuMesmo || souDono) && (
                           <>
                             {isInativo && p.motivo_inativo && (<div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-custom p-2 mb-3">INATIVO {p.motivo_inativo ? `• ${p.motivo_inativo}` : ''}</div>)}
-                            {!parceiroProfissional ? (
+                            {souDono ? (
                               <div className="space-y-2 mt-2">
                                 <div className="flex gap-2">
                                   <button onClick={() => toggleStatusProfissional(p)} className={`flex-1 py-2 rounded-button text-sm border font-normal uppercase ${isAtivo ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300' : 'bg-green-500/10 border-green-500/30 text-green-300'}`}>
@@ -1179,7 +1191,7 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             )}
 
-            {activeTab === 'info-negocio' && !parceiroProfissional && (
+            {activeTab === 'info-negocio' && souDono && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-2xl font-normal">Info do Negócio</h2>
