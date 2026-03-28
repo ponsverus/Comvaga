@@ -122,18 +122,6 @@ export default function Dashboard({ user, onLogout }) {
   const uiPrompt  = async (key, opts = {}) => { if (feedback?.prompt) return await feedback.prompt(key, opts); return null; };
 
   const [parceiroProfissional, setParceiroProfissional] = useState(null);
-
-  const checarPermissao = useCallback(async (profissionalId) => {
-    if (!acessoDashboardAutorizado) {
-      await uiAlert('dashboard.parceiro_acao_proibida', 'warning');
-      return false;
-    }
-    if (!parceiroProfissional) return true;
-    if (parceiroProfissional.id === profissionalId) return true;
-    await uiAlert('dashboard.parceiro_acao_proibida', 'warning');
-    return false;
-  }, [acessoDashboardAutorizado, parceiroProfissional]);
-
   const [activeTab, setActiveTab] = useState('agendamentos');
   const [negocio, setNegocio]             = useState(null);
   const [profissionais, setProfissionais] = useState([]);
@@ -145,6 +133,17 @@ export default function Dashboard({ user, onLogout }) {
   const [hoje, setHoje]                   = useState(() => '');
   const souDono = negocio?.owner_id === user?.id;
   const acessoDashboardAutorizado = souDono || !!parceiroProfissional;
+
+  const checarPermissao = useCallback(async (profissionalId) => {
+    if (!acessoDashboardAutorizado) {
+      await uiAlert('dashboard.parceiro_acao_proibida', 'warning');
+      return false;
+    }
+    if (!parceiroProfissional) return true;
+    if (parceiroProfissional.id === profissionalId) return true;
+    await uiAlert('dashboard.parceiro_acao_proibida', 'warning');
+    return false;
+  }, [acessoDashboardAutorizado, parceiroProfissional]);
 
   const agProfIds = useMemo(() => profissionais.map(p => p.id), [profissionais]);
 
