@@ -613,7 +613,14 @@ export default function Vitrine({ user, userType }) {
     const primeiroServico = flow.servicosSelecionados[0];
     const durTotal = flow.servicosSelecionados.reduce((sum, s) => sum + Number(s?.duracao_minutos || 0), 0);
     const valTotal = flow.servicosSelecionados.reduce((sum, s) => sum + getPrecoFinalServico(s), 0);
-    return { id: primeiroServico.id, nome: flow.servicosSelecionados.length === 1 ? primeiroServico.nome : `${flow.servicosSelecionados.length} ${counterPlural}`, duracao_minutos: durTotal, preco: valTotal, preco_promocional: null };
+    return {
+      id: primeiroServico.id,
+      nome: flow.servicosSelecionados.length === 1 ? primeiroServico.nome : `${flow.servicosSelecionados.length} ${counterPlural}`,
+      duracao_minutos: durTotal,
+      preco: valTotal,
+      preco_promocional: null,
+      entrega_ids: flow.servicosSelecionados.map(servico => servico.id).filter(Boolean),
+    };
   }, [flow.servicosSelecionados, counterPlural]);
 
   const handleBookingConfirm = (slot) => {
