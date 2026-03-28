@@ -122,8 +122,6 @@ export default function Dashboard({ user, onLogout }) {
   const uiPrompt  = async (key, opts = {}) => { if (feedback?.prompt) return await feedback.prompt(key, opts); return null; };
 
   const [parceiroProfissional, setParceiroProfissional] = useState(null);
-  const souDono = negocio?.owner_id === user?.id;
-  const acessoDashboardAutorizado = souDono || !!parceiroProfissional;
 
   const checarPermissao = useCallback(async (profissionalId) => {
     if (!acessoDashboardAutorizado) {
@@ -145,6 +143,8 @@ export default function Dashboard({ user, onLogout }) {
   const [error, setError]                 = useState(null);
   const [serverNow, setServerNow]         = useState(() => ({ ts: null, dow: 0, date: '', source: 'db', minutes: 0 }));
   const [hoje, setHoje]                   = useState(() => '');
+  const souDono = negocio?.owner_id === user?.id;
+  const acessoDashboardAutorizado = souDono || !!parceiroProfissional;
 
   const agProfIds = useMemo(() => profissionais.map(p => p.id), [profissionais]);
 
