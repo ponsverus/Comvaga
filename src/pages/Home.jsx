@@ -5,7 +5,7 @@ import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 
 const SUPORTE_PHONE_E164 = '5533999037979';
-const SUPORTE_MSG = 'OlA!, preciso de ajuda. Pode me orientar?';
+const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
 const SUPORTE_HREF =
   `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent(SUPORTE_MSG)}`;
 
@@ -45,8 +45,8 @@ function SearchBox({
     <div ref={wrapRef} className="relative">
       <div
         className={[
-          'relative flex items-center overflow-hidden rounded-full border border-white/10 bg-black/40 backdrop-blur-md transition-all duration-300 ease-out',
-          searchOpen ? 'w-[min(24rem,calc(100vw-2rem))] shadow-[0_0_0_1px_rgba(255,209,26,0.18)]' : 'w-11',
+          'relative flex items-center overflow-hidden rounded-full bg-black/40 backdrop-blur-md transition-all duration-300 ease-out',
+          searchOpen ? 'w-[min(24rem,calc(100vw-2rem))] border border-white/10 shadow-[0_0_0_1px_rgba(255,209,26,0.18)]' : 'w-11 border border-transparent bg-transparent backdrop-blur-0',
         ].join(' ')}
       >
         <button
@@ -69,7 +69,7 @@ function SearchBox({
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Buscar negocio ou profissional"
+          placeholder="Buscar negócio ou profissional"
           className={[
             'bg-transparent pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300',
             searchOpen ? 'w-full opacity-100' : 'w-0 opacity-0',
@@ -84,7 +84,7 @@ function SearchBox({
       </div>
 
       {searchOpen && resultadosBusca.length > 0 && (
-        <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[1.5rem] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl">
+        <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl">
           {resultadosBusca.map((r, i) => (
             <Link
               key={`${r.tipo}-${r.slug || r.negocios?.slug}-${i}`}
@@ -97,16 +97,19 @@ function SearchBox({
               className="block border-b border-white/5 px-5 py-4 transition-colors hover:bg-dark-200/90 last:border-b-0"
             >
               <div className="font-bold text-white">{r.nome}</div>
-              <div className="mt-1 text-[11px] uppercase tracking-[0.22em] text-gray-500">
-                {r.tipo === 'negocio' ? 'Negocio' : 'Profissional'}
+              <div className="mt-1 text-[11px] uppercase tracking-[0.08em] text-gray-500">
+                {r.tipo === 'negocio' ? 'Negócio' : 'Profissional'}
               </div>
+              {r.tipo === 'profissional' && r.negocios?.nome && (
+                <div className="mt-1 text-sm text-gray-400">{r.negocios.nome}</div>
+              )}
             </Link>
           ))}
         </div>
       )}
 
       {searchOpen && !buscando && searchTerm.trim().length >= 3 && resultadosBusca.length === 0 && (
-        <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[1.5rem] border border-white/10 bg-dark-100/95 px-5 py-4 text-sm text-gray-400 shadow-2xl backdrop-blur-xl">
+        <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[3px] border border-white/10 bg-dark-100/95 px-5 py-4 text-sm text-gray-400 shadow-2xl backdrop-blur-xl">
           Nenhum resultado encontrado.
         </div>
       )}
@@ -131,7 +134,10 @@ export default function Home({ user, userType, onLogout }) {
       const term = String(searchTerm || '').trim();
 
       if (term.length < 3) {
-        if (!cancelled) setResultadosBusca([]);
+        if (!cancelled) {
+          setResultadosBusca([]);
+          setBuscando(false);
+        }
         return;
       }
 
@@ -141,7 +147,7 @@ export default function Home({ user, userType, onLogout }) {
         const [{ data: negocios, error: nErr }, { data: profissionais, error: pErr }] =
           await Promise.all([
             supabase.from('negocios').select('nome, slug').ilike('nome', `%${term}%`).limit(5),
-            supabase.from('profissionais').select('nome, negocios(slug)').eq('status', 'ativo').ilike('nome', `%${term}%`).limit(5),
+            supabase.from('profissionais').select('nome, negocios(nome, slug)').eq('status', 'ativo').ilike('nome', `%${term}%`).limit(5),
           ]);
 
         if (nErr || pErr) throw nErr || pErr;
@@ -188,7 +194,7 @@ export default function Home({ user, userType, onLogout }) {
                     CLIQUE PARA IR
                   </span>
 
-                  <span className="text-black mx-4">o</span>
+                  <span className="text-black mx-4">•</span>
 
                   <a
                     href={SUPORTE_HREF}
@@ -199,7 +205,7 @@ export default function Home({ user, userType, onLogout }) {
                     SUPORTE
                   </a>
 
-                  <span className="text-black mx-4">o</span>
+                  <span className="text-black mx-4">•</span>
                 </div>
               ))}
             </div>
@@ -275,7 +281,7 @@ export default function Home({ user, userType, onLogout }) {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
-            O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span> antes que acontecam. Se um servico vai ultrapassar o proximo horario agendado, o sistema bloqueia automaticamente a reserva. Mas vai alem: quando ha um cancelamento, a tecnologia fragmenta esse tempo livre em multiplas oportunidades de agendamento, respeitando o tempo exato de cada servico oferecido. Resultado: sua agenda trabalha no maximo da capacidade, sem desperdicio.
+            O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span> antes que aconteçam. Se um serviço vai ultrapassar o próximo horário agendado, o sistema bloqueia automaticamente a reserva. Mas vai além: quando há um cancelamento, a tecnologia fragmenta esse tempo livre em múltiplas oportunidades de agendamento, respeitando o tempo exato de cada serviço oferecido. Resultado: sua agenda trabalha no máximo da capacidade, sem desperdício.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -291,7 +297,7 @@ export default function Home({ user, userType, onLogout }) {
               onClick={() => document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })}
               className="px-10 py-5 bg-white/10 border border-white/20 text-white rounded-button font-bold text-lg hover:bg-white/20 backdrop-blur-sm"
             >
-              ENTENDER A LOGICA
+              ENTENDER A LÓGICA
             </button>
           </div>
 
@@ -300,7 +306,7 @@ export default function Home({ user, userType, onLogout }) {
               <div key={i} className="bg-dark-100/50 backdrop-blur-md border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all">
                 <div className="text-4xl font-normal text-primary mb-2">{stat}</div>
                 <div className="text-sm text-gray-500 uppercase">
-                  {['Aproveitamento de Tempo', 'Conflito de Horarios'][i]}
+                  {['Aproveitamento de Tempo', 'Conflito de Horários'][i]}
                 </div>
               </div>
             ))}
@@ -312,16 +318,16 @@ export default function Home({ user, userType, onLogout }) {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-black mb-4">
-              A CIENCIA <span className="text-primary">POR TRAS</span>
+              A CIÊNCIA <span className="text-primary">POR TRÁS</span>
             </h2>
             <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-10 md:gap-14">
             {[
-              { num: 1, title: 'PAINEL DE SERVICOS', text: 'Cadastre seus servicos e tempos exatos. O sistema transforma esses dados em uma grade totalmente moldavel e fluida.' },
-              { num: 2, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horarios livres reais, sem precisar baixar nada.' },
-              { num: 3, title: 'ENCAIXE AUTOMATICO', text: 'O algoritmo recalcula sua agenda a cada mudanca: novos horarios marcados, desistencias ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o maximo de eficiencia' }
+              { num: 1, title: 'PAINEL DE SERVIÇOS', text: 'Cadastre seus serviços e tempos exatos. O sistema transforma esses dados em uma grade totalmente moldável e fluida.' },
+              { num: 2, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
+              { num: 3, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência' }
             ].map(({ num, title, text }) => (
               <div key={num} className="relative">
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 md:-top-10 md:-left-4 w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 z-10">
@@ -341,9 +347,9 @@ export default function Home({ user, userType, onLogout }) {
                 <Zap className="w-8 h-8 text-primary" />
               </div>
               <div>
-                <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO AUTOMATICO DE HORARIOS</h3>
+                <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO AUTOMÁTICO DE HORÁRIOS</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos. O horario vago e imediatamente redistribuido na vitrine como novas vagas disponiveis, cada uma dimensionada conforme seus servicos. Um espaco de 60 minutos pode se transformar em tres oportunidades de 20 minutos ou duas de 30 minutos. Seus clientes veem essas vagas especiais identificadas com um icone discreto, garantindo transparencia total.
+                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos. O horário vago é imediatamente redistribuído na vitrine como novas vagas disponíveis, cada uma dimensionada conforme seus serviços. Um espaço de 60 minutos pode se transformar em três oportunidades de 20 minutos ou duas de 30 minutos. Seus clientes veem essas vagas especiais identificadas com um ícone discreto, garantindo transparência total.
                 </p>
               </div>
             </div>
@@ -355,19 +361,19 @@ export default function Home({ user, userType, onLogout }) {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-black mb-4">
-              VANTAGEM <span className="text-primary">MUTUA</span>
+              VANTAGEM <span className="text-primary">MÚTUA</span>
             </h2>
             <p className="text-xl text-gray-400">Por que Profissionais e Clientes preferem Comvaga</p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: TrendingUp, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o maximo de clientes sem sobrecarga.' },
-              { icon: Users, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de calculo.' },
-              { icon: Shield, title: 'AGENDA INTELIGENTE', text: 'O sistema le o futuro: se o servico escolhido vai invadir o proximo horario, a reserva e bloqueada automaticamente.' },
-              { icon: Clock, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuizo. O horario volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
-              { icon: Star, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente ve profissionalismo desde o primeiro clique.' },
-              { icon: CheckCircle, title: 'GEOMETRIA DE TEMPO', text: 'Substituimos os blocos fixos e obsoletos pelo uso do tempo real de cada servico, garantindo o encaixe perfeito.' }
+              { icon: TrendingUp, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
+              { icon: Users, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
+              { icon: Shield, title: 'AGENDA INTELIGENTE', text: 'O sistema lê o futuro: se o serviço escolhido vai invadir o próximo horário, a reserva é bloqueada automaticamente.' },
+              { icon: Clock, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
+              { icon: Star, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
+              { icon: CheckCircle, title: 'GEOMETRIA DE TEMPO', text: 'Substituímos os blocos fixos e obsoletos pelo uso do tempo real de cada serviço, garantindo o encaixe perfeito.' }
             ].map(({ icon: Icon, title, text }, i) => (
               <div
                 key={i}
@@ -386,15 +392,15 @@ export default function Home({ user, userType, onLogout }) {
 
       <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-black text-black mb-6">ELEVE SEU NIVEL PROFISSIONAL</h2>
-          <p className="text-2xl text-black/80 mb-8">Sincronia automatica, cliente pontual e agenda cheia.</p>
+          <h2 className="text-5xl font-black text-black mb-6">ELEVE SEU NÍVEL PROFISSIONAL</h2>
+          <p className="text-2xl text-black/80 mb-8">Sincronia automática, cliente pontual e agenda cheia.</p>
           <Link
             to="/cadastro"
             className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all hover:scale-105"
           >
-            COMECAR AGORA GRATIS <Zap className="w-6 h-6" />
+            COMEÇAR AGORA GRÁTIS <Zap className="w-6 h-6" />
           </Link>
-          <p className="text-black/60 text-sm mt-6">Eficiencia comprovada em barbearias, estudios e clinicas.</p>
+          <p className="text-black/60 text-sm mt-6">Eficiência comprovada em barbearias, estúdios e clínicas.</p>
         </div>
       </section>
 
@@ -404,7 +410,7 @@ export default function Home({ user, userType, onLogout }) {
             <div>
               <h4 className="text-white font-normal mb-4">PRODUTO</h4>
               <ul className="space-y-2">
-                {['COMO FUNCIONA', 'PRECOS'].map(link => (
+                {['COMO FUNCIONA', 'PREÇOS'].map(link => (
                   <li key={link}>
                     <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm">
                       {link}
@@ -415,7 +421,7 @@ export default function Home({ user, userType, onLogout }) {
             </div>
 
             <div>
-              <h4 className="text-white font-normal mb-4">PARA VOCE</h4>
+              <h4 className="text-white font-normal mb-4">PARA VOCÊ</h4>
               <ul className="space-y-2">
                 {isLogged ? (
                   <>
@@ -424,7 +430,7 @@ export default function Home({ user, userType, onLogout }) {
                         to={userType === 'professional' ? '/dashboard' : '/minha-area'}
                         className="text-gray-500 hover:text-primary transition-colors text-sm"
                       >
-                        {userType === 'professional' ? 'DASHBOARD' : 'MINHA AREA'}
+                        {userType === 'professional' ? 'DASHBOARD' : 'MINHA ÁREA'}
                       </Link>
                     </li>
                     <li>
@@ -446,7 +452,7 @@ export default function Home({ user, userType, onLogout }) {
                     </li>
                     <li>
                       <Link to="/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        CADASTRAR GRATIS
+                        CADASTRAR GRÁTIS
                       </Link>
                     </li>
                     <li>
@@ -494,7 +500,7 @@ export default function Home({ user, userType, onLogout }) {
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <div className="flex items-center gap-3">
               <div className="text-white font-black text-sm">COMVAGA</div>
-              <div className="text-gray-600 text-sm">(c) 2026 COMVAGA. Todos os direitos reservados.</div>
+              <div className="text-gray-600 text-sm">© 2026 COMVAGA. Todos os direitos reservados.</div>
             </div>
           </div>
         </div>
