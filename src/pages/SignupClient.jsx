@@ -104,7 +104,7 @@ export default function SignupClient({ onLogin }) {
           />
         </div>
 
-        <div className="relative">
+        <form onSubmit={handleSignup} className="relative">
           <div className="text-center mb-10">
             <User className="mx-auto mb-4 text-blue-400 w-12 h-12" />
             <h1 className="text-4xl font-normal mb-3 tracking-wide">Criar conta</h1>
@@ -159,7 +159,7 @@ export default function SignupClient({ onLogin }) {
             </div>
 
             <button
-              onClick={handleSignup}
+              type="submit"
               disabled={loading}
               className="w-full py-3 bg-blue-500/10 border border-blue-500/30 hover:border-blue-500/60 hover:bg-blue-500/20 text-blue-400 rounded-full font-normal text-sm tracking-wider transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
@@ -177,7 +177,7 @@ export default function SignupClient({ onLogin }) {
               </Link>
             </div>
           </div>
-        </div>
+        </form>
 
         <div className="text-center mt-12">
           <p className="text-xs text-gray-600 font-normal">
