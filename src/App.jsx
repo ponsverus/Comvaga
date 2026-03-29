@@ -86,7 +86,7 @@ function ScrollToTopOnRouteChange() {
 function RecoveryWatcher({ onChange }) {
   const loc = useLocation();
   useEffect(() => {
-    if (isPasswordRecoveryUrl()) onChange(true);
+    onChange(isPasswordRecoveryUrl());
   }, [loc.pathname, loc.search, loc.hash, onChange]);
   return null;
 }
