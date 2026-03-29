@@ -426,7 +426,9 @@ export default function Dashboard({ user, onLogout }) {
         supabase.from('galerias').select('id, path, ordem').eq('negocio_id', negocioData.id).order('ordem', { ascending: true }).order('created_at', { ascending: true }),
         supabase.rpc('get_profissionais_com_status', { p_negocio_id: negocioData.id })
       ]);
-      if (galeriaResult.error) { }
+      if (galeriaResult.error) {
+        await uiAlert('dashboard.gallery_load_warning', 'warning');
+      }
       setGaleriaItems(galeriaResult.data || []);
       if (profissionaisResult.error) throw profissionaisResult.error;
       const profs = profissionaisResult.data || [];
