@@ -154,30 +154,30 @@ export const ptBR = {
       },
 
       button_add: {
-        servicos:  'SERVIÇO',
-        consultas: 'CONSULTAl',
+        servicos:  'ADD SERV',
+        consultas: 'CONSULTA',
         aulas:     'AULA',
       },
 
       modal_new: {
-        servicos:  'NOVO SERVIÇO',
+        servicos:  'NOVO SERV',
         consultas: 'NOVA CONSULTA',
         aulas:     'NOVA AULA',
       },
 
       modal_edit: {
-        servicos:  'EDITAR SERVIÇO',
+        servicos:  'EDITAR SERV',
         consultas: 'EDITAR CONSULTA',
         aulas:     'EDITAR AULA',
       },
 
       counter_singular: {
-        servicos:  'SERVIÇO',
+        servicos:  'SERV',
         consultas: 'CONSULTA',
         aulas:     'AULA',
       },
       counter_plural: {
-        servicos:  'SERVIÇOS',
+        servicos:  'SERV',
         consultas: 'CONSULTAS',
         aulas:     'AULAS',
       },
@@ -1038,14 +1038,14 @@ export const ptBR = {
         aulas:     'Aulas',
       },
       counter_singular: {
-        servicos:  'serviço',
-        consultas: 'consulta',
-        aulas:     'aula',
+        servicos:  'SERV',
+        consultas: 'CONSULTA',
+        aulas:     'AULA',
       },
       counter_plural: {
-        servicos:  'serviços',
-        consultas: 'consultas',
-        aulas:     'aulas',
+        servicos:  'SERV',
+        consultas: 'CONSULTAS',
+        aulas:     'AULAS',
       },
       empty_list: {
         servicos:  'Sem serviços para este profissional.',
