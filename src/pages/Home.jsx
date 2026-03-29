@@ -69,7 +69,7 @@ function SearchBox({
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Buscar negócio ou profissional"
+          placeholder="BUSQUE: NEGÓCIO OU PROFISSIONAL :)"
           className={[
             'bg-transparent pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300',
             searchOpen ? 'w-full opacity-100' : 'w-0 opacity-0',
@@ -194,7 +194,7 @@ export default function Home({ user, userType, onLogout }) {
                     CLIQUE PARA IR
                   </span>
 
-                  <span className="text-black mx-4">•</span>
+                  <span className="text-black mx-4">●</span>
 
                   <a
                     href={SUPORTE_HREF}
@@ -205,7 +205,7 @@ export default function Home({ user, userType, onLogout }) {
                     SUPORTE
                   </a>
 
-                  <span className="text-black mx-4">•</span>
+                  <span className="text-black mx-4">●</span>
                 </div>
               ))}
             </div>
