@@ -37,10 +37,8 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
   const { showMessage } = useFeedback();
 
   useEffect(() => {
-    if (inRecoveryProp) {
-      setIsRecovery(true);
-      setStep(2);
-    }
+    setIsRecovery(!!inRecoveryProp);
+    setStep(inRecoveryProp ? 2 : 1);
   }, [inRecoveryProp]);
 
   useEffect(() => {
