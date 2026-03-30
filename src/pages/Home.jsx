@@ -69,14 +69,13 @@ function SearchBox({
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="BUSQUE: NEGÓCIO OU PROFISSIONAL :)"
+          placeholder="BUSQUE UM PROFISSIONAL :)"
           className={[
             'bg-transparent pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300',
             searchOpen ? 'w-full opacity-100' : 'w-0 opacity-0',
           ].join(' ')}
         />
 
-        {/* FIX: só mostra spinner enquanto está buscando E o termo tem 3+ chars */}
         {buscando && searchTerm.trim().length >= 3 && (
           <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
             <div className="h-4 w-4 rounded-full border border-primary border-t-transparent animate-spin" />
@@ -88,8 +87,8 @@ function SearchBox({
         <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl">
           {resultadosBusca.map((r, i) => (
             <Link
-              key={`${r.tipo}-${r.slug || r.negocios?.slug}-${i}`}
-              to={`/v/${r.tipo === 'negocio' ? r.slug : r.negocios?.slug}`}
+              key={`profissional-${r.negocios?.slug}-${i}`}
+              to={`/v/${r.negocios?.slug}`}
               onClick={() => {
                 setSearchOpen(false);
                 setSearchTerm('');
@@ -99,9 +98,9 @@ function SearchBox({
             >
               <div className="font-bold text-white">{r.nome}</div>
               <div className="mt-1 text-[11px] uppercase tracking-[0.08em] text-gray-500">
-                {r.tipo === 'negocio' ? 'Negócio' : 'Profissional'}
+                Profissional
               </div>
-              {r.tipo === 'profissional' && r.negocios?.nome && (
+              {r.negocios?.nome && (
                 <div className="mt-1 text-sm text-gray-400">{r.negocios.nome}</div>
               )}
             </Link>
@@ -111,7 +110,7 @@ function SearchBox({
 
       {searchOpen && !buscando && searchTerm.trim().length >= 3 && resultadosBusca.length === 0 && (
         <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[3px] border border-white/10 bg-dark-100/95 px-5 py-4 text-sm text-gray-400 shadow-2xl backdrop-blur-xl">
-          Nenhum resultado encontrado.
+          BUSQUE: NEGÓCIO OU PROFISSIONAL :)
         </div>
       )}
     </div>
@@ -137,7 +136,6 @@ export default function Home({ user, userType, onLogout }) {
       if (term.length < 3) {
         if (!cancelled) {
           setResultadosBusca([]);
-          // FIX: garante que o spinner para quando o termo fica abaixo de 3 chars
           setBuscando(false);
         }
         return;
@@ -146,28 +144,27 @@ export default function Home({ user, userType, onLogout }) {
       if (!cancelled) setBuscando(true);
 
       try {
-        const [{ data: negocios, error: nErr }, { data: profissionais, error: pErr }] =
-          await Promise.all([
-            supabase.from('negocios').select('nome, slug').ilike('nome', `%${term}%`).limit(5),
-            supabase.from('profissionais').select('nome, negocios(nome, slug)').eq('status', 'ativo').ilike('nome', `%${term}%`).limit(5),
-          ]);
+        // CORREÇÃO: busca SOMENTE profissionais com status 'ativo'
+        const { data: profissionais, error: pErr } = await supabase
+          .from('profissionais')
+          .select('nome, negocios(nome, slug)')
+          .eq('status', 'ativo')
+          .ilike('nome', `%${term}%`)
+          .limit(10);
 
-        if (nErr || pErr) throw nErr || pErr;
+        if (pErr) throw pErr;
         if (cancelled) return;
 
+        // Filtra apenas profissionais que possuem negócio com slug válido
         const profOk = (profissionais || []).filter(p => p?.negocios?.slug);
 
-        setResultadosBusca([
-          ...(negocios || []).map(n => ({ ...n, tipo: 'negocio' })),
-          ...profOk.map(p => ({ ...p, tipo: 'profissional' })),
-        ]);
+        setResultadosBusca(profOk);
       } catch (error) {
         if (cancelled) return;
         console.error('Erro na busca:', error);
         showMessage('home.search_failed_support');
         setResultadosBusca([]);
       } finally {
-        // FIX: só para o spinner se não foi cancelado
         if (!cancelled) setBuscando(false);
       }
     };
@@ -176,7 +173,6 @@ export default function Home({ user, userType, onLogout }) {
     return () => {
       cancelled = true;
       clearTimeout(timer);
-      // FIX: para o spinner imediatamente ao cancelar (nova digitação)
       setBuscando(false);
     };
   }, [searchTerm, showMessage]);
@@ -413,17 +409,21 @@ export default function Home({ user, userType, onLogout }) {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
 
-            {/* FIX: seção PRODUTO removida, substituída pela logo COMVAGA */}
+            {/* LOGO IMAGEM no footer */}
             <div className="flex flex-col justify-start">
-              <Link to="/" className="text-white font-black text-2xl tracking-tight hover:text-primary transition-colors">
-                COMVAGA
+              <Link to="/" className="inline-block hover:opacity-80 transition-opacity">
+                <img
+                  src="/Comvaga Logo.png"
+                  alt="Comvaga"
+                  className="h-10 w-auto object-contain"
+                />
               </Link>
               <p className="text-gray-600 text-xs mt-2 uppercase leading-relaxed">
                 Sua agenda,<br />matematicamente perfeita.
               </p>
             </div>
 
-            {/* FIX: PARA VOCÊ — links de parceiro sempre visíveis */}
+            {/* PARA VOCÊ */}
             <div>
               <h4 className="text-white font-normal mb-4">PARA VOCÊ</h4>
               <ul className="space-y-2">
@@ -513,7 +513,6 @@ export default function Home({ user, userType, onLogout }) {
 
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="text-white font-black text-sm">COMVAGA</div>
               <div className="text-gray-600 text-sm">© 2026 COMVAGA. Todos os direitos reservados.</div>
             </div>
           </div>
