@@ -88,6 +88,16 @@ function FacebookIcon({ className = '', size = 16 }) {
   );
 }
 
+function InstagramIcon({ className = '', size = 16 }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
+      <path d="M16.5 7.5h.01" />
+      <circle cx="12" cy="12" r="4" />
+    </svg>
+  );
+}
+
 function HeartIcon({ filled = false, className = '', size = 20 }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
@@ -797,7 +807,7 @@ export default function Vitrine({ user, userType }) {
                 {negocio.telefone && (<a href={`tel:${sanitizeTel(negocio.telefone) || negocio.telefone}`} className={`flex items-center gap-2 text-sm font-normal transition-colors ${telClass}`}><Phone className="w-4 h-4" strokeWidth={1.5} />{negocio.telefone}</a>)}
                 {(instagramUrl || facebookUrl) && (
                   <div className="flex items-center gap-2">
-                    {instagramUrl && (<a href={instagramUrl} target="_blank" rel="noreferrer" aria-label="Instagram" className={`flex items-center justify-center w-9 h-9 rounded-full border transition-all ${socialIconCl}`}><Instagram className="w-[18px] h-[18px]" strokeWidth={1.5} /></a>)}
+                    {instagramUrl && (<a href={instagramUrl} target="_blank" rel="noreferrer" aria-label="Instagram" className={`flex items-center justify-center w-9 h-9 rounded-full border transition-all ${socialIconCl}`}><InstagramIcon className="w-[18px] h-[18px]" size={18} /></a>)}
                     {facebookUrl  && (<a href={facebookUrl}  target="_blank" rel="noreferrer" aria-label="Facebook"  className={`flex items-center justify-center w-9 h-9 rounded-full border transition-all ${socialIconCl}`}><FacebookIcon size={18} /></a>)}
                   </div>
                 )}
