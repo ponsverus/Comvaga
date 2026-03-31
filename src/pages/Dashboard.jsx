@@ -31,6 +31,7 @@ const IMAGE_EXT_BY_MIME = {
   'image/png': 'png',
   'image/webp': 'webp',
 };
+const NOW_RPC_SEQUENCE = ['now_sp', 'now_sp_fallback'];
 
 const toNumberOrNull = (v) => {
   if (v === '' || v == null) return null;
@@ -215,12 +216,35 @@ export default function Dashboard({ user, onLogout }) {
   [profissionais, user?.id]);
 
   const fetchNowFromDb = useCallback(async () => {
-    const { data, error: rpcErr } = await supabase.rpc('now_sp');
-    if (rpcErr) throw rpcErr;
-    const payload = data?.[0] ?? data;
-    if (!payload || !payload.date) throw new Error('now_sp vazio');
-    setServerNow(payload); setHoje(String(payload.date));
-    return String(payload.date);
+    let lastErr = null;
+
+    for (const rpcName of NOW_RPC_SEQUENCE) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const { data, error: rpcErr } = await supabase.rpc(rpcName);
+
+        if (rpcErr) {
+          lastErr = rpcErr;
+          continue;
+        }
+
+        const payload = data?.[0] ?? data;
+        if (!payload || !payload.date) {
+          lastErr = new Error(`${rpcName} vazio`);
+          continue;
+        }
+
+        const normalizedPayload = {
+          ...payload,
+          source: payload?.source || rpcName,
+        };
+
+        setServerNow(normalizedPayload);
+        setHoje(String(normalizedPayload.date));
+        return String(normalizedPayload.date);
+      }
+    }
+
+    throw lastErr || new Error('Falha ao obter data oficial do banco');
   }, []);
 
   const reloadFull = useCallback(async () => {
@@ -232,7 +256,22 @@ export default function Dashboard({ user, onLogout }) {
     }
   }, [fetchNowFromDb]);
 
-  useEffect(() => { if (!user?.id) return; fetchNowFromDb().then(d => loadData(d)); }, [user?.id]);
+  useEffect(() => {
+    let active = true;
+
+    if (!user?.id) return () => { active = false; };
+
+    (async () => {
+      try {
+        const d = await fetchNowFromDb();
+        if (active) await loadData(d);
+      } catch {
+        if (active) await loadData('');
+      }
+    })();
+
+    return () => { active = false; };
+  }, [user?.id, fetchNowFromDb]);
 
   const reloadAgendamentos = useCallback(async (negocioId, profIds, dataHoje) => {
     const id = negocioId || negocio?.id; const ids = profIds || agProfIds; const dh = dataHoje || hoje; if (!id || !ids?.length || !dh) return;
@@ -1230,7 +1269,7 @@ export default function Dashboard({ user, onLogout }) {
                       {galeriaItems.map((item) => (
                         <div key={item.id || item.path} className="relative bg-dark-100 border border-gray-800 rounded-custom overflow-hidden">
                           <img src={getPublicUrl('galerias', item.path)} alt="Galeria" className="w-full h-28 object-cover" />
-                          <button onClick={() => removerImagemGaleria(item)} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 sm:left-2 sm:top-2 sm:right-auto sm:transform-none px-3 py-1 rounded-full bg-black/60 border border-gray-700 hover:border-red-400 text-[12px] text-red-200 font-normal uppercase">REMOVER</button>
+                          <button onClick={() => removerImagemGaleria(item)} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 sm:left-auto sm:top-2 sm:right-2 sm:translate-x-0 sm:translate-y-0 px-3 py-1 rounded-full bg-black/60 border border-gray-700 hover:border-red-400 text-[12px] text-red-200 font-normal uppercase">REMOVER</button>
                         </div>
                       ))}
                     </div>
