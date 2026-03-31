@@ -413,7 +413,7 @@ export default function ClientArea({ user, onLogout }) {
                     onClick={() => marcarNovamente(ag)}
                     className="w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase"
                   >
-                    MARCAR NOVAMENTE
+                    AGENDAR NOVAMENTE
                   </button>
                 )}
               </div>
