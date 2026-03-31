@@ -447,7 +447,7 @@ function SlotButton({ slot, isSelected, onClick, isLight }) {
       ].join(' ')}
     >
       {slot.isRaio && !isSelected && (
-        <Zap className={`w-3 h-3 absolute top-1 right-1 ${isLight ? 'text-gray-700' : 'text-primary'}`} />
+        <Zap strokeWidth={1.5} className={`w-3 h-3 absolute top-1 right-1 ${isLight ? 'text-gray-700' : 'text-primary'}`} />
       )}
       <div className="text-lg normal-case">{slot.hora}</div>
       <div className={`text-[10px] normal-case ${minuteColor}`}>{slot.duracaoMin} MIN</div>
