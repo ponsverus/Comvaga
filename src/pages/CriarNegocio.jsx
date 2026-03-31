@@ -292,17 +292,6 @@ export default function CriarNegocio({ user }) {
           >
             {loading ? 'CRIANDO...' : 'CRIAR NEGÓCIO'}
           </button>
-
-          <div className="text-center pt-4 border-t border-gray-800/50">
-            <button
-              type="button"
-              onClick={() => navigate(backTarget)}
-              className="text-gray-600 hover:text-gray-400 text-sm font-normal transition-colors"
-            >
-              {backTarget === '/selecionar-negocio' ? 'Cancelar e voltar para a seleção' : 'Cancelar e voltar ao dashboard'}
-            </button>
-          </div>
-
         </form>
       </div>
     </div>
