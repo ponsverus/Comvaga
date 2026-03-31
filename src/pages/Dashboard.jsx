@@ -1141,7 +1141,7 @@ export default function Dashboard({ user, onLogout }) {
                         {isPendente && (<div className="absolute top-3 right-3 text-[10px] px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 font-normal uppercase">AGUARDANDO</div>)}
                         {!isPendente && isInativo && (<span className="absolute top-3 right-3 text-[10px] px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-300 font-normal uppercase">INATIVO</span>)}
                         <div className="flex items-start gap-3 mb-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center text-normal font-normal text-xl shrink-0">{p.nome?.[0] || 'P'}</div>
+                          <div className="w-12 h-12 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center font-normal text-xl shrink-0">{p.nome?.[0] || 'P'}</div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-normal pr-24">{p.nome}</h3>
                             <div className="flex items-center gap-2 mt-1">
