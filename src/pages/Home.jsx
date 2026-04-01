@@ -221,7 +221,7 @@ export default function Home({ user, userType, onLogout }) {
                 <div key={index} className="flex items-center">
                   <span className="text-black font-bold text-sm uppercase mx-4">CLIQUE PARA IR</span>
                   <span className="text-black mx-4">●</span>
-                  
+                  <a
                     href={SUPORTE_HREF}
                     target="_blank"
                     rel="noreferrer"
