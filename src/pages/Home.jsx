@@ -69,7 +69,7 @@ function SearchBox({
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="BUSQUE UM PROFISSIONAL :)"
+          placeholder="BUSQUE UM PROFISSIONAL OU NEGÓCIO :)"
           className={[
             'bg-transparent pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300',
             searchOpen ? 'w-full opacity-100' : 'w-0 opacity-0',
@@ -87,8 +87,8 @@ function SearchBox({
         <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl">
           {resultadosBusca.map((r, i) => (
             <Link
-              key={`${r.id}-${i}`}
-              to={`/v/${r.negocio_slug}`}
+              key={`${r.tipo}-${r.id}-${i}`}
+              to={`/v/${r.slug}`}
               onClick={() => {
                 setSearchOpen(false);
                 setSearchTerm('');
@@ -98,10 +98,10 @@ function SearchBox({
             >
               <div className="font-bold text-white">{r.nome}</div>
               <div className="mt-1 text-[11px] uppercase tracking-[0.08em] text-gray-500">
-                Profissional
+                {r.tipo === 'negocio' ? 'Negócio' : 'Profissional'}
               </div>
-              {r.negocio_nome && (
-                <div className="mt-1 text-sm text-gray-400">{r.negocio_nome}</div>
+              {r.subtitulo && (
+                <div className="mt-1 text-sm text-gray-400">{r.subtitulo}</div>
               )}
             </Link>
           ))}
@@ -110,7 +110,7 @@ function SearchBox({
 
       {searchOpen && !buscando && searchTerm.trim().length >= 3 && resultadosBusca.length === 0 && (
         <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[3px] border border-white/10 bg-dark-100/95 px-5 py-4 text-sm text-gray-400 shadow-2xl backdrop-blur-xl">
-          Nenhum profissional encontrado.
+          Nenhum resultado encontrado.
         </div>
       )}
     </div>
@@ -143,27 +143,50 @@ export default function Home({ user, userType, onLogout }) {
       if (!cancelled) setBuscando(true);
 
       try {
-        // ✅ JOIN único: elimina condição de corrida entre duas queries
-        const { data, error } = await supabase
-          .from('profissionais')
-          .select('id, nome, negocios(nome, slug)')
-          .eq('status', 'ativo')
-          .ilike('nome', `%${term}%`)
-          .limit(10);
+        // Busca profissionais com join direto no negócio — uma única query atômica
+        const [{ data: profs, error: profErr }, { data: negs, error: negErr }] =
+          await Promise.all([
+            supabase
+              .from('profissionais')
+              .select('id, nome, negocios(nome, slug)')
+              .eq('status', 'ativo')
+              .ilike('nome', `%${term}%`)
+              .limit(5),
+            supabase
+              .from('negocios')
+              .select('id, nome, slug')
+              .ilike('nome', `%${term}%`)
+              .limit(5),
+          ]);
 
-        if (error) throw error;
+        if (profErr) throw profErr;
+        if (negErr) throw negErr;
         if (cancelled) return;
 
-        const resultado = (data || [])
+        // Monta resultados de profissionais
+        const resultadosProfs = (profs || [])
           .filter((p) => p.negocios?.slug)
           .map((p) => ({
+            tipo: 'profissional',
             id: p.id,
             nome: p.nome,
-            negocio_slug: p.negocios.slug,
-            negocio_nome: p.negocios.nome,
+            slug: p.negocios.slug,
+            subtitulo: p.negocios.nome,
           }));
 
-        setResultadosBusca(resultado);
+        // Monta resultados de negócios
+        const resultadosNegs = (negs || [])
+          .filter((n) => n.slug)
+          .map((n) => ({
+            tipo: 'negocio',
+            id: n.id,
+            nome: n.nome,
+            slug: n.slug,
+            subtitulo: null,
+          }));
+
+        // Negócios primeiro, depois profissionais
+        setResultadosBusca([...resultadosNegs, ...resultadosProfs]);
       } catch (error) {
         if (cancelled) return;
         console.error('Erro na busca:', error);
