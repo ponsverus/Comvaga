@@ -6,16 +6,24 @@ import { useFeedback } from '../feedback/useFeedback';
 
 const PROFILE_TABLE = 'users';
 const isValidType = (t) => t === 'client' || t === 'professional';
+const isValidOnboardingStatus = (s) => s === 'pending' || s === 'completed';
 
-async function fetchProfileType(userId) {
+async function fetchProfile(userId) {
   const { data, error } = await supabase
     .from(PROFILE_TABLE)
-    .select('type')
+    .select('type, onboarding_status')
     .eq('id', userId)
     .maybeSingle();
 
   if (error || !data) return null;
-  return isValidType(data.type) ? data.type : null;
+  if (!isValidType(data.type)) return null;
+
+  return {
+    type: data.type,
+    onboardingStatus: data.type === 'professional'
+      ? (isValidOnboardingStatus(data.onboarding_status) ? data.onboarding_status : 'pending')
+      : 'completed',
+  };
 }
 
 export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
@@ -73,9 +81,9 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
       const authUser = authData?.user;
       if (!authUser?.id) throw new Error('Falha ao autenticar.');
 
-      const dbType = await fetchProfileType(authUser.id);
+      const profile = await fetchProfile(authUser.id);
 
-      if (!dbType) {
+      if (!profile) {
         await supabase.auth.signOut();
         throw new Error('Perfil inexistente. Conclua seu cadastro para acessar.');
       }
@@ -85,15 +93,19 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
         throw new Error('Selecione o tipo de conta para entrar.');
       }
 
-      if (dbType !== userType) {
+      if (profile.type !== userType) {
         await supabase.auth.signOut();
         throw new Error(
-          `Esta conta é de ${dbType === 'client' ? 'CLIENTE' : 'PROFISSIONAL'}. Selecione o tipo correto.`
+          `Esta conta Ã© de ${profile.type === 'client' ? 'CLIENTE' : 'PROFISSIONAL'}. Selecione o tipo correto.`
         );
       }
 
-      onLogin(authUser, dbType);
-      navigate(dbType === 'professional' ? '/dashboard' : '/minha-area');
+      onLogin(authUser, profile.type, profile.onboardingStatus);
+      navigate(
+        profile.type === 'professional'
+          ? (profile.onboardingStatus === 'pending' ? '/cadastro/profissional/retomada' : '/dashboard')
+          : '/minha-area'
+      );
     } catch (err) {
       showMessage('login.auth_error', { msg: err?.message || '' });
       console.error('Login error:', err);
@@ -247,7 +259,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
                     <div className="relative">
                       <User className="mx-auto mb-4 text-blue-400 w-10 h-10 group-hover:scale-110 transition-transform" />
                       <div className="font-normal text-lg tracking-wide mb-1">Cliente</div>
-                      <div className="text-xs text-gray-500">Agendar serviços</div>
+                      <div className="text-xs text-gray-500">Agendar serviÃ§os</div>
                     </div>
                   </button>
 
@@ -289,7 +301,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
                     <div className="relative">
                       <input
                         type={showPassword ? 'text' : 'password'}
-                        placeholder="••••••••"
+                        placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         className="w-full px-5 py-4 pr-12 bg-dark-100/50 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all backdrop-blur-sm"
@@ -350,7 +362,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
 
         <div className="text-center mt-12">
           <p className="text-xs text-gray-600 font-normal">
-            Ao continuar, você concorda com nossos{' '}
+            Ao continuar, vocÃª concorda com nossos{' '}
             <Link to="/termos" className="text-gray-500 hover:text-primary transition-colors">
               Termos de Uso
             </Link>
