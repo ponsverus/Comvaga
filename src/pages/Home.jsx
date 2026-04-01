@@ -143,46 +143,25 @@ export default function Home({ user, userType, onLogout }) {
       if (!cancelled) setBuscando(true);
 
       try {
-        const { data: profs, error: profErr } = await supabase
+        // ✅ JOIN único: elimina condição de corrida entre duas queries
+        const { data, error } = await supabase
           .from('profissionais')
-          .select('id, nome, negocio_id')
+          .select('id, nome, negocios(nome, slug)')
           .eq('status', 'ativo')
           .ilike('nome', `%${term}%`)
           .limit(10);
 
-        if (profErr) throw profErr;
+        if (error) throw error;
         if (cancelled) return;
 
-        if (!profs || profs.length === 0) {
-          setResultadosBusca([]);
-          return;
-        }
-
-        const negocioIds = [...new Set(profs.map((p) => p.negocio_id).filter(Boolean))];
-
-        if (negocioIds.length === 0) {
-          setResultadosBusca([]);
-          return;
-        }
-
-        const { data: negs, error: negErr } = await supabase
-          .from('negocios')
-          .select('id, nome, slug')
-          .in('id', negocioIds);
-
-        if (negErr) throw negErr;
-        if (cancelled) return;
-
-        const negMap = Object.fromEntries((negs || []).map((n) => [n.id, n]));
-
-        const resultado = profs
+        const resultado = (data || [])
+          .filter((p) => p.negocios?.slug)
           .map((p) => ({
             id: p.id,
             nome: p.nome,
-            negocio_slug: negMap[p.negocio_id]?.slug ?? null,
-            negocio_nome: negMap[p.negocio_id]?.nome ?? null,
-          }))
-          .filter((r) => r.negocio_slug);
+            negocio_slug: p.negocios.slug,
+            negocio_nome: p.negocios.nome,
+          }));
 
         setResultadosBusca(resultado);
       } catch (error) {
@@ -219,7 +198,7 @@ export default function Home({ user, userType, onLogout }) {
                 <div key={index} className="flex items-center">
                   <span className="text-black font-bold text-sm uppercase mx-4">CLIQUE PARA IR</span>
                   <span className="text-black mx-4">●</span>
-                  <a
+                  
                     href={SUPORTE_HREF}
                     target="_blank"
                     rel="noreferrer"
