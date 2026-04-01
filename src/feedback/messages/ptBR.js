@@ -1049,13 +1049,13 @@ export const ptBR = {
       },
       counter_singular: {
         servicos:  'SERV',
-        consultas: 'consulta',
-        aulas:     'aula',
+        consultas: 'CONSULTA',
+        aulas:     'AULA',
       },
       counter_plural: {
         servicos:  'SERV',
-        consultas: 'consultas',
-        aulas:     'aulas',
+        consultas: 'CONSULTAS',
+        aulas:     'AULAS',
       },
       empty_list: {
         servicos:  'Sem serviços para este profissional.',
