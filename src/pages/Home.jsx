@@ -143,12 +143,12 @@ export default function Home({ user, userType, onLogout }) {
       if (!cancelled) setBuscando(true);
 
       try {
-        // Busca profissionais com join direto no negócio — uma única query atômica
+        // FK explícita: negocios!negocio_id — resolve ambiguidade no PostgREST
         const [{ data: profs, error: profErr }, { data: negs, error: negErr }] =
           await Promise.all([
             supabase
               .from('profissionais')
-              .select('id, nome, negocios(nome, slug)')
+              .select('id, nome, negocios!negocio_id(nome, slug)')
               .eq('status', 'ativo')
               .ilike('nome', `%${term}%`)
               .limit(5),
@@ -163,7 +163,7 @@ export default function Home({ user, userType, onLogout }) {
         if (negErr) throw negErr;
         if (cancelled) return;
 
-        // Monta resultados de profissionais
+        // negocios retorna como objeto (relação muitos-para-um), não array
         const resultadosProfs = (profs || [])
           .filter((p) => p.negocios?.slug)
           .map((p) => ({
@@ -174,7 +174,6 @@ export default function Home({ user, userType, onLogout }) {
             subtitulo: p.negocios.nome,
           }));
 
-        // Monta resultados de negócios
         const resultadosNegs = (negs || [])
           .filter((n) => n.slug)
           .map((n) => ({
