@@ -1,3 +1,5 @@
+import { useCallback, useMemo } from 'react';
+
 import { ptBR } from './messages/ptBR.js';
 import { getFeedbackState, setFeedbackState } from './feedbackStore';
 
@@ -38,7 +40,7 @@ function buildPayloadFromKey(key, params) {
 }
 
 export function useFeedback() {
-  const showMessage = (key, params) => {
+  const showMessage = useCallback((key, params) => {
     const payload = buildPayloadFromKey(key, params);
 
     setFeedbackState({
@@ -48,9 +50,9 @@ export function useFeedback() {
         type: 'message',
       },
     });
-  };
+  }, []);
 
-  const confirm = (key, { params, variant } = {}) => {
+  const confirm = useCallback((key, { params, variant } = {}) => {
     const payload = buildPayloadFromKey(key, params);
 
     return new Promise((resolve) => {
@@ -66,9 +68,9 @@ export function useFeedback() {
         },
       });
     });
-  };
+  }, []);
 
-  const prompt = (key, { params, variant, placeholder = '', initialValue = '' } = {}) => {
+  const prompt = useCallback((key, { params, variant, placeholder = '', initialValue = '' } = {}) => {
     const payload = buildPayloadFromKey(key, params);
 
     return new Promise((resolve) => {
@@ -86,13 +88,13 @@ export function useFeedback() {
         },
       });
     });
-  };
+  }, []);
 
-  const showCustom = (payload) => {
+  const showCustom = useCallback((payload) => {
     setFeedbackState({ open: true, payload: { ...payload, type: payload?.type || 'message' } });
-  };
+  }, []);
 
-  const close = (result) => {
+  const close = useCallback((result) => {
     const cur = getFeedbackState();
     const resolver = cur?.payload?.__resolve;
     const onClose = cur?.payload?.onClose;
@@ -101,7 +103,10 @@ export function useFeedback() {
 
     if (typeof resolver === 'function') resolver(result);
     if (typeof onClose === 'function') onClose();
-  };
+  }, []);
 
-  return { showMessage, confirm, prompt, showCustom, close };
+  return useMemo(
+    () => ({ showMessage, confirm, prompt, showCustom, close }),
+    [showMessage, confirm, prompt, showCustom, close]
+  );
 }
