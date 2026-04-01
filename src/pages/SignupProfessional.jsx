@@ -210,7 +210,9 @@ export default function SignupProfessional({ onLogin }) {
           return;
         }
         if (code === 'usuario_nao_encontrado') {
+          onLogin(sessionUser, 'professional', 'pending');
           showMessage('signupProfessional.profile_not_created');
+          navigate('/cadastro/profissional/retomada');
           return;
         }
         if (code === 'horario_invalido' || code === 'dias_trabalho_invalidos') {
@@ -232,7 +234,17 @@ export default function SignupProfessional({ onLogin }) {
         return;
       }
 
-      onLogin(sessionUser, 'professional');
+      const { error: expErr } = await supabase
+        .from('profissionais')
+        .update({ anos_experiencia: anosExperiencia })
+        .eq('id', fnData.profissional_id)
+        .eq('user_id', userId);
+
+      if (expErr) {
+        console.error('signup-professional experience update error:', expErr);
+      }
+
+      onLogin(sessionUser, 'professional', 'completed');
       navigate('/dashboard');
     } catch (err) {
       console.error('SignupProfessional error:', err);
