@@ -125,12 +125,6 @@ export default function Home({ user, userType, onLogout }) {
 
   const { showMessage } = useFeedback();
 
-  // useFeedback() retorna um objeto novo a cada render.
-  // Colocar showMessage nas deps do useEffect faz o effect cancelar
-  // a busca antes da Promise do Supabase resolver (cancelled = true).
-  // A solução correta é manter showMessage num ref estável.
-  const showMessageRef = useRef(showMessage);
-  useEffect(() => { showMessageRef.current = showMessage; });
 
   const isLogged = !!user && !!userType;
 
@@ -196,7 +190,7 @@ export default function Home({ user, userType, onLogout }) {
       } catch (error) {
         if (cancelled) return;
         console.error('Erro na busca:', error);
-        showMessageRef.current('home.search_failed_support');
+        showMessage('home.search_failed_support');
         setResultadosBusca([]);
       } finally {
         if (!cancelled) setBuscando(false);
@@ -209,7 +203,7 @@ export default function Home({ user, userType, onLogout }) {
       clearTimeout(timer);
       setBuscando(false);
     };
-  }, [searchTerm]); // showMessage fora das deps — acesso via ref estável
+  }, [searchTerm, showMessage]);
 
   const handleLogoutClick = () => onLogout?.();
 
