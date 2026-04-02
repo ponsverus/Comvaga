@@ -2,16 +2,18 @@ import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { supabase } from './supabase';
 import { isPasswordRecoveryUrl } from './utils/auth';
+import { fetchUserAccessProfile, isValidType, normalizeOnboardingStatus } from './utils/profileAccess';
 
 import FeedbackProvider from './feedback/FeedbackProvider';
 
-import Home               from './pages/Home';
-import Login              from './pages/Login';
-import SignupChoice       from './pages/SignupChoice';
-import SignupClient       from './pages/SignupClient';
-import SignupProfessional from './pages/SignupProfessional';
-import ParceiroCadastro   from './pages/ParceiroCadastro';
-import ParceiroLogin      from './pages/ParceiroLogin';
+import Home                   from './pages/Home';
+import Login                  from './pages/Login';
+import SignupChoice           from './pages/SignupChoice';
+import SignupClient           from './pages/SignupClient';
+import SignupProfessional     from './pages/SignupProfessional';
+import ParceiroCadastro       from './pages/ParceiroCadastro';
+import ParceiroLogin          from './pages/ParceiroLogin';
+import PartnerPendingApproval from './pages/PartnerPendingApproval';
 
 const Dashboard                 = lazy(() => import('./pages/Dashboard'));
 const Vitrine                   = lazy(() => import('./pages/Vitrine'));
@@ -20,9 +22,6 @@ const CriarNegocio              = lazy(() => import('./pages/CriarNegocio'));
 const SelecionarNegocio         = lazy(() => import('./pages/SelecionarNegocio'));
 const SignupProfessionalResume  = lazy(() => import('./pages/SignupProfessionalResume'));
 
-const PROFILE_TABLE = 'users';
-const isValidType = (t) => t === 'client' || t === 'professional';
-const isValidOnboardingStatus = (s) => s === 'pending' || s === 'completed';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function FullScreenLoading({ text = 'CARREGANDO...' }) {
@@ -50,29 +49,6 @@ function FullScreenError({ message, onRetry }) {
   );
 }
 
-function normalizeOnboardingStatus(type, onboardingStatus) {
-  if (type !== 'professional') return 'completed';
-  return isValidOnboardingStatus(onboardingStatus) ? onboardingStatus : 'pending';
-}
-
-async function fetchProfileFromDb(userId) {
-  const { data, error } = await supabase
-    .from(PROFILE_TABLE)
-    .select('type, onboarding_status')
-    .eq('id', userId)
-    .maybeSingle();
-
-  if (error) throw error;
-
-  const type = data?.type;
-  if (!isValidType(type)) return null;
-
-  return {
-    type,
-    onboardingStatus: normalizeOnboardingStatus(type, data?.onboarding_status),
-  };
-}
-
 async function getUserProfileRobust(authUser) {
   if (!authUser?.id) return null;
 
@@ -81,7 +57,7 @@ async function getUserProfileRobust(authUser) {
 
   for (let i = 0; i < delays.length; i++) {
     try {
-      const profile = await fetchProfileFromDb(authUser.id);
+      const profile = await fetchUserAccessProfile(authUser.id);
       if (profile) return profile;
       if (i < delays.length - 1) await sleep(delays[i]);
     } catch (e) {
@@ -109,13 +85,14 @@ function RecoveryWatcher({ onChange }) {
 }
 
 export default function App() {
-  const [user,              setUser]              = useState(null);
-  const [userType,          setUserType]          = useState(null);
-  const [onboardingStatus,  setOnboardingStatus]  = useState(null);
-  const [booting,           setBooting]           = useState(true);
-  const [typeLoading,       setTypeLoading]       = useState(false);
-  const [fatalError,        setFatalError]        = useState(null);
-  const [inRecovery,        setInRecovery]        = useState(false);
+  const [user,             setUser]             = useState(null);
+  const [userType,         setUserType]         = useState(null);
+  const [onboardingStatus, setOnboardingStatus] = useState(null);
+  const [accessState,      setAccessState]      = useState('active');
+  const [booting,          setBooting]          = useState(true);
+  const [typeLoading,      setTypeLoading]      = useState(false);
+  const [fatalError,       setFatalError]       = useState(null);
+  const [inRecovery,       setInRecovery]       = useState(false);
 
   const aliveRef        = useRef(true);
   const loadedUserRef   = useRef(null);
@@ -127,13 +104,13 @@ export default function App() {
     if (aliveRef.current) fn();
   }, []);
 
-  const getPostLoginPath = useCallback((type, status) => {
-    if (type === 'professional') {
-      return normalizeOnboardingStatus(type, status) === 'pending'
-        ? '/cadastro/profissional/retomada'
-        : '/dashboard';
+  const getPostLoginPath = useCallback((type, currentAccessState, status) => {
+    if (type !== 'professional') return '/minha-area';
+    if (currentAccessState === 'partner_pending') return '/parceiro/aguardando';
+    if (currentAccessState === 'owner_resume' || normalizeOnboardingStatus(type, status) === 'pending') {
+      return '/cadastro/profissional/retomada';
     }
-    return '/minha-area';
+    return '/dashboard';
   }, []);
 
   const loadProfile = useCallback(async (sessionUser) => {
@@ -143,6 +120,7 @@ export default function App() {
       setTypeLoading(true);
       setUserType(null);
       setOnboardingStatus(null);
+      setAccessState('active');
     });
 
     try {
@@ -154,8 +132,9 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
+          setAccessState('active');
           loadedUserRef.current = null;
-          setFatalError('Perfil nÃ£o encontrado. Por favor, conclua seu cadastro.');
+          setFatalError('Perfil não encontrado. Por favor, conclua seu cadastro.');
         });
         return null;
       }
@@ -164,6 +143,7 @@ export default function App() {
       safeSet(() => {
         setUserType(profile.type);
         setOnboardingStatus(profile.onboardingStatus);
+        setAccessState(profile.accessState || 'active');
         setFatalError(null);
       });
       return profile;
@@ -171,6 +151,7 @@ export default function App() {
       safeSet(() => {
         setUserType(null);
         setOnboardingStatus(null);
+        setAccessState('active');
         setFatalError(e?.message || 'Falha ao carregar perfil.');
       });
       return null;
@@ -199,6 +180,7 @@ export default function App() {
               setUser(null);
               setUserType(null);
               setOnboardingStatus(null);
+              setAccessState('active');
               setBooting(false);
             });
             return;
@@ -216,6 +198,7 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
+          setAccessState('active');
           setFatalError(null);
           return;
         }
@@ -227,7 +210,7 @@ export default function App() {
     return () => { aliveRef.current = false; subscription?.unsubscribe(); };
   }, [loadProfile]);
 
-  const handleLogin = useCallback((userData, type, nextOnboardingStatus = 'completed') => {
+  const handleLogin = useCallback((userData, type, nextOnboardingStatus = 'completed', nextAccessState = 'active') => {
     loadedUserRef.current = userData?.id || null;
     setUser(userData || null);
     setUserType(isValidType(type) ? type : null);
@@ -236,6 +219,7 @@ export default function App() {
         ? normalizeOnboardingStatus(type, nextOnboardingStatus)
         : null
     );
+    setAccessState(nextAccessState);
     setFatalError(null);
   }, []);
 
@@ -248,6 +232,7 @@ export default function App() {
       setUser(null);
       setUserType(null);
       setOnboardingStatus(null);
+      setAccessState('active');
       setFatalError(null);
       setTypeLoading(false);
     }
@@ -262,6 +247,7 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
+          setAccessState('active');
           setBooting(false);
         });
         return;
@@ -275,6 +261,7 @@ export default function App() {
         setUser(null);
         setUserType(null);
         setOnboardingStatus(null);
+        setAccessState('active');
         setBooting(false);
       });
     }
@@ -296,13 +283,13 @@ export default function App() {
 
             <Route path="/login" element={
               inRecovery ? <Login onLogin={handleLogin} inRecovery={true} />
-              : isLoggedIn && userType ? <Navigate to={getPostLoginPath(userType, onboardingStatus)} />
+              : isLoggedIn && userType ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
               : <Login onLogin={handleLogin} inRecovery={false} />
             } />
 
             <Route path="/parceiro/cadastro" element={
               isLoggedIn && userType
-                ? <Navigate to={getPostLoginPath(userType, onboardingStatus)} />
+                ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                 : <ParceiroCadastro suppressAuthRef={suppressAuthRef} />
             } />
 
@@ -310,23 +297,32 @@ export default function App() {
               inRecovery
                 ? <ParceiroLogin onLogin={handleLogin} suppressAuthRef={suppressAuthRef} inRecovery={true} />
                 : isLoggedIn && userType
-                  ? <Navigate to={getPostLoginPath(userType, onboardingStatus)} />
+                  ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                   : <ParceiroLogin onLogin={handleLogin} suppressAuthRef={suppressAuthRef} />
+            } />
+
+            <Route path="/parceiro/aguardando" element={
+              isLoggedIn ? (
+                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'professional' && accessState === 'partner_pending'
+                  ? <PartnerPendingApproval onLogout={handleLogout} />
+                  : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+              ) : <Navigate to="/login" />
             } />
 
             <Route path="/cadastro" element={
               isLoggedIn && userType
-                ? <Navigate to={getPostLoginPath(userType, onboardingStatus)} />
+                ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                 : <SignupChoice />
             } />
 
             <Route path="/cadastro/cliente" element={
-              isLoggedIn && userType ? <Navigate to={getPostLoginPath(userType, onboardingStatus)} />
+              isLoggedIn && userType ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
               : <SignupClient onLogin={handleLogin} />
             } />
 
             <Route path="/cadastro/profissional" element={
-              isLoggedIn && userType ? <Navigate to={getPostLoginPath(userType, onboardingStatus)} />
+              isLoggedIn && userType ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
               : <SignupProfessional onLogin={handleLogin} />
             } />
 
@@ -334,9 +330,9 @@ export default function App() {
               isLoggedIn ? (
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'professional'
-                  ? onboardingStatus === 'pending'
+                  ? accessState === 'owner_resume'
                     ? <SignupProfessionalResume user={user} onLogin={handleLogin} />
-                    : <Navigate to="/dashboard" />
+                    : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                   : userType ? <Navigate to="/minha-area" />
                   : <Navigate to="/login" />
               ) : <Navigate to="/login" />
@@ -346,9 +342,11 @@ export default function App() {
               isLoggedIn ? (
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'professional'
-                  ? onboardingStatus === 'pending'
+                  ? accessState === 'owner_resume'
                     ? <Navigate to="/cadastro/profissional/retomada" />
-                    : <Dashboard user={user} onLogout={handleLogout} />
+                    : accessState === 'partner_pending'
+                      ? <Navigate to="/parceiro/aguardando" />
+                      : <Dashboard user={user} onLogout={handleLogout} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to="/login" />
               ) : <Navigate to="/login" />
@@ -358,7 +356,7 @@ export default function App() {
               isLoggedIn ? (
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'client' ? <ClientArea user={user} onLogout={handleLogout} />
-                : userType ? <Navigate to={getPostLoginPath(userType, onboardingStatus)} />
+                : userType ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                 : <Navigate to="/login" />
               ) : <Navigate to="/login" />
             } />
@@ -369,9 +367,11 @@ export default function App() {
               isLoggedIn ? (
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'professional'
-                  ? onboardingStatus === 'pending'
+                  ? accessState === 'owner_resume'
                     ? <Navigate to="/cadastro/profissional/retomada" />
-                    : <CriarNegocio user={user} />
+                    : accessState === 'partner_pending'
+                      ? <Navigate to="/parceiro/aguardando" />
+                      : <CriarNegocio user={user} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to="/login" />
               ) : <Navigate to="/login" />
@@ -381,9 +381,11 @@ export default function App() {
               isLoggedIn ? (
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'professional'
-                  ? onboardingStatus === 'pending'
+                  ? accessState === 'owner_resume'
                     ? <Navigate to="/cadastro/profissional/retomada" />
-                    : <SelecionarNegocio user={user} onLogout={handleLogout} />
+                    : accessState === 'partner_pending'
+                      ? <Navigate to="/parceiro/aguardando" />
+                      : <SelecionarNegocio user={user} onLogout={handleLogout} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to="/login" />
               ) : <Navigate to="/login" />
