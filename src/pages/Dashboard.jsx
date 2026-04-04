@@ -1,68 +1,41 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  Plus, X, Eye, Calendar,
-  Users, TrendingUp, Award, LogOut, AlertCircle, Clock,
-  Save
+  X, Eye, Calendar,
+  Users, TrendingUp, Award, LogOut, AlertCircle,
 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { getBusinessGroup } from '../businessTerms';
-import { ptBR } from '../feedback/messages/ptBR.js';
-import DatePicker from '../components/DatePicker';
-import PeriodoSelect from '../components/PeriodoSelect';
 import ProfissionalSelect from '../components/ProfissionalSelect';
-import TimePicker from '../components/TimePicker';
+import EntregaModal from './dashboard/components/EntregaModal';
+import ProfissionalModal from './dashboard/components/ProfissionalModal';
+import VisaoGeralSection from './dashboard/sections/VisaoGeralSection';
+import AgendamentosSection from './dashboard/sections/AgendamentosSection';
+import CanceladosSection from './dashboard/sections/CanceladosSection';
+import HistoricoSection from './dashboard/sections/HistoricoSection';
+import EntregasSection from './dashboard/sections/EntregasSection';
+import ProfissionaisSection from './dashboard/sections/ProfissionaisSection';
+import InfoNegocioSection from './dashboard/sections/InfoNegocioSection';
+import {
+  AG_PAGE_SIZE,
+  NOW_RPC_SEQUENCE,
+  SUPORTE_HREF,
+  WEEKDAYS,
+  getAgDate,
+  getAgInicio,
+  getBizLabel,
+  getImageExt,
+  getValorAgendamento,
+  getValorEntrega,
+  isCancelStatus,
+  isEnderecoPadrao,
+  sameDay,
+  timeToMinutes,
+  toNumberOrNull,
+  toUpperClean,
+} from './dashboard/utils';
 
-const STATUS_COLOR_CLASS = {
-  ABERTO: 'bg-green-500',
-  FECHADO: 'bg-red-500',
-  ALMOCO: 'bg-yellow-400',
-  INATIVO: 'bg-gray-600',
-};
-
-const SUPORTE_PHONE_E164 = '5533999037979';
-const SUPORTE_MSG = 'Olá, sou cadastrado como Profissional e gostaria de uma ajuda especializada para o meu perfil. Pode me orientar?';
-const SUPORTE_HREF = `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent(SUPORTE_MSG)}`;
-
-const AG_PAGE_SIZE = 15;
-const IMAGE_EXT_BY_MIME = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-};
-const NOW_RPC_SEQUENCE = ['now_sp', 'now_sp_fallback'];
-
-const toNumberOrNull = (v) => {
-  if (v === '' || v == null) return null;
-  const n = Math.round(Number(v) * 100) / 100;
-  return Number.isFinite(n) ? n : null;
-};
-
-const sameDay = (a, b) => String(a || '') === String(b || '');
-
-function timeToMinutes(t) {
-  if (!t) return 0;
-  const [h, m] = String(t).split(':').map(Number);
-  return (h * 60) + (m || 0);
-}
-
-const getAgDate   = (a) => String(a?.data ?? '');
-const getAgInicio = (a) => String(a?.horario_inicio ?? '').slice(0, 5);
-
-const normalizeStatus = (s) =>
-  String(s || '').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-
-const isCancelStatus = (s) => normalizeStatus(s).includes('cancelado');
-const isDoneStatus   = (s) => normalizeStatus(s) === 'concluido';
-const computeStatusFromDb = (a) => String(a?.status || '');
-
-function formatDateBRFromISO(dateStr) {
-  if (!dateStr) return 'Selecionar';
-  const [y, m, d] = String(dateStr).split('-');
-  if (!y || !m || !d) return String(dateStr);
-  return `${d}.${m}.${y}`;
-}
 
 function getPublicUrl(bucket, path) {
   if (!bucket || !path) return null;
@@ -72,46 +45,6 @@ function getPublicUrl(bucket, path) {
     return data?.publicUrl || null;
   } catch { return null; }
 }
-
-function getImageExt(file) {
-  return IMAGE_EXT_BY_MIME[file?.type] || null;
-}
-
-function TemaToggle({ value, onChange, loading }) {
-  const isLight = value === 'light';
-  return (
-    <div className="flex items-center gap-3">
-      <span className={`text-xs font-normal uppercase transition-colors ${!isLight ? 'text-primary' : 'text-gray-600'}`}>DARK</span>
-      <button type="button" disabled={loading} onClick={() => onChange(isLight ? 'dark' : 'light')} aria-label="Alternar tema da vitrine"
-        className={`relative inline-flex h-7 w-14 shrink-0 items-center rounded-full border transition-all duration-300 focus:outline-none ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${isLight ? 'bg-white border-gray-300' : 'bg-dark-200 border-gray-700'}`}>
-        <span className={`inline-block h-5 w-5 rounded-full shadow-md transition-all duration-300 ${isLight ? 'translate-x-7 bg-gray-900' : 'translate-x-1 bg-primary'}`} />
-      </button>
-      <span className={`text-xs font-normal uppercase transition-colors ${isLight ? 'text-primary' : 'text-gray-600'}`}>WHITE</span>
-    </div>
-  );
-}
-
-const toUpperClean = (s) => String(s || '').trim().replace(/\s+/g, ' ').toUpperCase();
-const isEnderecoPadrao = (s) => /^.+,\s*\d+.*\s-\s.+,\s.+$/.test(String(s || '').trim());
-
-function getValorEntrega(entrega) {
-  const preco = Number(entrega?.preco ?? 0);
-  const promoRaw = entrega?.preco_promocional;
-  const promo = (promoRaw == null || promoRaw === '') ? null : Number(promoRaw);
-  if (promo != null && Number.isFinite(promo) && promo > 0 && promo < preco) return promo;
-  return preco;
-}
-
-function getValorAgendamento(a) {
-  const frozen = Number(a?.preco_final);
-  if (Number.isFinite(frozen) && frozen > 0) return frozen;
-  return getValorEntrega(a?.entregas);
-}
-
-const normalizeKey = (s) => String(s || '').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-const getBizLabel = (group, key) =>
-  ptBR?.dashboard?.business?.[key]?.[group] ?? ptBR?.dashboard?.business?.[key]?.['servicos'] ?? '';
 
 export default function Dashboard({ user, onLogout }) {
   const navigate = useNavigate();
@@ -193,11 +126,6 @@ export default function Dashboard({ user, onLogout }) {
 
   const [submittingAdminProf, setSubmittingAdminProf] = useState(false);
 
-  const WEEKDAYS = [
-    { value: 0, label: 'DOM' }, { value: 1, label: 'SEG' }, { value: 2, label: 'TER' },
-    { value: 3, label: 'QUA' }, { value: 4, label: 'QUI' }, { value: 5, label: 'SEX' },
-    { value: 6, label: 'SÁB' },
-  ];
 
   useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
 
@@ -951,436 +879,148 @@ export default function Dashboard({ user, onLogout }) {
           <div className="p-6">
 
             {activeTab === 'visao-geral' && (
-              <div className="space-y-6">
-                <div className="grid md:grid-cols-3 gap-4 items-start">
-                  <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-2">CANCELAMENTOS HOJE</div><div className="text-3xl font-normal text-white">{Number(metricsHoje?.today?.cancelados || 0)}</div><div className="text-xs text-gray-300 mt-1">TAXA: <span className="text-primary">{Number(metricsHoje?.today?.taxa_cancelamento || 0).toFixed(1)}%</span></div></div>
-                  <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-2">CONCLUÍDOS HOJE</div><div className="text-3xl font-normal text-white">{Number(metricsHoje?.today?.concluidos || 0)}</div><div className="text-xs text-gray-300 mt-1">TICKET MÉDIO: <span className="text-primary">R$ {Number(metricsHoje?.today?.ticket_medio || 0).toFixed(2)}</span></div></div>
-                  <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-2">PRÓXIMO AGENDAMENTO</div>{proximoAgendamento ? (<><div className="text-3xl font-normal text-primary">{getAgInicio(proximoAgendamento)}</div><div className="text-sm text-gray-300 mt-1">{proximoAgendamento.cliente?.nome || '—'} • {proximoAgendamento.profissionais?.nome}</div><div className="text-xs text-gray-500 mt-1">{proximoAgendamento.entregas?.nome}</div></>) : <div className="text-sm text-gray-500">:(</div>}</div>
-                </div>
-                {souDono && faturamentoPorProfissionalHoje.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">{faturamentoPorProfissionalHoje.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-200 border border-gray-800 rounded-custom p-5"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}</div>)}
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"><h3 className="text-lg font-normal flex items-center gap-2 uppercase"><span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="font-normal text-2xl">$</span>FATURAMENTO</h3><DatePicker value={faturamentoData} onChange={(iso) => setFaturamentoData(iso)} todayISO={hoje} /></div>
-                  <div className="text-3xl font-normal text-white mb-2">{metricsDiaLoading ? <span className="text-gray-500 text-xl">...</span> : <>R$ {Number(metricsDia?.selected_day?.faturamento || 0).toFixed(2)}</>}</div>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4 items-start">
-                    <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">CONCLUÍDOS</div><div className="text-xl font-normal text-green-400">{Number(metricsDia?.selected_day?.concluidos || 0)}</div></div>
-                    <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">CANCELADOS</div><div className="text-xl font-normal text-red-400">{Number(metricsDia?.selected_day?.cancelados || 0)}</div><div className="text-xs text-gray-500 mt-1">{Number(metricsDia?.selected_day?.taxa_cancelamento || 0).toFixed(1)}%</div></div>
-                    <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">FECHAMENTO</div><div className="text-xl font-normal text-white">{Number(metricsDia?.selected_day?.taxa_conversao || 0).toFixed(1)}%</div><div className="text-xs text-gray-500 mt-1">sobre {Number(metricsDia?.selected_day?.total || 0)} agendamento(s)</div></div>
-                    <div className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">TICKET MÉDIO</div><div className="text-xl font-normal text-primary">R$ {Number(metricsDia?.selected_day?.ticket_medio || 0).toFixed(2)}</div></div>
-                  </div>
-                  {souDono && faturamentoPorProfissionalFiltro.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4 items-start">{faturamentoPorProfissionalFiltro.map(([nome, valor]) => (<div key={String(nome)} className="bg-dark-100 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div></div>))}</div>)}
-                  <div className="mt-2 bg-dark-100 border border-gray-800 rounded-custom p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3"><div className="text-xs text-gray-500 uppercase tracking-wide">FATURAMENTO POR PERÍODO</div><PeriodoSelect value={faturamentoPeriodo} onChange={setFaturamentoPeriodo} /></div>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
-                      <div className="bg-dark-200 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">CONCLUÍDOS</div><div className="text-xl font-normal text-green-400">{Number(metricsPeriodoData?.period?.concluidos || 0)}</div></div>
-                      <div className="bg-dark-200 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">FATURAMENTO</div><div className="text-xl font-normal text-primary">{metricsPeriodoLoading ? '...' : `R$ ${Number(metricsPeriodoData?.period?.faturamento || 0).toFixed(2)}`}</div></div>
-                      <div className="bg-dark-200 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">MÉDIA POR {counterSingular.toUpperCase()}</div><div className="text-xl font-normal text-white">{metricsPeriodoLoading ? '...' : `R$ ${Number(metricsPeriodoData?.period?.media_por_atendimento || 0).toFixed(2)}`}</div></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <VisaoGeralSection
+                metricsHoje={metricsHoje}
+                proximoAgendamento={proximoAgendamento}
+                souDono={souDono}
+                faturamentoPorProfissionalHoje={faturamentoPorProfissionalHoje}
+                faturamentoData={faturamentoData}
+                setFaturamentoData={setFaturamentoData}
+                hoje={hoje}
+                metricsDiaLoading={metricsDiaLoading}
+                metricsDia={metricsDia}
+                faturamentoPorProfissionalFiltro={faturamentoPorProfissionalFiltro}
+                faturamentoPeriodo={faturamentoPeriodo}
+                setFaturamentoPeriodo={setFaturamentoPeriodo}
+                metricsPeriodoData={metricsPeriodoData}
+                metricsPeriodoLoading={metricsPeriodoLoading}
+                counterSingular={counterSingular}
+              />
             )}
 
             {activeTab === 'agendamentos' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-normal">Agendamentos</h2>
-                  <button onClick={() => reloadAgendamentos()} className="px-4 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase">ATUALIZAR</button>
-                </div>
-                {agendamentosAgrupadosPorProfissional.length > 0 ? (
-                  <div className="space-y-8">
-                    {agendamentosAgrupadosPorProfissional.map(grupo => (
-                      <div key={grupo.pid} className="space-y-4">
-                        <div className="text-sm text-gray-400 uppercase tracking-wide">{grupo.nome}</div>
-                        <div className="space-y-4">
-                          {grupo.itens.map(a => {
-                            const dataA    = getAgDate(a);
-                            const isFuturo = dataA > String(hoje || '');
-                            const isHoje   = dataA === String(hoje || '');
-                            const st       = computeStatusFromDb(a);
-                            const isCancel = isCancelStatus(st);
-                            const isDone   = isDoneStatus(st);
-                            const valorReal = getValorAgendamento(a);
-                            return (
-                              <div key={a.id} className="bg-dark-200 border border-gray-800 rounded-custom p-4">
-                                <div className="flex items-start justify-between gap-2 mb-1">
-                                  <p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p>
-                                  <div className="shrink-0">
-                                    {isCancel ? <div className="px-3 py-1 rounded-button text-xs bg-red-500/20 text-red-300">CANCELADO</div>
-                                      : isDone ? <div className="px-3 py-1 rounded-button text-xs bg-green-500/20 text-green-400">CONCLUÍDO</div>
-                                      : isFuturo ? <div className="px-3 py-1 rounded-button text-xs bg-yellow-500/20 text-yellow-300">FUTURO</div>
-                                      : <div className="px-3 py-1 rounded-button text-xs bg-blue-500/20 text-blue-400">AGENDADO</div>}
-                                  </div>
-                                </div>
-                                <p className="text-xs text-gray-500 truncate mb-0.5">PROF: {a.profissionais?.nome || '—'}</p>
-                                <p className="text-xs text-primary truncate mb-3">{a.entregas?.nome || '—'}</p>
-                                <div className="grid grid-cols-3 gap-4 mb-4">
-                                  <div><div className="text-xs text-gray-500">DATA</div><div className="text-sm">{formatDateBRFromISO(getAgDate(a))}</div></div>
-                                  <div><div className="text-xs text-gray-500">HORÁRIO</div><div className="text-sm">{getAgInicio(a)}</div></div>
-                                  <div><div className="text-xs text-gray-500">VALOR</div><div className="text-sm">R$ {Number(valorReal).toFixed(2)}</div></div>
-                                </div>
-                                {!isDone && !isCancel && (
-                                  isHoje ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                      <button onClick={() => confirmarAtendimento(a)} className="w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">CONFIRMAR ATENDIMENTO</button>
-                                      <button onClick={() => cancelarAgendamento(a)} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">CANCELAR</button>
-                                    </div>
-                                  ) : (
-                                    <button onClick={() => cancelarAgendamento(a)} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">CANCELAR</button>
-                                  )
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : <p className="text-gray-500 text-center py-12">Nenhum agendamento hoje ou futuro.</p>}
-              </div>
+              <AgendamentosSection
+                reloadAgendamentos={reloadAgendamentos}
+                agendamentosAgrupadosPorProfissional={agendamentosAgrupadosPorProfissional}
+                hoje={hoje}
+                confirmarAtendimento={confirmarAtendimento}
+                cancelarAgendamento={cancelarAgendamento}
+              />
             )}
 
             {activeTab === 'cancelados' && (
-              <div>
-                <h2 className="text-2xl font-normal mb-6">Cancelados Hoje</h2>
-                {hojeCancelados.length > 0 ? (
-                  <div className="space-y-4">
-                    {hojeCancelados.sort((a, b) => String(getAgInicio(a)).localeCompare(String(getAgInicio(b)))).map(a => {
-                      const valorReal = getValorAgendamento(a);
-                      return (
-                        <div key={a.id} className="bg-dark-200 border border-red-500/30 rounded-custom p-4">
-                          <div className="flex items-start justify-between gap-2 mb-1"><p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p><div className="px-3 py-1 rounded-button text-xs bg-red-500/20 border border-red-500/50 text-red-400 shrink-0">CANCELADO</div></div>
-                          <p className="text-xs text-gray-500 truncate mb-0.5">PROF: {a.profissionais?.nome || '—'}</p>
-                          <p className="text-xs text-primary truncate mb-3">{a.entregas?.nome || '—'}</p>
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div><div className="text-xs text-gray-500">DATA</div><div className="text-white">{formatDateBRFromISO(getAgDate(a))}</div></div>
-                            <div><div className="text-xs text-gray-500">HORÁRIO</div><div className="text-white">{getAgInicio(a)}</div></div>
-                            <div><div className="text-xs text-gray-500">VALOR</div><div className="text-white">R$ {Number(valorReal).toFixed(2)}</div></div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : <p className="text-gray-500 text-center py-12">Nenhum cancelamento hoje.</p>}
-              </div>
+              <CanceladosSection hojeCancelados={hojeCancelados} />
             )}
 
             {activeTab === 'historico' && (
-              <div>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                  <h2 className="text-2xl font-normal">Histórico</h2>
-                  <DatePicker value={historicoData} onChange={(iso) => setHistoricoData(iso)} todayISO={hoje} />
-                </div>
-                {historicoAgendamentos.length > 0 ? (
-                  <div className="space-y-3">
-                    {historicoAgendamentos.map(a => {
-                      const st = computeStatusFromDb(a); const isCancel = isCancelStatus(st); const isDone = isDoneStatus(st); const valorReal = getValorAgendamento(a);
-                      return (
-                        <div key={a.id} className={`bg-dark-200 border rounded-custom p-4 ${isCancel ? 'border-red-500/30' : 'border-gray-800'}`}>
-                          <div className="flex items-start justify-between gap-2 mb-1">
-                            <p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p>
-                            <div className={`px-3 py-1 rounded-button text-xs shrink-0 ${isCancel ? 'bg-red-500/20 border border-red-500/50 text-red-300' : isDone ? 'bg-green-500/20 border border-green-500/50 text-green-300' : 'bg-blue-500/20 border border-blue-500/50 text-blue-300'}`}>
-                              {isCancel ? 'CANCELADO' : isDone ? 'CONCLUÍDO' : 'AGENDADO'}
-                            </div>
-                          </div>
-                          <p className="text-xs text-gray-500 truncate mb-0.5">PROF: {a.profissionais?.nome || '—'}</p>
-                          <p className="text-xs text-primary truncate mb-3">{a.entregas?.nome || '—'}</p>
-                          <div className="grid grid-cols-3 gap-4 mb-4">
-                            <div><div className="text-xs text-gray-500">DATA</div><div className="text-sm">{formatDateBRFromISO(getAgDate(a))}</div></div>
-                            <div><div className="text-xs text-gray-500">HORÁRIO</div><div className="text-sm">{getAgInicio(a)}</div></div>
-                            <div><div className="text-xs text-gray-500">VALOR</div><div className="text-sm">R$ {Number(valorReal).toFixed(2)}</div></div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : <div className="text-gray-500 text-center py-12">Nenhum agendamento carregado para essa data.</div>}
-                {historicoHasMore && (
-                  <button onClick={loadMoreHistorico} disabled={historicoLoadingMore} className="mt-4 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-60">
-                    {historicoLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
-                  </button>
-                )}
-              </div>
+              <HistoricoSection
+                historicoData={historicoData}
+                setHistoricoData={setHistoricoData}
+                hoje={hoje}
+                historicoAgendamentos={historicoAgendamentos}
+                historicoHasMore={historicoHasMore}
+                loadMoreHistorico={loadMoreHistorico}
+                historicoLoadingMore={historicoLoadingMore}
+              />
             )}
 
             {activeTab === 'entregas' && (
-              <div>
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-normal">{sectionTitle}</h2>
-                  <button
-                    onClick={() => { const profId = parceiroProfissional ? parceiroProfissional.id : ''; setShowNovaEntrega(true); setEditingEntregaId(null); setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: profId }); }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-button font-normal uppercase border bg-gradient-to-r from-primary to-yellow-600 text-black border-transparent">
-                    <Plus className="w-5 h-5" />{btnAddLabel}
-                  </button>
-                </div>
-                {profissionais.length === 0 ? <div className="text-gray-500">Nenhum profissional cadastrado.</div> : (
-                  <div className="space-y-4">
-                    {profissionais.map(p => {
-                      const lista = (entregasPorProf.get(p.id) || []).slice().sort((a, b) => Number(b.preco || 0) - Number(a.preco || 0));
-                      return (
-                        <div key={p.id} className="bg-dark-200 border border-gray-800 rounded-custom p-6">
-                          <div className="flex items-center justify-between mb-4"><div className="font-normal text-lg">{p.nome}</div><div className="text-xs text-gray-500">{lista.length} {lista.length === 1 ? counterSingular : counterPlural}</div></div>
-                          {lista.length ? (
-                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
-                              {lista.map(s => {
-                                const preco = Number(s.preco ?? 0); const promo = s.preco_promocional == null ? null : Number(s.preco_promocional);
-                                return (
-                                  <div key={s.id} className="bg-dark-100 border border-gray-800 rounded-custom p-5">
-                                    <div className="flex justify-between items-start mb-3">
-                                      {promo != null && promo > 0 && promo < preco ? (<div><div className="text-xl font-normal text-green-400">R$ {promo.toFixed(2)}</div><div className="text-xs font-normal text-red-400 line-through">R$ {preco.toFixed(2)}</div></div>) : (<div className="text-xl font-normal text-primary">R$ {preco.toFixed(2)}</div>)}
-                                      <span className="text-xs text-gray-500">{s.duracao_minutos} MIN</span>
-                                    </div>
-                                    <h3 className="text-sm font-normal text-white mb-0.5">{s.nome}</h3>
-                                    <p className="text-xs text-gray-500 mb-4">{p.nome}</p>
-                                    <div className="flex gap-2">
-                                      <button onClick={async () => {
-                                        if (!await checarPermissao(s.profissional_id)) return;
-                                        setEditingEntregaId(s.id);
-                                        setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: String(s.preco_promocional ?? ''), profissional_id: s.profissional_id || '' });
-                                        setShowNovaEntrega(true);
-                                      }} className="flex-1 py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
-                                      <button onClick={() => deleteEntrega(s)} className="flex-1 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : <p className="text-gray-500">{emptyListMsg}</p>}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+              <EntregasSection
+                sectionTitle={sectionTitle}
+                parceiroProfissional={parceiroProfissional}
+                setShowNovaEntrega={setShowNovaEntrega}
+                setEditingEntregaId={setEditingEntregaId}
+                setFormEntrega={setFormEntrega}
+                btnAddLabel={btnAddLabel}
+                profissionais={profissionais}
+                entregasPorProf={entregasPorProf}
+                counterSingular={counterSingular}
+                counterPlural={counterPlural}
+                emptyListMsg={emptyListMsg}
+                checarPermissao={checarPermissao}
+                deleteEntrega={deleteEntrega}
+              />
             )}
 
             {activeTab === 'profissionais' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-normal">Profissionais</h2>
-
-                  {souDono && !adminJaEhProfissional && (
-                    <button
-                      onClick={cadastrarAdminComoProfissional}
-                      disabled={submittingAdminProf}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-button text-sm font-normal uppercase border transition-all ${submittingAdminProf ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/10 hover:bg-primary/20 border-primary/30 text-primary'}`}>
-                      <Plus className="w-4 h-4" />
-                      {submittingAdminProf ? 'CADASTRANDO...' : 'ME CADASTRAR'}
-                    </button>
-                  )}
-                </div>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
-                  {profissionais.map(p => {
-                    const isPendente = p.status === 'pendente';
-                    const isInativo  = p.status === 'inativo';
-                    const isAtivo    = p.status === 'ativo';
-                    const label      = normalizeKey(p.status_label);
-                    const dotClass   = STATUS_COLOR_CLASS[label] || 'bg-gray-500';
-                    const isEuMesmo  = parceiroProfissional?.id === p.id;
-                    return (
-                      <div key={p.id} className={`relative bg-dark-200 border rounded-custom p-5 ${isPendente ? 'border-yellow-500/40' : isEuMesmo ? 'border-primary/30' : 'border-gray-800'}`}>
-                        {isPendente && (<div className="absolute top-3 right-3 text-[10px] px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 font-normal uppercase">AGUARDANDO</div>)}
-                        {!isPendente && isInativo && (<span className="absolute top-3 right-3 text-[10px] px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-300 font-normal uppercase">INATIVO</span>)}
-                        <div className="flex items-start gap-3 mb-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center font-normal text-xl shrink-0">{p.nome?.[0] || 'P'}</div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-normal pr-24">{p.nome}</h3>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isPendente ? 'bg-yellow-400' : dotClass}`} />
-                              <span className={`text-xs ${isPendente ? 'text-yellow-400' : 'text-gray-400'}`}>{isPendente ? 'PENDENTE' : (p.status_label || '—')}</span>
-                            </div>
-                            {p.profissao && <p className="text-xs text-gray-500 mt-1">{p.profissao}</p>}
-                            {!isPendente && p.anos_experiencia != null && (<p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIÊNCIA</p>)}
-                          </div>
-                        </div>
-                        {!isPendente && (
-                          <>
-                            <div className="text-sm text-gray-400 mb-3">{entregas.filter(s => s.profissional_id === p.id).length} {counterPlural}</div>
-                            <div className="text-xs text-gray-500 mb-3">
-                              <Clock className="w-4 h-4 inline mr-1" />{p.horario_inicio} - {p.horario_fim}
-                              {p.almoco_inicio && p.almoco_fim && <span className="ml-2 text-yellow-300">• {p.almoco_inicio} - {p.almoco_fim}</span>}
-                            </div>
-                          </>
-                        )}
-                        {isPendente && souDono && (
-                          <div className="flex gap-2 mt-4">
-                            <button onClick={() => aprovarParceiro(p)} className="flex-1 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">APROVAR</button>
-                            <button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
-                          </div>
-                        )}
-                        {!isPendente && (isEuMesmo || souDono) && (
-                          <>
-                            {isInativo && p.motivo_inativo && (<div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-custom p-2 mb-3">INATIVO {p.motivo_inativo ? `• ${p.motivo_inativo}` : ''}</div>)}
-                            {souDono ? (
-                              <div className="space-y-2 mt-2">
-                                <div className="flex gap-2">
-                                  <button onClick={() => toggleStatusProfissional(p)} className={`flex-1 py-2 rounded-button text-sm border font-normal uppercase ${isAtivo ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300' : 'bg-green-500/10 border-green-500/30 text-green-300'}`}>
-                                    {isAtivo ? 'INATIVAR' : 'ATIVAR'}
-                                  </button>
-                                  <button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
-                                </div>
-                                <button onClick={() => { setEditingProfissionalId(p.id); setFormProfissional({ nome: p.nome || '', profissao: p.profissao || '', anos_experiencia: String(p.anos_experiencia ?? ''), horario_inicio: p.horario_inicio || '08:00', horario_fim: p.horario_fim || '18:00', almoco_inicio: p.almoco_inicio || '', almoco_fim: p.almoco_fim || '', dias_trabalho: p.dias_trabalho || [1,2,3,4,5,6] }); setShowEditProfissional(true); }} className="w-full py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
-                              </div>
-                            ) : isEuMesmo ? (
-                              <button onClick={() => { setEditingProfissionalId(p.id); setFormProfissional({ nome: p.nome || '', profissao: p.profissao || '', anos_experiencia: String(p.anos_experiencia ?? ''), horario_inicio: p.horario_inicio || '08:00', horario_fim: p.horario_fim || '18:00', almoco_inicio: p.almoco_inicio || '', almoco_fim: p.almoco_fim || '', dias_trabalho: p.dias_trabalho || [1,2,3,4,5,6] }); setShowEditProfissional(true); }} className="w-full py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
-                            ) : null}
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              <ProfissionaisSection
+                souDono={souDono}
+                adminJaEhProfissional={adminJaEhProfissional}
+                cadastrarAdminComoProfissional={cadastrarAdminComoProfissional}
+                submittingAdminProf={submittingAdminProf}
+                profissionais={profissionais}
+                parceiroProfissional={parceiroProfissional}
+                entregas={entregas}
+                counterPlural={counterPlural}
+                aprovarParceiro={aprovarParceiro}
+                excluirProfissional={excluirProfissional}
+                toggleStatusProfissional={toggleStatusProfissional}
+                setEditingProfissionalId={setEditingProfissionalId}
+                setFormProfissional={setFormProfissional}
+                setShowEditProfissional={setShowEditProfissional}
+              />
             )}
 
             {activeTab === 'info-negocio' && souDono && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-2xl font-normal">Info do Negócio</h2>
-                  <button onClick={salvarInfoNegocio} disabled={infoSaving}
-                    className={`px-5 py-2.5 rounded-button font-normal border flex items-center gap-2 uppercase ${infoSaving ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'}`}>
-                    <Save className="w-4 h-4" />{infoSaving ? 'SALVANDO...' : 'SALVAR'}
-                  </button>
-                </div>
-                <div className="flex justify-start"><TemaToggle value={formInfo.tema} onChange={salvarTema} loading={temaSaving} /></div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><label className="block text-sm mb-2">Negócio</label><input value={formInfo.nome} onChange={(e) => setFormInfo(prev => ({ ...prev, nome: e.target.value }))} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="Nome" /></div>
-                  <div className="bg-dark-200 border border-gray-800 rounded-custom p-5"><label className="block text-sm mb-2">Telefone</label><input value={formInfo.telefone} onChange={(e) => setFormInfo(prev => ({ ...prev, telefone: e.target.value }))} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="(xx) xxxxx-xxxx" /></div>
-                  <div className="bg-dark-200 border border-gray-800 rounded-custom p-5 md:col-span-2"><label className="block text-sm mb-2">Endereço</label><input value={formInfo.endereco} onChange={(e) => setFormInfo(prev => ({ ...prev, endereco: e.target.value }))} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder='Ex.: Rua Serra do Sincorá, 1038 - Belo Horizonte, Minas Gerais' /><p className="text-[12px] text-yellow-300 mt-2">Use o formato: <span className="text-gray-300">"RUA, NÚMERO - CIDADE, ESTADO"</span><span className="text-gray-500"> Ex.: Rua Serra do Sincorá, 1038 - Belo Horizonte, Minas Gerais</span></p></div>
-                  <div className="bg-dark-200 border border-gray-800 rounded-custom p-5 md:col-span-2"><label className="block text-sm mb-2">Sobre</label><textarea value={formInfo.descricao} onChange={(e) => setFormInfo(prev => ({ ...prev, descricao: e.target.value }))} rows={3} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white resize-none" placeholder="Sobre o negócio..." /></div>
-                </div>
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
-                  <div className="text-sm font-normal text-white tracking-wide mb-1">REDES</div>
-                  <p className="text-sm text-gray-500 mb-4">Seus links aparecem na vitrine pública. Deixe em branco para ocultar.</p>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div><label className="block text-sm mb-2">Instagram</label><input value={formInfo.instagram} onChange={(e) => setFormInfo(prev => ({ ...prev, instagram: e.target.value }))} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="@seuinstagram" /></div>
-                    <div><label className="block text-sm mb-2">Facebook</label><input value={formInfo.facebook} onChange={(e) => setFormInfo(prev => ({ ...prev, facebook: e.target.value }))} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="facebook.com/..." /></div>
-                  </div>
-                </div>
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="text-sm font-normal text-white tracking-wide">GALERIA</div>
-                    <label className="hidden sm:inline-block">
-                      <input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} />
-                      <span className={`inline-flex items-center gap-2 rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-4 py-2 text-sm`}><Plus className="w-4 h-4" />{galleryUploading ? 'ENVIANDO...' : 'ADICIONAR'}</span>
-                    </label>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-4">Adicione fotos do seu local e do que você oferece. Elas aparecem na sua vitrine pública para atrair novos clientes.</p>
-                  {galeriaItems.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {galeriaItems.map((item) => (
-                        <div key={item.id || item.path} className="relative bg-dark-100 border border-gray-800 rounded-custom overflow-hidden">
-                          <img src={getPublicUrl('galerias', item.path)} alt="Galeria" className="w-full h-28 object-cover" />
-                          <button onClick={() => removerImagemGaleria(item)} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 sm:left-auto sm:top-2 sm:right-2 sm:translate-x-0 sm:translate-y-0 px-3 py-1 rounded-full bg-black/60 border border-gray-700 hover:border-red-400 text-[12px] text-red-200 font-normal uppercase">REMOVER</button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : <div className="text-gray-500">Nenhuma imagem ainda.</div>}
-                  <label className="sm:hidden mt-4 block">
-                    <input type="file" accept="image/png,image/jpeg,image/webp" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} />
-                    <span className={`w-full inline-flex items-center justify-center gap-2 rounded-button font-normal border cursor-pointer transition-all uppercase ${galleryUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'} px-4 py-3 text-sm`}><Plus className="w-4 h-4" />{galleryUploading ? 'ENVIANDO...' : 'ADICIONAR FOTOS'}</span>
-                  </label>
-                </div>
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
-                  <div className="text-xs text-gray-500 uppercase tracking-wide mb-4">CREDENCIAIS</div>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm mb-2">EMAIL</label>
-                      <input type="email" value={novoEmail} onChange={(e) => setNovoEmail(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="seu@email.com" />
-                      <button type="button" disabled={savingDados} onClick={salvarEmail} className="mt-3 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed uppercase font-normal">SALVAR NOVO EMAIL</button>
-                    </div>
-                    <div>
-                      <label className="block text-sm mb-2">NOVA SENHA</label>
-                      <input type="password" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="••••••••" />
-                      <label className="block text-sm mb-2 mt-3">CONFIRMAR SENHA</label>
-                      <input type="password" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="••••••••" />
-                      <button type="button" disabled={savingDados} onClick={salvarSenha} className="mt-3 w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed uppercase font-normal">SALVAR NOVA SENHA</button>
-                    </div>
-                  </div>
-                </div>
-                <div className="pt-2 pb-4">
-                  <button type="button" onClick={() => navigate('/criar-negocio')} className="w-full py-4 rounded-full border border-primary/40 bg-primary/10 text-primary text-sm font-normal uppercase tracking-normal hover:border-primary/70 hover:bg-primary/20 transition-all">
-                    + CRIAR OUTRO NEGÓCIO
-                  </button>
-                </div>
-              </div>
+              <InfoNegocioSection
+                salvarInfoNegocio={salvarInfoNegocio}
+                infoSaving={infoSaving}
+                formInfo={formInfo}
+                setFormInfo={setFormInfo}
+                salvarTema={salvarTema}
+                temaSaving={temaSaving}
+                galleryUploading={galleryUploading}
+                uploadGaleria={uploadGaleria}
+                galeriaItems={galeriaItems}
+                getPublicUrl={getPublicUrl}
+                removerImagemGaleria={removerImagemGaleria}
+                novoEmail={novoEmail}
+                setNovoEmail={setNovoEmail}
+                savingDados={savingDados}
+                salvarEmail={salvarEmail}
+                novaSenha={novaSenha}
+                setNovaSenha={setNovaSenha}
+                confirmarSenha={confirmarSenha}
+                setConfirmarSenha={setConfirmarSenha}
+                salvarSenha={salvarSenha}
+                navigate={navigate}
+              />
             )}
 
           </div>
         </div>
       </div>
 
-      {showNovaEntrega && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-          <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-normal">{editingEntregaId ? modalEditLabel : modalNewLabel}</h3>
-              <button onClick={() => { setShowNovaEntrega(false); setEditingEntregaId(null); setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' }); }}><X className="w-6 h-6" /></button>
-            </div>
-            <form onSubmit={editingEntregaId ? updateEntrega : createEntrega} className="space-y-4">
-              <div>
-                <label className="block text-sm mb-2">Profissional</label>
-                <ProfissionalSelect
-                  value={formEntrega.profissional_id}
-                  onChange={(id) => setFormEntrega({ ...formEntrega, profissional_id: id })}
-                  profissionais={parceiroProfissional ? profissionais.filter(p => p.id === parceiroProfissional.id) : profissionais}
-                  placeholder="Selecione"
-                  apenasAtivos={true}
-                />
-              </div>
-              <div><label className="block text-sm mb-2">Nome</label><input type="text" value={formEntrega.nome} onChange={(e) => setFormEntrega({ ...formEntrega, nome: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" required /></div>
-              <div><label className="block text-sm mb-2">Tempo estimado (min)</label><input type="number" value={formEntrega.duracao_minutos} onChange={(e) => setFormEntrega({ ...formEntrega, duracao_minutos: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" required /></div>
-              <div><label className="block text-sm mb-2">Preço (R$)</label><input type="number" step="0.01" value={formEntrega.preco} onChange={(e) => setFormEntrega({ ...formEntrega, preco: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" required /></div>
-              <div>
-                <label className="block text-sm mb-2">Preço de OFERTA (opcional)</label>
-                <input type="number" step="0.01" value={formEntrega.preco_promocional} onChange={(e) => setFormEntrega({ ...formEntrega, preco_promocional: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" placeholder="Apenas se houver oferta" />
-                <p className="text-[12px] text-gray-500 mt-2">O preço de oferta deve ser menor que o preço normal.</p>
-              </div>
-              <button type="submit" disabled={submittingEntrega} className={`w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase ${submittingEntrega ? 'opacity-60 cursor-not-allowed' : ''}`}>
-                {submittingEntrega ? 'SALVANDO...' : 'SALVAR'}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      <EntregaModal
+        show={showNovaEntrega}
+        editingEntregaId={editingEntregaId}
+        modalNewLabel={modalNewLabel}
+        modalEditLabel={modalEditLabel}
+        formEntrega={formEntrega}
+        setFormEntrega={setFormEntrega}
+        parceiroProfissional={parceiroProfissional}
+        profissionais={profissionais}
+        submittingEntrega={submittingEntrega}
+        onClose={() => {
+          setShowNovaEntrega(false);
+          setEditingEntregaId(null);
+          setFormEntrega({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' });
+        }}
+        onSubmit={editingEntregaId ? updateEntrega : createEntrega}
+      />
 
-      {showEditProfissional && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-          <div className="bg-dark-100 border border-gray-800 rounded-custom max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-normal">EDITAR PROFISSIONAL</h3>
-              <button onClick={() => { setShowEditProfissional(false); setEditingProfissionalId(null); }}><X className="w-6 h-6" /></button>
-            </div>
-            <form onSubmit={updateProfissional} className="space-y-4">
-              <div><label className="block text-sm mb-2">Nome</label><input type="text" value={formProfissional.nome} onChange={(e) => setFormProfissional({ ...formProfissional, nome: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" required /></div>
-              <div><label className="block text-sm mb-2">Como te chamamos?</label><input type="text" value={formProfissional.profissao} onChange={(e) => setFormProfissional({ ...formProfissional, profissao: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" placeholder="Ex: Barbeiro, Manicure..." /></div>
-              <div><label className="block text-sm mb-2">Anos de experiência</label><input type="number" value={formProfissional.anos_experiencia} onChange={(e) => setFormProfissional({ ...formProfissional, anos_experiencia: e.target.value })} className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white" /></div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-sm mb-2">Das</label><TimePicker value={formProfissional.horario_inicio} onChange={(v) => setFormProfissional({ ...formProfissional, horario_inicio: v })} step={30} /></div>
-                <div><label className="block text-sm mb-2">Até</label><TimePicker value={formProfissional.horario_fim} onChange={(v) => setFormProfissional({ ...formProfissional, horario_fim: v })} step={30} /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-sm mb-2">Almoço (Início)</label><TimePicker value={formProfissional.almoco_inicio} onChange={(v) => setFormProfissional({ ...formProfissional, almoco_inicio: v })} step={15} /></div>
-                <div><label className="block text-sm mb-2">Almoço (Fim)</label><TimePicker value={formProfissional.almoco_fim} onChange={(v) => setFormProfissional({ ...formProfissional, almoco_fim: v })} step={15} /></div>
-              </div>
-              <div>
-                <label className="block text-sm mb-2">Dias de trabalho</label>
-                <div className="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-7 gap-2">
-                  {WEEKDAYS.map(d => (
-                    <button key={d.value} type="button"
-                      onClick={() => { const dias = formProfissional.dias_trabalho.includes(d.value) ? formProfissional.dias_trabalho.filter(x => x !== d.value) : [...formProfissional.dias_trabalho, d.value].sort(); setFormProfissional({ ...formProfissional, dias_trabalho: dias }); }}
-                      className={`py-2 sm:py-1.5 px-2 sm:px-3 rounded-full border font-normal text-xs transition-all ${formProfissional.dias_trabalho.includes(d.value) ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-dark-200 border-gray-800 text-gray-500'}`}>
-                      {d.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <button type="submit" disabled={submittingProfissional} className={`w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase ${submittingProfissional ? 'opacity-60 cursor-not-allowed' : ''}`}>
-                {submittingProfissional ? 'SALVANDO...' : 'SALVAR'}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      <ProfissionalModal
+        show={showEditProfissional}
+        formProfissional={formProfissional}
+        setFormProfissional={setFormProfissional}
+        weekdays={WEEKDAYS}
+        submittingProfissional={submittingProfissional}
+        onClose={() => {
+          setShowEditProfissional(false);
+          setEditingProfissionalId(null);
+        }}
+        onSubmit={updateProfissional}
+      />
 
     </div>
   );
