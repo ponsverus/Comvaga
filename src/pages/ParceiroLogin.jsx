@@ -9,9 +9,9 @@ const msgs = ptBR.parceiroLogin;
 function Alerta({ msg }) {
   if (!msg) return null;
   const estilos = {
-    erro:   'bg-red-500/10 border-red-500/30 text-red-400',
-    aviso:  'bg-yellow-500/10 border-yellow-500/30 text-yellow-300',
-    sucesso:'bg-green-500/10 border-green-500/30 text-green-400',
+    erro: 'bg-red-500/10 border-red-500/30 text-red-400',
+    aviso: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300',
+    sucesso: 'bg-green-500/10 border-green-500/30 text-green-400',
   };
   const classe = estilos[msg.variant] || estilos.erro;
   return (
@@ -24,18 +24,18 @@ function Alerta({ msg }) {
 export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: inRecoveryProp = false }) {
   const navigate = useNavigate();
 
-  const [email,        setEmail]        = useState('');
-  const [senha,        setSenha]        = useState('');
-  const [slug,         setSlug]         = useState('');
-  const [loading,      setLoading]      = useState(false);
-  const [alerta,       setAlerta]       = useState(null);
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [slug, setSlug] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [alerta, setAlerta] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  const [isRecovery,      setIsRecovery]      = useState(inRecoveryProp);
-  const [newPassword,     setNewPassword]     = useState('');
-  const [newPassword2,    setNewPassword2]    = useState('');
+  const [isRecovery, setIsRecovery] = useState(inRecoveryProp);
+  const [newPassword, setNewPassword] = useState('');
+  const [newPassword2, setNewPassword2] = useState('');
   const [recoveryLoading, setRecoveryLoading] = useState(false);
-  const [recoveryAlerta,  setRecoveryAlerta]  = useState(null);
+  const [recoveryAlerta, setRecoveryAlerta] = useState(null);
 
   const [resetLoading, setResetLoading] = useState(false);
 
@@ -58,11 +58,11 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
     setAlerta(null);
 
     const emailClean = email.trim().toLowerCase();
-    const slugClean  = slug.trim().toLowerCase();
+    const slugClean = slug.trim().toLowerCase();
 
     if (!emailClean || !emailClean.includes('@')) return setAlerta(msgs.email_invalid);
-    if (senha.length < 6)                         return setAlerta(msgs.senha_too_short);
-    if (!slugClean)                               return setAlerta(msgs.slug_required);
+    if (senha.length < 6) return setAlerta(msgs.senha_too_short);
+    if (!slugClean) return setAlerta(msgs.slug_required);
 
     setLoading(true);
     if (suppressAuthRef) suppressAuthRef.current = true;
@@ -117,7 +117,6 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
       if (suppressAuthRef) suppressAuthRef.current = false;
       onLogin(signInData.user, 'professional');
       navigate('/dashboard', { state: { negocioId: negocio.id } });
-
     } catch (e) {
       setAlerta({ body: e?.message || msgs.unexpected_error.body, variant: 'erro' });
       await supabase.auth.signOut();
@@ -154,7 +153,7 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
     if (recoveryLoading) return;
     setRecoveryAlerta(null);
 
-    if (newPassword.length < 6)       return setRecoveryAlerta(msgs.recovery_password_too_short);
+    if (newPassword.length < 6) return setRecoveryAlerta(msgs.recovery_password_too_short);
     if (newPassword !== newPassword2) return setRecoveryAlerta(msgs.recovery_password_mismatch);
 
     setRecoveryLoading(true);
@@ -177,7 +176,6 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center mx-auto mb-4">
               <span className="text-black text-2xl font-normal">C</span>
@@ -188,7 +186,6 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
 
           <div className="bg-dark-100 border border-gray-800 rounded-custom p-8">
             <form onSubmit={handleSetNewPassword} className="space-y-4">
-
               <div>
                 <label className="block text-xs text-gray-400 uppercase mb-2">Nova senha</label>
                 <input
@@ -222,10 +219,8 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
               >
                 {recoveryLoading ? 'SALVANDO...' : 'SALVAR NOVA SENHA'}
               </button>
-
             </form>
           </div>
-
         </div>
       </div>
     );
@@ -234,7 +229,6 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center mx-auto mb-4">
             <span className="text-black text-2xl font-normal">C</span>
@@ -245,7 +239,6 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
 
         <div className="bg-dark-100 border border-gray-800 rounded-custom p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
-
             <div>
               <label className="block text-xs text-gray-400 uppercase mb-2">Email</label>
               <input
@@ -311,7 +304,6 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
             >
               {loading ? 'ENTRANDO...' : 'ENTRAR'}
             </button>
-
           </form>
         </div>
 
@@ -321,7 +313,6 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
             Solicitar acesso
           </Link>
         </p>
-
       </div>
     </div>
   );
