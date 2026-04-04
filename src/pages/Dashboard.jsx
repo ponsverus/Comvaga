@@ -192,26 +192,6 @@ export default function Dashboard({ user, onLogout }) {
   const agProfIdsKey = useMemo(() => profissionais.map(p => p.id).sort().join(','), [profissionais]);
 
   useEffect(() => {
-    if (!negocio?.id || !agProfIdsKey || !hoje) return;
-    const channel = supabase.channel(`agendamentos:${negocio.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'agendamentos', filter: `negocio_id=eq.${negocio.id}` }, (payload) => {
-        const ev = payload?.eventType;
-        const novo = payload?.new;
-        const profIdEvento = novo?.profissional_id;
-        const meuId = parceiroProfissionalId;
-        const meResponde = !meuId || profIdEvento === meuId;
-        if (ev === 'INSERT' && meResponde) setNotifAgendamentos(prev => prev + 1);
-        if (ev === 'UPDATE' && meResponde) {
-          const st = String(novo?.status || '').toLowerCase();
-          if (st.includes('cancelado') && !st.includes('profissional')) setNotifCancelados(prev => prev + 1);
-        }
-        reloadAgendamentosRef.current();
-        loadHoje(negocio.id, parceiroProfissionalId);
-      }).subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [negocio?.id, agProfIdsKey, hoje, parceiroProfissionalId, loadHoje]);
-
-  useEffect(() => {
     setHistoricoData(prev => prev ? prev : hoje);
     setFaturamentoData(prev => prev ? prev : hoje);
   }, [hoje]);
@@ -263,6 +243,26 @@ export default function Dashboard({ user, onLogout }) {
   useEffect(() => { if (!negocio?.id || !hoje) return; loadHoje(negocio.id, parceiroProfissionalId); }, [negocio?.id, hoje, parceiroProfissionalId, loadHoje]);
   useEffect(() => { if (!negocio?.id || !faturamentoData) return; loadDia(negocio.id, faturamentoData, parceiroProfissionalId); }, [negocio?.id, faturamentoData, parceiroProfissionalId, loadDia]);
   useEffect(() => { if (!negocio?.id || !hoje) return; loadPeriodo(negocio.id, hoje, faturamentoPeriodo, parceiroProfissionalId); }, [negocio?.id, hoje, faturamentoPeriodo, parceiroProfissionalId, loadPeriodo]);
+
+  useEffect(() => {
+    if (!negocio?.id || !agProfIdsKey || !hoje) return;
+    const channel = supabase.channel(`agendamentos:${negocio.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'agendamentos', filter: `negocio_id=eq.${negocio.id}` }, (payload) => {
+        const ev = payload?.eventType;
+        const novo = payload?.new;
+        const profIdEvento = novo?.profissional_id;
+        const meuId = parceiroProfissionalId;
+        const meResponde = !meuId || profIdEvento === meuId;
+        if (ev === 'INSERT' && meResponde) setNotifAgendamentos(prev => prev + 1);
+        if (ev === 'UPDATE' && meResponde) {
+          const st = String(novo?.status || '').toLowerCase();
+          if (st.includes('cancelado') && !st.includes('profissional')) setNotifCancelados(prev => prev + 1);
+        }
+        reloadAgendamentosRef.current();
+        loadHoje(negocio.id, parceiroProfissionalId);
+      }).subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [negocio?.id, agProfIdsKey, hoje, parceiroProfissionalId, loadHoje]);
 
   const fetchHistoricoPage = useCallback(async ({ negocioId, profIds, date, page, append }) => {
     const from = page * AG_PAGE_SIZE; const to = from + AG_PAGE_SIZE - 1;
