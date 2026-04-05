@@ -17,6 +17,7 @@ import { supabase } from '../supabase';
 import { ptBR } from '../feedback/messages/ptBR';
 import { getBusinessGroup } from '../businessTerms';
 import BookingCalendar from '../components/BookingCalendar';
+import negocioVerificadoIcon from '../assets/icons/negocio-verificado.svg';
 
 const SERVICOS_POR_PAGINA = 4;
 const DEPOIMENTOS_POR_PAGINA = 10;
@@ -1012,7 +1013,10 @@ export default function Vitrine({ user, userType }) {
               : (<div className="w-20 h-20 sm:w-24 sm:h-24 bg-vprimary rounded-custom flex items-center justify-center text-4xl sm:text-5xl font-normal text-vprimary-text">{negocio.nome?.[0] || 'N'}</div>)
             }
             <div className="flex-1">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-normal mb-3">{negocio.nome}</h1>
+              <div className="flex items-center gap-2 mb-3">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-normal">{negocio.nome}</h1>
+                <img src={negocioVerificadoIcon} alt="Negócio verificado" className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" />
+              </div>
               <p className="text-base sm:text-lg text-vsub mb-4 font-normal">{negocio.descricao}</p>
               <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                 <div className="flex items-center gap-2"><StarChar size={18} className="text-primary" /><span className={`text-xl font-normal ${mediaColor}`}>{mediaDepoimentos}</span></div>
