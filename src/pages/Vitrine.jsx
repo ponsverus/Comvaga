@@ -611,7 +611,7 @@ export default function Vitrine({ user, userType }) {
     setLoading(true); setError(null);
     const watchdog = setTimeout(() => { setLoading(false); setError(getMsg('load_timeout', 'Demorou demais para carregar. Tente novamente.')); }, 12000);
     try {
-      await fetchNowFromDb();
+      fetchNowFromDb().catch(() => null);
       const { data: negocioData, error: negocioError } = await withTimeout(supabase.from('negocios').select('*').eq('slug', slug).maybeSingle(), 7000, 'negocio');
       if (negocioError) throw negocioError;
       if (!negocioData) { setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]); return; }
@@ -669,6 +669,11 @@ export default function Vitrine({ user, userType }) {
   }, [fetchNowFromDb]);
 
   useEffect(() => {
+    if (!user) return;
+    fetchNowFromDb().catch(() => {});
+  }, [user, fetchNowFromDb]);
+
+  useEffect(() => {
     if (user && negocio?.id) checkFavorito();
     else setIsFavorito(false);
   }, [checkFavorito, negocio?.id, user]);
@@ -716,16 +721,20 @@ export default function Vitrine({ user, userType }) {
   };
 
   const requireLogin = async () => {
-    if (!todayISO) {
-      alertKey('schedule_time_unavailable', 'Horário oficial indisponível', 'Ainda estamos sincronizando o horário oficial. Tente novamente em instantes.', 'ENTENDI');
-      return false;
-    }
     if (!user) {
       const ok = await confirmKey('schedule_need_login_confirm', 'Login necessário', 'Você precisa fazer login para agendar. Deseja fazer login agora?', 'IR PARA LOGIN', 'MAIS TARDE');
       if (ok) navigate('/login');
       return false;
     }
     if (userType !== 'client') { alertKey('schedule_only_client', 'Ação restrita', 'Você está logado como PROFISSIONAL. Para agendar, entre como CLIENTE.', 'ENTENDI'); return false; }
+    if (!todayISO) {
+      try {
+        await fetchNowFromDb();
+      } catch {
+        alertKey('schedule_time_unavailable', 'Horário oficial indisponível', 'Ainda estamos sincronizando o horário oficial. Tente novamente em instantes.', 'ENTENDI');
+        return false;
+      }
+    }
     return true;
   };
 
@@ -903,6 +912,7 @@ export default function Vitrine({ user, userType }) {
 
   const getProfStatus = (p) => {
     if (p?.status !== 'ativo') return { label: 'FECHADO', color: 'bg-red-500' };
+    if (!serverNow.date) return null;
     const ini = timeToMinutes(p?.horario_inicio || '08:00');
     const fim = timeToMinutes(p?.horario_fim    || '18:00');
     const dias = normalizeDiasTrabalho(p?.dias_trabalho);
@@ -1059,10 +1069,12 @@ export default function Vitrine({ user, userType }) {
                         <h3 className="text-lg font-normal">{prof.nome}</h3>
                         {profissao && (<span className={`inline-block px-2 py-1 rounded-button text-[10px] font-normal uppercase whitespace-nowrap shrink-0 border ${profissaoTag}`}>{profissao}</span>)}
                       </div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${status.color}`} />
-                        <span className="text-xs text-vsub font-normal uppercase">{status.label}</span>
-                      </div>
+                      {status?.label && (
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${status.color}`} />
+                          <span className="text-xs text-vsub font-normal uppercase">{status.label}</span>
+                        </div>
+                      )}
                       {depInfo?.media && (<div className="flex items-center gap-2 mb-1"><StarChar size={16} className="text-primary" /><span className={`text-lg font-normal ${mediaColor}`}>{depInfo.media}</span><span className="text-xs text-vmuted">({depInfo.count})</span></div>)}
                       {prof.anos_experiencia != null && (<p className="text-sm text-vmuted font-normal">{prof.anos_experiencia} ano(s) de experiência</p>)}
                     </div>
