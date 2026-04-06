@@ -34,7 +34,7 @@ export default function FutureBookingsBlock({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div>
           <h3 className="text-lg font-normal uppercase">Receita Futura Projetada</h3>
-          <div className="text-xs text-gray-500 mt-1">Receita confirmada para {String(data?.amanha || 'amanhã')}</div>
+          <div className="text-xs text-gray-500 mt-1">Receita confirmada para {formatDate(data?.amanha)}</div>
         </div>
         <div className="text-sm text-gray-400">Amanhã</div>
       </div>
