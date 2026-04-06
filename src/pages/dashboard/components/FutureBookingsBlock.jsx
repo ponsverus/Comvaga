@@ -4,11 +4,11 @@ function formatCurrency(value) {
   return `R$ ${Number(value || 0).toFixed(2)}`;
 }
 
-function formatDate(value) {
-  if (!value) return 'Sem agenda futura';
-  const date = new Date(`${value}T00:00:00`);
-  if (Number.isNaN(date.getTime())) return String(value);
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
+function formatDateDots(value) {
+  if (!value) return 'Selecionar';
+  const [year, month, day] = String(value).split('-');
+  if (!year || !month || !day) return String(value);
+  return `${day}.${month}.${year}`;
 }
 
 function MetricCard({ label, value, tone = 'text-white', subtle }) {
@@ -31,12 +31,12 @@ export default function FutureBookingsBlock({
 
   return (
     <div className="bg-dark-200 border border-gray-800 rounded-custom p-5">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
         <div>
           <h3 className="text-lg font-normal uppercase">Receita Futura Projetada</h3>
-          <div className="mt-2 inline-flex items-center rounded-full border border-gray-700 bg-dark-100 px-3 py-1 text-xs text-gray-300">
-            {formatDate(data?.amanha)}
-          </div>
+        </div>
+        <div className="inline-flex items-center self-start rounded-full border border-gray-700 bg-dark-100 px-3 py-1 text-xs text-gray-300">
+          {formatDateDots(data?.amanha)}
         </div>
       </div>
 
@@ -51,7 +51,7 @@ export default function FutureBookingsBlock({
           value={metricsFutureBookingsLoading ? '...' : Number(data?.total_agendamentos || 0)}
         />
         <MetricCard
-          label="TICKET MÃ‰DIO FUTURO"
+          label="TICKET MÉDIO FUTURO"
           tone="text-green-400"
           value={metricsFutureBookingsLoading ? '...' : formatCurrency(data?.ticket_medio)}
         />
