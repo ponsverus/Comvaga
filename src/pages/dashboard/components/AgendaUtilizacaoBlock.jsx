@@ -69,10 +69,10 @@ export default function AgendaUtilizacaoBlock({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div>
           <h3 className="text-lg font-normal uppercase">Utili. da Agenda</h3>
-          <div className="text-xs text-gray-500 mt-1">Leitura prevista para {formatDateDots(data?.amanha)}</div>
+          <div className="text-xs text-gray-500 mt-1"> {formatDateDots(data?.amanha)}</div>
         </div>
         <div className="text-sm text-gray-400">
-          AMANH<span className="font-bold italic">A</span>
+          AMANH<span className="font-bold italic">Ã</span>
         </div>
       </div>
 
