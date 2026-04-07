@@ -1,3 +1,4 @@
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -85,10 +86,11 @@ export default function Dashboard({ user, onLogout }) {
   const [profissionais, setProfissionais] = useState([]);
   const [entregas, setEntregas]           = useState([]);
   const [agendamentos, setAgendamentos]   = useState([]);
-  const [loading, setLoading]             = useState(true);
+  const [bootstrapState, setBootstrapState] = useState('loading');
   const [error, setError]                 = useState(null);
   const [serverNow, setServerNow]         = useState(() => ({ ts: null, dow: 0, date: '', source: 'db', minutes: 0 }));
   const [hoje, setHoje]                   = useState(() => '');
+  const loadDataRunRef                    = useRef(0);
   const souDono = negocio?.owner_id === user?.id;
   const parceiroProfissionalId = parceiroProfissional?.id ?? null;
   const acessoDashboardAutorizado = souDono || !!parceiroProfissional;
@@ -373,11 +375,17 @@ export default function Dashboard({ user, onLogout }) {
     setFormInfo({ nome: data.nome || '', descricao: data.descricao || '', telefone: data.telefone || '', endereco: data.endereco || '', instagram: data.instagram || '', facebook: data.facebook || '', tema: data.tema || 'dark' });
   }, [negocio?.id]);
 
-  const reloadProfissionais = useCallback(async (negocioId) => {
+  const reloadProfissionais = useCallback(async (negocioId, negocioOwnerId = negocio?.owner_id) => {
     const id = negocioId || negocio?.id; if (!id) return;
     const { data, error: err } = await supabase.rpc('get_profissionais_com_status', { p_negocio_id: id });
-    if (err) return; const profs = data || []; setProfissionais(profs); return profs;
-  }, [negocio?.id]);
+    if (err) return;
+    const profs = data || [];
+    const ownerContext = (negocioOwnerId === user?.id);
+    const scopedProfs = ownerContext ? profs : profs.filter((p) => p.user_id === user?.id);
+    setProfissionais(scopedProfs);
+    setParceiroProfissional(ownerContext ? null : (scopedProfs[0] || null));
+    return scopedProfs;
+  }, [negocio?.id, negocio?.owner_id, user?.id]);
 
   const reloadEntregas = useCallback(async (negocioId, profIds) => {
     const id = negocioId || negocio?.id; const ids = profIds || agProfIds; if (!id || !ids?.length) return;
@@ -392,30 +400,45 @@ export default function Dashboard({ user, onLogout }) {
   }, [negocio?.id]);
 
   const loadData = useCallback(async (dataRef) => {
-    if (!user?.id) { setError('Sessao invalida. Faca login novamente.'); setLoading(false); return; }
-    setLoading(true); setError(null);
+    if (!user?.id) { setError('Sessao invalida. Faca login novamente.'); setBootstrapState('error'); return; }
+    const runId = ++loadDataRunRef.current;
+    const isCurrentRun = () => loadDataRunRef.current === runId;
+    setBootstrapState('loading');
+    setError(null);
+    setParceiroProfissional(null);
+    setNegocio(null);
+    setProfissionais([]);
+    setEntregas([]);
+    setAgendamentos([]);
     try {
       const negocioIdFromState = location?.state?.negocioId || null;
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       const { count: ownerCount, error: ownerCountErr } = await supabase
         .from('negocios')
         .select('id', { count: 'exact', head: true })
         .eq('owner_id', user.id);
       if (ownerCountErr) throw ownerCountErr;
       const totalOwnerBusinesses = Number(ownerCount || 0);
+      if (!isCurrentRun()) return;
       setOwnerBusinessCount(totalOwnerBusinesses);
 
-      let negocioData = null;
+      const resolveNegocioData = async () => {
+        if (negocioIdFromState) {
+          const { data, error } = await supabase.from('negocios').select('*').eq('id', negocioIdFromState).maybeSingle();
+          if (error) throw error;
+          return data || null;
+        }
 
-      if (negocioIdFromState) {
-        const { data, error } = await supabase.from('negocios').select('*').eq('id', negocioIdFromState).maybeSingle();
-        if (error) throw error;
-        negocioData = data || null;
-      } else if (totalOwnerBusinesses > 0) {
-        if (totalOwnerBusinesses > 1) { navigate('/selecionar-negocio', { replace: true }); setLoading(false); return; }
-        const { data, error } = await supabase.from('negocios').select('*').eq('owner_id', user.id).maybeSingle();
-        if (error) throw error;
-        negocioData = data || null;
-      } else {
+        if (totalOwnerBusinesses > 0) {
+          if (totalOwnerBusinesses > 1) {
+            navigate('/selecionar-negocio', { replace: true });
+            return '__redirect__';
+          }
+          const { data, error } = await supabase.from('negocios').select('*').eq('owner_id', user.id).maybeSingle();
+          if (error) throw error;
+          return data || null;
+        }
+
         const { data: vinculos, error: vinculosErr } = await supabase
           .from('profissionais')
           .select('negocio_id')
@@ -424,40 +447,60 @@ export default function Dashboard({ user, onLogout }) {
         if (vinculosErr) throw vinculosErr;
 
         const negocioIds = [...new Set((vinculos || []).map(v => v.negocio_id).filter(Boolean))];
-        if (negocioIds.length > 1) { navigate('/selecionar-negocio', { replace: true }); setLoading(false); return; }
+        if (negocioIds.length > 1) {
+          navigate('/selecionar-negocio', { replace: true });
+          return '__redirect__';
+        }
         if (negocioIds.length === 1) {
           const { data, error } = await supabase.from('negocios').select('*').eq('id', negocioIds[0]).maybeSingle();
           if (error) throw error;
-          negocioData = data || null;
+          return data || null;
         }
+
+        return null;
+      };
+
+      let negocioData = null;
+      for (const delay of [0, 120, 320]) {
+        if (delay) await wait(delay);
+        negocioData = await resolveNegocioData();
+        if (negocioData === '__redirect__') return;
+        if (negocioData) break;
       }
 
-      if (!negocioData) { setNegocio(null); setProfissionais([]); setEntregas([]); setAgendamentos([]); setError('Nenhum negocio cadastrado.'); setLoading(false); return; }
+      if (!isCurrentRun()) return;
+      if (!negocioData) {
+        setError('Nenhum negocio cadastrado.');
+        setBootstrapState('error');
+        return;
+      }
       setNegocio(negocioData);
       setFormInfo({ nome: negocioData.nome || '', descricao: negocioData.descricao || '', telefone: negocioData.telefone || '', endereco: negocioData.endereco || '', instagram: negocioData.instagram || '', facebook: negocioData.facebook || '', tema: negocioData.tema || 'dark' });
       const [galeriaResult, profissionaisResult] = await Promise.all([
         supabase.from('galerias').select('id, path, ordem').eq('negocio_id', negocioData.id).order('ordem', { ascending: true }).order('created_at', { ascending: true }),
         supabase.rpc('get_profissionais_com_status', { p_negocio_id: negocioData.id })
       ]);
+      if (!isCurrentRun()) return;
       if (galeriaResult.error) {
         await uiAlert('dashboard.gallery_load_warning', 'warning');
       }
       setGaleriaItems(galeriaResult.data || []);
       if (profissionaisResult.error) throw profissionaisResult.error;
       const profs = profissionaisResult.data || [];
-      setProfissionais(profs);
       const souDonoDoNegocio = negocioData.owner_id === user.id;
       const meuProfissional = souDonoDoNegocio ? null : (profs.find(p => p.user_id === user.id) || null);
       if (!souDonoDoNegocio && !meuProfissional) {
         setNegocio(null); setParceiroProfissional(null); setProfissionais([]); setEntregas([]); setAgendamentos([]); setGaleriaItems([]);
         setError('Você não tem acesso a este negócio.');
-        setLoading(false);
+        setBootstrapState('error');
         return;
       }
+      const profsEscopo = souDonoDoNegocio ? profs : profs.filter((p) => p.id === meuProfissional?.id);
       setParceiroProfissional(meuProfissional);
+      setProfissionais(profsEscopo);
       const profId = meuProfissional?.id ?? null;
-      if (profs.length === 0) { setEntregas([]); setAgendamentos([]); setLoading(false); return; }
-      const ids = profs.map(p => p.id);
+      if (profsEscopo.length === 0) { setEntregas([]); setAgendamentos([]); setBootstrapState('ready'); return; }
+      const ids = profsEscopo.map(p => p.id);
       const dataHoje = (typeof dataRef === 'string' && dataRef) ? dataRef : String(serverNow?.date || hoje || '');
       const [entregasResult, agendamentosResult] = await Promise.all([
         supabase.from('entregas').select('*, profissionais (id, nome)').eq('negocio_id', negocioData.id).in('profissional_id', ids).order('created_at', { ascending: false }),
@@ -469,20 +512,17 @@ export default function Dashboard({ user, onLogout }) {
             })
           : Promise.resolve({ data: [], error: null })
       ]);
+      if (!isCurrentRun()) return;
       if (entregasResult.error) throw entregasResult.error;
       setEntregas(entregasResult.data || []);
       if (agendamentosResult.error) throw agendamentosResult.error;
       setAgendamentos((agendamentosResult.data || []).map(normalizeAgRow));
-      if (dataHoje) {
-        loadHoje(negocioData.id, profId);
-        loadDia(negocioData.id, dataHoje, profId);
-        loadPeriodo(negocioData.id, dataHoje, faturamentoPeriodoRef.current, profId);
-        loadUtilizacao(negocioData.id, dataHoje, null, profId);
-        loadFutureBookings(negocioData.id, dataHoje, null, profId);
-      }
-    } catch (e) { setError(e?.message || 'Erro inesperado.'); }
-    finally { setLoading(false); }
-  }, [user?.id, location?.state?.negocioId, serverNow?.date, hoje, navigate, uiAlert, loadHoje, loadDia, loadPeriodo, loadUtilizacao, loadFutureBookings]);
+      setBootstrapState('ready');
+    } catch (e) {
+      setError(e?.message || 'Erro inesperado.');
+      setBootstrapState('error');
+    }
+  }, [user?.id, location?.state?.negocioId, serverNow?.date, hoje, navigate, uiAlert]);
 
   const reloadFull = useCallback(async () => {
     try {
@@ -836,7 +876,7 @@ export default function Dashboard({ user, onLogout }) {
 
   const TAB_LABELS = { 'visao-geral': 'GERAL', 'agendamentos': 'AGENDAMENTOS', 'cancelados': 'CANCELADOS', 'historico': 'HISTÓRICO', 'entregas': tabEntregasLabel, 'profissionais': 'PROFISSIONAIS', 'info-negocio': 'INFO DO NEGÓCIO' };
 
-  if (loading) return (
+  if (bootstrapState === 'loading') return (
     <div className="min-h-screen bg-black flex items-center justify-center">
       <div className="text-center">
         <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -845,14 +885,23 @@ export default function Dashboard({ user, onLogout }) {
     </div>
   );
 
-  if (error || !negocio) return (
+  if (bootstrapState === 'error' && error) return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-dark-100 border border-red-500/50 rounded-custom p-8 text-center">
         <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
         <h1 className="text-2xl font-normal text-white mb-2">Erro ao carregar</h1>
-        <p className="text-gray-400 mb-6">{error || 'Negocio inexistente'}</p>
+        <p className="text-gray-400 mb-6">{error}</p>
         <button onClick={reloadFull} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button mb-3 font-normal uppercase">TENTAR NOVAMENTE</button>
         <button onClick={onLogout} className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-button font-normal uppercase">SAIR</button>
+      </div>
+    </div>
+  );
+
+  if (bootstrapState !== 'ready' || !negocio) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="text-primary text-xl">CARREGANDO...</div>
       </div>
     </div>
   );
