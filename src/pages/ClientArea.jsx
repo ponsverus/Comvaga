@@ -4,6 +4,14 @@ import { Calendar, History, LogOut, X, Save } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 
+function getImageExt(file) {
+  const type = String(file?.type || '').toLowerCase();
+  if (type === 'image/png') return 'png';
+  if (type === 'image/jpeg') return 'jpg';
+  if (type === 'image/webp') return 'webp';
+  return null;
+}
+
 function formatDateBRFromISO(dateStr) {
   if (!dateStr) return '';
   const [y, m, d] = String(dateStr).split('-');
@@ -206,11 +214,17 @@ export default function ClientArea({ user, onLogout }) {
     if (file.size > maxMb * 1024 * 1024) { uiAlert('clientArea.avatar_too_large', 'error', { maxMb }); return; }
     try {
       setUploadingAvatar(true);
-      const path = `${user.id}/avatar.webp`;
+      const ext = getImageExt(file);
+      if (!ext) { uiAlert('clientArea.avatar_invalid_format', 'error'); return; }
+      const oldPath = avatarPath || null;
+      const path = `${user.id}/avatar.${ext}`;
       const { error: upErr } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
       if (upErr) throw upErr;
       const { error: updErr } = await supabase.from('users').update({ avatar_path: path }).eq('id', user.id);
       if (updErr) throw updErr;
+      if (oldPath && oldPath !== path) {
+        await supabase.storage.from('avatars').remove([oldPath]);
+      }
       setAvatarPath(path);
       uiAlert('clientArea.avatar_updated', 'success');
     } catch {
