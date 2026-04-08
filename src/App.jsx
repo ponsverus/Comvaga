@@ -95,6 +95,44 @@ function LogoutRedirectResetter({ redirectPath, onClear }) {
   return null;
 }
 
+function SelecionarNegocioRouteGuard({ user, onLogout }) {
+  const [loading, setLoading] = useState(true);
+  const [ownerBusinessCount, setOwnerBusinessCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!user?.id) {
+      setOwnerBusinessCount(0);
+      setLoading(false);
+      return () => { active = false; };
+    }
+
+    supabase
+      .from('negocios')
+      .select('id', { count: 'exact', head: true })
+      .eq('owner_id', user.id)
+      .then(({ count, error }) => {
+        if (!active) return;
+        if (error) {
+          setOwnerBusinessCount(0);
+          setLoading(false);
+          return;
+        }
+        setOwnerBusinessCount(Number(count || 0));
+        setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user?.id]);
+
+  if (loading) return <FullScreenLoading text="CARREGANDO..." />;
+  if (ownerBusinessCount > 1) return <SelecionarNegocio user={user} onLogout={onLogout} />;
+  return <Navigate to="/dashboard" replace />;
+}
+
 export default function App() {
   const [user,             setUser]             = useState(null);
   const [userType,         setUserType]         = useState(null);
@@ -400,7 +438,7 @@ export default function App() {
                     ? <Navigate to="/cadastro/profissional/retomada" />
                     : accessState === 'partner_pending'
                       ? <Navigate to="/parceiro/aguardando" />
-                      : <SelecionarNegocio user={user} onLogout={handleLogout} />
+                      : <SelecionarNegocioRouteGuard user={user} onLogout={handleLogout} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to={postLogoutRedirect || "/login"} />
               ) : <Navigate to={postLogoutRedirect || "/login"} />
