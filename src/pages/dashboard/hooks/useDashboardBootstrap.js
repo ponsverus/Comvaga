@@ -135,11 +135,7 @@ export function useDashboardBootstrap({
         }
 
         const negocioIds = await fetchPartnerNegocioIds(userId);
-        if (negocioIds.length > 1) {
-          navigate('/selecionar-negocio', { replace: true });
-          return '__redirect__';
-        }
-        if (negocioIds.length === 1) return fetchNegocioById(negocioIds[0]);
+        if (negocioIds.length >= 1) return fetchNegocioById(negocioIds[0]);
         return null;
       };
 
