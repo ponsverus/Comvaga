@@ -1,4 +1,4 @@
-import { supabase } from '../../supabase';
+import { supabase } from '../../../supabase';
 
 export function getPublicUrl(bucket, path) {
   if (!bucket || !path) return null;
