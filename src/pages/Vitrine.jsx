@@ -13,11 +13,13 @@ import {
   ChevronLeft,
   ShoppingBag,
 } from 'lucide-react';
-import { supabase } from '../supabase';
 import { ptBR } from '../feedback/messages/ptBR';
 import { getBusinessGroup } from '../businessTerms';
 import BookingCalendar from '../components/BookingCalendar';
 import negocioVerificadoIcon from '../assets/icons/negocio-verificado.png';
+import { getPublicUrl } from './vitrine/api/vitrineApi';
+import { useVitrineBootstrap } from './vitrine/hooks/useVitrineBootstrap';
+import { useVitrineInteractions } from './vitrine/hooks/useVitrineInteractions';
 
 const SERVICOS_POR_PAGINA = 4;
 const DEPOIMENTOS_POR_PAGINA = 10;
@@ -44,23 +46,6 @@ function getDowFromDateSP(dateStr) {
   }).format(dt);
   const map = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
   return map[weekday] ?? null;
-}
-
-const withTimeout = (promise, ms, label = 'timeout') => {
-  let t;
-  const timeout = new Promise((_, reject) => {
-    t = setTimeout(() => reject(new Error(`Timeout (${label}) em ${ms}ms`)), ms);
-  });
-  return Promise.race([promise, timeout]).finally(() => clearTimeout(t));
-};
-
-function getPublicUrl(bucket, path) {
-  if (!path) return null;
-  try {
-    const stripped = path.replace(new RegExp(`^${bucket}/`), '');
-    const { data } = supabase.storage.from(bucket).getPublicUrl(stripped);
-    return data?.publicUrl || null;
-  } catch { return null; }
 }
 
 function pad2(value) {
@@ -177,7 +162,7 @@ function HeartIcon({ filled = false, className = '', size = 20 }) {
 }
 
 function StarChar({ size = 18, className = '' }) {
-  return <span className={className || 'text-primary'} style={{ fontSize: size, lineHeight: 1 }} aria-hidden="true">★</span>;
+  return <span className={className || 'text-primary'} style={{ fontSize: size, lineHeight: 1 }} aria-hidden="true">â˜…</span>;
 }
 
 function Stars5Char({ value = 0, size = 14 }) {
@@ -185,7 +170,7 @@ function Stars5Char({ value = 0, size = 14 }) {
   return (
     <div className="flex items-center gap-1" aria-label={`Nota ${v} de 5`}>
       {[1, 2, 3, 4, 5].map(i => (
-        <span key={i} style={{ fontSize: size, lineHeight: 1 }} className={i <= v ? 'text-primary' : 'text-gray-300'} aria-hidden="true">★</span>
+        <span key={i} style={{ fontSize: size, lineHeight: 1 }} className={i <= v ? 'text-primary' : 'text-gray-300'} aria-hidden="true">â˜…</span>
       ))}
     </div>
   );
@@ -292,9 +277,9 @@ function SelectionBar({ itens, counterSingular, counterPlural, onConfirm, onClea
           <div className="w-8 h-8 rounded-full bg-vprimary flex items-center justify-center text-vprimary-text text-xs font-normal shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{qtd}</div>
           <div className="min-w-0">
             <div className={`text-sm font-normal truncate ${textMain}`}>{qtd} {label} selecionado{qtd > 1 ? 's' : ''}</div>
-            <div className={`text-xs font-normal ${textSub}`}>{durTotal} min • R$ {valTotal.toFixed(2)}</div>
+            <div className={`text-xs font-normal ${textSub}`}>{durTotal} min â€¢ R$ {valTotal.toFixed(2)}</div>
           </div>
-          <button onClick={onClear} className={`shrink-0 ml-1 ${clearBtn}`} title="Limpar seleção"><X className="w-4 h-4" /></button>
+          <button onClick={onClear} className={`shrink-0 ml-1 ${clearBtn}`} title="Limpar seleÃ§Ã£o"><X className="w-4 h-4" /></button>
         </div>
         <button onClick={onConfirm} className="shrink-0 flex items-center gap-2 px-5 py-2.5 bg-vprimary text-vprimary-text rounded-full text-sm font-normal uppercase whitespace-nowrap transition-opacity hover:opacity-80">
           <Calendar className="w-4 h-4" />Escolher data<ChevronRight className="w-4 h-4" />
@@ -428,7 +413,7 @@ function ServicosCarousel({ lista, profissional, selecaoProfId, servicosSelecion
       {totalPaginas > 1 && (
         <div className="flex items-center justify-center gap-3 mt-4">
           <button onClick={() => irPara(pagina - 1)} disabled={pagina === 0} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}><ChevronLeft className="w-4 h-4" /></button>
-          {Array.from({ length: totalPaginas }).map((_, i) => (<button key={i} onClick={() => irPara(i)} className={['rounded-full transition-all duration-300', i === pagina ? 'w-4 h-2 bg-vprimary' : `w-2 h-2 ${dotInactive}`].join(' ')} aria-label={`Página ${i + 1}`} />))}
+          {Array.from({ length: totalPaginas }).map((_, i) => (<button key={i} onClick={() => irPara(i)} className={['rounded-full transition-all duration-300', i === pagina ? 'w-4 h-2 bg-vprimary' : `w-2 h-2 ${dotInactive}`].join(' ')} aria-label={`PÃ¡gina ${i + 1}`} />))}
           <button onClick={() => irPara(pagina + 1)} disabled={pagina === totalPaginas - 1} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}><ChevronRight className="w-4 h-4" /></button>
         </div>
       )}
@@ -476,7 +461,7 @@ function DepoimentosPaginados({ depoimentos, nomeNegocioLabel, isLight }) {
       {totalPaginas > 1 && (
         <div className="flex items-center justify-center gap-3 mt-6">
           <button onClick={() => setPagina(p => Math.max(0, p - 1))} disabled={pagina === 0} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}><ChevronLeft className="w-4 h-4" /></button>
-          {Array.from({ length: totalPaginas }).map((_, i) => (<button key={i} onClick={() => setPagina(i)} className={['rounded-full transition-all duration-300', i === pagina ? 'w-4 h-2 bg-vprimary' : `w-2 h-2 ${dotInact}`].join(' ')} aria-label={`Página ${i + 1}`} />))}
+          {Array.from({ length: totalPaginas }).map((_, i) => (<button key={i} onClick={() => setPagina(i)} className={['rounded-full transition-all duration-300', i === pagina ? 'w-4 h-2 bg-vprimary' : `w-2 h-2 ${dotInact}`].join(' ')} aria-label={`PÃ¡gina ${i + 1}`} />))}
           <button onClick={() => setPagina(p => Math.min(totalPaginas - 1, p + 1))} disabled={pagina === totalPaginas - 1} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}><ChevronRight className="w-4 h-4" /></button>
         </div>
       )}
@@ -491,20 +476,30 @@ export default function Vitrine({ user, userType }) {
   const vitrineMsgs = useMemo(() => ptBR?.vitrine || {}, []);
   const getMsg      = useCallback((key, fallback) => vitrineMsgs?.[key] || fallback, [vitrineMsgs]);
 
-  const [negocio,       setNegocio]       = useState(null);
-  const [profissionais, setProfissionais] = useState([]);
-  const [entregas,      setEntregas]      = useState([]);
-  const [depoimentos,   setDepoimentos]   = useState([]);
-  const [galeriaItems,  setGaleriaItems]  = useState([]);
-  const [loading,       setLoading]       = useState(true);
-  const [error,         setError]         = useState(null);
+  const {
+    negocio,
+    profissionais,
+    entregas,
+    depoimentos,
+    galeriaItems,
+    loading,
+    error,
+    serverNow,
+    fetchNowFromDb,
+    refreshDepoimentos,
+    loadVitrine,
+  } = useVitrineBootstrap({
+    slug,
+    rpcSequence: NOW_RPC_SEQUENCE,
+    getMsg,
+  });
 
   const businessGroup   = useMemo(() => getBusinessGroup(negocio?.tipo_negocio), [negocio?.tipo_negocio]);
   const bizV            = vitrineMsgs?.business || {};
-  const sectionTitle    = bizV?.section_title?.[businessGroup]  ?? 'Serviços';
-  const counterSingular = ptBR?.vitrine?.business?.counter_singular?.[businessGroup] ?? 'serviço';
-  const counterPlural   = ptBR?.vitrine?.business?.counter_plural?.[businessGroup]   ?? 'serviços';
-  const emptyListMsg    = ptBR?.vitrine?.business?.empty_list?.[businessGroup]       ?? 'Sem serviços para este profissional.';
+  const sectionTitle    = bizV?.section_title?.[businessGroup]  ?? 'ServiÃ§os';
+  const counterSingular = ptBR?.vitrine?.business?.counter_singular?.[businessGroup] ?? 'serviÃ§o';
+  const counterPlural   = ptBR?.vitrine?.business?.counter_plural?.[businessGroup]   ?? 'serviÃ§os';
+  const emptyListMsg    = ptBR?.vitrine?.business?.empty_list?.[businessGroup]       ?? 'Sem serviÃ§os para este profissional.';
 
   const [nativeAlertOpen,   setNativeAlertOpen]   = useState(false);
   const [nativeAlertData,   setNativeAlertData]   = useState({ title: '', body: '', buttonText: 'OK' });
@@ -546,8 +541,6 @@ export default function Vitrine({ user, userType }) {
     if (typeof r === 'function') r(!!value);
   };
 
-  const [isFavorito, setIsFavorito] = useState(false);
-  const [serverNow, setServerNow] = useState(() => ({ ts: null, dow: 0, date: '', source: 'db', minutes: 0 }));
   const [calendarExport, setCalendarExport] = useState({ googleUrl: '', icsUrl: '', icsFilename: '' });
   const [flow, setFlow] = useState({ step: 'idle', profissional: null, servicosSelecionados: [], lastSlot: null });
   const [selecaoProfId,        setSelecaoProfId]        = useState(null);
@@ -557,116 +550,29 @@ export default function Vitrine({ user, userType }) {
   const [showDepoimento,           setShowDepoimento]           = useState(false);
   const [depoimentoNota,           setDepoimentoNota]           = useState(5);
   const [depoimentoTexto,          setDepoimentoTexto]          = useState('');
-  const [depoimentoLoading,        setDepoimentoLoading]        = useState(false);
   const [depoimentoTipo,           setDepoimentoTipo]           = useState('negocio');
   const [depoimentoProfissionalId, setDepoimentoProfissionalId] = useState(null);
   const rebookAppliedRef = useRef(false);
 
   const isProfessional = user && userType === 'professional';
   const calendarPlatformMode = useMemo(() => getCalendarPlatformMode(), []);
+  const {
+    isFavorito,
+    depoimentoLoading,
+    checkFavorito,
+    toggleFavorito: toggleFavoritoState,
+    enviarDepoimento: enviarDepoimentoState,
+  } = useVitrineInteractions({
+    user,
+    userType,
+    negocioId: negocio?.id,
+    depoimentoTipo,
+    depoimentoNota,
+    depoimentoTexto,
+    depoimentoProfissionalId,
+    refreshDepoimentos,
+  });
 
-  const fetchNowFromDb = useCallback(async () => {
-    let lastErr = null;
-
-    for (const rpcName of NOW_RPC_SEQUENCE) {
-      for (let attempt = 0; attempt < 2; attempt++) {
-        const { data, error } = await supabase.rpc(rpcName);
-
-        if (error) {
-          lastErr = error;
-          continue;
-        }
-
-        const payload = data?.[0] ?? data;
-        if (!payload?.date) {
-          lastErr = new Error(`${rpcName} vazio`);
-          continue;
-        }
-
-        setServerNow({
-          ts: payload?.ts ?? null,
-          dow: Number(payload?.dow ?? 0),
-          date: String(payload.date),
-          source: payload?.source || rpcName,
-          minutes: Number(payload?.minutes ?? 0),
-        });
-        return payload;
-      }
-    }
-
-    throw lastErr || new Error('Falha ao obter horário oficial');
-  }, []);
-
-  const loadDepoimentos = useCallback(async (negocioId) => {
-    const { data, error: rpcErr } = await withTimeout(supabase.rpc('get_depoimentos_vitrine', { p_negocio_id: negocioId }), 7000, 'depoimentos');
-    if (rpcErr) throw rpcErr;
-    return (data || []).map(d => ({
-      ...d,
-      users:         d.cliente_nome     ? { nome: d.cliente_nome, avatar_path: d.cliente_avatar_path, type: d.cliente_type } : null,
-      profissionais: d.profissional_nome ? { nome: d.profissional_nome } : null,
-    }));
-  }, []);
-
-  const loadVitrine = useCallback(async () => {
-    setLoading(true); setError(null);
-    const watchdog = setTimeout(() => { setLoading(false); setError(getMsg('load_timeout', 'Demorou demais para carregar. Tente novamente.')); }, 12000);
-    try {
-      fetchNowFromDb().catch(() => null);
-      const { data: negocioData, error: negocioError } = await withTimeout(supabase.from('negocios').select('*').eq('slug', slug).maybeSingle(), 7000, 'negocio');
-      if (negocioError) throw negocioError;
-      if (!negocioData) { setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]); return; }
-      setNegocio(negocioData);
-
-      const { data: profissionaisData, error: profErr } = await withTimeout(
-        supabase.from('profissionais').select('*').eq('negocio_id', negocioData.id).eq('status', 'ativo'),
-        7000, 'profissionais'
-      );
-      if (profErr) throw profErr;
-      const profs = profissionaisData || [];
-      setProfissionais(profs);
-
-      const profissionalIds = profs.map(p => p.id).filter(Boolean);
-
-      const [entregasResult, galeriaResult, deps] = await Promise.all([
-        profissionalIds.length
-          ? withTimeout(supabase.from('entregas').select('*').in('profissional_id', profissionalIds).eq('ativo', true), 7000, 'entregas')
-          : Promise.resolve({ data: [], error: null }),
-        withTimeout(supabase.from('galerias').select('id, path, ordem').eq('negocio_id', negocioData.id).order('ordem', { ascending: true }).order('created_at', { ascending: true }), 7000, 'galerias'),
-        loadDepoimentos(negocioData.id),
-      ]);
-
-      if (entregasResult.error) throw entregasResult.error;
-      if (galeriaResult.error)  throw galeriaResult.error;
-
-      setEntregas(entregasResult.data || []);
-      setGaleriaItems(galeriaResult.data || []);
-      setDepoimentos(deps);
-    } catch (e) {
-      setError(e?.message || getMsg('load_error', 'Erro ao carregar a vitrine.'));
-      setNegocio(null); setProfissionais([]); setEntregas([]); setDepoimentos([]); setGaleriaItems([]);
-    } finally {
-      clearTimeout(watchdog);
-      setLoading(false);
-    }
-  }, [slug, loadDepoimentos, getMsg, fetchNowFromDb]);
-
-  const checkFavorito = useCallback(async () => {
-    if (!user || userType !== 'client' || !negocio?.id) { setIsFavorito(false); return; }
-    try {
-      const { data, error: favErr } = await withTimeout(supabase.from('favoritos').select('id').eq('cliente_id', user.id).eq('tipo', 'negocio').eq('negocio_id', negocio.id).maybeSingle(), 6000, 'favorito');
-      if (favErr) throw favErr;
-      setIsFavorito(!!data);
-    } catch { setIsFavorito(false); }
-  }, [user, userType, negocio?.id]);
-
-  useEffect(() => { loadVitrine(); }, [loadVitrine]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      fetchNowFromDb().catch(() => {});
-    }, 60000);
-    return () => clearInterval(timer);
-  }, [fetchNowFromDb]);
 
   useEffect(() => {
     if (!user) return;
@@ -675,7 +581,6 @@ export default function Vitrine({ user, userType }) {
 
   useEffect(() => {
     if (user && negocio?.id) checkFavorito();
-    else setIsFavorito(false);
   }, [checkFavorito, negocio?.id, user]);
 
   useEffect(() => {
@@ -704,34 +609,25 @@ export default function Vitrine({ user, userType }) {
   }, [calendarExport.icsUrl, location.pathname, location.state, loading, negocio?.id, profissionais, entregas, navigate]);
 
   const toggleFavorito = async () => {
-    if (!user) { alertKey('favorite_need_login', 'Login necessário', 'Faça login para favoritar.', 'ENTENDI'); return; }
-    if (userType !== 'client') { alertKey('favorite_only_client', 'Ação restrita', 'Apenas CLIENTE pode favoritar negócios.', 'ENTENDI'); return; }
-    if (!negocio?.id) { alertKey('favorite_invalid_business', 'Negócio inválido', 'Negócio inválido.', 'ENTENDI'); return; }
-    try {
-      if (isFavorito) {
-        const { error: delErr } = await supabase.from('favoritos').delete().eq('cliente_id', user.id).eq('tipo', 'negocio').eq('negocio_id', negocio.id);
-        if (delErr) throw delErr;
-        setIsFavorito(false);
-      } else {
-        const { error: insErr } = await supabase.from('favoritos').insert({ cliente_id: user.id, tipo: 'negocio', negocio_id: negocio.id, profissional_id: null });
-        if (insErr) throw insErr;
-        setIsFavorito(true);
-      }
-    } catch { alertKey('favorite_toggle_error', 'Erro', 'Erro ao favoritar. Tente novamente.', 'OK'); }
+    if (!user) { alertKey('favorite_need_login', 'Login necessÃ¡rio', 'FaÃ§a login para favoritar.', 'ENTENDI'); return; }
+    if (userType !== 'client') { alertKey('favorite_only_client', 'AÃ§Ã£o restrita', 'Apenas CLIENTE pode favoritar negÃ³cios.', 'ENTENDI'); return; }
+    if (!negocio?.id) { alertKey('favorite_invalid_business', 'NegÃ³cio invÃ¡lido', 'NegÃ³cio invÃ¡lido.', 'ENTENDI'); return; }
+    try { await toggleFavoritoState(); }
+    catch { alertKey('favorite_toggle_error', 'Erro', 'Erro ao favoritar. Tente novamente.', 'OK'); }
   };
 
   const requireLogin = async () => {
     if (!user) {
-      const ok = await confirmKey('schedule_need_login_confirm', 'Login necessário', 'Você precisa fazer login para agendar. Deseja fazer login agora?', 'IR PARA LOGIN', 'MAIS TARDE');
+      const ok = await confirmKey('schedule_need_login_confirm', 'Login necessÃ¡rio', 'VocÃª precisa fazer login para agendar. Deseja fazer login agora?', 'IR PARA LOGIN', 'MAIS TARDE');
       if (ok) navigate('/login');
       return false;
     }
-    if (userType !== 'client') { alertKey('schedule_only_client', 'Ação restrita', 'Você está logado como PROFISSIONAL. Para agendar, entre como CLIENTE.', 'ENTENDI'); return false; }
+    if (userType !== 'client') { alertKey('schedule_only_client', 'AÃ§Ã£o restrita', 'VocÃª estÃ¡ logado como PROFISSIONAL. Para agendar, entre como CLIENTE.', 'ENTENDI'); return false; }
     if (!todayISO) {
       try {
         await fetchNowFromDb();
       } catch {
-        alertKey('schedule_time_unavailable', 'Horário oficial indisponível', 'Ainda estamos sincronizando o horário oficial. Tente novamente em instantes.', 'ENTENDI');
+        alertKey('schedule_time_unavailable', 'HorÃ¡rio oficial indisponÃ­vel', 'Ainda estamos sincronizando o horÃ¡rio oficial. Tente novamente em instantes.', 'ENTENDI');
         return false;
       }
     }
@@ -793,7 +689,7 @@ export default function Vitrine({ user, userType }) {
     const detalhes = [
       'Agendamento confirmado pelo Comvaga.',
       flow.profissional?.nome ? `Profissional: ${flow.profissional.nome}` : '',
-      serviceNames.length ? `Serviços: ${serviceNames.join(', ')}` : '',
+      serviceNames.length ? `ServiÃ§os: ${serviceNames.join(', ')}` : '',
     ].filter(Boolean).join('\n');
     const local = negocio?.endereco || nomeNegocioLabel || '';
     const googleUrl = gerarLinkGoogle({
@@ -843,25 +739,25 @@ export default function Vitrine({ user, userType }) {
   const calendarActionConfig = useMemo(() => {
     if (calendarPlatformMode === 'google-with-fallback') {
       return {
-        hint: 'Abrir no Google Agenda. Se não abrir no seu celular, baixe o evento.',
+        hint: 'Abrir no Google Agenda. Se nÃ£o abrir no seu celular, baixe o evento.',
         primaryLabel: 'ABRIR NO GOOGLE AGENDA',
         primaryAction: abrirGoogleAgenda,
-        secondaryLabel: 'SE NÃO ABRIR, BAIXAR EVENTO (.ICS)',
+        secondaryLabel: 'SE NÃƒO ABRIR, BAIXAR EVENTO (.ICS)',
         secondaryAction: baixarEventoICS,
       };
     }
     if (calendarPlatformMode === 'ics') {
       return {
-        hint: 'Baixar evento compatível com Calendário do iPhone, Mac e Outlook.',
-        primaryLabel: 'BAIXAR EVENTO DO CALENDÁRIO',
+        hint: 'Baixar evento compatÃ­vel com CalendÃ¡rio do iPhone, Mac e Outlook.',
+        primaryLabel: 'BAIXAR EVENTO DO CALENDÃRIO',
         primaryAction: baixarEventoICS,
         secondaryLabel: '',
         secondaryAction: null,
       };
     }
     return {
-      hint: 'Baixar evento compatível com os principais aplicativos de calendário.',
-      primaryLabel: 'BAIXAR EVENTO DO CALENDÁRIO',
+      hint: 'Baixar evento compatÃ­vel com os principais aplicativos de calendÃ¡rio.',
+      primaryLabel: 'BAIXAR EVENTO DO CALENDÃRIO',
       primaryAction: baixarEventoICS,
       secondaryLabel: '',
       secondaryAction: null,
@@ -870,29 +766,25 @@ export default function Vitrine({ user, userType }) {
 
   const abrirDepoimento = async () => {
     if (!user) {
-      const ok = await confirmKey('review_need_login_confirm', 'Login necessário', 'Você precisa fazer login para deixar um depoimento. Deseja fazer login agora?', 'IR PARA LOGIN', 'MAIS TARDE');
+      const ok = await confirmKey('review_need_login_confirm', 'Login necessÃ¡rio', 'VocÃª precisa fazer login para deixar um depoimento. Deseja fazer login agora?', 'IR PARA LOGIN', 'MAIS TARDE');
       if (ok) navigate('/login');
       return;
     }
-    if (userType !== 'client') { alertKey('review_only_client', 'Ação restrita', 'Apenas CLIENTE pode deixar depoimentos.', 'ENTENDI'); return; }
+    if (userType !== 'client') { alertKey('review_only_client', 'AÃ§Ã£o restrita', 'Apenas CLIENTE pode deixar depoimentos.', 'ENTENDI'); return; }
     setDepoimentoNota(5); setDepoimentoTexto(''); setDepoimentoTipo('negocio'); setDepoimentoProfissionalId(null); setShowDepoimento(true);
   };
 
   const enviarDepoimento = async () => {
     if (!user || userType !== 'client') return;
-    if (!negocio?.id) { alertKey('review_invalid_business', 'Negócio inválido', 'Negócio inválido.', 'ENTENDI'); return; }
+    if (!negocio?.id) { alertKey('review_invalid_business', 'NegÃ³cio invÃ¡lido', 'NegÃ³cio invÃ¡lido.', 'ENTENDI'); return; }
     try {
-      setDepoimentoLoading(true);
-      const payload = { cliente_id: user.id, tipo: depoimentoTipo, nota: depoimentoNota, comentario: depoimentoTexto || null, negocio_id: depoimentoTipo === 'negocio' ? negocio.id : null, profissional_id: depoimentoTipo === 'profissional' ? depoimentoProfissionalId : null };
-      const { error: depErr } = await withTimeout(supabase.from('depoimentos').insert(payload), 7000, 'enviar-depoimento');
-      if (depErr) throw depErr;
+      const ok = await enviarDepoimentoState();
+      if (!ok) return;
       setShowDepoimento(false);
-      const deps = await loadDepoimentos(negocio.id);
-      setDepoimentos(deps);
       alertKey('review_sent', 'Depoimento registrado', 'Seu depoimento foi entregue com sucesso!', 'OK');
     } catch (e) {
       openAlert({ title: getMsg('review_send_error_title', 'Erro ao enviar depoimento'), body: `${getMsg('review_send_error_body', 'Erro ao enviar depoimento:')} ${e?.message || ''}`, buttonText: getMsg('common_ok', 'ENTENDI') });
-    } finally { setDepoimentoLoading(false); }
+    }
   };
 
   const logoUrl      = useMemo(() => getPublicUrl('logos',   negocio?.logo_path), [negocio?.logo_path]);
@@ -921,7 +813,7 @@ export default function Vitrine({ user, userType }) {
     const trabalhaHoje = hojeDow == null ? true : diasEfetivos.includes(hojeDow);
     const dentroHorario = serverNow.minutes >= ini && serverNow.minutes < fim;
     if (!(trabalhaHoje && dentroHorario)) return { label: 'FECHADO', color: 'bg-red-500' };
-    if (isInLunchNow(p)) return { label: 'ALMOÇO', color: 'bg-yellow-400' };
+    if (isInLunchNow(p)) return { label: 'ALMOÃ‡O', color: 'bg-yellow-400' };
     return { label: 'ABERTO', color: 'bg-green-500' };
   };
 
@@ -945,11 +837,11 @@ export default function Vitrine({ user, userType }) {
 
   if (loading) return (<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-primary text-2xl font-normal animate-pulse">CARREGANDO...</div></div>);
   if (error)   return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="max-w-md w-full bg-dark-100 border border-red-500/40 rounded-custom p-8 text-center"><AlertCircle className="w-14 h-14 text-red-400 mx-auto mb-4" /><h1 className="text-2xl font-normal text-white mb-2">Houve um erro ao carregar</h1><p className="text-gray-400 mb-6">{error}</p><button onClick={loadVitrine} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button font-normal uppercase">Tentar novamente</button></div></div>);
-  if (!negocio) return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="text-center"><h1 className="text-3xl font-normal text-white mb-4">Negócio inexistente.</h1><Link to="/" className="text-primary hover:text-yellow-500 font-normal">Voltar para Home</Link></div></div>);
+  if (!negocio) return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="text-center"><h1 className="text-3xl font-normal text-white mb-4">NegÃ³cio inexistente.</h1><Link to="/" className="text-primary hover:text-yellow-500 font-normal">Voltar para Home</Link></div></div>);
 
   const depoimentosNegocio = depoimentos.filter(d => d.tipo === 'negocio');
   const mediaDepoimentos = depoimentosNegocio.length > 0 ? (depoimentosNegocio.reduce((sum, d) => sum + d.nota, 0) / depoimentosNegocio.length).toFixed(1) : '0.0';
-  const nomeNegocioLabel = String(negocio?.nome || '').trim() || 'NEGÓCIO';
+  const nomeNegocioLabel = String(negocio?.nome || '').trim() || 'NEGÃ“CIO';
   const temaAtivo = negocio?.tema || 'dark';
   const isLight   = temaAtivo === 'light';
   const hasSelecao = servicosSelecionados.length > 0;
@@ -991,8 +883,8 @@ export default function Vitrine({ user, userType }) {
       <div className="bg-primary overflow-hidden relative h-10 flex items-center">
         <div className="announcement-bar-marquee flex whitespace-nowrap">
           <div className="flex animate-marquee-sync">
-            <div className="flex items-center shrink-0">{[...Array(20)].map((_, i) => (<div key={`a-${i}`} className="flex items-center"><span className="text-black font-normal text-sm uppercase mx-4">É DE MINAS</span><span className="text-black text-sm">●</span></div>))}</div>
-            <div className="flex items-center shrink-0" aria-hidden="true">{[...Array(20)].map((_, i) => (<div key={`b-${i}`} className="flex items-center"><span className="text-black font-normal text-sm uppercase mx-4">É DE MINAS</span><span className="text-black text-sm">●</span></div>))}</div>
+            <div className="flex items-center shrink-0">{[...Array(20)].map((_, i) => (<div key={`a-${i}`} className="flex items-center"><span className="text-black font-normal text-sm uppercase mx-4">Ã‰ DE MINAS</span><span className="text-black text-sm">â—</span></div>))}</div>
+            <div className="flex items-center shrink-0" aria-hidden="true">{[...Array(20)].map((_, i) => (<div key={`b-${i}`} className="flex items-center"><span className="text-black font-normal text-sm uppercase mx-4">Ã‰ DE MINAS</span><span className="text-black text-sm">â—</span></div>))}</div>
           </div>
         </div>
         <style>{`@keyframes marquee-sync{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}.animate-marquee-sync{display:flex;animation:marquee-sync 40s linear infinite}.announcement-bar-marquee:hover .animate-marquee-sync{animation-play-state:paused}@media(prefers-reduced-motion:reduce){.animate-marquee-sync{animation:none}}`}</style>
@@ -1025,7 +917,7 @@ export default function Vitrine({ user, userType }) {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-normal">{negocio.nome}</h1>
-                <img src={negocioVerificadoIcon} alt="Negócio verificado" className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" />
+                <img src={negocioVerificadoIcon} alt="NegÃ³cio verificado" className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" />
               </div>
               <p className="text-base sm:text-lg text-vsub mb-4 font-normal">{negocio.descricao}</p>
               <div className="flex flex-wrap items-center gap-4 sm:gap-6">
@@ -1076,12 +968,12 @@ export default function Vitrine({ user, userType }) {
                         </div>
                       )}
                       {depInfo?.media && (<div className="flex items-center gap-2 mb-1"><StarChar size={16} className="text-primary" /><span className={`text-lg font-normal ${mediaColor}`}>{depInfo.media}</span><span className="text-xs text-vmuted">({depInfo.count})</span></div>)}
-                      {prof.anos_experiencia != null && (<p className="text-sm text-vmuted font-normal">{prof.anos_experiencia} ano(s) de experiência</p>)}
+                      {prof.anos_experiencia != null && (<p className="text-sm text-vmuted font-normal">{prof.anos_experiencia} ano(s) de experiÃªncia</p>)}
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal"><Clock className="w-3 h-3 shrink-0" />{horarioIni} - {horarioFim}</span>
-                    {almIni && almFim && (<span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal"><span className={`ml-1 ${almocoBadge}`}> • {String(almIni).slice(0, 5)} - {String(almFim).slice(0, 5)}</span></span>)}
+                    {almIni && almFim && (<span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal"><span className={`ml-1 ${almocoBadge}`}> â€¢ {String(almIni).slice(0, 5)} - {String(almFim).slice(0, 5)}</span></span>)}
                     <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">{totalEntregas} {totalEntregas === 1 ? counterSingular : counterPlural}</span>
                   </div>
                 </div>
@@ -1189,7 +1081,7 @@ export default function Vitrine({ user, userType }) {
             </div>
             <div className="overflow-y-auto px-6 pb-6 flex-1">
               <div className="mb-4">
-                <div className={`text-sm font-normal mb-2 ${depoModalLabel}`}>Você está deixando um depoimento sobre</div>
+                <div className={`text-sm font-normal mb-2 ${depoModalLabel}`}>VocÃª estÃ¡ deixando um depoimento sobre</div>
                 <div className="grid grid-cols-2 gap-2">
                   <button onClick={() => { setDepoimentoTipo('negocio'); setDepoimentoProfissionalId(null); }} className={`px-4 py-3 rounded-custom border transition-all font-normal ${depoNegBtn(depoimentoTipo)}`}>{nomeNegocioLabel}</button>
                   <button onClick={() => setDepoimentoTipo('profissional')} className={`px-4 py-3 rounded-custom border transition-all font-normal ${depoProfBtn(depoimentoTipo)}`}>PROFISSIONAL</button>
@@ -1208,8 +1100,8 @@ export default function Vitrine({ user, userType }) {
                 <div className="flex gap-2">{[1, 2, 3, 4, 5].map(n => (<button key={n} onClick={() => setDepoimentoNota(n)} className={`w-12 h-8 rounded-button border transition-all font-normal ${depoNotaBtn(n)}`}>{n}</button>))}</div>
               </div>
               <div className="mb-5">
-                <div className={`text-sm font-normal mb-2 ${depoModalLabel}`}>Comentário é opcional</div>
-                <textarea value={depoimentoTexto} onChange={(e) => setDepoimentoTexto(e.target.value)} rows={4} className={`w-full px-4 py-3 border rounded-custom focus:outline-none resize-none font-normal ${depoTextarea}`} placeholder="Conte como foi sua experiência..." />
+                <div className={`text-sm font-normal mb-2 ${depoModalLabel}`}>ComentÃ¡rio Ã© opcional</div>
+                <textarea value={depoimentoTexto} onChange={(e) => setDepoimentoTexto(e.target.value)} rows={4} className={`w-full px-4 py-3 border rounded-custom focus:outline-none resize-none font-normal ${depoTextarea}`} placeholder="Conte como foi sua experiÃªncia..." />
               </div>
               <button onClick={enviarDepoimento} disabled={depoimentoLoading || (depoimentoTipo === 'profissional' && !depoimentoProfissionalId)} className={`w-full py-3 rounded-button disabled:opacity-60 uppercase font-normal transition-colors ${depoSendBtn}`}>
                 {depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}
