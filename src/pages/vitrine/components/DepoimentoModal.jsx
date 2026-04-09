@@ -5,7 +5,7 @@ function StarChar({ active }) {
   return (
     <span
       aria-hidden="true"
-      className={`text-2xl leading-none transition-opacity ${active ? 'text-yellow-400 opacity-100' : 'text-yellow-400 opacity-25'}`}
+      className={`text-[28px] leading-none transition-opacity ${active ? 'text-primary opacity-100' : 'text-primary opacity-25'}`}
     >
       {'\u2605'}
     </span>
@@ -65,7 +65,7 @@ export default function DepoimentoModal({
                   type="button"
                   key={n}
                   onClick={() => actions.setNota(n)}
-                  className="p-0 bg-transparent border-0 shadow-none appearance-none transition-transform hover:scale-105 focus:outline-none"
+                  className="inline-flex h-9 w-9 cursor-pointer items-center justify-center bg-transparent border-0 p-0 shadow-none appearance-none transition-transform hover:scale-105 focus:outline-none"
                   aria-label={`${n} estrela${n > 1 ? 's' : ''}`}
                   aria-pressed={state.nota === n}
                 >
