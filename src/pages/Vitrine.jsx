@@ -617,6 +617,7 @@ export default function Vitrine({ user, userType }) {
         }}
         state={{
           tipo: depoimentoTipo,
+          nota: depoimentoNota,
           profissionalId: depoimentoProfissionalId,
           texto: depoimentoTexto,
           loading: depoimentoLoading,
