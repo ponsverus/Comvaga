@@ -1071,28 +1071,28 @@ export const ptBR = {
       },
     },
 
-    review_need_login_confirm: {
+    depoimento_need_login_confirm: {
       title: 'Login necessário',
       body: 'Você precisa fazer login para deixar um depoimento. Deseja fazer login agora?',
       confirmText: 'IR PARA LOGIN',
       cancelText: 'TALVEZ DEPOIS',
     },
-    review_only_client: {
+    depoimento_only_client: {
       title: 'Acesso restrito',
       body: 'Apenas contas do tipo CLIENTE podem deixar depoimentos.',
       buttonText: 'ENTENDI',
     },
-    review_invalid_business: {
+    depoimento_invalid_business: {
       title: 'Negócio inválido',
       body: 'Negócio inválido.',
       buttonText: 'ENTENDI',
     },
-    review_sent: {
+    depoimento_sent: {
       title: 'Depoimento registrado',
       body: 'Seu depoimento foi enviado com sucesso.',
       buttonText: 'OK',
     },
-    review_send_error_title: 'Erro ao enviar depoimento',
-    review_send_error_body: 'Não foi possível enviar seu depoimento:',
+    depoimento_send_error_title: 'Erro ao enviar depoimento',
+    depoimento_send_error_body: 'Não foi possível enviar seu depoimento:',
   },
 };
