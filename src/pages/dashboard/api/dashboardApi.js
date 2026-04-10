@@ -141,6 +141,12 @@ export async function removeProfissionalSeguramente(profissionalId) {
   return data;
 }
 
+export async function removeNegocioSeguramente(negocioId) {
+  const { data, error } = await supabase.rpc('remove_negocio_seguro', { p_negocio_id: negocioId });
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchEntregas(negocioId, profissionalIds) {
   const { data, error } = await supabase
     .from('entregas')
