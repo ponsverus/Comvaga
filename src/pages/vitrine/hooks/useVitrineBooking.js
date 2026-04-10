@@ -74,7 +74,7 @@ export function useVitrineBooking({
     if (userType !== 'client') {
       alertKey(
         'schedule_only_client',
-        'Ação restrita',
+        'Uso restrita',
         'Você está logado como PROFISSIONAL. Para agendar, entre como CLIENTE.',
         'ENTENDI'
       );
