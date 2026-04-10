@@ -17,9 +17,9 @@ export default function VitrineProfessionalsSection({
     <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-normal mb-6">Profissionais</h2>
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 [column-fill:_balance]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
           {cards.map((prof) => (
-            <div key={prof.id} className="mb-6 break-inside-avoid bg-vcard border border-vborder rounded-custom p-6 hover:border-vprimary/50 transition-all">
+            <div key={prof.id} className="bg-vcard border border-vborder rounded-custom p-6 hover:border-vprimary/50 transition-all self-start">
               <div className="flex items-start gap-4 mb-4">
                 {prof.avatarUrl ? (
                   <div className="w-14 h-14 rounded-custom overflow-hidden border border-vborder bg-vcard2 shrink-0">
