@@ -30,7 +30,7 @@ export default function InfoNegocioSection({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-2xl font-normal">Info do Negocio</h2>
+        <h2 className="text-2xl font-normal">Info do Negócio</h2>
         <button
           onClick={salvarInfoNegocio}
           disabled={infoSaving}
@@ -90,7 +90,7 @@ export default function InfoNegocioSection({
           <div>
             <label className="block text-sm mb-2">NOVA SENHA</label>
             <input type="password" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="********" />
-            <label className="block text-sm mb-2 mt-3">CONFIRMAR SENHA</label>
+            <label className="block text-sm mb-2 mt-3">CONFIRMAR NOVA SENHA</label>
             <input type="password" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="********" />
             <button type="button" disabled={savingDados} onClick={salvarSenha} className="mt-3 w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed uppercase font-normal">SALVAR NOVA SENHA</button>
           </div>
@@ -110,7 +110,7 @@ export default function InfoNegocioSection({
               : 'border-red-500/40 bg-red-500/10 text-red-400 hover:border-red-500/70 hover:bg-red-500/20'
           }`}
         >
-          {deletingBusiness ? 'EXCLUINDO NEGOCIO...' : 'EXCLUIR NEGOCIO'}
+          {deletingBusiness ? 'EXCLUINDO NEGÓCIO...' : 'EXCLUIR NEGÓCIO'}
         </button>
       </div>
     </div>
