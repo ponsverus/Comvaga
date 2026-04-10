@@ -3,14 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Calendar, History, LogOut, X, Save } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-
-function getImageExt(file) {
-  const type = String(file?.type || '').toLowerCase();
-  if (type === 'image/png') return 'png';
-  if (type === 'image/jpeg') return 'jpg';
-  if (type === 'image/webp') return 'webp';
-  return null;
-}
+import { convertImageToWebp, isImageFile } from '../utils/media';
 
 function formatDateBRFromISO(dateStr) {
   if (!dateStr) return '';
@@ -209,16 +202,14 @@ export default function ClientArea({ user, onLogout }) {
     if (!file) return;
     e.target.value = '';
     const maxMb   = 3;
-    const okTypes = ['image/png', 'image/jpeg', 'image/webp'];
-    if (!okTypes.includes(file.type)) { uiAlert('clientArea.avatar_invalid_format', 'error'); return; }
+    if (!isImageFile(file)) { uiAlert('clientArea.avatar_invalid_format', 'error'); return; }
     if (file.size > maxMb * 1024 * 1024) { uiAlert('clientArea.avatar_too_large', 'error', { maxMb }); return; }
     try {
       setUploadingAvatar(true);
-      const ext = getImageExt(file);
-      if (!ext) { uiAlert('clientArea.avatar_invalid_format', 'error'); return; }
+      const convertedFile = await convertImageToWebp(file);
       const oldPath = avatarPath || null;
-      const path = `${user.id}/avatar.${ext}`;
-      const { error: upErr } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+      const path = `${user.id}/avatar.webp`;
+      const { error: upErr } = await supabase.storage.from('avatars').upload(path, convertedFile, { upsert: true, contentType: convertedFile.type });
       if (upErr) throw upErr;
       const { error: updErr } = await supabase.from('users').update({ avatar_path: path }).eq('id', user.id);
       if (updErr) throw updErr;
@@ -464,7 +455,7 @@ export default function ClientArea({ user, onLogout }) {
               </div>
             </Link>
             <div className="flex items-center gap-2">
-              <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={onPickAvatar} className="hidden" />
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={onPickAvatar} className="hidden" />
               <button onClick={openFilePicker} disabled={uploadingAvatar} className="h-9 px-5 bg-dark-200 border border-gray-800 hover:border-primary/50 rounded-button text-sm transition-all uppercase focus:outline-none">
                 {uploadingAvatar ? 'ENVIANDO...' : 'FOTO'}
               </button>
@@ -600,22 +591,22 @@ export default function ClientArea({ user, onLogout }) {
                 </div>
 
                 <div className="bg-dark-200 border border-gray-800 rounded-custom p-5">
-                  <div className="text-xs text-gray-500 mb-4">CREDENCIAIS</div>
+                  <div className="text-xs text-gray-500 mb-4">CONTA</div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm mb-2">EMAIL</label>
                       <input type="email" value={novoEmail} onChange={(e) => setNovoEmail(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" />
                       <button type="button" disabled={savingDados} onClick={salvarEmail} className="mt-3 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-                        SALVAR NOVO EMAIL
+                        SALVAR EMAIL
                       </button>
                     </div>
                     <div>
-                      <label className="block text-sm mb-2">NOVA SENHA</label>
+                      <label className="block text-sm mb-2">SENHA</label>
                       <input type="password" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="••••••••" />
-                      <label className="block text-sm mb-2 mt-3">CONFIRMAR NOVA SENHA</label>
+                      <label className="block text-sm mb-2 mt-3">CONFIRMAR</label>
                       <input type="password" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="••••••••" />
                       <button type="button" disabled={savingDados} onClick={salvarSenha} className="mt-3 w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-                        SALVAR NOVA SENHA
+                        SALVAR SENHA
                       </button>
                     </div>
                   </div>
