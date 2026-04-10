@@ -210,10 +210,9 @@ export function useVitrineBooking({
   const calendarActionConfig = useMemo(() => {
     if (calendarPlatformMode === 'google-with-fallback') {
       return {
-        hint: 'Abrir no Google Agenda. Se não abrir no seu celular, baixe o evento.',
         primaryLabel: 'ABRIR NO GOOGLE AGENDA',
         primaryAction: abrirGoogleAgenda,
-        secondaryLabel: 'SE NÃO ABRIR, BAIXAR EVENTO (.ICS)',
+        secondaryLabel: 'BAIXAR AGENDAMENTO',
         secondaryAction: baixarEventoICS,
       };
     }
