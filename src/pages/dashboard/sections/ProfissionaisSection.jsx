@@ -40,6 +40,7 @@ export default function ProfissionaisSection({
           const isAtivo = p.status === 'ativo';
           const label = normalizeKey(p.status_label);
           const dotClass = STATUS_COLOR_CLASS[label] || 'bg-gray-500';
+          const statusLabelView = label === 'ALMOCO' ? 'PAUSA' : p.status_label;
           const isEuMesmo = parceiroProfissional?.id === p.id;
           const isAdminOwnProfessionalCard = souDono && p.user_id && p.user_id === currentUserId;
           return (
@@ -52,7 +53,7 @@ export default function ProfissionaisSection({
                   <h3 className="font-normal pr-24">{p.nome}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isPendente ? 'bg-yellow-400' : dotClass}`} />
-                    <span className={`text-xs ${isPendente ? 'text-yellow-400' : 'text-gray-400'}`}>{isPendente ? 'PENDENTE' : (p.status_label || '—')}</span>
+                    <span className={`text-xs ${isPendente ? 'text-yellow-400' : 'text-gray-400'}`}>{isPendente ? 'PENDENTE' : (statusLabelView || '�')}</span>
                   </div>
                   {p.profissao && <p className="text-xs text-gray-500 mt-1">{p.profissao}</p>}
                   {!isPendente && p.anos_experiencia != null && (<p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIÊNCIA</p>)}
