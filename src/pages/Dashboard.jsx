@@ -77,10 +77,10 @@ function RevenueTrendBadge({ data }) {
   const hasPercent = percent !== null && percent !== undefined;
   const value = hasPercent ? Number(percent || 0) : Number(delta || 0);
   const text = hasPercent ? formatPercentDelta(percent) : formatDelta(delta);
-  const tone = value > 0 ? 'text-green-500' : value < 0 ? 'text-red-500' : 'text-gray-500';
+  const tone = value > 0 ? 'text-green-400' : value < 0 ? 'text-red-400' : 'text-gray-400';
 
   return (
-    <div className={`inline-flex items-center rounded-full border border-white bg-white px-3 py-1 text-xs ${tone}`}>
+    <div className={`inline-flex items-center rounded-full border border-gray-700 bg-transparent px-3 py-1 text-xs ${tone}`}>
       {text}
     </div>
   );
