@@ -54,7 +54,7 @@ function ProfessionalMetricBar({ label, value, percent, barClass = 'bg-white' })
 function ProfessionalCountPill({ label, value, tone = 'text-white', border = 'border-gray-700', bg = 'bg-dark-200/60' }) {
   return (
     <div className={`flex flex-1 items-center justify-center gap-2 rounded-full border ${border} ${bg} px-3 py-1.5`}>
-      <span className="text-[10px] text-gray-500 uppercase tracking-wide">{label}</span>
+      <span className="text-xs text-gray-500 uppercase tracking-wide">{label}</span>
       <span className={`text-sm font-normal ${tone}`}>{value}</span>
     </div>
   );
@@ -171,7 +171,7 @@ export default function AgendaUtilizacaoBlock({
                     <>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-[10px] text-gray-600 uppercase tracking-wide">Profissional</div>
+                    <div className="text-[14px] text-gray-500 uppercase tracking-wide">Profissional</div>
                     <div className="mt-1 font-normal text-white leading-snug">{String(item?.nome || 'PROFISSIONAL')}</div>
                   </div>
                   <div className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-normal text-primary">
@@ -186,7 +186,7 @@ export default function AgendaUtilizacaoBlock({
                   <ProfessionalMetricBar label="" value={formatDurationFromMinutes(minutosDisponiveis)} percent={minutosDisponiveis > 0 ? 100 : 0} barClass="bg-gray-300" />
                   <div className="flex items-center gap-2 pt-1">
                     <ProfessionalCountPill label="Válidos" value={validos} />
-                    <ProfessionalCountPill label="Cancelados" value={cancelados} tone="text-red-600" border="border-red-400/30" bg="bg-red-400/10" />
+                    <ProfessionalCountPill label="Cancelados" value={cancelados} tone="text-red-400" border="border-red-400/30" bg="bg-red-400/10" />
                   </div>
                 </div>
                     </>
