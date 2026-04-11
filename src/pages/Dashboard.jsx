@@ -36,6 +36,71 @@ import { useDashboardHistorico } from './dashboard/hooks/useDashboardHistorico';
 import { useDashboardMetrics } from './dashboard/hooks/useDashboardMetrics';
 import { useDashboardMutations } from './dashboard/hooks/useDashboardMutations';
 
+function formatCurrency(value) {
+  return `R$ ${Number(value || 0).toFixed(2)}`;
+}
+
+function formatDelta(value) {
+  const number = Number(value || 0);
+  if (number === 0) return '0';
+  return `${number > 0 ? '+' : ''}${number}`;
+}
+
+function formatPercentDelta(value) {
+  const number = Number(value || 0);
+  if (number === 0) return '0.0%';
+  return `${number > 0 ? '+' : ''}${number.toFixed(1)}%`;
+}
+
+function TrendBadge({ data }) {
+  const percent = data?.variacao_percentual;
+  const delta = data?.variacao_valor;
+  const hasPercent = percent !== null && percent !== undefined;
+  const value = hasPercent ? Number(percent || 0) : Number(delta || 0);
+  const tone = value > 0
+    ? 'border-green-400/30 bg-green-400/10 text-green-400'
+    : value < 0
+      ? 'border-red-400/30 bg-red-400/10 text-red-400'
+      : 'border-gray-700 bg-transparent text-gray-400';
+  const text = hasPercent ? formatPercentDelta(percent) : formatDelta(delta);
+
+  return (
+    <div className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${tone}`}>
+      {text}
+    </div>
+  );
+}
+
+function InfoPill({ label, value, tone = 'text-gray-300', border = 'border-gray-700', bg = 'bg-transparent' }) {
+  return (
+    <div className={`inline-flex items-center justify-center gap-1.5 rounded-full border ${border} ${bg} px-3 py-1 text-xs`}>
+      {label ? <span className="text-gray-500 uppercase">{label}</span> : null}
+      <span className={tone}>{value}</span>
+    </div>
+  );
+}
+
+function DashboardTopCard({ icon, label, value, children, highlight = false }) {
+  const baseClass = highlight
+    ? 'bg-gradient-to-br from-green-500/20 to-emerald-600/20 border-green-500/30'
+    : 'bg-dark-100 border-gray-800';
+
+  return (
+    <div className={`${baseClass} border rounded-custom p-6 min-h-[136px]`}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="mb-2 flex items-center gap-2">
+            {icon}
+            <span className="text-sm text-gray-500">{label}</span>
+          </div>
+          <div className="text-3xl font-normal text-white mb-1">{value}</div>
+        </div>
+        <div className="shrink-0 flex flex-col items-end gap-2">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard({ user, onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -98,16 +163,19 @@ export default function Dashboard({ user, onLogout }) {
   const [faturamentoPeriodo, setFaturamentoPeriodo]       = useState('7d');
   const {
     metricsHoje,
+    metricsTopCards,
     metricsDia,
     metricsPeriodoData,
     metricsUtilizacao,
     metricsFutureBookings,
     metricsHojeLoading,
+    metricsTopCardsLoading,
     metricsDiaLoading,
     metricsPeriodoLoading,
     metricsUtilizacaoLoading,
     metricsFutureBookingsLoading,
     loadHoje,
+    loadTopCards,
     loadDia,
     loadPeriodo,
     loadUtilizacao,
@@ -271,11 +339,12 @@ export default function Dashboard({ user, onLogout }) {
         }
         reloadAgendamentosRef.current();
         loadHoje(negocio.id, parceiroProfissionalId);
+        loadTopCards(negocio.id, parceiroProfissionalId);
         loadUtilizacao(negocio.id, hoje, parceiroProfissionalId);
         loadFutureBookings(negocio.id, hoje, parceiroProfissionalId);
       }).subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [negocio?.id, agProfIdsKey, hoje, parceiroProfissionalId, loadHoje, loadUtilizacao, loadFutureBookings]);
+  }, [negocio?.id, agProfIdsKey, hoje, parceiroProfissionalId, loadHoje, loadTopCards, loadUtilizacao, loadFutureBookings]);
 
 
   const agendamentosHoje = useMemo(() => {
@@ -310,6 +379,11 @@ export default function Dashboard({ user, onLogout }) {
 
   const faturamentoPorProfissionalHoje   = useMemo(() => { const arr = metricsHoje?.today?.por_profissional || []; if (!Array.isArray(arr)) return []; return arr.map(x => { if (!x) return null; const nome = String(x.nome ?? '').trim(); const valor = Number(x.faturamento ?? x.valor ?? 0); if (!nome) return null; return [nome, Number.isFinite(valor) ? valor : 0]; }).filter(Boolean).sort((a, b) => Number(b[1]) - Number(a[1])); }, [metricsHoje]);
   const faturamentoPorProfissionalFiltro = useMemo(() => { const arr = metricsDia?.selected_day?.por_profissional || []; if (!Array.isArray(arr)) return []; return arr.map(x => { if (!x) return null; const nome = String(x.nome ?? '').trim(); const valor = Number(x.faturamento ?? x.valor ?? 0); if (!nome) return null; return [nome, Number.isFinite(valor) ? valor : 0]; }).filter(Boolean).sort((a, b) => Number(b[1]) - Number(a[1])); }, [metricsDia]);
+  const topFaturamento = metricsTopCards?.faturamento_hoje || {};
+  const topAgendamentos = metricsTopCards?.agendamentos_hoje || {};
+  const topProfissionais = metricsTopCards?.profissionais || {};
+  const topEntregas = metricsTopCards?.entregas || {};
+  const topCardsReady = !!metricsTopCards;
 
   const tabs = parceiroProfissional
     ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'entregas', 'profissionais']
@@ -394,16 +468,59 @@ export default function Dashboard({ user, onLogout }) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 items-start">
-          <div className="bg-gradient-to-br from-green-500/20 to-emerald-600/20 border border-green-500/30 rounded-custom p-6">
-            <div className="mb-2 flex items-center gap-2">
-              <span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="text-green-400 font-normal text-3xl leading-none">$</span>
-              <span className="text-sm text-gray-500">FATURAMENTO HOJE</span>
-            </div>
-            <div className="text-3xl font-normal text-white mb-1">R$ {Number(metricsHoje?.today?.faturamento || 0).toFixed(2)}</div>
-          </div>
-          <div className="bg-dark-100 border border-gray-800 rounded-custom p-6"><Calendar className="w-8 h-8 text-blue-400 mb-2" /><div className="text-3xl font-normal text-white mb-1">{hojeValidos.length}</div><div className="text-sm text-gray-400">AGENDAMENTOS HOJE</div></div>
-          <div className="bg-dark-100 border border-gray-800 rounded-custom p-6"><Users className="w-8 h-8 text-purple-400 mb-2" /><div className="text-3xl font-normal text-white mb-1">{profissionais.length}</div><div className="text-sm text-gray-400">PROFISSIONAIS</div></div>
-          <div className="bg-dark-100 border border-gray-800 rounded-custom p-6"><TrendingUp className="w-8 h-8 text-primary mb-2" /><div className="text-3xl font-normal text-white mb-1">{entregas.length}</div><div className="text-sm text-gray-400">{tabEntregasLabel}</div></div>
+          <DashboardTopCard
+            highlight
+            icon={<span style={{ fontFamily: 'Roboto Condensed, sans-serif' }} className="text-green-400 font-normal text-3xl leading-none">$</span>}
+            label="FATURAMENTO HOJE"
+            value={metricsTopCardsLoading ? '...' : topCardsReady ? formatCurrency(topFaturamento.valor) : '--'}
+          >
+            {topCardsReady ? (
+              <>
+                <TrendBadge data={topFaturamento} />
+                <span className="text-[10px] text-gray-500 uppercase">{topFaturamento.comparativo_label || 'vs ontem'}</span>
+              </>
+            ) : null}
+          </DashboardTopCard>
+
+          <DashboardTopCard
+            icon={<Calendar className="w-8 h-8 text-blue-400" />}
+            label="AGENDAMENTOS HOJE"
+            value={metricsTopCardsLoading ? '...' : topCardsReady ? Number(topAgendamentos.total || 0) : '--'}
+          >
+            {topCardsReady ? (
+              <>
+                <TrendBadge data={topAgendamentos} />
+                <span className="text-[10px] text-gray-500 uppercase">{topAgendamentos.comparativo_label || 'vs ontem'}</span>
+              </>
+            ) : null}
+          </DashboardTopCard>
+
+          <DashboardTopCard
+            icon={<Users className="w-8 h-8 text-purple-400" />}
+            label="PROFISSIONAIS"
+            value={metricsTopCardsLoading ? '...' : topCardsReady ? Number(topProfissionais.total || 0) : '--'}
+          >
+            {topCardsReady ? (
+              <>
+                <InfoPill label="Ativos" value={Number(topProfissionais.ativos || 0)} tone="text-green-400" border="border-green-400/30" bg="bg-green-400/10" />
+                {topProfissionais.inativos !== undefined && <InfoPill label="Inativos" value={Number(topProfissionais.inativos || 0)} />}
+                {topProfissionais.pendentes !== undefined && <InfoPill label="Pend." value={Number(topProfissionais.pendentes || 0)} tone="text-yellow-400" border="border-yellow-400/30" bg="bg-yellow-400/10" />}
+              </>
+            ) : null}
+          </DashboardTopCard>
+
+          <DashboardTopCard
+            icon={<TrendingUp className="w-8 h-8 text-primary" />}
+            label={tabEntregasLabel}
+            value={metricsTopCardsLoading ? '...' : topCardsReady ? Number(topEntregas.total || 0) : '--'}
+          >
+            {topCardsReady ? (
+              <>
+                <InfoPill label="Ativos" value={Number(topEntregas.ativos || 0)} tone="text-green-400" border="border-green-400/30" bg="bg-green-400/10" />
+                <InfoPill label="Media" value={formatCurrency(topEntregas.preco_medio)} tone="text-primary" border="border-primary/30" bg="bg-primary/10" />
+              </>
+            ) : null}
+          </DashboardTopCard>
         </div>
 
         <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen bg-yellow-400 border-y border-yellow-300/50 mb-8 overflow-hidden h-10 flex items-center">
@@ -475,7 +592,6 @@ export default function Dashboard({ user, onLogout }) {
 
             {activeTab === 'agendamentos' && (
               <AgendamentosSection
-                reloadAgendamentos={reloadAgendamentos}
                 agendamentosAgrupadosPorProfissional={agendamentosAgrupadosPorProfissional}
                 hoje={hoje}
                 confirmarAtendimento={confirmarAtendimento}
