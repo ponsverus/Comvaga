@@ -41,7 +41,7 @@ function ProfessionalMetricBar({ label, value, percent, barClass = 'bg-white' })
   return (
     <div className="min-w-0">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[10px] text-gray-500 uppercase tracking-wide leading-none">{label}</span>
+        <span className="text-[10px] text-gray-500 tracking-wide leading-none">{label}</span>
         <span className="text-xs font-normal text-gray-200">{value}</span>
       </div>
       <div className="mt-1.5 h-1.5 w-full rounded-full bg-gray-800 overflow-hidden">
@@ -182,7 +182,7 @@ export default function AgendaUtilizacaoBlock({
                 <div className="mt-4 space-y-3">
                   <ProfessionalMetricBar label="Disponível" value={formatDurationFromMinutes(minutosOciosos)} percent={minutosDisponiveis > 0 ? (minutosOciosos / minutosDisponiveis) * 100 : 0} barClass="bg-yellow-400" />
                   <ProfessionalMetricBar label="Ocupado" value={formatDurationFromMinutes(minutosOcupados)} percent={minutosDisponiveis > 0 ? (minutosOcupados / minutosDisponiveis) * 100 : 0} barClass="bg-green-400" />
-                  <ProfessionalMetricBar label="Ocupação" value={formatPercent(item?.taxa_ocupacao)} percent={item?.taxa_ocupacao} barClass="bg-primary" />
+                  <ProfessionalMetricBar label="Ocupa." value={formatPercent(item?.taxa_ocupacao)} percent={item?.taxa_ocupacao} barClass="bg-primary" />
                   <ProfessionalMetricBar label="Tempo total" value={formatDurationFromMinutes(minutosDisponiveis)} percent={minutosDisponiveis > 0 ? 100 : 0} barClass="bg-gray-300" />
                   <div className="flex items-center gap-2 pt-1">
                     <ProfessionalCountPill label="Válidos" value={validos} />
