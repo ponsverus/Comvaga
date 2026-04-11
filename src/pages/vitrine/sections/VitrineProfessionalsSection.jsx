@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 
 const PROFISSIONAIS_POR_PAGINA = 3;
@@ -19,17 +19,37 @@ export default function VitrineProfessionalsSection({
   const totalPaginas = Math.ceil(cards.length / PROFISSIONAIS_POR_PAGINA);
   const inicio = pagina * PROFISSIONAIS_POR_PAGINA;
   const itens = cards.slice(inicio, inicio + PROFISSIONAIS_POR_PAGINA);
+  const touchStartRef = useRef(null);
 
   useEffect(() => {
     const ultimaPaginaValida = Math.max(0, totalPaginas - 1);
     setPagina((prev) => Math.min(prev, ultimaPaginaValida));
   }, [totalPaginas]);
 
+  const goPrev = () => setPagina((p) => Math.max(0, p - 1));
+  const goNext = () => setPagina((p) => Math.min(totalPaginas - 1, p + 1));
+  const handleTouchStart = (event) => {
+    const touch = event.touches?.[0];
+    if (!touch) return;
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+  const handleTouchEnd = (event) => {
+    const start = touchStartRef.current;
+    const touch = event.changedTouches?.[0];
+    touchStartRef.current = null;
+    if (!start || !touch || totalPaginas <= 1) return;
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+    if (dx < 0) goNext();
+    else goPrev();
+  };
+
   return (
     <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-normal mb-6">Profissionais</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
           {itens.map((prof) => (
             <div key={prof.id} className="bg-vcard border border-vborder rounded-custom p-6 hover:border-vprimary/50 transition-all self-start">
               <div className="flex items-start gap-4 mb-4">
@@ -87,11 +107,12 @@ export default function VitrineProfessionalsSection({
           ))}
         </div>
         {totalPaginas > 1 && (
-          <div className="flex items-center justify-center gap-3 mt-6">
-            <button type="button" onClick={() => setPagina((p) => Math.max(0, p - 1))} disabled={pagina === 0} className="p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:bg-vcard text-vmuted hover:text-vtext">
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <button type="button" onClick={goPrev} disabled={pagina === 0} className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-transparent border border-vborder text-vmuted transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:border-vsub hover:text-vtext">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            {Array.from({ length: totalPaginas }).map((_, i) => (
+            <div className="flex items-center justify-center gap-3">
+              {Array.from({ length: totalPaginas }).map((_, i) => (
               <button
                 type="button"
                 key={i}
@@ -99,8 +120,9 @@ export default function VitrineProfessionalsSection({
                 className={['rounded-full transition-all duration-300', i === pagina ? 'w-4 h-2 bg-vprimary' : 'w-2 h-2 bg-vborder hover:bg-vsub/40'].join(' ')}
                 aria-label={`Página ${i + 1}`}
               />
-            ))}
-            <button type="button" onClick={() => setPagina((p) => Math.min(totalPaginas - 1, p + 1))} disabled={pagina === totalPaginas - 1} className="p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:bg-vcard text-vmuted hover:text-vtext">
+              ))}
+            </div>
+            <button type="button" onClick={goNext} disabled={pagina === totalPaginas - 1} className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-transparent border border-vborder text-vmuted transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:border-vsub hover:text-vtext">
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
