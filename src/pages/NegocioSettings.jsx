@@ -425,7 +425,7 @@ export default function NegocioSettings({ user }) {
             <ArrowLeft className="h-4 w-4" />
             VOLTAR
           </button>
-          <span className="text-[14px] font-normal text-white">Info do negócio</span>
+          <span className="text-[14px] font-normal text-white">INFO DO NEGÓCIO</span>
           <Link to={`/v/${negocio.slug}`} target="_blank" className="inline-flex items-center rounded-full border border-gray-700 px-3 py-1 text-[12px] uppercase text-gray-400 hover:border-primary hover:text-primary">
             VITRINE
           </Link>
