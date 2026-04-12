@@ -7,10 +7,21 @@ import { getPublicUrl, removeNegocioSeguramente } from './dashboard/api/dashboar
 import TemaToggle from './dashboard/components/TemaToggle';
 import { useFeedback } from '../feedback/useFeedback';
 
+const fieldPlaceholders = {
+  Nome: 'Nome público do negócio',
+  Telefone: 'Telefone de contato',
+  Endereço: 'Rua, número - cidade, estado',
+  Sobre: 'Conte sobre seu negócio, atendimento e diferenciais',
+  Instagram: '@seuinstagram ou link do perfil',
+  Facebook: 'Link da página do Facebook',
+  'E-mail': 'E-mail de acesso da conta',
+};
+
 function SettingRow({ label, value, hint, multiline = false, type = 'text', onSave }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value || '');
   const [saving, setSaving] = useState(false);
+  const placeholder = fieldPlaceholders[label] || `Preencha ${String(label || '').toLowerCase()}`;
 
   useEffect(() => {
     if (!editing) setDraft(value || '');
@@ -41,6 +52,7 @@ function SettingRow({ label, value, hint, multiline = false, type = 'text', onSa
             <textarea
               rows={4}
               className="w-full resize-none rounded-custom border border-gray-800 bg-dark-200 px-4 py-3 text-[14px] font-normal text-white outline-none transition-all placeholder-gray-500 focus:border-primary"
+              placeholder={placeholder}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               autoFocus
@@ -49,6 +61,7 @@ function SettingRow({ label, value, hint, multiline = false, type = 'text', onSa
             <input
               className="w-full rounded-custom border border-gray-800 bg-dark-200 px-3 py-2 text-[14px] text-white outline-none focus:border-primary/50"
               type={type}
+              placeholder={placeholder}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               autoFocus
@@ -66,7 +79,7 @@ function SettingRow({ label, value, hint, multiline = false, type = 'text', onSa
         </div>
       ) : (
         <>
-          <span className="min-w-0 flex-1 break-words text-[14px] leading-5 text-gray-300">{value || <span className="text-gray-600">-</span>}</span>
+          <span className="min-w-0 flex-1 break-words text-[14px] leading-5 text-gray-300">{value || <span className="text-gray-600">{placeholder}</span>}</span>
           <button type="button" onClick={() => { setDraft(value || ''); setEditing(true); }} className="shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] uppercase text-primary">
             EDITAR
           </button>
@@ -398,7 +411,7 @@ export default function NegocioSettings({ user }) {
         <div className="absolute bottom-1/4 -right-20 h-96 w-96 rounded-full bg-primary/5 blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
-      <div className="relative z-10 mx-auto mb-6 flex h-20 w-20 items-center justify-center overflow-hidden rounded-custom border border-gray-800 bg-dark-100">
+      <div className="relative z-10 mx-auto mb-6 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-gray-800 bg-dark-100">
         {negocioLogoUrl ? (
           <img src={negocioLogoUrl} alt={negocio.nome || 'Logo'} className="h-full w-full object-cover" />
         ) : (
@@ -413,7 +426,7 @@ export default function NegocioSettings({ user }) {
             VOLTAR
           </button>
           <span className="text-[14px] font-normal text-white">Info do negócio</span>
-          <Link to={`/v/${negocio.slug}`} target="_blank" className="inline-flex items-center rounded-full border border-primary/30 px-3 py-1 text-[12px] uppercase text-primary hover:border-primary">
+          <Link to={`/v/${negocio.slug}`} target="_blank" className="inline-flex items-center rounded-full border border-gray-700 px-3 py-1 text-[12px] uppercase text-gray-400 hover:border-primary hover:text-primary">
             VITRINE
           </Link>
         </div>
@@ -429,7 +442,7 @@ export default function NegocioSettings({ user }) {
         <SettingRow label="Facebook" value={negocio.facebook || ''} onSave={(value) => updateNegocio('facebook', String(value || '').trim() || null)} />
 
         <GroupLabel>Aparência</GroupLabel>
-        <div className="flex items-start gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
+        <div className="flex items-start gap-3 px-4 py-3 sm:px-6">
           <span className="w-[74px] shrink-0 pt-1 text-[14px] text-gray-500">Tema</span>
           <div className="min-w-0 flex-1">
             <TemaToggle value={negocio.tema || 'dark'} onChange={salvarTema} loading={temaSaving} />
@@ -505,7 +518,7 @@ export default function NegocioSettings({ user }) {
         <PasswordRow onSave={salvarSenha} />
 
         <GroupLabel>Zona de perigo</GroupLabel>
-        <div className="flex items-start gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
+        <div className="flex items-start gap-3 px-4 py-3 sm:px-6">
           <span className="w-[74px] shrink-0 pt-0.5 text-[14px] text-gray-500">Negócio</span>
           <span className="min-w-0 flex-1 text-[14px] leading-5 text-red-400">Excluir permanentemente</span>
           <button type="button" onClick={excluirNegocio} disabled={deletingBusiness} className="shrink-0 rounded-full border border-red-500/30 px-3 py-1 text-[12px] uppercase text-red-400 disabled:opacity-50">
