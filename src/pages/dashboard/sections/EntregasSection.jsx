@@ -41,11 +41,11 @@ export default function EntregasSection({
                       return (
                         <div key={s.id} className="bg-dark-100 border border-gray-800 rounded-custom p-5">
                           <div className="flex justify-between items-start mb-3">
-                            {promo != null && promo > 0 && promo < preco ? (<div><div className="text-xl font-normal text-green-400">R$ {promo.toFixed(2)}</div><div className="text-xs font-normal text-red-400 line-through">R$ {preco.toFixed(2)}</div></div>) : (<div className="text-xl font-normal text-primary">R$ {preco.toFixed(2)}</div>)}
-                            <span className="text-xs text-gray-500">{s.duracao_minutos} MIN</span>
+                            {promo != null && promo > 0 && promo < preco ? (<div className="text-xl font-normal text-green-400">R$ {promo.toFixed(2)}</div>) : (<div className="text-xl font-normal text-primary">R$ {preco.toFixed(2)}</div>)}
+                            <span className="inline-flex items-center rounded-full border border-gray-700 bg-transparent px-3 py-1 text-xs text-gray-500">{s.duracao_minutos} MIN</span>
                           </div>
                           <h3 className="text-sm font-normal text-white mb-0.5">{s.nome}</h3>
-                          <p className="text-xs text-gray-500 mb-4">PROF: {p.nome}</p>
+                          <p className="text-xs text-gray-500 mb-4">{p.nome}</p>
                           <div className="flex gap-2">
                             <button onClick={async () => {
                               if (!await checarPermissao(s.profissional_id)) return;
