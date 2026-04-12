@@ -46,7 +46,7 @@ export default function EntregaModal({
         </div>
 
         <form onSubmit={onSubmit}>
-          <ServiceFieldRow label="Profissional">
+          <ServiceFieldRow label="PROFISSIONAL">
             <ProfissionalSelect
               value={formEntrega.profissional_id}
               onChange={(id) => setFormEntrega({ ...formEntrega, profissional_id: id })}
@@ -57,7 +57,7 @@ export default function EntregaModal({
             />
           </ServiceFieldRow>
 
-          <ServiceFieldRow label="Nome">
+          <ServiceFieldRow label="NOME">
             <input
               type="text"
               value={formEntrega.nome}
@@ -68,7 +68,7 @@ export default function EntregaModal({
             />
           </ServiceFieldRow>
 
-          <ServiceFieldRow label="Duracao">
+          <ServiceFieldRow label="TEMPO EM MIN">
             <input
               type="number"
               value={formEntrega.duracao_minutos}
@@ -79,7 +79,7 @@ export default function EntregaModal({
             />
           </ServiceFieldRow>
 
-          <ServiceFieldRow label="Preco">
+          <ServiceFieldRow label="VALOR">
             <input
               type="number"
               step="0.01"
@@ -90,8 +90,6 @@ export default function EntregaModal({
               required
             />
           </ServiceFieldRow>
-
-          <ServiceFieldRow label="Oferta" hint="O preco de oferta deve ser menor que o preco normal." last>
             <input
               type="number"
               step="0.01"
@@ -107,7 +105,7 @@ export default function EntregaModal({
               type="button"
               onClick={onClose}
               disabled={submittingEntrega}
-              className="flex-1 rounded-button border border-red-500/30 py-3 text-[12px] uppercase text-red-400 disabled:opacity-50"
+              className="flex-1 rounded-button border border-red-500/30 py-3 text-[12px] font-normal uppercase text-red-400 disabled:opacity-50"
             >
               CANCELAR
             </button>
