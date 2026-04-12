@@ -5,7 +5,7 @@ import ProfissionalSelect from '../../../components/ProfissionalSelect';
 function ServiceFieldRow({ label, children, hint, last = false }) {
   return (
     <div className={`flex items-start gap-3 px-8 py-3 ${last ? '' : 'border-b border-gray-800'}`}>
-      <span className="w-[86px] shrink-0 pt-2 text-[13px] text-gray-500">{label}</span>
+      <span className="w-[86px] shrink-0 py-2 text-[13px] leading-5 text-gray-500">{label}</span>
       <div className="min-w-0 flex-1">
         {children}
         {hint ? <p className="mt-1 text-[11px] text-gray-500">{hint}</p> : null}
@@ -53,7 +53,7 @@ export default function EntregaModal({
               profissionais={profissionaisDisponiveis}
               placeholder="SELECIONE"
               apenasAtivos={true}
-              buttonClassName="w-full flex items-center gap-3 bg-transparent px-0 py-1 text-sm font-normal transition-colors focus:outline-none"
+              buttonClassName="w-full flex items-center gap-3 bg-transparent px-0 py-2 text-sm font-normal transition-colors focus:outline-none"
             />
           </ServiceFieldRow>
 
@@ -63,7 +63,6 @@ export default function EntregaModal({
               value={formEntrega.nome}
               onChange={(e) => setFormEntrega({ ...formEntrega, nome: e.target.value })}
               className={serviceInputClass}
-              placeholder=""
               required
             />
           </ServiceFieldRow>
@@ -74,7 +73,6 @@ export default function EntregaModal({
               value={formEntrega.duracao_minutos}
               onChange={(e) => setFormEntrega({ ...formEntrega, duracao_minutos: e.target.value })}
               className={serviceInputClass}
-              placeholder=""
               required
             />
           </ServiceFieldRow>
@@ -86,7 +84,6 @@ export default function EntregaModal({
               value={formEntrega.preco}
               onChange={(e) => setFormEntrega({ ...formEntrega, preco: e.target.value })}
               className={serviceInputClass}
-              placeholder=""
               required
             />
           </ServiceFieldRow>
@@ -106,7 +103,7 @@ export default function EntregaModal({
               type="button"
               onClick={onClose}
               disabled={submittingEntrega}
-              className="flex-1 rounded-button border border-red-500/30 py-3 text-[12px] uppercase text-red-400 disabled:opacity-50"
+              className="flex-1 rounded-button border border-red-500/30 py-3 text-[12px] font-normal uppercase text-red-400 disabled:opacity-50"
             >
               CANCELAR
             </button>
