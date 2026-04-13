@@ -580,7 +580,7 @@ export default function ClientArea({ user, onLogout }) {
             {activeTab === 'dados' && (
               <>
                 <div className="flex items-start gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
-                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">Nome</span>
+                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">NOME</span>
                   <div className="min-w-0 flex-1">
                     <input
                       type="text"
