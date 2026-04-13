@@ -101,16 +101,16 @@ export default function InfoNegocioSection({
         <TemaToggle value={formInfo.tema} onChange={salvarTema} loading={temaSaving} />
       </InfoRow>
 
-      <InfoRow label="Negócio" action={businessSaveAction}>
+      <InfoRow label="NEGÓCIO" action={businessSaveAction}>
         <input
           value={formInfo.nome}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, nome: e.target.value }))}
-          className={`${inputClass} truncate pr-6 sm:pr-0`}
+          className={`${inputClass} truncate pr-10 sm:pr-0`}
           placeholder="Nome publico do negocio"
         />
       </InfoRow>
 
-      <InfoRow label="Telefone" action={businessSaveAction}>
+      <InfoRow label="TELEFONE" action={businessSaveAction}>
         <input
           value={formInfo.telefone}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, telefone: e.target.value }))}
@@ -119,7 +119,7 @@ export default function InfoNegocioSection({
         />
       </InfoRow>
 
-      <InfoRow label="Endere." action={businessSaveAction}>
+      <InfoRow label="ENDERE." action={businessSaveAction}>
         <input
           value={formInfo.endereco}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, endereco: e.target.value }))}
@@ -130,7 +130,7 @@ export default function InfoNegocioSection({
 
       <div className="border-b border-gray-800 px-4 py-3 sm:px-6">
         <div className="mb-2 flex items-center justify-between gap-3">
-          <span className="text-[14px] leading-5 text-gray-500">Sobre</span>
+          <span className="text-[14px] leading-5 text-gray-500">SOBRE</span>
           {businessSaveAction}
         </div>
         <textarea
@@ -142,7 +142,7 @@ export default function InfoNegocioSection({
         />
       </div>
 
-      <InfoRow label="Instagram" action={businessSaveAction}>
+      <InfoRow label="INSTAGRAM" action={businessSaveAction}>
         <input
           value={formInfo.instagram}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, instagram: e.target.value }))}
@@ -151,7 +151,7 @@ export default function InfoNegocioSection({
         />
       </InfoRow>
 
-      <InfoRow label="Facebook" action={businessSaveAction}>
+      <InfoRow label="FACEBOOK" action={businessSaveAction}>
         <input
           value={formInfo.facebook}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, facebook: e.target.value }))}
