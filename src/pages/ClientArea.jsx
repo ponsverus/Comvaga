@@ -627,7 +627,7 @@ export default function ClientArea({ user, onLogout }) {
                       onClick={() => setEmailVisivel(true)}
                       className="shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] font-normal uppercase text-primary disabled:opacity-50"
                     >
-                      VER
+                      VER E-MAIL
                     </button>
                   )}
                 </div>
