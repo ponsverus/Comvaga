@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Calendar, History, LogOut, X, Save } from 'lucide-react';
+import { Calendar, History, LogOut, X } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { convertImageToWebp, isImageFile } from '../utils/media';
@@ -570,46 +570,75 @@ export default function ClientArea({ user, onLogout }) {
             )}
 
             {activeTab === 'dados' && (
-              <div className="space-y-6">
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-5">
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <div className="text-xs text-gray-500">PERFIL</div>
-                    <button
-                      type="button"
-                      onClick={salvarNome}
-                      disabled={savingPerfil}
-                      className={`px-4 py-2 rounded-button font-normal border flex items-center gap-2 uppercase ${
-                        savingPerfil ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'
-                      }`}
-                    >
-                      <Save className="w-4 h-4" />
-                      {savingPerfil ? 'SALVANDO...' : 'SALVAR'}
-                    </button>
+              <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-200">
+                <div className="flex items-start gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
+                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">Nome</span>
+                  <div className="min-w-0 flex-1">
+                    <input
+                      type="text"
+                      value={nomePerfil}
+                      onChange={(e) => setNomePerfil(e.target.value)}
+                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
+                      placeholder="Nome do perfil"
+                    />
                   </div>
-                  <label className="block text-sm mb-2">NOME</label>
-                  <input type="text" value={nomePerfil} onChange={(e) => setNomePerfil(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" />
+                  <button
+                    type="button"
+                    onClick={salvarNome}
+                    disabled={savingPerfil}
+                    className="shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] font-normal uppercase text-primary disabled:opacity-50"
+                  >
+                    {savingPerfil ? 'SALVANDO' : 'SALVAR'}
+                  </button>
                 </div>
 
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-5">
-                  <div className="text-xs text-gray-500 mb-4">CREDENCIAIS</div>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm mb-2">EMAIL</label>
-                      <input type="email" value={novoEmail} onChange={(e) => setNovoEmail(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" />
-                      <button type="button" disabled={savingDados} onClick={salvarEmail} className="mt-3 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-                        SALVAR NOVO EMAIL
-                      </button>
-                    </div>
-                    <div>
-                      <label className="block text-sm mb-2">NOVA SENHA</label>
-                      <input type="password" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="••••••••" />
-                      <label className="block text-sm mb-2 mt-3">CONFIRMAR NOVA SENHA</label>
-                      <input type="password" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} className="w-full px-4 py-3 bg-dark-100 border border-gray-800 rounded-custom text-white" placeholder="••••••••" />
-                      <button type="button" disabled={savingDados} onClick={salvarSenha} className="mt-3 w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 rounded-button text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-                        SALVAR NOVA SENHA
-                      </button>
-                    </div>
+                <div className="flex items-start gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
+                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">E-mail</span>
+                  <div className="min-w-0 flex-1">
+                    <input
+                      type="email"
+                      value={novoEmail}
+                      onChange={(e) => setNovoEmail(e.target.value)}
+                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
+                      placeholder="E-mail de acesso"
+                    />
                   </div>
+                  <button
+                    type="button"
+                    disabled={savingDados}
+                    onClick={salvarEmail}
+                    className="shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] font-normal uppercase text-primary disabled:opacity-50"
+                  >
+                    {savingDados ? 'SALVANDO' : 'SALVAR'}
+                  </button>
+                </div>
+
+                <div className="flex items-start gap-3 px-4 py-3 sm:px-6">
+                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">Senha</span>
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <input
+                      type="password"
+                      value={novaSenha}
+                      onChange={(e) => setNovaSenha(e.target.value)}
+                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
+                      placeholder="Nova senha"
+                    />
+                    <input
+                      type="password"
+                      value={confirmarSenha}
+                      onChange={(e) => setConfirmarSenha(e.target.value)}
+                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
+                      placeholder="Confirmar nova senha"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    disabled={savingDados}
+                    onClick={salvarSenha}
+                    className="shrink-0 rounded-full border border-green-500/40 px-3 py-1 text-[12px] font-normal uppercase text-green-300 disabled:opacity-50"
+                  >
+                    {savingDados ? 'SALVANDO' : 'SALVAR'}
+                  </button>
                 </div>
               </div>
             )}
