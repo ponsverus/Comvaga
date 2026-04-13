@@ -15,6 +15,7 @@ function InfoRow({ label, children, action, last = false }) {
 const inputClass = 'w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white';
 const pillInputClass = 'w-full rounded-full border border-gray-800 bg-transparent px-4 py-2 text-center text-[14px] text-white placeholder-gray-600 outline-none focus:border-primary/50 focus:text-white';
 const saveButtonClass = 'shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] font-normal uppercase text-primary disabled:opacity-50';
+const maskedPrivateValue = '••••••••';
 
 export default function InfoNegocioSection({
   salvarInfoNegocio,
@@ -47,6 +48,8 @@ export default function InfoNegocioSection({
     facebook: false,
     email: false,
   });
+  const [savingBusinessField, setSavingBusinessField] = useState(null);
+  const [savingAccountField, setSavingAccountField] = useState(null);
   const swipeStartRef = useRef(null);
 
   useEffect(() => {
@@ -95,26 +98,45 @@ export default function InfoNegocioSection({
     setVisiblePrivateFields((current) => ({ ...current, [field]: false }));
   };
 
-  const saveBusinessPrivateField = async (field) => {
-    await Promise.resolve(salvarInfoNegocio());
-    hidePrivateField(field);
+  const saveBusinessField = async (field) => {
+    try {
+      setSavingBusinessField(field);
+      await Promise.resolve(salvarInfoNegocio());
+      if (field === 'instagram' || field === 'facebook') hidePrivateField(field);
+    } finally {
+      setSavingBusinessField(null);
+    }
   };
 
   const saveEmailPrivateField = async () => {
-    await Promise.resolve(salvarEmail());
-    hidePrivateField('email');
+    try {
+      setSavingAccountField('email');
+      await Promise.resolve(salvarEmail());
+      hidePrivateField('email');
+    } finally {
+      setSavingAccountField(null);
+    }
   };
 
-  const businessSaveAction = (
-    <button type="button" onClick={salvarInfoNegocio} disabled={infoSaving} className={saveButtonClass}>
-      {infoSaving ? 'SALVANDO' : 'SALVAR'}
+  const savePasswordField = async () => {
+    try {
+      setSavingAccountField('password');
+      await Promise.resolve(salvarSenha());
+    } finally {
+      setSavingAccountField(null);
+    }
+  };
+
+  const businessSaveAction = (field) => (
+    <button type="button" onClick={() => saveBusinessField(field)} disabled={infoSaving} className={saveButtonClass}>
+      {savingBusinessField === field ? 'SALVANDO' : 'SALVAR'}
     </button>
   );
 
   const privateBusinessAction = (field) => (
     visiblePrivateFields[field] ? (
-      <button type="button" onClick={() => saveBusinessPrivateField(field)} disabled={infoSaving} className={saveButtonClass}>
-        {infoSaving ? 'SALVANDO' : 'SALVAR'}
+      <button type="button" onClick={() => saveBusinessField(field)} disabled={infoSaving} className={saveButtonClass}>
+        {savingBusinessField === field ? 'SALVANDO' : 'SALVAR'}
       </button>
     ) : (
       <button type="button" onClick={() => revealPrivateField(field)} className={saveButtonClass}>
@@ -126,7 +148,7 @@ export default function InfoNegocioSection({
   const privateEmailAction = (
     visiblePrivateFields.email ? (
       <button type="button" disabled={savingDados} onClick={saveEmailPrivateField} className={saveButtonClass}>
-        {savingDados ? 'SALVANDO' : 'SALVAR'}
+        {savingAccountField === 'email' ? 'SALVANDO' : 'SALVAR'}
       </button>
     ) : (
       <button type="button" onClick={() => revealPrivateField('email')} className={saveButtonClass}>
@@ -148,7 +170,7 @@ export default function InfoNegocioSection({
         <TemaToggle value={formInfo.tema} onChange={salvarTema} loading={temaSaving} />
       </InfoRow>
 
-      <InfoRow label="NEGÓCIO" action={businessSaveAction}>
+      <InfoRow label="NEGÓCIO" action={businessSaveAction('nome')}>
         <input
           value={formInfo.nome}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, nome: e.target.value }))}
@@ -157,7 +179,7 @@ export default function InfoNegocioSection({
         />
       </InfoRow>
 
-      <InfoRow label="TELEFONE" action={businessSaveAction}>
+      <InfoRow label="TELEFONE" action={businessSaveAction('telefone')}>
         <input
           value={formInfo.telefone}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, telefone: e.target.value }))}
@@ -166,11 +188,11 @@ export default function InfoNegocioSection({
         />
       </InfoRow>
 
-      <InfoRow label="ENDERE." action={businessSaveAction}>
+      <InfoRow label="ENDERE." action={businessSaveAction('endereco')}>
         <input
           value={formInfo.endereco}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, endereco: e.target.value }))}
-          className={`${inputClass} w-[calc(100%-5.5rem)] truncate sm:w-full`}
+          className={`${inputClass} w-[calc(100%-2.5rem)] truncate sm:w-full`}
           placeholder="Rua, número - cidade, estado"
         />
       </InfoRow>
@@ -178,7 +200,7 @@ export default function InfoNegocioSection({
       <div className="border-b border-gray-800 px-4 py-3 sm:px-6">
         <div className="mb-2 flex items-center justify-between gap-3">
           <span className="text-[14px] leading-5 text-gray-500">SOBRE</span>
-          {businessSaveAction}
+          {businessSaveAction('descricao')}
         </div>
         <textarea
           value={formInfo.descricao}
@@ -191,8 +213,8 @@ export default function InfoNegocioSection({
 
       <InfoRow label="INSTAGRAM" action={privateBusinessAction('instagram')}>
         <input
-          type={visiblePrivateFields.instagram ? 'text' : 'password'}
-          value={formInfo.instagram}
+          type="text"
+          value={visiblePrivateFields.instagram ? formInfo.instagram : maskedPrivateValue}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, instagram: e.target.value }))}
           readOnly={!visiblePrivateFields.instagram}
           className={inputClass}
@@ -202,8 +224,8 @@ export default function InfoNegocioSection({
 
       <InfoRow label="FACEBOOK" action={privateBusinessAction('facebook')}>
         <input
-          type={visiblePrivateFields.facebook ? 'text' : 'password'}
-          value={formInfo.facebook}
+          type="text"
+          value={visiblePrivateFields.facebook ? formInfo.facebook : maskedPrivateValue}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, facebook: e.target.value }))}
           readOnly={!visiblePrivateFields.facebook}
           className={inputClass}
@@ -300,8 +322,8 @@ export default function InfoNegocioSection({
         action={privateEmailAction}
       >
         <input
-          type={visiblePrivateFields.email ? 'email' : 'password'}
-          value={novoEmail}
+          type={visiblePrivateFields.email ? 'email' : 'text'}
+          value={visiblePrivateFields.email ? novoEmail : maskedPrivateValue}
           onChange={(e) => setNovoEmail(e.target.value)}
           readOnly={!visiblePrivateFields.email}
           className={inputClass}
@@ -311,8 +333,8 @@ export default function InfoNegocioSection({
       <InfoRow
         label="SENHA"
         action={(
-          <button type="button" disabled={savingDados} onClick={salvarSenha} className="shrink-0 rounded-full border border-green-500/40 px-3 py-1 text-[12px] font-normal uppercase text-green-300 disabled:opacity-50">
-            {savingDados ? 'SALVANDO' : 'SALVAR'}
+          <button type="button" disabled={savingDados} onClick={savePasswordField} className="shrink-0 rounded-full border border-green-500/40 px-3 py-1 text-[12px] font-normal uppercase text-green-300 disabled:opacity-50">
+            {savingAccountField === 'password' ? 'SALVANDO' : 'SALVAR'}
           </button>
         )}
       >
