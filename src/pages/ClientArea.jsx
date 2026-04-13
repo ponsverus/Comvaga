@@ -509,7 +509,7 @@ export default function ClientArea({ user, onLogout }) {
             ))}
           </div>
 
-          <div className="p-4 sm:p-6">
+          <div className={activeTab === 'dados' ? '' : 'p-4 sm:p-6'}>
 
             {activeTab === 'agendamentos' && (
               <div>
@@ -570,7 +570,7 @@ export default function ClientArea({ user, onLogout }) {
             )}
 
             {activeTab === 'dados' && (
-              <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-200">
+              <>
                 <div className="flex items-start gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
                   <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">Nome</span>
                   <div className="min-w-0 flex-1">
@@ -620,14 +620,14 @@ export default function ClientArea({ user, onLogout }) {
                       type="password"
                       value={novaSenha}
                       onChange={(e) => setNovaSenha(e.target.value)}
-                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
+                      className="w-full rounded-full border border-gray-800 bg-transparent px-4 py-2 text-center text-[14px] text-white placeholder-gray-600 outline-none focus:border-primary/50 focus:text-white"
                       placeholder="Nova senha"
                     />
                     <input
                       type="password"
                       value={confirmarSenha}
                       onChange={(e) => setConfirmarSenha(e.target.value)}
-                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
+                      className="w-full rounded-full border border-gray-800 bg-transparent px-4 py-2 text-center text-[14px] text-white placeholder-gray-600 outline-none focus:border-primary/50 focus:text-white"
                       placeholder="Confirmar nova senha"
                     />
                   </div>
@@ -640,7 +640,7 @@ export default function ClientArea({ user, onLogout }) {
                     {savingDados ? 'SALVANDO' : 'SALVAR'}
                   </button>
                 </div>
-              </div>
+              </>
             )}
 
           </div>
