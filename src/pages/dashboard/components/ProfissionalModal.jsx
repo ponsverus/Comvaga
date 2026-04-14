@@ -56,13 +56,13 @@ export default function ProfissionalModal({
             />
           </ProfessionalFieldRow>
 
-          <ProfessionalFieldRow label="PROFI.">
+          <ProfessionalFieldRow label="FUNCAO">
             <input
               type="text"
               value={formProfissional.profissao}
               onChange={(e) => setFormProfissional({ ...formProfissional, profissao: toUpperClean(e.target.value) })}
               className={professionalInputClass}
-              placeholder="EX: BARBEIRO, MANICURE"
+              placeholder="EX: BARBEIRO"
             />
           </ProfessionalFieldRow>
 
@@ -72,20 +72,20 @@ export default function ProfissionalModal({
               value={formProfissional.anos_experiencia}
               onChange={(e) => setFormProfissional({ ...formProfissional, anos_experiencia: e.target.value })}
               className={professionalInputClass}
-              placeholder="ANOS DE EXPERIÊNCIA"
+              placeholder="Anos de experiencia"
             />
           </ProfessionalFieldRow>
 
-          <ProfessionalFieldRow label="HORÁRIO">
+          <ProfessionalFieldRow label="HORARIO">
             <div className="grid grid-cols-2 gap-4">
-              <TimeCell label="ABRE">
+              <TimeCell label="DAS">
                 <TimePicker
                   value={formProfissional.horario_inicio}
                   onChange={(v) => setFormProfissional({ ...formProfissional, horario_inicio: v })}
                   triggerClassName={timePickerClass}
                 />
               </TimeCell>
-              <TimeCell label="FECHA">
+              <TimeCell label="ATE">
                 <TimePicker
                   value={formProfissional.horario_fim}
                   onChange={(v) => setFormProfissional({ ...formProfissional, horario_fim: v })}
@@ -95,9 +95,9 @@ export default function ProfissionalModal({
             </div>
           </ProfessionalFieldRow>
 
-          <ProfessionalFieldRow label="PAUSA">
+          <ProfessionalFieldRow label="ALMOCO">
             <div className="grid grid-cols-2 gap-4">
-              <TimeCell label="INÍCIO">
+              <TimeCell label="INICIO">
                 <TimePicker
                   value={formProfissional.almoco_inicio}
                   onChange={(v) => setFormProfissional({ ...formProfissional, almoco_inicio: v })}
@@ -146,7 +146,7 @@ export default function ProfissionalModal({
             <button
               type="submit"
               disabled={submittingProfissional}
-              className={`flex-1 rounded-button bg-gradient-to-r from-primary to-yellow-600 py-3 font-normal uppercase text-black ${submittingProfissional ? 'cursor-not-allowed opacity-60' : ''}`}
+              className={`flex-1 rounded-button border border-primary/30 py-3 text-[12px] font-normal uppercase text-primary hover:border-primary ${submittingProfissional ? 'cursor-not-allowed opacity-60' : ''}`}
             >
               {submittingProfissional ? 'SALVANDO...' : 'SALVAR'}
             </button>
