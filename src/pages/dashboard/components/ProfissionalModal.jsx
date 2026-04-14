@@ -56,13 +56,13 @@ export default function ProfissionalModal({
             />
           </ProfessionalFieldRow>
 
-          <ProfessionalFieldRow label="FUNCAO">
+          <ProfessionalFieldRow label="PROFISS.">
             <input
               type="text"
               value={formProfissional.profissao}
               onChange={(e) => setFormProfissional({ ...formProfissional, profissao: toUpperClean(e.target.value) })}
               className={professionalInputClass}
-              placeholder="EX: BARBEIRO"
+              placeholder="EX: BARBEIRO, MANICURE..."
             />
           </ProfessionalFieldRow>
 
@@ -73,19 +73,20 @@ export default function ProfissionalModal({
               onChange={(e) => setFormProfissional({ ...formProfissional, anos_experiencia: e.target.value })}
               className={professionalInputClass}
               placeholder="Anos de experiencia"
+              placeholder="ANOS DE EXPERIÊNCIA"
             />
           </ProfessionalFieldRow>
 
-          <ProfessionalFieldRow label="HORARIO">
+          <ProfessionalFieldRow label="HORÁRIO">
             <div className="grid grid-cols-2 gap-4">
-              <TimeCell label="DAS">
+              <TimeCell label="ABRE">
                 <TimePicker
                   value={formProfissional.horario_inicio}
                   onChange={(v) => setFormProfissional({ ...formProfissional, horario_inicio: v })}
                   triggerClassName={timePickerClass}
                 />
               </TimeCell>
-              <TimeCell label="ATE">
+              <TimeCell label="FECHA">
                 <TimePicker
                   value={formProfissional.horario_fim}
                   onChange={(v) => setFormProfissional({ ...formProfissional, horario_fim: v })}
@@ -95,9 +96,9 @@ export default function ProfissionalModal({
             </div>
           </ProfessionalFieldRow>
 
-          <ProfessionalFieldRow label="ALMOCO">
+          <ProfessionalFieldRow label="PAUSA">
             <div className="grid grid-cols-2 gap-4">
-              <TimeCell label="INICIO">
+              <TimeCell label="INÍCIO">
                 <TimePicker
                   value={formProfissional.almoco_inicio}
                   onChange={(v) => setFormProfissional({ ...formProfissional, almoco_inicio: v })}
