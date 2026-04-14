@@ -9,6 +9,9 @@ export default function BookingConfirmedModal({
   formatDateBR,
   onClose,
   navigate,
+  assistedBooking = false,
+  assistedReturnTo = '/dashboard',
+  negocioId = null,
 }) {
   if (!open) return null;
 
@@ -22,23 +25,38 @@ export default function BookingConfirmedModal({
             {booking.lastSlot?.label && <span className={`font-normal ${styles.hora}`}>{booking.lastSlot.label}</span>}
             {booking.lastSlot?.dataISO && <span className={styles.data}> - {formatDateBR(booking.lastSlot.dataISO)}</span>}
           </p>
-          <div className={`rounded-custom border p-4 text-left mb-6 ${styles.box}`}>
-            <p className={`font-normal text-sm mb-3 ${styles.sub}`}>Crie um lembrete no seu celular para assegurar o compromisso.</p>
-            <p className={`font-normal text-xs uppercase mb-4 ${styles.hint}`}>{calendarActionConfig.hint}</p>
-            <button type="button" onClick={calendarActionConfig.primaryAction} className={`w-full py-4 rounded-button uppercase font-normal transition-colors ${styles.actionBtn}`}>
-              {calendarActionConfig.primaryLabel}
-            </button>
-            {calendarActionConfig.secondaryAction && (
-              <button
-                type="button"
-                onClick={calendarActionConfig.secondaryAction}
-                className={`w-full py-3 rounded-button uppercase font-normal mt-3 transition-colors border ${styles.secondaryBtn}`}
-              >
-                {calendarActionConfig.secondaryLabel}
+          {!assistedBooking && (
+            <div className={`rounded-custom border p-4 text-left mb-6 ${styles.box}`}>
+              <p className={`font-normal text-sm mb-3 ${styles.sub}`}>Crie um lembrete no seu celular para assegurar o compromisso.</p>
+              <p className={`font-normal text-xs uppercase mb-4 ${styles.hint}`}>{calendarActionConfig.hint}</p>
+              <button type="button" onClick={calendarActionConfig.primaryAction} className={`w-full py-4 rounded-button uppercase font-normal transition-colors ${styles.actionBtn}`}>
+                {calendarActionConfig.primaryLabel}
               </button>
-            )}
-          </div>
-          <button type="button" onClick={() => { onClose(); navigate('/minha-area'); }} className="w-full py-3 bg-transparent border border-red-500 text-red-500 rounded-button uppercase font-normal hover:bg-red-500/10 transition-colors">PREFIRO ESQUECER</button>
+              {calendarActionConfig.secondaryAction && (
+                <button
+                  type="button"
+                  onClick={calendarActionConfig.secondaryAction}
+                  className={`w-full py-3 rounded-button uppercase font-normal mt-3 transition-colors border ${styles.secondaryBtn}`}
+                >
+                  {calendarActionConfig.secondaryLabel}
+                </button>
+              )}
+            </div>
+          )}
+          {assistedBooking ? (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                navigate(assistedReturnTo, { state: { negocioId, activeTab: 'clientes' } });
+              }}
+              className="w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button uppercase font-normal transition-colors"
+            >
+              VOLTAR AO DASHBOARD
+            </button>
+          ) : (
+            <button type="button" onClick={() => { onClose(); navigate('/minha-area'); }} className="w-full py-3 bg-transparent border border-red-500 text-red-500 rounded-button uppercase font-normal hover:bg-red-500/10 transition-colors">PREFIRO ESQUECER</button>
+          )}
         </div>
       </div>
     </div>
