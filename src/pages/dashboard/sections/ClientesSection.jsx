@@ -53,10 +53,21 @@ export default function ClientesSection({
                     </div>
                   </div>
 
-                  <div className="border border-gray-800 rounded-button p-3 mb-4">
-                    <div className="text-xs text-gray-500 uppercase mb-2">Último agendamento</div>
-                    <div className="text-sm text-white truncate">
-                      {formatDateBRFromISO(cliente.ultimo_data)} · {cliente.ultimo_entrega_nome || 'Serviço'} · R$ {moneyBR(cliente.ultimo_valor)}
+                  <div className="mb-4">
+                    <div className="text-xs text-gray-500 uppercase mb-3">Último agendamento</div>
+                    <div className="grid grid-cols-3 gap-3 text-sm">
+                      <div className="min-w-0">
+                        <div className="text-xs text-gray-500 mb-1">DATA</div>
+                        <div className="text-white truncate">{formatDateBRFromISO(cliente.ultimo_data)}</div>
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs text-gray-500 mb-1">SERVIÇO</div>
+                        <div className="text-white truncate">{cliente.ultimo_entrega_nome || 'Serviço'}</div>
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs text-gray-500 mb-1">VALOR</div>
+                        <div className="text-white truncate">R$ {moneyBR(cliente.ultimo_valor)}</div>
+                      </div>
                     </div>
                   </div>
 
