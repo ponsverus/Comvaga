@@ -416,12 +416,12 @@ export default function ClientArea({ user, onLogout }) {
     cancelado_profissional: 'CANCELADO',
   }[status] || String(status || '').toUpperCase());
 
-  const sortByDateThenTime = (list) =>
+  const sortByDateThenTimeDesc = (list) =>
     [...(list || [])].sort((a, b) => {
       const da = String(a?.data || '');
       const db = String(b?.data || '');
-      if (da !== db) return da.localeCompare(db);
-      return String(a?.hora_inicio || '99:99').localeCompare(String(b?.hora_inicio || '99:99'));
+      if (da !== db) return db.localeCompare(da);
+      return String(b?.hora_inicio || '00:00').localeCompare(String(a?.hora_inicio || '00:00'));
     });
 
   const agendamentosPorStatus = useMemo(() => {
@@ -433,9 +433,9 @@ export default function ClientArea({ user, onLogout }) {
       else                               abertos.push(a);
     }
     return {
-      abertos:    sortByDateThenTime(abertos),
-      cancelados: sortByDateThenTime(cancelados),
-      concluidos: sortByDateThenTime(concluidos),
+      abertos:    sortByDateThenTimeDesc(abertos),
+      cancelados: sortByDateThenTimeDesc(cancelados),
+      concluidos: sortByDateThenTimeDesc(concluidos),
     };
   }, [agendamentos]);
 
@@ -596,8 +596,8 @@ export default function ClientArea({ user, onLogout }) {
                 {(agendamentosPorStatus.abertos.length || agendamentosPorStatus.cancelados.length || agendamentosPorStatus.concluidos.length) ? (
                   <>
                     {renderSecaoAgendamentos('EM ABERTO',  agendamentosPorStatus.abertos)}
-                    {renderSecaoAgendamentos('CANCELADOS', agendamentosPorStatus.cancelados)}
                     {renderSecaoAgendamentos('CONCLUÍDOS', agendamentosPorStatus.concluidos)}
+                    {renderSecaoAgendamentos('CANCELADOS', agendamentosPorStatus.cancelados)}
                   </>
                 ) : (
                   <div className="text-center py-12">
@@ -612,7 +612,7 @@ export default function ClientArea({ user, onLogout }) {
                     type="button"
                     onClick={carregarMaisAgendamentos}
                     disabled={agendamentosLoadingMore}
-                    className="mt-2 w-full py-3 bg-dark-200 border border-gray-800 hover:border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="mt-2 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {agendamentosLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
                   </button>
@@ -661,7 +661,7 @@ export default function ClientArea({ user, onLogout }) {
                     type="button"
                     onClick={carregarMaisFavoritos}
                     disabled={favoritosLoadingMore}
-                    className="mt-4 w-full py-3 bg-dark-200 border border-gray-800 hover:border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="mt-4 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {favoritosLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
                   </button>
@@ -672,7 +672,7 @@ export default function ClientArea({ user, onLogout }) {
             {activeTab === 'dados' && (
               <>
                 <div className="flex items-start gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
-                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">NOME</span>
+                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">Nome</span>
                   <div className="min-w-0 flex-1">
                     <input
                       type="text"
@@ -693,7 +693,7 @@ export default function ClientArea({ user, onLogout }) {
                 </div>
 
                 <div className="flex items-start gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
-                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">E-MAIL</span>
+                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">E-mail</span>
                   <div className="min-w-0 flex-1">
                     <input
                       type={emailVisivel ? 'email' : 'text'}
@@ -719,27 +719,27 @@ export default function ClientArea({ user, onLogout }) {
                       onClick={() => setEmailVisivel(true)}
                       className="shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] font-normal uppercase text-primary disabled:opacity-50"
                     >
-                      VER E-MAIL
+                      VER
                     </button>
                   )}
                 </div>
 
                 <div className="flex items-start gap-3 px-4 py-3 sm:px-6">
-                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">SENHA</span>
+                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">Senha</span>
                   <div className="min-w-0 flex-1 space-y-2">
                     <input
                       type="password"
                       value={novaSenha}
                       onChange={(e) => setNovaSenha(e.target.value)}
                       className="w-full rounded-full border border-gray-800 bg-transparent px-4 py-2 text-center text-[14px] text-white placeholder-gray-600 outline-none focus:border-primary/50 focus:text-white"
-                      placeholder="NOVA SENHA"
+                      placeholder="Nova senha"
                     />
                     <input
                       type="password"
                       value={confirmarSenha}
                       onChange={(e) => setConfirmarSenha(e.target.value)}
                       className="w-full rounded-full border border-gray-800 bg-transparent px-4 py-2 text-center text-[14px] text-white placeholder-gray-600 outline-none focus:border-primary/50 focus:text-white"
-                      placeholder="CONFIRMAR"
+                      placeholder="Confirmar nova senha"
                     />
                   </div>
                   <button
