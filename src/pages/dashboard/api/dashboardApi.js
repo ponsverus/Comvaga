@@ -180,6 +180,23 @@ export async function fetchAgendamentosNegocio({
   return (data || []).map(normalizeAgRow);
 }
 
+export async function fetchClientesDashboard({
+  negocioId,
+  limit = 50,
+  offset = 0,
+  search = null,
+}) {
+  const { data, error } = await supabase.rpc('get_clientes_dashboard', {
+    p_negocio_id: negocioId,
+    p_limit: limit,
+    p_offset: offset,
+    p_search: search,
+  });
+
+  if (error) throw error;
+  return data || [];
+}
+
 export async function fetchDashboardToday(negocioId, profissionalId = null) {
   const params = { p_negocio_id: negocioId };
   if (profissionalId) params.p_profissional_id = profissionalId;
