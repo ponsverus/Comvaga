@@ -179,13 +179,18 @@ export default function BookingCalendar({
       });
     } catch (e) {
       const msg     = String(e?.message || '').toLowerCase();
+      const expired = msg.includes('agendamento_horario_expirado')
+        || msg.includes('horario_expirado');
       const overlap = msg.includes('conflito')
         || msg.includes('almoco')
         || msg.includes('overlap')
         || msg.includes('sobrepos')
         || msg.includes('exclusion')
         || String(e?.code || '') === '23P01';
-      if (overlap) {
+      if (expired) {
+        setConfirmError('Esse horário expirou. Escolha outro.');
+        fetchSlots(selectedDay);
+      } else if (overlap) {
         setConfirmError('Alguém acabou de reservar esse horário. Escolha outro.');
         fetchSlots(selectedDay);
       } else {
