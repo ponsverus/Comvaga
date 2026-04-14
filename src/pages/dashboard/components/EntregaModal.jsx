@@ -64,6 +64,7 @@ export default function EntregaModal({
               onChange={(e) => setFormEntrega({ ...formEntrega, nome: e.target.value })}
               className={serviceInputClass}
               required
+              placeholder="EX: CORTE, BLINDAGEM"
             />
           </ServiceFieldRow>
 
@@ -74,6 +75,7 @@ export default function EntregaModal({
               onChange={(e) => setFormEntrega({ ...formEntrega, duracao_minutos: e.target.value })}
               className={serviceInputClass}
               required
+              placeholder="MINUTOS"
             />
           </ServiceFieldRow>
 
@@ -85,6 +87,7 @@ export default function EntregaModal({
               onChange={(e) => setFormEntrega({ ...formEntrega, preco: e.target.value })}
               className={serviceInputClass}
               required
+              placeholder="$"
             />
           </ServiceFieldRow>
 
@@ -95,6 +98,7 @@ export default function EntregaModal({
               value={formEntrega.preco_promocional}
               onChange={(e) => setFormEntrega({ ...formEntrega, preco_promocional: e.target.value })}
               className={serviceInputClass}
+              placeholder="OPCIONAL"
             />
           </ServiceFieldRow>
 
