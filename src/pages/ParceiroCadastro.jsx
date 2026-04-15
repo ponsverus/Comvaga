@@ -57,10 +57,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
 
       if (signupStatusErr) throw signupStatusErr;
       if (signupStatus?.status === 'negocio_not_found') return setAlerta(msgs.negocio_not_found);
-      if (signupStatus?.status === 'pendente') return setAlerta(msgs.already_pending);
-      if (signupStatus?.status === 'ativo') return setAlerta(msgs.already_active);
-      if (signupStatus?.status === 'inativo') return setAlerta(msgs.access_inactive);
-      if (signupStatus?.status === 'email_exists') return setAlerta(msgs.email_already_exists);
+      if (signupStatus?.status === 'unavailable') return setAlerta(msgs.access_unavailable);
       if (signupStatus?.status !== 'available' || !signupStatus?.negocio_id) {
         throw new Error(msgs.unexpected_error.body);
       }
@@ -78,7 +75,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
 
       if (signUpErr) {
         if (String(signUpErr.message || '').toLowerCase().includes('already')) {
-          return setAlerta(msgs.email_already_exists);
+          return setAlerta(msgs.access_unavailable);
         }
         throw signUpErr;
       }
@@ -113,9 +110,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
           p_email: emailClean,
         });
 
-        if (retryStatus?.status === 'pendente') return setAlerta(msgs.already_pending);
-        if (retryStatus?.status === 'ativo') return setAlerta(msgs.already_active);
-        if (retryStatus?.status === 'inativo') return setAlerta(msgs.access_inactive);
+        if (retryStatus?.status === 'unavailable') return setAlerta(msgs.access_unavailable);
 
         throw profErr;
       }
