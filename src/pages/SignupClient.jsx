@@ -113,7 +113,7 @@ export default function SignupClient({ onLogin }) {
             <p className="text-gray-500 text-base font-normal">CADASTRO DE <span className="text-blue-400">CLIENTE</span></p>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-3">
             <div className="overflow-hidden rounded-custom border border-gray-800/50 bg-dark-100/40 backdrop-blur-sm">
               <div className={fieldRowClass}>
               <label className={fieldLabelClass}>NOME</label>
