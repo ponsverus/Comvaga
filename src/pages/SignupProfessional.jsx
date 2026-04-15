@@ -294,14 +294,14 @@ export default function SignupProfessional({ onLogin }) {
 
         <form onSubmit={handleSignup} className="space-y-5">
           <div className="overflow-hidden rounded-custom border border-gray-800/50 bg-dark-100/40 backdrop-blur-sm">
-            <SignupFieldRow label="NOME:">
+            <SignupFieldRow label="NOME">
               <input
                 type="text"
                 value={formData.nome}
                 onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                 className={fieldInputClass}
                 required
-                placeholder="NOME COMPLETO"
+                placeholder="EX: JONAS CAMPOS"
               />
             </SignupFieldRow>
 
@@ -315,20 +315,20 @@ export default function SignupProfessional({ onLogin }) {
               />
             </SignupFieldRow>
 
-            <SignupFieldRow label="NOME COMPLETO">
+            <SignupFieldRow label="NOME">
               <input
                 type="text"
                 value={formData.nomeNegocio}
                 onChange={(e) => handleNegocioNameChange(e.target.value)}
                 className={fieldInputClass}
                 required
-                placeholder="EX: VIKINGS BARBER"
+                placeholder="NOME DO NEGÓCIO"
               />
             </SignupFieldRow>
 
             <SignupFieldRow label="SUA URL">
               <div className="flex min-w-0 items-center gap-2">
-                <span className="shrink-0 text-xs text-gray-600">comvaga.app/v/</span>
+                <span className="shrink-0 text-xs text-gray-600">COMVAGA.COM.BR/v/</span>
                 <input
                   type="text"
                   value={formData.urlNegocio}
