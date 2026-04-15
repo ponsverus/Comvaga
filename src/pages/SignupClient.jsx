@@ -78,7 +78,9 @@ export default function SignupClient({ onLogin }) {
     }
   };
 
-  const inputClass = 'w-full px-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-blue-500/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm';
+  const fieldRowClass = 'flex items-center gap-3 px-5 py-3 border-b border-gray-800/50';
+  const fieldLabelClass = 'w-[76px] shrink-0 text-xs text-gray-500 tracking-wide';
+  const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white';
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
@@ -112,50 +114,52 @@ export default function SignupClient({ onLogin }) {
           </div>
 
           <div className="space-y-5">
-            <div>
-              <label className="block text-sm text-gray-400 mb-2 tracking-wide">NOME</label>
+            <div className="overflow-hidden rounded-custom border border-gray-800/50 bg-dark-100/40 backdrop-blur-sm">
+              <div className={fieldRowClass}>
+              <label className={fieldLabelClass}>NOME</label>
               <input
                 type="text"
                 value={formData.nome}
                 onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                 placeholder="Seu nome completo"
-                className={inputClass}
+                className={fieldInputClass}
                 required
               />
             </div>
 
-            <div>
-              <label className="block text-sm text-gray-400 mb-2 tracking-wide">E-MAIL</label>
+              <div className={fieldRowClass}>
+              <label className={fieldLabelClass}>E-MAIL</label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="seu@email.com"
-                className={inputClass}
+                className={fieldInputClass}
                 required
               />
             </div>
 
-            <div>
-              <label className="block text-sm text-gray-400 mb-2 tracking-wide">SENHA</label>
-              <div className="relative">
+              <div className="flex items-center gap-3 px-5 py-3">
+              <label className={fieldLabelClass}>SENHA</label>
+              <div className="relative min-w-0 flex-1">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Mínimo 6 caracteres"
-                  className="w-full px-4 pr-12 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-blue-500/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm"
+                  className={`${fieldInputClass} pr-10`}
                   required
                   minLength={6}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 transition-colors"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+            </div>
             </div>
 
             <button
@@ -168,7 +172,7 @@ export default function SignupClient({ onLogin }) {
 
             <Link
               to="/login"
-              className="w-full rounded-button border border-blue-500/30 bg-transparent py-3 text-center text-sm font-normal uppercase tracking-wider text-blue-400 transition-all hover:border-blue-500/60 hover:text-blue-300"
+              className="flex w-full items-center justify-center rounded-full border border-blue-500/30 bg-transparent py-3 text-center text-sm font-normal uppercase tracking-wider text-blue-400 transition-all hover:border-blue-500/60 hover:text-blue-300"
             >
               FAZER LOGIN
             </Link>
