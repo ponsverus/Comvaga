@@ -140,46 +140,15 @@ export default function Home({ user, userType, onLogout }) {
       if (!cancelled) setBuscando(true);
 
       try {
-        const [{ data: profs, error: profErr }, { data: negs, error: negErr }] =
-          await Promise.all([
-            supabase
-              .from('profissionais')
-              .select('id, nome, profissao, cargo, negocios!negocio_id(nome, slug)')
-              .eq('status', 'ativo')
-              .ilike('nome', `%${term}%`)
-              .limit(5),
-            supabase
-              .from('negocios')
-              .select('id, nome, slug, tipo_negocio')
-              .ilike('nome', `%${term}%`)
-              .limit(5),
-          ]);
+        const { data, error } = await supabase.rpc('search_home', {
+          p_term: term,
+          p_limit: 10,
+        });
 
-        if (profErr) throw profErr;
-        if (negErr) throw negErr;
+        if (error) throw error;
         if (cancelled) return;
 
-        const resultadosProfs = (profs || [])
-          .filter((p) => p.negocios?.slug)
-          .map((p) => ({
-            tipo: 'profissional',
-            id: p.id,
-            nome: p.nome,
-            slug: p.negocios.slug,
-            subtitulo: p.profissao || p.cargo || p.negocios.nome || null,
-          }));
-
-        const resultadosNegs = (negs || [])
-          .filter((n) => n.slug)
-          .map((n) => ({
-            tipo: 'negocio',
-            id: n.id,
-            nome: n.nome,
-            slug: n.slug,
-            subtitulo: n.tipo_negocio || null,
-          }));
-
-        setResultadosBusca([...resultadosNegs, ...resultadosProfs]);
+        setResultadosBusca((data || []).filter((item) => item.slug));
       } catch (error) {
         if (cancelled) return;
         console.error('Erro na busca:', error);
