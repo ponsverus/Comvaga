@@ -41,7 +41,7 @@ export default function SignupChoice() {
 
         <div className="relative">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-normal mb-3 tracking-wide">QUEM É VOCÊ</h1>
+            <h1 className="text-4xl font-normal mb-3 tracking-wide">QUEM É VOCÊ?</h1>
           </div>
 
           <div className="grid grid-cols-2 gap-5">
