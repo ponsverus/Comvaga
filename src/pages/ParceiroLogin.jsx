@@ -21,6 +21,17 @@ function Alerta({ msg }) {
   );
 }
 
+function FieldRow({ label, children, last = false }) {
+  return (
+    <div className={`flex items-center gap-3 px-5 py-3 ${last ? '' : 'border-b border-gray-800'}`}>
+      <label className="w-[76px] shrink-0 text-sm tracking-wide text-gray-500">{label}</label>
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}
+
+const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white';
+
 export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: inRecoveryProp = false }) {
   const navigate = useNavigate();
 
@@ -117,8 +128,8 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
       if (suppressAuthRef) suppressAuthRef.current = false;
       onLogin(signInData.user, 'professional');
       navigate('/dashboard', { state: { negocioId: negocio.id } });
-    } catch (e) {
-      setAlerta({ body: e?.message || msgs.unexpected_error.body, variant: 'erro' });
+    } catch (e2) {
+      setAlerta({ body: e2?.message || msgs.unexpected_error.body, variant: 'erro' });
       await supabase.auth.signOut();
     } finally {
       if (suppressAuthRef) suppressAuthRef.current = false;
@@ -178,47 +189,45 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-20 w-auto object-contain mx-auto mb-4" />
-            <h1 className="text-3xl font-normal text-white uppercase">Nova senha</h1>
-            <p className="text-gray-500 text-sm mt-2 font-normal">Defina sua nova senha de acesso</p>
+            <h1 className="text-3xl font-normal text-white uppercase">NOVA SENHA</h1>
+            <p className="text-gray-500 text-sm mt-2 font-normal">DEFINA SUA NOVA SENHA DE ACESSO</p>
           </div>
 
-          <div className="bg-dark-100 border border-gray-800 rounded-custom p-8">
-            <form onSubmit={handleSetNewPassword} className="space-y-4">
-              <div>
-                <label className="block text-xs text-gray-400 uppercase mb-2">Nova senha</label>
+          <form onSubmit={handleSetNewPassword} className="space-y-5">
+            <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-100">
+              <FieldRow label="SENHA">
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Mínimo 6 caracteres"
-                  className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors font-normal"
+                  placeholder="MINIMO 6 CARACTERES"
+                  className={fieldInputClass}
                   required
                 />
-              </div>
+              </FieldRow>
 
-              <div>
-                <label className="block text-xs text-gray-400 uppercase mb-2">Confirmar nova senha</label>
+              <FieldRow label="CONFIRM." last>
                 <input
                   type="password"
                   value={newPassword2}
                   onChange={(e) => setNewPassword2(e.target.value)}
-                  placeholder="Repita a nova senha"
-                  className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors font-normal"
+                  placeholder="REPITA A SENHA"
+                  className={fieldInputClass}
                   required
                 />
-              </div>
+              </FieldRow>
+            </div>
 
-              <Alerta msg={recoveryAlerta} />
+            <Alerta msg={recoveryAlerta} />
 
-              <button
-                type="submit"
-                disabled={recoveryLoading}
-                className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {recoveryLoading ? 'SALVANDO...' : 'SALVAR NOVA SENHA'}
-              </button>
-            </form>
-          </div>
+            <button
+              type="submit"
+              disabled={recoveryLoading}
+              className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {recoveryLoading ? 'SALVANDO...' : 'SALVAR NOVA SENHA'}
+            </button>
+          </form>
         </div>
       </div>
     );
@@ -229,70 +238,69 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-20 w-auto object-contain mx-auto mb-4" />
-          <h1 className="text-3xl font-normal text-white uppercase">Login Parceiro</h1>
-          <p className="text-gray-500 text-sm mt-2 font-normal">Acesse o painel do seu negócio agora</p>
+          <h1 className="text-3xl font-normal text-white uppercase">LOGIN PARCEIRO</h1>
+          <p className="text-gray-500 text-sm mt-2 font-normal">ACESSE O PAINEL DO SEU NEGOCIO AGORA</p>
         </div>
 
-        <div className="bg-dark-100 border border-gray-800 rounded-custom p-8">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs text-gray-400 uppercase mb-2">Email</label>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="flex items-center justify-end">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={resetLoading}
+              className="inline-flex shrink-0 items-center justify-center rounded-full border border-yellow-500/40 bg-transparent px-4 py-1.5 text-xs font-normal uppercase text-yellow-400 transition-colors hover:border-yellow-500 hover:text-yellow-300 disabled:opacity-50"
+            >
+              {resetLoading ? 'ENVIANDO...' : 'TROCAR SENHA'}
+            </button>
+          </div>
+
+          <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-100">
+            <FieldRow label="E-MAIL">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
-                className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors font-normal"
+                placeholder="SEU E-MAIL"
+                className={fieldInputClass}
                 required
               />
-            </div>
+            </FieldRow>
 
-            <div>
-              <label className="block text-xs text-gray-400 uppercase mb-2">Senha</label>
-              <div className="relative">
+            <FieldRow label="SENHA">
+              <div className="relative min-w-0">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 pr-12 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors font-normal"
+                  className={`${fieldInputClass} pr-10`}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 transition-colors hover:text-gray-300"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-            </div>
+            </FieldRow>
 
-            <div>
-              <label className="block text-xs text-gray-400 uppercase mb-2">Slug do negócio</label>
+            <FieldRow label="SLUG" last>
               <input
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
-                placeholder="ex: barbearia-do-ze"
-                className="w-full px-4 py-3 bg-dark-200 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none transition-colors font-normal"
+                placeholder="SLUG DO NEGOCIO"
+                className={fieldInputClass}
                 required
               />
-            </div>
+            </FieldRow>
+          </div>
 
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                disabled={resetLoading}
-                className="text-xs text-primary hover:text-yellow-500 transition-colors disabled:opacity-50"
-              >
-                {resetLoading ? 'ENVIANDO...' : 'Esqueceu a senha?'}
-              </button>
-            </div>
+          <Alerta msg={alerta} />
 
-            <Alerta msg={alerta} />
-
+          <div className="space-y-2">
             <button
               type="submit"
               disabled={loading}
@@ -300,15 +308,15 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
             >
               {loading ? 'ENTRANDO...' : 'ENTRAR'}
             </button>
-          </form>
-        </div>
 
-        <p className="text-center text-sm text-gray-600 mt-6 font-normal">
-          Ainda não tem cadastro?{' '}
-          <Link to="/parceiro/cadastro" className="text-primary hover:text-yellow-500 transition-colors">
-            Solicitar acesso
-          </Link>
-        </p>
+            <Link
+              to="/parceiro/cadastro"
+              className="flex w-full items-center justify-center rounded-button border border-primary/30 bg-transparent py-3 text-sm font-normal uppercase tracking-wider text-primary transition-all hover:border-primary hover:text-yellow-500"
+            >
+              SOLICITAR ACESSO
+            </Link>
+          </div>
+        </form>
       </div>
     </div>
   );
