@@ -17,7 +17,7 @@ function montarEnderecoUnico({ rua, numero, cidade, estado }) {
 function FieldRow({ label, children, last = false, alignStart = false }) {
   return (
     <div className={`flex ${alignStart ? 'items-start' : 'items-center'} gap-3 px-5 py-3 ${last ? '' : 'border-b border-gray-800'}`}>
-      <label className="w-[96px] shrink-0 text-sm tracking-wide text-gray-500">{label}</label>
+      <label className="w-[96px] shrink-0 text-sm tracking-wide text-white-500">{label}</label>
       <div className="min-w-0 flex-1">{children}</div>
     </div>
   );
@@ -204,6 +204,27 @@ export default function CriarNegocio({ user }) {
               />
             </FieldRow>
 
+            <FieldRow label="TELEFONE">
+              <input
+                type="tel"
+                value={formData.telefone}
+                onChange={(e) => setFormData(prev => ({ ...prev, telefone: e.target.value }))}
+                className={fieldInputClass}
+                required
+              />
+            </FieldRow>           
+
+            <FieldRow label="TIPO">
+              <input
+                type="text"
+                value={formData.tipoNegocio}
+                onChange={(e) => setFormData(prev => ({ ...prev, tipoNegocio: e.target.value }))}
+                placeholder="EX: ESTÚDIO, PET SHOP..."
+                className={fieldInputClass}
+                required
+              />
+            </FieldRow>
+
             <FieldRow label="SUA URL">
               <div className="flex min-w-0 items-center gap-2">
                 <span className="shrink-0 text-sm text-gray-600">COMVAGA.COM.BR/V/</span>
@@ -217,27 +238,6 @@ export default function CriarNegocio({ user }) {
                   pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
                 />
               </div>
-            </FieldRow>
-
-            <FieldRow label="TIPO">
-              <input
-                type="text"
-                value={formData.tipoNegocio}
-                onChange={(e) => setFormData(prev => ({ ...prev, tipoNegocio: e.target.value }))}
-                placeholder="EX: ESTÚDIO, PET SHOP..."
-                className={fieldInputClass}
-                required
-              />
-            </FieldRow>
-
-            <FieldRow label="TELEFONE">
-              <input
-                type="tel"
-                value={formData.telefone}
-                onChange={(e) => setFormData(prev => ({ ...prev, telefone: e.target.value }))}
-                className={fieldInputClass}
-                required
-              />
             </FieldRow>
 
             <SplitRow>
