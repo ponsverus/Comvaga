@@ -79,7 +79,7 @@ export default function SignupClient({ onLogin }) {
   };
 
   const fieldRowClass = 'flex items-center gap-3 px-5 py-3 border-b border-gray-800/50';
-  const fieldLabelClass = 'w-[76px] shrink-0 text-sm text-white-500 tracking-wide';
+  const fieldLabelClass = 'w-[76px] shrink-0 text-sm text-gray-500 tracking-wide';
   const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white';
 
   return (
@@ -120,9 +120,9 @@ export default function SignupClient({ onLogin }) {
               <input
                 type="text"
                 value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value.toUpperCase() })}
                 placeholder="NOME COMPLETO"
-                className={fieldInputClass}
+                className={`${fieldInputClass} uppercase`}
                 required
               />
             </div>
