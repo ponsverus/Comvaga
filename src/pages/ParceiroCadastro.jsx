@@ -172,9 +172,9 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
               <input
                 type="text"
                 value={nome}
-                onChange={(e) => setNome(e.target.value)}
+                onChange={(e) => setNome(e.target.value.toUpperCase())}
                 placeholder="NOME COMPLETO"
-                className={fieldInputClass}
+                className={`${fieldInputClass} uppercase`}
                 required
               />
             </FieldRow>
