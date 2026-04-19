@@ -724,9 +724,20 @@ export default function ClientArea({ user, onLogout }) {
                   )}
                 </div>
 
-                <div className="flex items-start gap-3 px-4 py-3 sm:px-6">
-                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">SENHA</span>
-                  <div className="min-w-0 flex-1 space-y-2">
+                <div className="px-4 py-3 sm:px-6">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <span className="text-[14px] leading-5 text-gray-500">SENHA</span>
+                    <button
+                      type="button"
+                      disabled={savingDados}
+                      onClick={salvarSenha}
+                      className="shrink-0 rounded-full border border-green-500/40 px-3 py-1 text-[12px] font-normal uppercase text-green-300 disabled:opacity-50"
+                    >
+                      {savingDados ? 'SALVANDO' : 'SALVAR'}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
                     <input
                       type="password"
                       value={novaSenha}
@@ -742,14 +753,6 @@ export default function ClientArea({ user, onLogout }) {
                       placeholder="CONFIRMAR"
                     />
                   </div>
-                  <button
-                    type="button"
-                    disabled={savingDados}
-                    onClick={salvarSenha}
-                    className="shrink-0 rounded-full border border-green-500/40 px-3 py-1 text-[12px] font-normal uppercase text-green-300 disabled:opacity-50"
-                  >
-                    {savingDados ? 'SALVANDO' : 'SALVAR'}
-                  </button>
                 </div>
               </>
             )}
