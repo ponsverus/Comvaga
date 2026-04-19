@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Award, ArrowLeft, MapPin } from 'lucide-react';
+import { Award, ArrowLeft } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 
@@ -26,6 +26,34 @@ function parseEndereco(endereco) {
     estado: onlyTrim(match[4]),
   };
 }
+
+function ResumeFieldRow({ label, children, last = false }) {
+  return (
+    <div className={`flex items-start gap-3 px-5 py-3 ${last ? '' : 'border-b border-gray-800/50'}`}>
+      <label className="w-[96px] shrink-0 py-2 text-sm tracking-wide text-white">{label}</label>
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}
+
+function ResumeSplitRow({ children, last = false }) {
+  return (
+    <div className={`grid grid-cols-2 ${last ? '' : 'border-b border-gray-800/50'}`}>
+      {children}
+    </div>
+  );
+}
+
+function ResumeSplitField({ label, children, divider = false }) {
+  return (
+    <div className={`flex items-center gap-3 px-5 py-3 ${divider ? 'border-r border-gray-800/50' : ''}`}>
+      <label className="w-[62px] shrink-0 text-sm tracking-wide text-white">{label}</label>
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}
+
+const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white';
 
 export default function SignupProfessionalResume({ user, onLogin }) {
   const navigate = useNavigate();
@@ -146,10 +174,11 @@ export default function SignupProfessionalResume({ user, onLogin }) {
   };
 
   const handleNegocioNameChange = (value) => {
+    const nomeUpper = value.toUpperCase();
     setFormData((prev) => ({
       ...prev,
-      nomeNegocio: value,
-      urlNegocio: prev.urlNegocio ? prev.urlNegocio : generateSlug(value),
+      nomeNegocio: nomeUpper,
+      urlNegocio: prev.urlNegocio ? prev.urlNegocio : generateSlug(nomeUpper),
     }));
   };
 
@@ -333,18 +362,16 @@ export default function SignupProfessionalResume({ user, onLogin }) {
     );
   }
 
-  const inputClass = 'w-full px-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm';
-  const inputIconClass = 'w-full pl-10 pr-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm';
+  const selectClass = 'w-full px-4 py-3 bg-dark-100/40 border border-gray-800/50 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:bg-dark-100/60 transition-all backdrop-blur-sm text-sm';
   const labelClass = 'block text-sm text-gray-400 mb-2 tracking-wide';
-  const labelSmClass = 'block text-xs text-gray-500 mb-2 tracking-wide';
   const isWaitingRoom = !resumeContexts.length;
   const hasMultipleContexts = resumeContexts.length > 1;
 
   return (
     <div className="min-h-screen bg-black text-white py-8 px-4 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
       <div className="relative z-10 w-full max-w-2xl mx-auto">
@@ -362,20 +389,20 @@ export default function SignupProfessionalResume({ user, onLogin }) {
 
         <div className="text-center mb-10">
           <Award className="mx-auto mb-4 text-primary w-12 h-12" />
-          <h1 className="text-4xl font-normal mb-3 tracking-wide">{isWaitingRoom ? 'Criar vitrine' : 'Retomar vitrine'}</h1>
+          <h1 className="text-4xl font-normal mb-3 tracking-wide">{isWaitingRoom ? 'CRIAR VITRINE' : 'RETOMAR VITRINE'}</h1>
           <p className="text-gray-500 text-base font-normal">
-            {isWaitingRoom ? 'Finalize os dados do seu negócio para liberar o dashboard.' : 'Seu cadastro ficou incompleto. Finalize os dados para liberar o dashboard.'}
+            {isWaitingRoom ? 'FINALIZE OS DADOS DO SEU NEGOCIO PARA LIBERAR O DASHBOARD.' : 'SEU CADASTRO FICOU INCOMPLETO. FINALIZE OS DADOS PARA LIBERAR O DASHBOARD.'}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {hasMultipleContexts && (
             <div>
-              <label className={labelClass}>Qual negócio deseja retomar?</label>
+              <label className={labelClass}>QUAL NEGOCIO DESEJA RETOMAR?</label>
               <select
                 value={selectedNegocioId}
                 onChange={(e) => setSelectedNegocioId(e.target.value)}
-                className={inputClass}
+                className={selectClass}
                 required
               >
                 {resumeContexts.map((context) => (
@@ -387,149 +414,119 @@ export default function SignupProfessionalResume({ user, onLogin }) {
             </div>
           )}
 
-          <div>
-            <label className={labelClass}>Seu Nome Completo</label>
-            <input
-              type="text"
-              value={profileName}
-              onChange={(e) => setProfileName(e.target.value)}
-              className={inputClass}
-              placeholder="Seu nome completo"
-              required
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>Nome do Negócio *</label>
-            <input
-              type="text"
-              value={formData.nomeNegocio}
-              onChange={(e) => handleNegocioNameChange(e.target.value)}
-              placeholder="Ex: Elite Barbers"
-              className={inputClass}
-              required
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>URL Única *</label>
-            <div className="flex items-center gap-2">
-              <span className="text-gray-600 text-sm whitespace-nowrap">comvaga.app/v/</span>
+          <div className="overflow-hidden rounded-custom border border-gray-800/50 bg-dark-100/40 backdrop-blur-sm">
+            <ResumeFieldRow label="SEU NOME">
               <input
                 type="text"
-                value={formData.urlNegocio}
-                onChange={(e) => setFormData((prev) => ({ ...prev, urlNegocio: generateSlug(e.target.value) }))}
-                placeholder="elite-barbers"
-                className={inputClass}
+                value={profileName}
+                onChange={(e) => setProfileName(e.target.value.toUpperCase())}
+                className={`${fieldInputClass} uppercase`}
                 required
-                pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
               />
-            </div>
-            <p className="text-xs text-gray-600 mt-1">Apenas letras minúsculas, números e hífens</p>
-          </div>
+            </ResumeFieldRow>
 
-          <div>
-            <label className={labelClass}>Tipo de Negócio *</label>
-            <input
-              type="text"
-              value={formData.tipoNegocio}
-              onChange={(e) => setFormData((prev) => ({ ...prev, tipoNegocio: e.target.value }))}
-              placeholder="Ex: barbearia, estúdio, manicure..."
-              className={inputClass}
-              required
-            />
-          </div>
+            <ResumeFieldRow label="EXPERIÊNCIA">
+              <input
+                type="number"
+                value={formData.anosExperiencia}
+                onChange={(e) => setFormData((prev) => ({ ...prev, anosExperiencia: e.target.value }))}
+                min="0"
+                max="50"
+                className={fieldInputClass}
+                required
+                placeholder="ANOS"
+              />
+            </ResumeFieldRow>
 
-          <div>
-            <label className={labelClass}>Anos de Experiência *</label>
-            <input
-              type="number"
-              value={formData.anosExperiencia}
-              onChange={(e) => setFormData((prev) => ({ ...prev, anosExperiencia: e.target.value }))}
-              placeholder="5"
-              min="0"
-              max="50"
-              className={inputClass}
-              required
-            />
-          </div>
+            <ResumeFieldRow label="NOME">
+              <input
+                type="text"
+                value={formData.nomeNegocio}
+                onChange={(e) => handleNegocioNameChange(e.target.value)}
+                className={`${fieldInputClass} uppercase`}
+                required
+                placeholder="NOME DO NEGOCIO"
+              />
+            </ResumeFieldRow>
 
-          <div>
-            <label className={labelClass}>Telefone (WhatsApp) *</label>
-            <input
-              type="tel"
-              value={formData.telefone}
-              onChange={(e) => setFormData((prev) => ({ ...prev, telefone: e.target.value }))}
-              placeholder="(31) 90000 - 0000"
-              className={inputClass}
-              required
-            />
-          </div>
+            <ResumeFieldRow label="TELEFONE">
+              <input
+                type="tel"
+                value={formData.telefone}
+                onChange={(e) => setFormData((prev) => ({ ...prev, telefone: e.target.value }))}
+                className={fieldInputClass}
+                required
+              />
+            </ResumeFieldRow>
 
-          <div>
-            <label className={labelClass}>Endereço Completo do Negócio *</label>
-            <div className="bg-dark-100/40 border border-gray-800/50 rounded-custom p-4 backdrop-blur-sm">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className={labelSmClass}>Rua *</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                    <input
-                      type="text"
-                      value={formData.rua}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, rua: e.target.value }))}
-                      placeholder="Rua Serra do Sincorá"
-                      className={inputIconClass}
-                      required
-                    />
-                  </div>
-                </div>
+            <ResumeFieldRow label="TIPO">
+              <input
+                type="text"
+                value={formData.tipoNegocio}
+                onChange={(e) => setFormData((prev) => ({ ...prev, tipoNegocio: e.target.value.toUpperCase() }))}
+                className={`${fieldInputClass} uppercase`}
+                required
+                placeholder="EX: BARBEARIA, CLINICA..."
+              />
+            </ResumeFieldRow>
 
-                <div>
-                  <label className={labelSmClass}>Número *</label>
-                  <input
-                    type="text"
-                    value={formData.numero}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, numero: e.target.value }))}
-                    placeholder="1038"
-                    className={inputClass}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className={labelSmClass}>Cidade *</label>
-                  <input
-                    type="text"
-                    value={formData.cidade}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, cidade: e.target.value }))}
-                    placeholder="Belo Horizonte"
-                    className={inputClass}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className={labelSmClass}>Estado *</label>
-                  <input
-                    type="text"
-                    value={formData.estado}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, estado: e.target.value }))}
-                    placeholder="Minas Gerais"
-                    className={inputClass}
-                    required
-                  />
-                </div>
+            <ResumeFieldRow label="SUA URL">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="shrink-0 text-sm text-gray-600">COMVAGA.COM.BR/V/</span>
+                <input
+                  type="text"
+                  value={formData.urlNegocio}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, urlNegocio: generateSlug(e.target.value) }))}
+                  className={`${fieldInputClass} uppercase`}
+                  required
+                  pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                />
               </div>
+            </ResumeFieldRow>
 
-              <div className="text-xs text-gray-600 mt-3">
-                Assim vai aparecer no dashboard/vitrine:
-                <span className="text-gray-400">
-                  {' '}
-                  {formData.rua || 'Rua X'}, {formData.numero || '000'} - {formData.cidade || 'Cidade'}, {formData.estado || 'Estado'}
-                </span>
-              </div>
-            </div>
+            <ResumeSplitRow>
+              <ResumeSplitField label="RUA" divider>
+                <input
+                  type="text"
+                  value={formData.rua}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, rua: e.target.value }))}
+                  className={fieldInputClass}
+                  required
+                />
+              </ResumeSplitField>
+
+              <ResumeSplitField label="NÚM.">
+                <input
+                  type="text"
+                  value={formData.numero}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, numero: e.target.value }))}
+                  className={fieldInputClass}
+                  required
+                />
+              </ResumeSplitField>
+            </ResumeSplitRow>
+
+            <ResumeSplitRow last>
+              <ResumeSplitField label="CIDADE" divider>
+                <input
+                  type="text"
+                  value={formData.cidade}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, cidade: e.target.value }))}
+                  className={fieldInputClass}
+                  required
+                />
+              </ResumeSplitField>
+
+              <ResumeSplitField label="ESTADO">
+                <input
+                  type="text"
+                  value={formData.estado}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, estado: e.target.value }))}
+                  className={fieldInputClass}
+                  required
+                />
+              </ResumeSplitField>
+            </ResumeSplitRow>
           </div>
 
           <button
