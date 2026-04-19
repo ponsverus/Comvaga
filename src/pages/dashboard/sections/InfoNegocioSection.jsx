@@ -159,16 +159,15 @@ export default function InfoNegocioSection({
 
   return (
     <div className="-m-6">
-      <InfoRow
-        label="TEMA"
-        action={(
-          <span className="shrink-0 py-1 text-[12px] uppercase text-gray-600">
-            {temaSaving ? 'SALVANDO' : ''}
-          </span>
-        )}
-      >
-        <TemaToggle value={formInfo.tema} onChange={salvarTema} loading={temaSaving} />
-      </InfoRow>
+      <div className="flex items-center gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
+        <span className="w-[86px] shrink-0 text-[14px] leading-5 text-gray-500">TEMA</span>
+        <div className="min-w-0 flex-1">
+          <TemaToggle value={formInfo.tema} onChange={salvarTema} loading={temaSaving} />
+        </div>
+        <span className="shrink-0 text-[12px] uppercase text-gray-600">
+          {temaSaving ? 'SALVANDO' : ''}
+        </span>
+      </div>
 
       <InfoRow label="NEGÓCIO" action={businessSaveAction('nome')}>
         <input
