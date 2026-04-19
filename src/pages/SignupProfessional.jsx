@@ -160,13 +160,10 @@ export default function SignupProfessional({ onLogin }) {
       });
 
       const { data: existingNegocio, error: slugError } = await supabase
-        .from('negocios')
-        .select('id')
-        .eq('slug', slug)
-        .maybeSingle();
+        .rpc('get_negocio_vitrine_by_slug', { p_slug: slug });
 
       if (slugError) throw slugError;
-      if (existingNegocio) { showMessage('signupProfessional.business_slug_taken'); return; }
+      if (existingNegocio?.[0]) { showMessage('signupProfessional.business_slug_taken'); return; }
 
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -391,7 +388,7 @@ export default function SignupProfessional({ onLogin }) {
                 />
               </SplitField>
 
-              <SplitField label="NÚMERO">
+              <SplitField label="NÚM.">
                 <input
                   type="text"
                   value={formData.numero}
