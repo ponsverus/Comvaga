@@ -14,6 +14,23 @@ function ServiceFieldRow({ label, children, hint, last = false }) {
   );
 }
 
+function ServiceSplitRow({ children, last = false }) {
+  return (
+    <div className={`grid grid-cols-2 ${last ? '' : 'border-b border-gray-800'}`}>
+      {children}
+    </div>
+  );
+}
+
+function ServiceSplitField({ label, children, divider = false }) {
+  return (
+    <div className={`flex items-start gap-3 px-8 py-3 ${divider ? 'border-r border-gray-800' : ''}`}>
+      <span className="w-[58px] shrink-0 py-2 text-[13px] leading-5 text-gray-500">{label}</span>
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}
+
 const serviceInputClass = 'w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white';
 
 export default function EntregaModal({
@@ -68,28 +85,30 @@ export default function EntregaModal({
             />
           </ServiceFieldRow>
 
-          <ServiceFieldRow label="TEMPO">
-            <input
-              type="number"
-              value={formEntrega.duracao_minutos}
-              onChange={(e) => setFormEntrega({ ...formEntrega, duracao_minutos: e.target.value })}
-              className={serviceInputClass}
-              required
-              placeholder="MINUTOS"
-            />
-          </ServiceFieldRow>
+          <ServiceSplitRow>
+            <ServiceSplitField label="TEMPO" divider>
+              <input
+                type="number"
+                value={formEntrega.duracao_minutos}
+                onChange={(e) => setFormEntrega({ ...formEntrega, duracao_minutos: e.target.value })}
+                className={serviceInputClass}
+                required
+                placeholder="MIN"
+              />
+            </ServiceSplitField>
 
-          <ServiceFieldRow label="VALOR">
-            <input
-              type="number"
-              step="0.01"
-              value={formEntrega.preco}
-              onChange={(e) => setFormEntrega({ ...formEntrega, preco: e.target.value })}
-              className={serviceInputClass}
-              required
-              placeholder="$"
-            />
-          </ServiceFieldRow>
+            <ServiceSplitField label="VALOR">
+              <input
+                type="number"
+                step="0.01"
+                value={formEntrega.preco}
+                onChange={(e) => setFormEntrega({ ...formEntrega, preco: e.target.value })}
+                className={serviceInputClass}
+                required
+                placeholder="$"
+              />
+            </ServiceSplitField>
+          </ServiceSplitRow>
 
           <ServiceFieldRow label="OFERTA">
             <input
