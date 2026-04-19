@@ -5,7 +5,7 @@ export default function TemaToggle({ value, onChange, loading }) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className={`text-xs font-normal uppercase transition-colors ${!isLight ? 'text-primary' : 'text-gray-600'}`}>DARK</span>
+      <span className={`text-sm font-normal uppercase transition-colors ${!isLight ? 'text-primary' : 'text-gray-600'}`}>DARK</span>
       <button
         type="button"
         disabled={loading}
