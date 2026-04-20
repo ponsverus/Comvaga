@@ -3,7 +3,7 @@ export const ptBR = {
     action_failed_support: {
       title: 'Algo fugiu do esperado',
       body:
-        'Não foi possível concluir este procedimento agora.\n\n' +
+        'Houve um erro inesperado durante o processamento.\n\n' +
         'Isso pode ser uma instabilidade temporária.\n\n' +
         'Se o problema persistir, clique em SUPORTE na faixa amarela para falar com a gente.',
       variant: 'warning',
@@ -12,14 +12,14 @@ export const ptBR = {
     },
     session_invalid: {
       title: 'Falha no acesso',
-      body: 'Sua sessão não é válida no momento.\n\nFaça login novamente.',
+      body: 'Por favor, realize o login novamente.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
     business_not_loaded: {
       title: 'Falha ao ler os dados do negócio',
-      body: 'Não foi possível carregar os dados do negócio agora.\n\nRecarregue a página e tente novamente.',
+      body: 'Ocorreu um erro técnico durante o carregamento dos dados.\n\nRecarregue a página e tente novamente.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -31,7 +31,7 @@ export const ptBR = {
       title: 'Excluir negócio?',
       body:
         'Tem certeza que deseja excluir este negócio?\n\n' +
-        'Esta ação remove os dados do negócio e não pode ser desfeita.',
+        'Este comando encerra e apaga os registros do negócio para sempre.',
       variant: 'warning',
       screen: 'dark',
       confirmText: 'EXCLUIR',
@@ -47,7 +47,7 @@ export const ptBR = {
     },
     business_delete_error: {
       title: 'Erro ao excluir',
-      body: 'Não foi possível excluir o negócio agora.\n\nTente novamente.',
+      body: 'Erro ao excluir negócio\n\nTente novamente.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -61,7 +61,7 @@ export const ptBR = {
     },
     logo_update_error: {
       title: 'Erro ao atualizar logo',
-      body: 'Não foi possível atualizar a logo agora.\n\nTente novamente.',
+      body: 'Tente atualizar sua logo novamente em instantes.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
