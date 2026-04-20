@@ -133,7 +133,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <div className="w-full max-w-md text-center">
           <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-green-400 text-2xl font-normal">OK</span>
+            <span className="text-green-400 text-2xl font-normal">:)</span>
           </div>
           <h1 className="text-3xl font-normal text-white uppercase mb-4">{msgs.success_title}</h1>
           <p className="text-gray-400 font-normal mb-8">{msgs.success_body}</p>
