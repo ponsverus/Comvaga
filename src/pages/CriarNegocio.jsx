@@ -217,7 +217,7 @@ export default function CriarNegocio({ user }) {
                 type="text"
                 value={formData.tipoNegocio}
                 onChange={(e) => setFormData(prev => ({ ...prev, tipoNegocio: e.target.value.toUpperCase() }))}
-                placeholder="EX: ESTÚDIO, PET SHOP..."
+                placeholder="EX: ESTÚDIO"
                 className={`${fieldInputClass} uppercase`}
                 required
               />
