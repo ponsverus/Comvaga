@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Calendar, Check, ChevronLeft, ChevronRight, Clock, ShoppingBag } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import agendarIcon from '../../../assets/icons/agendar.png';
+import selecionarIcon from '../../../assets/icons/selecionar.png';
 
 const ENTREGAS_POR_PAGINA = 4;
 
@@ -48,7 +50,19 @@ function EntregaButtons({
         disabled={agendarDesabilitado}
         className={`flex-1 py-2.5 rounded-button text-sm font-normal uppercase transition-all flex items-center justify-center gap-1.5 ${agendarClass}`}
       >
-        <Calendar className="w-3.5 h-3.5" />
+        <img
+          src={agendarIcon}
+          alt=""
+          className={[
+            'w-3.5 h-3.5 object-contain',
+            agendarDesabilitado
+              ? 'opacity-40'
+              : isLight
+                ? 'opacity-90'
+                : 'brightness-0 opacity-90',
+          ].join(' ')}
+          aria-hidden="true"
+        />
         Agendar
       </button>
       <button
@@ -64,7 +78,19 @@ function EntregaButtons({
           </>
         ) : (
           <>
-            <ShoppingBag className="w-3.5 h-3.5" />
+            <img
+              src={selecionarIcon}
+              alt=""
+              className={[
+                'w-3.5 h-3.5 object-contain',
+                selecionarDesabilitado
+                  ? 'opacity-40'
+                  : isLight
+                    ? 'opacity-80'
+                    : 'brightness-0 invert opacity-80',
+              ].join(' ')}
+              aria-hidden="true"
+            />
             Selecionar
           </>
         )}
