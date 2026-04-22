@@ -22,6 +22,19 @@ function getProfessionalAccessState(statuses, onboardingStatus) {
 }
 
 export async function fetchUserAccessProfile(userId) {
+  try {
+    const { data, error } = await supabase.rpc('get_user_access_profile');
+    if (!error && data && isValidType(data.type)) {
+      return {
+        type: data.type,
+        onboardingStatus: normalizeOnboardingStatus(data.type, data.onboardingStatus),
+        accessState: data.accessState || 'active',
+      };
+    }
+  } catch {
+    // Fallback para a leitura direta atual enquanto o novo contrato estabiliza.
+  }
+
   const { data: userData, error: userError } = await supabase
     .from(PROFILE_TABLE)
     .select('type, onboarding_status')
