@@ -59,9 +59,9 @@ export default function DepoimentosPaginados({ depoimentos, nomeNegocioLabel, is
 
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         {itens.map((dep) => (
-          <div key={dep.id} className="bg-vcard border border-vborder rounded-custom p-4 relative self-start">
+          <div key={dep.id} className="mb-4 w-full break-inside-avoid bg-vcard border border-vborder rounded-custom p-4 relative">
             <div className="absolute top-3 right-3">
               {dep.profissional_id && dep.profissionais?.nome ? (
                 <span className="inline-flex items-center justify-center min-h-5 px-1.5 py-0.5 bg-vprimary/10 border border-vprimary/30 rounded-button text-[10px] leading-none text-vprimary font-normal uppercase">
