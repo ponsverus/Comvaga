@@ -20,6 +20,9 @@ export default function DepoimentoModal({
   actions,
   nomeNegocioLabel,
   profissionais,
+  showProfessionalOption = true,
+  contextSummary = null,
+  submitLabel = 'ENVIAR DEPOIMENTO',
 }) {
   if (!open) return null;
 
@@ -35,12 +38,28 @@ export default function DepoimentoModal({
         <div className="overflow-y-auto px-6 pb-6 flex-1">
           <div className="mb-4">
             <div className={`text-sm font-normal mb-2 ${styles.modalLabel}`}>Você está deixando um depoimento sobre</div>
-            <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => actions.setTipo('negocio')} className={`px-4 py-3 rounded-custom border transition-all font-normal ${styles.negocioBtn(state.tipo)}`}>{nomeNegocioLabel}</button>
-              <button type="button" onClick={() => actions.setTipo('profissional')} className={`px-4 py-3 rounded-custom border transition-all font-normal ${styles.profissionalBtn(state.tipo)}`}>PROFISSIONAL</button>
-            </div>
+            {showProfessionalOption ? (
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" onClick={() => actions.setTipo('negocio')} className={`px-4 py-3 rounded-custom border transition-all font-normal ${styles.negocioBtn(state.tipo)}`}>{nomeNegocioLabel}</button>
+                <button type="button" onClick={() => actions.setTipo('profissional')} className={`px-4 py-3 rounded-custom border transition-all font-normal ${styles.profissionalBtn(state.tipo)}`}>PROFISSIONAL</button>
+              </div>
+            ) : (
+              <div className={`rounded-custom border p-4 ${styles.summaryBox || ''}`}>
+                <div className={`text-sm font-normal ${styles.summaryTitle || styles.modalTitle}`}>{contextSummary?.title || nomeNegocioLabel}</div>
+                {contextSummary?.rows?.length ? (
+                  <div className="mt-3 space-y-2">
+                    {contextSummary.rows.map((row) => (
+                      <div key={row.label} className="flex items-center justify-between gap-4 text-sm">
+                        <span className={styles.summaryLabel || styles.modalLabel}>{row.label}</span>
+                        <span className={styles.summaryValue || styles.modalTitle}>{row.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            )}
           </div>
-          {state.tipo === 'profissional' && (
+          {showProfessionalOption && state.tipo === 'profissional' && (
             <div className="mb-4">
               <div className={`text-sm font-normal mb-2 ${styles.modalLabel}`}>Qual profissional?</div>
               <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -85,10 +104,10 @@ export default function DepoimentoModal({
             />
           </div>
           <button type="button" onClick={actions.onEnviar} disabled={state.loading || (state.tipo === 'profissional' && !state.profissionalId)} className={`w-full py-3 rounded-button disabled:opacity-60 uppercase font-normal transition-colors ${styles.sendBtn}`}>
-            {state.loading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}
+            {state.loading ? 'ENVIANDO...' : submitLabel}
           </button>
           <p className={`text-xs mt-3 font-normal ${styles.hintClass}`}>
-            {state.tipo === 'profissional' && !state.profissionalId
+            {showProfessionalOption && state.tipo === 'profissional' && !state.profissionalId
               ? 'Selecione um profissional para continuar'
               : 'Somente clientes logados podem deixar depoimentos.'}
           </p>
