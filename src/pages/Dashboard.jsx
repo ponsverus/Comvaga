@@ -535,7 +535,7 @@ export default function Dashboard({ user, onLogout }) {
           </DashboardTopCard>
 
           <DashboardTopCard
-            icon={<AgendamentosIcon className="w-8 h-8 text-blue-500" dotOpacity={0} />}
+            icon={<AgendamentosIcon className="w-8 h-8 text-blue-400" dotOpacity={0} />}
             label="AGENDAMENTOS HOJE"
             value={metricsTopCardsLoading ? '...' : topCardsReady ? Number(topAgendamentos.total || 0) : '--'}
           >
