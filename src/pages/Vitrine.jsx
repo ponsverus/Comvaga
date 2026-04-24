@@ -606,6 +606,7 @@ export default function Vitrine({ user, userType }) {
       <DepoimentoModal
         open={showDepoimento}
         onClose={() => setShowDepoimento(false)}
+        title="Deixe um depoimento para este negócio"
         styles={{
           modalBg: styles.depoModalBg,
           modalTitle: styles.depoModalTitle,
