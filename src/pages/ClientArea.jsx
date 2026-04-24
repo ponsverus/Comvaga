@@ -516,17 +516,8 @@ export default function ClientArea({ user, onLogout }) {
     modalTitle: 'text-white',
     modalClose: 'text-gray-400 hover:text-white',
     modalLabel: 'text-gray-400',
-    summaryBox: 'bg-dark-200 border-gray-800',
-    summaryTitle: 'text-white',
-    summaryLabel: 'text-gray-500',
-    summaryValue: 'text-white',
-    negocioBtn: () => 'bg-dark-200 border-gray-800 text-gray-400',
-    profissionalBtn: () => 'bg-primary/20 border-primary/50 text-primary',
-    profissionalItem: () => 'bg-dark-200 border-gray-800 text-gray-400',
-    notaBtn: () => 'bg-dark-200 border-gray-800 text-gray-500',
     textarea: 'bg-dark-200 border-gray-800 text-white placeholder-gray-500 focus:border-primary',
     sendBtn: 'bg-gradient-to-r from-primary to-yellow-600 text-black',
-    hintClass: 'text-gray-500',
   };
   const renderSecaoAgendamentos = (titulo, lista) => {
     if (!lista.length) return null;
@@ -860,27 +851,19 @@ export default function ClientArea({ user, onLogout }) {
       <DepoimentoModal
         open={depoimentoModalOpen}
         onClose={() => setDepoimentoModalOpen(false)}
+        title="Deixe um depoimento para este profissional"
         styles={depoimentoModalStyles}
         state={{
-          tipo: 'profissional',
           nota: depoimentoNota,
-          profissionalId: depoimentoAlvo?.profissional_id || null,
           texto: depoimentoTexto,
           loading: depoimentoLoading,
         }}
         actions={{
-          setTipo: () => {},
-          setProfissionalId: () => {},
           setNota: setDepoimentoNota,
           setTexto: setDepoimentoTexto,
           onEnviar: enviarDepoimentoAgendamento,
         }}
-        nomeNegocioLabel={depoimentoAlvo?.profissionais?.negocios?.nome || 'Depoimento'}
-        profissionais={[]}
-        showProfessionalOption={false}
-        contextSummary={null}
-        submitLabel="ENVIAR DEPOIMENTO"
-        compactMode
+        submitLabel="+ DEPOIMENTO"
         showSectionTitles
       />
     </div>
