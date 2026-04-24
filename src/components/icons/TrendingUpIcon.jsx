@@ -12,17 +12,17 @@ export default function TrendingUpIcon({ className = '', title, style = {}, ...p
       {title && <title>{title}</title>}
 
       <path
-        d="M4 14l5-5 4 4 6-6"
+        d="M4 14c2-2 3-3 5-5s3 3 5 3 3-3 6-6"
         stroke="currentColor"
-        strokeWidth="0.75"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
 
       <path
-        d="M17 7h3v3"
+        d="M18 6h3v3"
         stroke="currentColor"
-        strokeWidth="0.75"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
