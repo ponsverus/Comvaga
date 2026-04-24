@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, Zap } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { ProtectionIcon, UsersIcon, TimeIcon, TrendingUpIcon, CrownIcon } from '../components/icons';
+import { ProtectionIcon, UsersIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon } from '../components/icons';
 
 const SUPORTE_PHONE_E164 = '5533999037979';
 const SUPORTE_MSG = 'Ol?, preciso de ajuda. Pode me orientar?';
@@ -360,7 +360,7 @@ export default function Home({ user, userType, onLogout }) {
               { icon: ProtectionIcon, title: 'AGENDA INTELIGENTE', text: 'O sistema l? o futuro: se o servi?o escolhido vai invadir o pr?ximo hor?rio, a reserva ? bloqueada automaticamente.' },
               { icon: TimeIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser preju?zo. O hor?rio volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
               { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente v? profissionalismo desde o primeiro clique.' },
-              { icon: CrownIcon, title: 'GEOMETRIA DE TEMPO', text: 'Substitu?mos os blocos fixos e obsoletos pelo uso do tempo real de cada servi?o, garantindo o encaixe perfeito.' },
+              { icon: CheckDoubleIcon, title: 'GEOMETRIA DE TEMPO', text: 'Substitu?mos os blocos fixos e obsoletos pelo uso do tempo real de cada servi?o, garantindo o encaixe perfeito.' },
             ].map(({ icon: Icon, title, text }, i) => (
               <div
                 key={i}
