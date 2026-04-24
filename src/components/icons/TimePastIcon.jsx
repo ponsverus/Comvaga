@@ -1,87 +1,20 @@
 import React from 'react';
 
-export default function TimeLapseIcon({ className = '', title, style = {}, ...props }) {
+export default function TimePastIcon({ className = '', title, style = {}, ...props }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      fill="none"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       style={{ display: 'inline-block', ...style }}
+      aria-hidden={!title}
+      aria-label={title}
       {...props}
     >
       {title && <title>{title}</title>}
-
-      <path
-        d="M12 2v2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-
-      <path
-        d="M5 5l1.5 1.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-
-      <path
-        d="M2 12h2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-
-      <path
-        d="M5 19l1.5-1.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-
-      <path
-        d="M12 22v-2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-
-      <path
-        d="M19 19l-1.5-1.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-
-      <path
-        d="M22 12h-2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-
-      <path
-        d="M19 5l-1.5 1.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-
-      <circle
-        cx="12"
-        cy="12"
-        r="7"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-
-      <path
-        d="M12 8v4l2.5 1.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M12,6a1,1,0,0,0-1,1v5a1,1,0,0,0,.293.707l3,3a1,1,0,0,0,1.414-1.414L13,11.586V7A1,1,0,0,0,12,6Z
+        M23.812,10.132A12,12,0,0,0,3.578,3.415V1a1,1,0,0,0-2,0V5a2,2,0,0,0,2,2h4a1,1,0,0,0,0-2H4.827a9.99,9.99,0,1,1-2.835,7.878A.982.982,0,0,0,1,12a1.007,1.007,0,0,0-1,1.1,12,12,0,1,0,23.808-2.969Z"/>
     </svg>
   );
 }
