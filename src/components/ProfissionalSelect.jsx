@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
+import { CheckIcon } from './icons';
 
 export default function ProfissionalSelect({
   value,
@@ -96,7 +97,7 @@ export default function ProfissionalSelect({
                       <div className="text-[11px] text-gray-500 truncate">{p.profissao}</div>
                     )}
                   </div>
-                  {isSelected && <Check className="w-4 h-4 text-primary shrink-0" />}
+                  {isSelected && <CheckIcon className="w-4 h-4 text-primary shrink-0" />}
                 </button>
               );
             })
