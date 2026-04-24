@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Check, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
-import { SelecionarIcon } from '../../../components/icons';
+import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import { CheckIcon, SelecionarIcon } from '../../../components/icons';
 
 const ENTREGAS_POR_PAGINA = 4;
 
@@ -49,6 +49,12 @@ function EntregaButtons({
         disabled={agendarDesabilitado}
         className={`flex-1 py-2.5 rounded-button text-sm font-normal uppercase transition-all flex items-center justify-center gap-1.5 ${agendarClass}`}
       >
+        <CheckIcon
+          className={[
+            'w-3.5 h-3.5',
+            agendarDesabilitado ? 'opacity-40' : 'opacity-90',
+          ].join(' ')}
+        />
         Agendar
       </button>
       <button
@@ -59,7 +65,7 @@ function EntregaButtons({
       >
         {isSelecionado ? (
           <>
-            <Check className="w-3.5 h-3.5" />
+            <CheckIcon className="w-3.5 h-3.5" />
             Selecionado
           </>
         ) : (
