@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, X, Check, Loader2, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Loader2, Zap } from 'lucide-react';
 import { supabase } from '../supabase';
+import { CheckIcon } from './icons';
 
 function parseISO(iso) {
   if (!iso) return null;
@@ -432,7 +433,7 @@ export default function BookingCalendar({
               >
                 {confirming
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> CONFIRMANDO...</>
-                  : <><Check className="w-4 h-4" /> CONFIRMAR AGENDAMENTO</>
+                  : <><CheckIcon className="w-4 h-4" /> CONFIRMAR AGENDAMENTO</>
                 }
               </button>
             </div>
