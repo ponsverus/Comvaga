@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function TimerHistoryIcon({ className = '', title, style = {}, ...props }) {
+export default function TimerPastIcon({ className = '', title, style = {}, ...props }) {
   return (
     <svg
       viewBox="0 0 24 24"
