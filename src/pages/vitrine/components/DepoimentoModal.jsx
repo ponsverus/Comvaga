@@ -20,6 +20,7 @@ export default function DepoimentoModal({
   actions,
   submitLabel = 'ENVIAR DEPOIMENTO',
   showSectionTitles = true,
+  title = 'Depoimento',
 }) {
   if (!open) return null;
 
@@ -27,7 +28,7 @@ export default function DepoimentoModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className={`flex max-h-[90vh] w-full max-w-md flex-col rounded-custom border ${styles.modalBg}`}>
         <div className="flex shrink-0 items-center justify-between p-6 pb-4">
-          <h3 className={`text-2xl font-normal ${styles.modalTitle}`}>DEPOIMENTO</h3>
+          <h3 className={`text-2xl font-normal ${styles.modalTitle}`}>{title}</h3>
           <button type="button" onClick={onClose} className={styles.modalClose}>
             <X className="h-6 w-6" />
           </button>
