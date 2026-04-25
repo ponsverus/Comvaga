@@ -5,6 +5,7 @@ export { default as CrownIcon } from './CrownIcon';
 export { default as EnderecoIcon } from './EnderecoIcon';
 export { default as NegocioVerificadoIcon } from './NegocioVerificadoIcon';
 export { default as ProtectionIcon } from './ProtectionIcon';
+export { default as SearchnIcon } from './SearchIcon';
 export { default as SelecionarIcon } from './SelecionarIcon';
 export { default as TimeIcon } from './TimeIcon';
 export { default as TimePastIcon } from './TimePastIcon';
