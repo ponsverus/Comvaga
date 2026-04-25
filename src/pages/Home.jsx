@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Zap } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { ProtectionIcon, UsersIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon } from '../components/icons';
+import { ProtectionIcon, UsersIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon } from '../components/icons';
 
 const SUPORTE_PHONE_E164 = '5533999037979';
 const SUPORTE_MSG = 'Ol?, preciso de ajuda. Pode me orientar?';
@@ -257,7 +257,7 @@ export default function Home({ user, userType, onLogout }) {
 
         <div className="relative z-10 max-w-7xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 border border-primary/30 rounded-button mb-8 backdrop-blur-sm">
-            <Zap className="w-4 h-4 text-primary" />
+            <ZapIcon className="w-4 h-4 text-primary" />
             <span className="text-primary font-bold text-sm">O FIM DA AGENDA ESBURACADA</span>
           </div>
 
@@ -277,7 +277,7 @@ export default function Home({ user, userType, onLogout }) {
               to="/cadastro"
               className="px-10 py-5 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-black text-lg hover:shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105 flex items-center justify-center gap-3"
             >
-              MAXIMIZAR MEUS GANHOS <Zap className="w-5 h-5" />
+              MAXIMIZAR MEUS GANHOS <ZapIcon className="w-5 h-5" />
             </Link>
             <button
               type="button"
@@ -331,7 +331,7 @@ export default function Home({ user, userType, onLogout }) {
           <div className="mt-16 bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
             <div className="flex items-start gap-4">
               <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                <Zap className="w-8 h-8 text-primary" />
+                <ZapIcon className="w-8 h-8 text-primary" />
               </div>
               <div>
                 <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO AUTOM?TICO DE HOR?RIOS</h3>
@@ -385,7 +385,7 @@ export default function Home({ user, userType, onLogout }) {
             to="/cadastro"
             className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all hover:scale-105"
           >
-            COME?AR AGORA GR?TIS <Zap className="w-6 h-6" />
+            COME?AR AGORA GR?TIS <ZapIcon className="w-6 h-6" />
           </Link>
           <p className="text-black/60 text-sm mt-6">Efici?ncia comprovada em barbearias, est?dios e cl?nicas.</p>
         </div>
