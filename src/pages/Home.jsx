@@ -232,7 +232,12 @@ export default function Home({ user, userType, onLogout }) {
       <header className="absolute top-16 left-0 w-full z-40 bg-transparent border-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-center h-16 sm:h-20">
-            <Link to="/" className="flex items-center justify-center">
+            <Link to="/" className="flex flex-col items-center justify-center gap-1">
+              <img
+                src="/Comvaga Logo.png"
+                alt="Comvaga"
+                className="h-9 w-auto object-contain sm:h-11"
+              />
               <h1 className="text-2xl sm:text-3xl font-black">COMVAGA</h1>
             </Link>
             <div className="absolute right-0 top-1/2 -translate-y-1/2">
