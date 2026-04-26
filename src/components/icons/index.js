@@ -6,6 +6,7 @@ export { default as EnderecoIcon } from './EnderecoIcon';
 export { default as NegocioVerificadoIcon } from './NegocioVerificadoIcon';
 export { default as ProtectionIcon } from './ProtectionIcon';
 export { default as SearchIcon } from './SearchIcon';
+export { default as SelectIcon } from './SelectIcon';
 export { default as TimeIcon } from './TimeIcon';
 export { default as TimePastIcon } from './TimePastIcon';
 export { default as TrendingUpIcon } from './TrendingUpIcon';
