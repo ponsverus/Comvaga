@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
+import { UserIcon } from '../components/icons';
 
 const PROFILE_TABLE = 'users';
 const isValidType = (t) => t === 'client' || t === 'professional';
@@ -108,7 +109,7 @@ export default function SignupClient({ onLogin }) {
 
         <form onSubmit={handleSignup} className="relative">
           <div className="text-center mb-10">
-            <User className="mx-auto mb-4 text-blue-400 w-12 h-12" />
+            <UserIcon className="mx-auto mb-4 text-blue-400 w-12 h-12" />
             <h1 className="text-4xl font-normal mb-3 tracking-wide">CRIAR CONTA</h1>
             <p className="text-gray-500 text-base font-normal">CADASTRO DE <span className="text-blue-400">CLIENTE</span></p>
           </div>
