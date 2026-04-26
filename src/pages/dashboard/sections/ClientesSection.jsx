@@ -1,6 +1,5 @@
 import React from 'react';
-import { UsersIcon } from '../../../components/icons';
-import { CheckIcon } from '../../../components/icons';
+import { UsersIcon, CheckIcon } from '../../../components/icons';
 import { formatDateBRFromISO } from '../utils';
 import { getPublicUrl } from '../api/dashboardApi';
 
@@ -101,7 +100,7 @@ export default function ClientesSection({
       ) : (
         <div className="text-center py-12">
           <UsersIcon className="w-16 h-16 mx-auto mb-4 text-gray-500 opacity-40" />
-          <p className="text-gray-500">Nenhum cliente encontrado.</p>
+          <p className="text-gray-500">NENHUM CLIENTE ENCONTRADO</p>
         </div>
       )}
     </div>
