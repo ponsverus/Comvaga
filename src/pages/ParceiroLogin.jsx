@@ -272,7 +272,7 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="SEU E-MAIL"
-                className={fieldInputClass}
+                className={`${fieldInputClass} uppercase`}
                 required
               />
             </FieldRow>
