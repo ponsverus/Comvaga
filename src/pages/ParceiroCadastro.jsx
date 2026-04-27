@@ -198,12 +198,12 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
               />
             </FieldRow>
 
-            <FieldRow label="SLUG" last>
+            <FieldRow label="SLUG DO NEGÓCIO" last>
               <input
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase())}
-                placeholder="SLUG DO NEGÓCIO"
+                placeholder="EX: BARBEARIA-TORRES"
                 className={fieldInputClass}
                 required
               />
