@@ -54,7 +54,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
 
     if (!nomeClean) return setAlerta(msgs.nome_required);
     if (!emailClean || !emailClean.includes('@')) return setAlerta(msgs.email_invalid);
-    if (senha.length < 6) return setAlerta(msgs.senha_too_short);
+    if (senha.length < 7) return setAlerta(msgs.senha_too_short);
     if (!slugClean) return setAlerta(msgs.slug_required);
 
     setLoading(true);
@@ -181,7 +181,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="SEU E-MAIL"
-                className={fieldInputClass}
+                className={`${fieldInputClass} uppercase`}
                 required
               />
             </FieldRow>
@@ -191,9 +191,10 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
                 type="password"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                placeholder="MÍNIMO 6 CARACTERES"
+                placeholder="MÍNIMO 7 CARACTERES"
                 className={fieldInputClass}
                 required
+                minLength={7}
               />
             </FieldRow>
 
