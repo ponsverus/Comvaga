@@ -79,7 +79,7 @@ export default function EntregaModal({
               type="text"
               value={formEntrega.nome}
               onChange={(e) => setFormEntrega({ ...formEntrega, nome: e.target.value })}
-              className={serviceInputClass}
+              className={`${fieldInputClass} uppercase`}
               required
               placeholder="EX: CORTE, BLINDAGEM"
             />
