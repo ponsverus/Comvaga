@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus } from 'lucide-react';
+import { Award, LogOut, Plus } from 'lucide-react';
 import { supabase } from '../supabase';
-import { CrownIcon } from '../components/icons';
 
 function getPublicUrl(bucket, path) {
   if (!bucket || !path) return null;
@@ -104,7 +103,7 @@ export default function SelecionarNegocio({ user, onLogout }) {
                     <img src={logoUrl} alt={neg.nome} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary to-yellow-600 flex items-center justify-center">
-                      <CrownIcon className="w-6 h-6 text-black" />
+                      <Award className="w-6 h-6 text-black" />
                     </div>
                   )}
                 </div>
@@ -125,23 +124,26 @@ export default function SelecionarNegocio({ user, onLogout }) {
           })}
         </div>
 
-        <button
-          type="button"
-          onClick={() => navigate('/criar-negocio')}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-full border border-primary/40 bg-primary/10 text-primary text-sm font-normal uppercase tracking-normal hover:border-primary/70 hover:bg-primary/20 transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          CRIAR OUTRO NEGOCIO
-        </button>
-
-        <div className="mt-8 text-center">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/criar-negocio')}
+            className="flex-1 rounded-full border border-primary/30 py-3 text-[12px] font-normal uppercase text-primary transition-colors hover:border-primary"
+          >
+            <span className="inline-flex items-center justify-center gap-2">
+              <Plus className="w-4 h-4" />
+              CRIAR OUTRO
+            </span>
+          </button>
           <button
             type="button"
             onClick={onLogout}
-            className="inline-flex items-center gap-2 text-red-500 hover:text-red-400 text-sm font-normal transition-colors"
+            className="flex-1 rounded-full border border-red-500/40 py-3 text-[12px] font-normal uppercase text-red-400 transition-colors hover:border-red-500 hover:text-red-300"
           >
-            <LogOut className="w-4 h-4" />
+            <span className="inline-flex items-center justify-center gap-2">
+              <LogOut className="w-4 h-4" />
             SAIR
+            </span>
           </button>
         </div>
       </div>
