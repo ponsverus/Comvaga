@@ -18,6 +18,10 @@ const saveButtonClass = 'shrink-0 rounded-full border border-primary/30 px-3 py-
 const maskedPrivateValue = '••••••••';
 
 export default function InfoNegocioSection({
+  nomePerfil,
+  setNomePerfil,
+  savingPerfil,
+  salvarNomePerfil,
   salvarInfoNegocio,
   infoSaving,
   formInfo,
@@ -168,6 +172,22 @@ export default function InfoNegocioSection({
           {temaSaving ? 'SALVANDO' : ''}
         </span>
       </div>
+
+      <InfoRow
+        label="ADMIN"
+        action={(
+          <button type="button" onClick={salvarNomePerfil} disabled={savingPerfil} className={saveButtonClass}>
+            {savingPerfil ? 'SALVANDO' : 'SALVAR'}
+          </button>
+        )}
+      >
+        <input
+          value={nomePerfil}
+          onChange={(e) => setNomePerfil(e.target.value)}
+          className={`${inputClass} truncate pr-10 sm:pr-0`}
+          placeholder="NOME DA CONTA"
+        />
+      </InfoRow>
 
       <InfoRow label="NEGÓCIO" action={businessSaveAction('nome')}>
         <input
