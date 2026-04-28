@@ -33,7 +33,7 @@ export function normalizeAgRow(a) {
       nome: a?.prof_nome ?? null,
     },
     cliente: {
-      id: a?.cliente_id_ref ?? null,
+      id: a?.cliente_id ?? null,
       nome: a?.cliente_nome ?? null,
       avatar_path: a?.cliente_avatar ?? null,
       type: a?.cliente_type ?? null,
@@ -132,7 +132,7 @@ export async function fetchProfissionaisComStatus(negocioId) {
 export async function fetchHistoricoProfissionalIds(negocioId) {
   const { data, error } = await supabase.rpc('get_profissionais_com_status', { p_negocio_id: negocioId });
   if (error) throw error;
-  return [...new Set((data || []).map((row) => row?.id).filter(Boolean))];
+  return [...new Set((data || []).filter((row) => !isAdminRemovedProfessional(row)).map((row) => row?.id).filter(Boolean))];
 }
 
 export async function removeProfissionalSeguramente(profissionalId) {
