@@ -51,8 +51,8 @@ export default function AccountDataSection({
           type="text"
           value={nomePerfil}
           onChange={(e) => setNomePerfil(e.target.value)}
-          className={inputClass}
-          placeholder="Nome da conta"
+          className={`${serviceInputClass} uppercase`}
+          placeholder="NOME COMPLETO"
         />
       </DataRow>
 
@@ -73,8 +73,8 @@ export default function AccountDataSection({
           value={emailVisivel ? novoEmail : maskedPrivateValue}
           onChange={(e) => setNovoEmail(e.target.value)}
           readOnly={!emailVisivel}
-          className={inputClass}
-          placeholder="E-mail de acesso"
+          className={`${serviceInputClass} uppercase`}
+          placeholder="E-MAIL DE ACESSO"
         />
       </DataRow>
 
