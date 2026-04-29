@@ -361,7 +361,7 @@ export default function InfoNegocioSection({
           value={visiblePrivateFields.email ? novoEmail : maskedPrivateValue}
           onChange={(e) => setNovoEmail(e.target.value)}
           readOnly={!visiblePrivateFields.email}
-          className={`${inputClass} max-w-[calc(100vw-13.75rem)] truncate pr-4 sm:max-w-none sm:pr-0`}
+          className={`${inputClass} uppercase max-w-[calc(100vw-13.75rem)] truncate pr-4 sm:max-w-none sm:pr-0`}
         />
       </InfoRow>
 
