@@ -228,7 +228,7 @@ export default function InfoNegocioSection({
             <button
               type="button"
               onClick={() => setSobreExpanded(true)}
-              className="shrink-0 rounded-full border border-primary/30 p-1.5 text-primary hover:border-primary"
+              className="shrink-0 rounded-full border border-primary/30 p-0.5 text-primary hover:border-primary"
               aria-label="Abrir sobre o negocio"
             >
               <ChevronDown className="h-4 w-4" />
