@@ -311,9 +311,7 @@ export default function Dashboard({ user, onLogout }) {
   } = useDashboardHistorico({
     negocioId: negocio?.id,
     hoje,
-    agProfIds,
     parceiroProfissionalId,
-    parceiroProfissional,
   });
   const {
     clientes,
@@ -406,11 +404,8 @@ export default function Dashboard({ user, onLogout }) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'agendamentos', filter: channelFilter }, (payload) => {
         const ev = payload?.eventType;
         const novo = payload?.new;
-        const profIdEvento = novo?.profissional_id;
-        const meuId = parceiroProfissionalId;
-        const meResponde = !meuId || profIdEvento === meuId;
-        if (ev === 'INSERT' && meResponde) setNotifAgendamentos(prev => prev + 1);
-        if (ev === 'UPDATE' && meResponde) {
+        if (ev === 'INSERT') setNotifAgendamentos(prev => prev + 1);
+        if (ev === 'UPDATE') {
           const st = String(novo?.status || '').toLowerCase();
           if (st.includes('cancelado') && !st.includes('profissional')) setNotifCancelados(prev => prev + 1);
         }
