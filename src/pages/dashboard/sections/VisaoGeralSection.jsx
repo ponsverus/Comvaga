@@ -20,6 +20,7 @@ export default function VisaoGeralSection({
   setFaturamentoPeriodo,
   metricsPeriodoData,
   metricsPeriodoLoading,
+  faturamentoPorProfissionalPeriodo,
   metricsUtilizacao,
   metricsUtilizacaoLoading,
   metricsFutureBookings,
@@ -61,6 +62,7 @@ export default function VisaoGeralSection({
             <div className="bg-dark-200 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">FATURAMENTO</div><div className="text-xl font-normal text-primary">{metricsPeriodoLoading ? '...' : `R$ ${Number(metricsPeriodoData?.period?.faturamento || 0).toFixed(2)}`}</div></div>
             <div className="bg-dark-200 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">MÉDIA POR {counterSingular.toUpperCase()}</div><div className="text-xl font-normal text-white">{metricsPeriodoLoading ? '...' : `R$ ${Number(metricsPeriodoData?.period?.media_por_atendimento || 0).toFixed(2)}`}</div></div>
           </div>
+          {souDono && faturamentoPorProfissionalPeriodo.length > 0 && (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3 items-start">{faturamentoPorProfissionalPeriodo.map(([nome, valor, concluidos]) => (<div key={String(nome)} className="bg-dark-200 border border-gray-800 rounded-custom p-4"><div className="text-xs text-gray-500 mb-1">PROFISSIONAL</div><div className="font-normal text-white">{String(nome || '—')}</div><div className="text-primary font-normal mt-1">R$ {Number(valor || 0).toFixed(2)}</div><div className="mt-2 inline-flex items-center rounded-full border border-gray-700 bg-transparent px-3 py-1 text-xs text-gray-500">{Number(concluidos || 0)} CONCLUÍDOS</div></div>))}</div>)}
         </div>
       </div>
     </div>
