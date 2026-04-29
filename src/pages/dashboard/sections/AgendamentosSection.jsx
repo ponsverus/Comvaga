@@ -69,7 +69,7 @@ export default function AgendamentosSection({
             </div>
           ))}
         </div>
-      ) : <p className="text-gray-500 text-center py-12">:(</p>}
+      ) : <p className="text-gray-500 text-sm font-medium">NENHUM AGENDAMENTO HOJE OU FUTURO</p>}
     </div>
   );
 }
