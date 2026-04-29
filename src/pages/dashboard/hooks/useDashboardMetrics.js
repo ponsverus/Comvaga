@@ -40,17 +40,18 @@ export function useDashboardMetrics({
     }
   }, [negocioId, parceiroProfissionalId]);
 
-  const loadTopCards = useCallback(async (id = negocioId, profId = parceiroProfissionalId) => {
+  const loadTopCards = useCallback(async (id = negocioId, profId = parceiroProfissionalId, options = {}) => {
     if (!id) return;
+    const silent = !!options?.silent || !!metricsTopCards;
     try {
-      setMetricsTopCardsLoading(true);
+      if (!silent) setMetricsTopCardsLoading(true);
       setMetricsTopCards(await fetchDashboardTopCards(id, profId));
     } catch {
       setMetricsTopCards(null);
     } finally {
-      setMetricsTopCardsLoading(false);
+      if (!silent) setMetricsTopCardsLoading(false);
     }
-  }, [negocioId, parceiroProfissionalId]);
+  }, [metricsTopCards, negocioId, parceiroProfissionalId]);
 
   const loadDia = useCallback(async (id = negocioId, dateISO = faturamentoData || hoje, profId = parceiroProfissionalId) => {
     if (!id || !dateISO) return;
