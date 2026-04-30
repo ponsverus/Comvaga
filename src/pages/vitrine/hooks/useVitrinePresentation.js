@@ -13,7 +13,6 @@ export function useVitrinePresentation({
   getPublicUrl,
   getPrecoFinalServico,
   getDowFromDateSP,
-  normalizeDiasTrabalho,
   resolveInstagram,
   resolveFacebook,
   timeToMinutes,
@@ -22,7 +21,35 @@ export function useVitrinePresentation({
   const instagramUrl = useMemo(() => resolveInstagram(negocio?.instagram), [negocio?.instagram, resolveInstagram]);
   const facebookUrl = useMemo(() => resolveFacebook(negocio?.facebook), [negocio?.facebook, resolveFacebook]);
 
-  const getAlmocoRange = useCallback((p) => ({ ini: p?.almoco_inicio || null, fim: p?.almoco_fim || null }), []);
+  const getHorarioDia = useCallback((p, dow) => {
+    if (Array.isArray(p?.horarios) && dow != null) {
+      const item = p.horarios.find((h) => Number(h?.dia_semana) === Number(dow));
+      if (item) return item;
+    }
+    return null;
+  }, []);
+
+  const getHorarioExibicao = useCallback((p) => {
+    const hojeDow = serverNow.date ? getDowFromDateSP(serverNow.date) : null;
+    const horarioHoje = getHorarioDia(p, hojeDow);
+    if (horarioHoje?.ativo !== false && horarioHoje?.horario_inicio && horarioHoje?.horario_fim) return horarioHoje;
+    if (Array.isArray(p?.horarios)) {
+      const primeiroAtivo = p.horarios.find((h) => h?.ativo !== false);
+      if (primeiroAtivo) return primeiroAtivo;
+    }
+    return {
+      ativo: true,
+      horario_inicio: '08:00',
+      horario_fim: '18:00',
+      almoco_inicio: null,
+      almoco_fim: null,
+    };
+  }, [getDowFromDateSP, getHorarioDia, serverNow.date]);
+
+  const getAlmocoRange = useCallback((p) => {
+    const horario = getHorarioExibicao(p);
+    return { ini: horario?.almoco_inicio || null, fim: horario?.almoco_fim || null };
+  }, [getHorarioExibicao]);
 
   const isInLunchNow = useCallback((p) => {
     const { ini, fim } = getAlmocoRange(p);
@@ -37,17 +64,16 @@ export function useVitrinePresentation({
   const getProfStatus = useCallback((p) => {
     if (p?.status !== 'ativo') return { label: 'FECHADO', color: 'bg-red-500' };
     if (!serverNow.date) return null;
-    const ini = timeToMinutes(p?.horario_inicio || '08:00');
-    const fim = timeToMinutes(p?.horario_fim || '18:00');
-    const dias = normalizeDiasTrabalho(p?.dias_trabalho);
-    const diasEfetivos = dias.length ? dias : [0, 1, 2, 3, 4, 5, 6];
     const hojeDow = getDowFromDateSP(serverNow.date);
-    const trabalhaHoje = hojeDow == null ? true : diasEfetivos.includes(hojeDow);
+    const horarioHoje = getHorarioDia(p, hojeDow);
+    const ini = timeToMinutes(horarioHoje?.horario_inicio || '08:00');
+    const fim = timeToMinutes(horarioHoje?.horario_fim || '18:00');
+    const trabalhaHoje = horarioHoje ? horarioHoje.ativo !== false : (hojeDow == null ? true : [1, 2, 3, 4, 5].includes(hojeDow));
     const dentroHorario = serverNow.minutes >= ini && serverNow.minutes < fim;
     if (!(trabalhaHoje && dentroHorario)) return { label: 'FECHADO', color: 'bg-red-500' };
     if (isInLunchNow(p)) return { label: 'PAUSA', color: 'bg-yellow-400' };
     return { label: 'ABERTO', color: 'bg-green-500' };
-  }, [getDowFromDateSP, isInLunchNow, normalizeDiasTrabalho, serverNow.date, serverNow.minutes, timeToMinutes]);
+  }, [getDowFromDateSP, getHorarioDia, isInLunchNow, serverNow.date, serverNow.minutes, timeToMinutes]);
 
   const entregasPorProf = useMemo(() => {
     const map = new Map();
@@ -84,6 +110,7 @@ export function useVitrinePresentation({
   const profissionaisView = useMemo(() => (
     profissionais.map((prof) => {
       const totalEntregas = (entregasPorProf.get(prof.id) || []).length;
+      const horarioExibicao = getHorarioExibicao(prof);
       return {
         ...prof,
         avatarUrl: getPublicUrl('avatars', prof.avatar_path),
@@ -91,12 +118,12 @@ export function useVitrinePresentation({
         depInfo: depoimentosPorProf.get(prof.id),
         profissaoLabel: String(prof?.profissao ?? '').trim(),
         almoco: getAlmocoRange(prof),
-        horarioIni: String(prof.horario_inicio || '08:00').slice(0, 5),
-        horarioFim: String(prof.horario_fim || '18:00').slice(0, 5),
+        horarioIni: String(horarioExibicao?.horario_inicio || '08:00').slice(0, 5),
+        horarioFim: String(horarioExibicao?.horario_fim || '18:00').slice(0, 5),
         totalEntregas,
       };
     })
-  ), [depoimentosPorProf, entregasPorProf, getAlmocoRange, getProfStatus, getPublicUrl, profissionais]);
+  ), [depoimentosPorProf, entregasPorProf, getAlmocoRange, getHorarioExibicao, getProfStatus, getPublicUrl, profissionais]);
 
   const entregaCards = useMemo(() => (
     profissionais.map((prof) => {
