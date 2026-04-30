@@ -1,7 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import TimePicker from '../../../components/TimePicker';
-import { toUpperClean } from '../utils';
+import { DEFAULT_PROFISSIONAL_HORARIOS, toUpperClean } from '../utils';
 
 function ProfessionalFieldRow({ label, children, last = false }) {
   return (
@@ -34,6 +34,17 @@ export default function ProfissionalModal({
   onSubmit,
 }) {
   if (!show) return null;
+
+  const horarios = Array.isArray(formProfissional.horarios) && formProfissional.horarios.length === 7
+    ? formProfissional.horarios
+    : DEFAULT_PROFISSIONAL_HORARIOS;
+  const activeCount = horarios.filter((h) => h.ativo !== false).length;
+  const updateHorario = (diaSemana, patch) => {
+    setFormProfissional({
+      ...formProfissional,
+      horarios: horarios.map((h) => (h.dia_semana === diaSemana ? { ...h, ...patch } : h)),
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
@@ -72,66 +83,68 @@ export default function ProfissionalModal({
               value={formProfissional.anos_experiencia}
               onChange={(e) => setFormProfissional({ ...formProfissional, anos_experiencia: e.target.value })}
               className={professionalInputClass}
-              placeholder="ANOS DE EXPERIÊNCIA"
+              placeholder="ANOS DE EXPERIENCIA"
             />
           </ProfessionalFieldRow>
 
-          <ProfessionalFieldRow label="HORÁRIO">
-            <div className="grid grid-cols-2 gap-4">
-              <TimeCell label="ABRE">
-                <TimePicker
-                  value={formProfissional.horario_inicio}
-                  onChange={(v) => setFormProfissional({ ...formProfissional, horario_inicio: v })}
-                  triggerClassName={timePickerClass}
-                />
-              </TimeCell>
-              <TimeCell label="FECHA">
-                <TimePicker
-                  value={formProfissional.horario_fim}
-                  onChange={(v) => setFormProfissional({ ...formProfissional, horario_fim: v })}
-                  triggerClassName={timePickerClass}
-                />
-              </TimeCell>
-            </div>
-          </ProfessionalFieldRow>
+          <div className="border-y border-gray-800">
+            {weekdays.map((d, index) => {
+              const item = horarios.find((h) => h.dia_semana === d.value) || DEFAULT_PROFISSIONAL_HORARIOS[d.value];
+              const ativo = item.ativo !== false;
+              const disableToggle = ativo && activeCount <= 1;
 
-          <ProfessionalFieldRow label="PAUSA">
-            <div className="grid grid-cols-2 gap-4">
-              <TimeCell label="INÍCIO">
-                <TimePicker
-                  value={formProfissional.almoco_inicio}
-                  onChange={(v) => setFormProfissional({ ...formProfissional, almoco_inicio: v })}
-                  triggerClassName={timePickerClass}
-                />
-              </TimeCell>
-              <TimeCell label="FIM">
-                <TimePicker
-                  value={formProfissional.almoco_fim}
-                  onChange={(v) => setFormProfissional({ ...formProfissional, almoco_fim: v })}
-                  triggerClassName={timePickerClass}
-                />
-              </TimeCell>
-            </div>
-          </ProfessionalFieldRow>
+              return (
+                <div key={d.value} className={`px-8 py-4 ${index === weekdays.length - 1 ? '' : 'border-b border-gray-800'}`}>
+                  <div className="mb-3 flex items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={disableToggle}
+                      onClick={() => updateHorario(d.value, { ativo: !ativo })}
+                      className={`h-8 w-14 shrink-0 rounded-full border text-[11px] font-normal transition-all disabled:cursor-not-allowed disabled:opacity-60 ${ativo ? 'border-primary/40 bg-primary/15 text-primary' : 'border-gray-800 bg-transparent text-gray-500'}`}
+                    >
+                      {d.label}
+                    </button>
+                    <div className={`h-px flex-1 ${ativo ? 'bg-primary/20' : 'bg-gray-800'}`} />
+                    <span className={`text-[11px] uppercase ${ativo ? 'text-primary' : 'text-gray-600'}`}>{ativo ? 'ATIVO' : 'FECHADO'}</span>
+                  </div>
 
-          <div className="border-b border-gray-800">
-            <div className="grid grid-cols-7">
-              {weekdays.map((d, index) => (
-                <button
-                  key={d.value}
-                  type="button"
-                  onClick={() => {
-                    const dias = formProfissional.dias_trabalho.includes(d.value)
-                      ? formProfissional.dias_trabalho.filter((x) => x !== d.value)
-                      : [...formProfissional.dias_trabalho, d.value].sort();
-                    setFormProfissional({ ...formProfissional, dias_trabalho: dias });
-                  }}
-                  className={`h-12 text-xs font-normal transition-all ${index === 0 ? '' : 'border-l border-gray-800'} ${formProfissional.dias_trabalho.includes(d.value) ? 'bg-primary/15 text-primary' : 'bg-transparent text-gray-500'}`}
-                >
-                  {d.label}
-                </button>
-              ))}
-            </div>
+                  <div className={ativo ? 'space-y-4' : 'pointer-events-none space-y-4 opacity-35'}>
+                    <div className="grid grid-cols-2 gap-4">
+                      <TimeCell label="ABRE">
+                        <TimePicker
+                          value={item.horario_inicio}
+                          onChange={(v) => updateHorario(d.value, { horario_inicio: v })}
+                          triggerClassName={timePickerClass}
+                        />
+                      </TimeCell>
+                      <TimeCell label="FECHA">
+                        <TimePicker
+                          value={item.horario_fim}
+                          onChange={(v) => updateHorario(d.value, { horario_fim: v })}
+                          triggerClassName={timePickerClass}
+                        />
+                      </TimeCell>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <TimeCell label="PAUSA INICIO">
+                        <TimePicker
+                          value={item.almoco_inicio || ''}
+                          onChange={(v) => updateHorario(d.value, { almoco_inicio: v })}
+                          triggerClassName={timePickerClass}
+                        />
+                      </TimeCell>
+                      <TimeCell label="PAUSA FIM">
+                        <TimePicker
+                          value={item.almoco_fim || ''}
+                          onChange={(v) => updateHorario(d.value, { almoco_fim: v })}
+                          triggerClassName={timePickerClass}
+                        />
+                      </TimeCell>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-3 border-t border-gray-800 px-8 py-6">
