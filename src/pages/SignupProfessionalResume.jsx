@@ -244,9 +244,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
             nome_prof: nome,
             profissao: tipoNegocio,
             anos_experiencia: anosExperiencia,
-            horario_inicio: '08:00',
-            horario_fim: '18:00',
-            dias_trabalho: [1, 2, 3, 4, 5],
           },
         });
 
@@ -266,11 +263,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
             showMessage('signupProfessional.profile_not_created');
             return;
           }
-          if (code === 'horario_invalido' || code === 'dias_trabalho_invalidos') {
-            showMessage('signupProfessional.professional_create_error');
-            return;
-          }
-
           console.error('signup-professional waiting room error:', fnError, payload);
           showMessage('signupProfessional.business_create_error');
           return;
@@ -317,11 +309,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           showMessage('signupProfessional.business_slug_invalid');
           return;
         }
-        if (code === 'horario_invalido' || code === 'dias_trabalho_invalidos') {
-          showMessage('signupProfessional.professional_create_error');
-          return;
-        }
-
         console.error('resume_professional_onboarding error:', error);
         showMessage('signupProfessional.business_create_error');
         return;
