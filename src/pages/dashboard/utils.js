@@ -30,6 +30,64 @@ export const WEEKDAYS = [
   { value: 6, label: 'SÁB' },
 ];
 
+export const DEFAULT_PROFISSIONAL_HORARIOS = WEEKDAYS.map((dia) => ({
+  dia_semana: dia.value,
+  ativo: [1, 2, 3, 4, 5].includes(dia.value),
+  horario_inicio: '08:00',
+  horario_fim: '18:00',
+  almoco_inicio: '',
+  almoco_fim: '',
+}));
+
+export function normalizeProfissionalHorarios(profissional = {}) {
+  const byDay = new Map();
+
+  if (Array.isArray(profissional?.horarios)) {
+    for (const item of profissional.horarios) {
+      const dia = Number(item?.dia_semana);
+      if (!Number.isInteger(dia) || dia < 0 || dia > 6) continue;
+      byDay.set(dia, {
+        dia_semana: dia,
+        ativo: item?.ativo !== false,
+        horario_inicio: String(item?.horario_inicio || '08:00').slice(0, 5),
+        horario_fim: String(item?.horario_fim || '18:00').slice(0, 5),
+        almoco_inicio: item?.almoco_inicio ? String(item.almoco_inicio).slice(0, 5) : '',
+        almoco_fim: item?.almoco_fim ? String(item.almoco_fim).slice(0, 5) : '',
+      });
+    }
+  }
+
+  return WEEKDAYS.map((dia) => byDay.get(dia.value) || {
+    dia_semana: dia.value,
+    ativo: [1, 2, 3, 4, 5].includes(dia.value),
+    horario_inicio: '08:00',
+    horario_fim: '18:00',
+    almoco_inicio: '',
+    almoco_fim: '',
+  });
+}
+
+export function getDiasTrabalhoFromHorarios(horarios) {
+  return (Array.isArray(horarios) ? horarios : [])
+    .filter((h) => h?.ativo !== false)
+    .map((h) => Number(h.dia_semana))
+    .filter((d) => Number.isInteger(d) && d >= 0 && d <= 6)
+    .sort((a, b) => a - b);
+}
+
+export function formatHorariosResumo(horarios) {
+  const ativos = (Array.isArray(horarios) ? horarios : []).filter((h) => h?.ativo !== false);
+  if (!ativos.length) return 'Sem dias ativos';
+  const grupos = new Map();
+  for (const h of ativos) {
+    const key = `${String(h.horario_inicio || '08:00').slice(0, 5)}-${String(h.horario_fim || '18:00').slice(0, 5)}`;
+    grupos.set(key, [...(grupos.get(key) || []), Number(h.dia_semana)]);
+  }
+  const [range, dias] = [...grupos.entries()].sort((a, b) => b[1].length - a[1].length)[0];
+  const labels = dias.map((d) => WEEKDAYS.find((w) => w.value === d)?.label).filter(Boolean).join('/');
+  return grupos.size === 1 ? `${labels} ${range.replace('-', ' - ')}` : `${labels} ${range.replace('-', ' - ')} + outros`;
+}
+
 export const toNumberOrNull = (v) => {
   if (v === '' || v == null) return null;
   const n = Math.round(Number(v) * 100) / 100;
