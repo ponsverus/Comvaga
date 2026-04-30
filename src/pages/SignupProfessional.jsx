@@ -200,9 +200,6 @@ export default function SignupProfessional({ onLogin }) {
           nome_prof: nome,
           profissao: tipoNegocio,
           anos_experiencia: anosExperiencia,
-          horario_inicio: '08:00',
-          horario_fim: '18:00',
-          dias_trabalho: [1, 2, 3, 4, 5],
         },
       });
 
@@ -238,12 +235,6 @@ export default function SignupProfessional({ onLogin }) {
           navigate('/cadastro/profissional/retomada');
           return;
         }
-        if (code === 'horario_invalido' || code === 'dias_trabalho_invalidos') {
-          await clearSignupSession();
-          showMessage('signupProfessional.professional_create_error');
-          return;
-        }
-
         console.error('signup-professional edge error:', fnError, payload);
         await clearSignupSession();
         showMessage('signupProfessional.business_create_error');
