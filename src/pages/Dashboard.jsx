@@ -19,6 +19,7 @@ import InfoNegocioSection from './dashboard/sections/InfoNegocioSection';
 import AccountDataSection from './dashboard/sections/AccountDataSection';
 import {
   NOW_RPC_SEQUENCE,
+  DEFAULT_PROFISSIONAL_HORARIOS,
   SUPORTE_HREF,
   WEEKDAYS,
   compareAgendamentoDateTimeDesc,
@@ -223,7 +224,7 @@ export default function Dashboard({ user, onLogout }) {
 
   const [showEditProfissional, setShowEditProfissional]       = useState(false);
   const [editingProfissionalId, setEditingProfissionalId]     = useState(null);
-  const [formProfissional, setFormProfissional] = useState({ nome: '', profissao: '', anos_experiencia: '', horario_inicio: '08:00', horario_fim: '18:00', almoco_inicio: '', almoco_fim: '', dias_trabalho: [1,2,3,4,5,6] });
+  const [formProfissional, setFormProfissional] = useState({ nome: '', profissao: '', anos_experiencia: '', horarios: DEFAULT_PROFISSIONAL_HORARIOS });
 
 
   useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
