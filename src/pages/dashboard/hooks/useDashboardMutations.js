@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../../../supabase';
-import { isEnderecoPadrao, toNumberOrNull, toUpperClean } from '../utils';
+import { getDiasTrabalhoFromHorarios, isEnderecoPadrao, timeToMinutes, toNumberOrNull, toUpperClean } from '../utils';
 import { aprovarParceiroProfissional, removeNegocioSeguramente, removeProfissionalSeguramente } from '../api/dashboardApi';
 import { convertImageToWebp, isImageFile } from '../../../utils/media';
 
@@ -387,18 +387,40 @@ export function useDashboardMutations({
     try {
       setSubmittingProfissional(true);
       if (!await checarPermissao(editingProfissionalId)) return;
+      const horarios = Array.isArray(formProfissional.horarios) ? formProfissional.horarios : [];
+      const diasAtivos = getDiasTrabalhoFromHorarios(horarios);
+      if (!diasAtivos.length) throw new Error('profissional_horarios_sem_dia_ativo');
+      for (const h of horarios) {
+        if (h.ativo === false) continue;
+        const inicio = timeToMinutes(h.horario_inicio);
+        const fim = timeToMinutes(h.horario_fim);
+        const almocoInicio = h.almoco_inicio ? timeToMinutes(h.almoco_inicio) : null;
+        const almocoFim = h.almoco_fim ? timeToMinutes(h.almoco_fim) : null;
+        if (!Number.isFinite(inicio) || !Number.isFinite(fim) || inicio >= fim) throw new Error('profissional_horarios_invalidos');
+        if ((almocoInicio == null) !== (almocoFim == null)) throw new Error('profissional_horarios_invalidos');
+        if (almocoInicio != null && (almocoInicio >= almocoFim || almocoInicio < inicio || almocoFim > fim)) throw new Error('profissional_horarios_invalidos');
+      }
       const payload = {
         nome: String(formProfissional.nome || '').trim(),
         profissao: toUpperClean(formProfissional.profissao) || null,
         anos_experiencia: formProfissional.anos_experiencia !== '' ? Number(formProfissional.anos_experiencia) : null,
-        horario_inicio: formProfissional.horario_inicio || '08:00',
-        horario_fim: formProfissional.horario_fim || '18:00',
-        almoco_inicio: formProfissional.almoco_inicio || null,
-        almoco_fim: formProfissional.almoco_fim || null,
-        dias_trabalho: formProfissional.dias_trabalho,
+        horarios: horarios.map((h) => ({
+          dia_semana: Number(h.dia_semana),
+          ativo: h.ativo !== false,
+          horario_inicio: h.horario_inicio || '08:00',
+          horario_fim: h.horario_fim || '18:00',
+          almoco_inicio: h.almoco_inicio || null,
+          almoco_fim: h.almoco_fim || null,
+        })),
       };
       if (!payload.nome) throw new Error('Nome obrigatorio.');
-      const { error: updErr } = await supabase.from('profissionais').update(payload).eq('id', editingProfissionalId).eq('negocio_id', negocio.id);
+      const { error: updErr } = await supabase.rpc('update_profissional_com_horarios', {
+        p_profissional_id: editingProfissionalId,
+        p_nome: payload.nome,
+        p_profissao: payload.profissao,
+        p_anos_experiencia: payload.anos_experiencia,
+        p_horarios: payload.horarios,
+      });
       if (updErr) throw updErr;
       await uiAlert('dashboard.professional_updated', 'success');
       setShowEditProfissional(false);
@@ -406,7 +428,8 @@ export function useDashboardMutations({
       await reloadProfissionais();
     } catch (e) {
       const msg = String(e?.message || '');
-      if (msg.includes('profissional_almoco_bloqueado')) await uiAlert('dashboard.professional_almoco_blocked', 'error');
+      if (msg.includes('profissional_horarios_invalidos') || msg.includes('profissional_horarios_sem_dia_ativo')) await uiAlert('dashboard.professional_update_error', 'error');
+      else if (msg.includes('profissional_almoco_bloqueado')) await uiAlert('dashboard.professional_almoco_blocked', 'error');
       else if (msg.includes('profissional_dia_bloqueado')) await uiAlert('dashboard.professional_dia_blocked', 'error');
       else if (msg.includes('profissional_horario_bloqueado') || msg.includes('profissional_expediente_bloqueado')) await uiAlert('dashboard.professional_schedule_blocked', 'error');
       else await uiAlert('dashboard.professional_update_error', 'error');
