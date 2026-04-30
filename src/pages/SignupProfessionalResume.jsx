@@ -246,7 +246,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
             anos_experiencia: anosExperiencia,
             horario_inicio: '08:00',
             horario_fim: '18:00',
-            dias_trabalho: [1, 2, 3, 4, 5, 6],
+            dias_trabalho: [1, 2, 3, 4, 5],
           },
         });
 
