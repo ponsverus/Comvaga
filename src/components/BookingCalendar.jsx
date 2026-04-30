@@ -26,6 +26,15 @@ function firstDow(y, m)     { return new Date(y, m - 1, 1).getDay(); }
 function isoLt(a, b)        { return String(a) < String(b); }
 function isoEq(a, b)        { return String(a) === String(b); }
 function timeToMin(t)       { if (!t) return 0; const [h, m] = String(t).split(':').map(Number); return h * 60 + (m || 0); }
+function getDiasTrabalho(profissional) {
+  if (Array.isArray(profissional?.horarios) && profissional.horarios.length) {
+    return profissional.horarios
+      .filter((h) => h?.ativo !== false)
+      .map((h) => Number(h.dia_semana))
+      .filter((d) => Number.isInteger(d) && d >= 0 && d <= 6);
+  }
+  return [1, 2, 3, 4, 5];
+}
 
 const MONTH_NAMES   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const WEEKDAY_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -216,7 +225,7 @@ export default function BookingCalendar({
   function nextMonth() { if (viewMonth === 12) { setViewYear(y => y + 1); setViewMonth(1); } else setViewMonth(m => m + 1); }
 
   const canGoPrev    = !(viewYear === today?.year && viewMonth === today?.month);
-  const diasTrabalho = profissional?.dias_trabalho ?? [1, 2, 3, 4, 5, 6];
+  const diasTrabalho = getDiasTrabalho(profissional);
   const valorExibido = entrega?.preco_promocional
     ? Number(entrega.preco_promocional).toFixed(2)
     : Number(entrega?.preco ?? 0).toFixed(2);
