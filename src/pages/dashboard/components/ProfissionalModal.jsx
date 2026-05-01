@@ -83,7 +83,7 @@ export default function ProfissionalModal({
               value={formProfissional.anos_experiencia}
               onChange={(e) => setFormProfissional({ ...formProfissional, anos_experiencia: e.target.value })}
               className={professionalInputClass}
-              placeholder="ANOS DE EXPERIENCIA"
+              placeholder="ANOS DE EXPERIÊNCIA"
             />
           </ProfessionalFieldRow>
 
@@ -105,7 +105,7 @@ export default function ProfissionalModal({
                       {d.label}
                     </button>
                     <div className={`h-px flex-1 ${ativo ? 'bg-primary/20' : 'bg-gray-800'}`} />
-                    <span className={`text-[11px] uppercase ${ativo ? 'text-primary' : 'text-gray-600'}`}>{ativo ? 'ATIVO' : 'FECHADO'}</span>
+                    <span className={`text-[11px] uppercase ${ativo ? 'text-primary' : 'text-gray-600'}`}>{ativo ? 'ABERTO' : 'FECHADO'}</span>
                   </div>
 
                   <div className={ativo ? 'space-y-4' : 'pointer-events-none space-y-4 opacity-35'}>
@@ -126,7 +126,7 @@ export default function ProfissionalModal({
                       </TimeCell>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      <TimeCell label="PAUSA INICIO">
+                      <TimeCell label="PAUSA INÍCIO">
                         <TimePicker
                           value={item.almoco_inicio || ''}
                           onChange={(v) => updateHorario(d.value, { almoco_inicio: v })}
