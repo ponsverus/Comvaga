@@ -15,7 +15,6 @@ export function useVitrinePresentation({
   getDowFromDateSP,
   resolveInstagram,
   resolveFacebook,
-  timeToMinutes,
 }) {
   const logoUrl = useMemo(() => getPublicUrl('logos', negocio?.logo_path), [getPublicUrl, negocio?.logo_path]);
   const instagramUrl = useMemo(() => resolveInstagram(negocio?.instagram), [negocio?.instagram, resolveInstagram]);
@@ -50,30 +49,6 @@ export function useVitrinePresentation({
     const horario = getHorarioExibicao(p);
     return { ini: horario?.almoco_inicio || null, fim: horario?.almoco_fim || null };
   }, [getHorarioExibicao]);
-
-  const isInLunchNow = useCallback((p) => {
-    const { ini, fim } = getAlmocoRange(p);
-    if (!ini || !fim) return false;
-    const a = timeToMinutes(ini);
-    const b = timeToMinutes(fim);
-    if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
-    if (b < a) return (serverNow.minutes >= a || serverNow.minutes < b);
-    return (serverNow.minutes >= a && serverNow.minutes < b);
-  }, [getAlmocoRange, serverNow.minutes, timeToMinutes]);
-
-  const getProfStatus = useCallback((p) => {
-    if (p?.status !== 'ativo') return { label: 'FECHADO', color: 'bg-red-500' };
-    if (!serverNow.date) return null;
-    const hojeDow = getDowFromDateSP(serverNow.date);
-    const horarioHoje = getHorarioDia(p, hojeDow);
-    const ini = timeToMinutes(horarioHoje?.horario_inicio || '08:00');
-    const fim = timeToMinutes(horarioHoje?.horario_fim || '18:00');
-    const trabalhaHoje = horarioHoje ? horarioHoje.ativo !== false : (hojeDow == null ? true : [1, 2, 3, 4, 5].includes(hojeDow));
-    const dentroHorario = serverNow.minutes >= ini && serverNow.minutes < fim;
-    if (!(trabalhaHoje && dentroHorario)) return { label: 'FECHADO', color: 'bg-red-500' };
-    if (isInLunchNow(p)) return { label: 'PAUSA', color: 'bg-yellow-400' };
-    return { label: 'ABERTO', color: 'bg-green-500' };
-  }, [getDowFromDateSP, getHorarioDia, isInLunchNow, serverNow.date, serverNow.minutes, timeToMinutes]);
 
   const entregasPorProf = useMemo(() => {
     const map = new Map();
@@ -114,7 +89,10 @@ export function useVitrinePresentation({
       return {
         ...prof,
         avatarUrl: getPublicUrl('avatars', prof.avatar_path),
-        status: getProfStatus(prof),
+        status: {
+          label: String(prof?.status_label || 'FECHADO'),
+          color: String(prof?.status_color || 'bg-red-500'),
+        },
         depInfo: depoimentosPorProf.get(prof.id),
         profissaoLabel: String(prof?.profissao ?? '').trim(),
         almoco: getAlmocoRange(prof),
@@ -123,7 +101,7 @@ export function useVitrinePresentation({
         totalEntregas,
       };
     })
-  ), [depoimentosPorProf, entregasPorProf, getAlmocoRange, getHorarioExibicao, getProfStatus, getPublicUrl, profissionais]);
+  ), [depoimentosPorProf, entregasPorProf, getAlmocoRange, getHorarioExibicao, getPublicUrl, profissionais]);
 
   const entregaCards = useMemo(() => (
     profissionais.map((prof) => {
