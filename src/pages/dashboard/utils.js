@@ -67,6 +67,12 @@ export function normalizeProfissionalHorarios(profissional = {}) {
   });
 }
 
+export function getHorarioPorDia(horarios, diaSemana) {
+  const dia = Number(diaSemana);
+  if (!Number.isInteger(dia) || dia < 0 || dia > 6) return null;
+  return (Array.isArray(horarios) ? horarios : []).find((h) => Number(h?.dia_semana) === dia) || null;
+}
+
 export function getDiasTrabalhoFromHorarios(horarios) {
   return (Array.isArray(horarios) ? horarios : [])
     .filter((h) => h?.ativo !== false)
@@ -75,9 +81,19 @@ export function getDiasTrabalhoFromHorarios(horarios) {
     .sort((a, b) => a - b);
 }
 
-export function formatHorariosResumo(horarios) {
+export function formatHorariosResumo(horarios, diaDestaque = null) {
   const ativos = (Array.isArray(horarios) ? horarios : []).filter((h) => h?.ativo !== false);
   if (!ativos.length) return 'Sem dias ativos';
+
+  const destaque = getHorarioPorDia(ativos, diaDestaque);
+  if (destaque) {
+    const label = WEEKDAYS.find((w) => w.value === Number(diaDestaque))?.label || '';
+    const range = `${String(destaque.horario_inicio || '08:00').slice(0, 5)} - ${String(destaque.horario_fim || '18:00').slice(0, 5)}`;
+    return destaque.ativo !== false
+      ? `${label} ${range}`
+      : `${label} INATIVO`;
+  }
+
   const grupos = new Map();
   for (const h of ativos) {
     const key = `${String(h.horario_inicio || '08:00').slice(0, 5)}-${String(h.horario_fim || '18:00').slice(0, 5)}`;
