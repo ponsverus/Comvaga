@@ -104,6 +104,20 @@ export function formatHorariosResumo(horarios, diaDestaque = null) {
   return grupos.size === 1 ? `${labels} ${range.replace('-', ' - ')}` : `${labels} ${range.replace('-', ' - ')} + OUTROS`;
 }
 
+export function getSemanaResumo(horarios, diaDestaque = null) {
+  return WEEKDAYS.map((dia) => {
+    const item = (Array.isArray(horarios) ? horarios : []).find((h) => Number(h?.dia_semana) === dia.value);
+    const ativo = item?.ativo !== false;
+    const destaque = Number(diaDestaque) === dia.value;
+    return {
+      ...dia,
+      ativo,
+      destaque,
+      item,
+    };
+  });
+}
+
 export const toNumberOrNull = (v) => {
   if (v === '' || v == null) return null;
   const n = Math.round(Number(v) * 100) / 100;
