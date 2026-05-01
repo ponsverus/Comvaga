@@ -1,6 +1,6 @@
 import React from 'react';
 import { Clock, Plus } from 'lucide-react';
-import { formatHorariosResumo, normalizeKey, normalizeProfissionalHorarios, STATUS_COLOR_CLASS } from '../utils';
+import { formatHorariosResumo, normalizeKey, normalizeProfissionalHorarios, STATUS_COLOR_CLASS, WEEKDAYS } from '../utils';
 
 function buildProfissionalForm(p) {
   return {
@@ -21,6 +21,7 @@ export default function ProfissionaisSection({
   parceiroProfissional,
   entregas,
   counterPlural,
+  todayDow,
   aprovarParceiro,
   excluirProfissional,
   toggleStatusProfissional,
@@ -80,7 +81,7 @@ export default function ProfissionaisSection({
                   </div>
                   {p.profissao && <p className="text-xs text-gray-500 mt-1">{p.profissao}</p>}
                   {!isPendente && p.anos_experiencia != null && (
-                    <p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIÊNCIA</p>
+                    <p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIENCIA</p>
                   )}
                 </div>
               </div>
@@ -89,7 +90,26 @@ export default function ProfissionaisSection({
                 <>
                   <div className="text-sm text-gray-400 mb-3">{entregas.filter((s) => s.profissional_id === p.id).length} {counterPlural}</div>
                   <div className="text-xs text-gray-500 mb-3">
-                    <Clock className="w-4 h-4 inline mr-1" />{formatHorariosResumo(horarios)}
+                    <Clock className="w-4 h-4 inline mr-1" />{formatHorariosResumo(horarios, todayDow)}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mb-1">
+                    {WEEKDAYS.map((dia) => {
+                      const item = horarios.find((h) => h.dia_semana === dia.value);
+                      const ativo = item?.ativo !== false;
+                      const ehHoje = Number(todayDow) === dia.value;
+                      const chipClass = ehHoje
+                        ? (ativo ? 'bg-yellow-500/20 border-yellow-400 text-yellow-200' : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300')
+                        : (ativo ? 'bg-green-500/10 border-green-500/30 text-green-300' : 'bg-gray-900 border-gray-800 text-gray-500');
+                      return (
+                        <span
+                          key={dia.value}
+                          className={`px-2 py-1 text-[10px] rounded-full border leading-none uppercase ${chipClass}`}
+                          title={item ? `${dia.label} ${ativo ? `${String(item.horario_inicio || '08:00').slice(0, 5)} - ${String(item.horario_fim || '18:00').slice(0, 5)}` : 'INATIVO'}` : `${dia.label} sem configuração`}
+                        >
+                          {dia.label}
+                        </span>
+                      );
+                    })}
                   </div>
                 </>
               )}
