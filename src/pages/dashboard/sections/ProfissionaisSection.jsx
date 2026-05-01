@@ -80,7 +80,7 @@ export default function ProfissionaisSection({
                   </div>
                   {p.profissao && <p className="text-xs text-gray-500 mt-1">{p.profissao}</p>}
                   {!isPendente && p.anos_experiencia != null && (
-                    <p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIENCIA</p>
+                    <p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIÊNCIA</p>
                   )}
                 </div>
               </div>
