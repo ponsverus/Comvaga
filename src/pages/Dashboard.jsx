@@ -735,9 +735,10 @@ export default function Dashboard({ user, onLogout }) {
                 adminJaEhProfissional={adminJaEhProfissional}
                 cadastrarAdminComoProfissional={cadastrarAdminComoProfissional}
                 submittingAdminProf={submittingAdminProf}
-                profissionais={profissionais}
-                parceiroProfissional={parceiroProfissional}
-                entregas={entregas}
+              profissionais={profissionais}
+              todayDow={serverNow?.dow ?? null}
+              parceiroProfissional={parceiroProfissional}
+              entregas={entregas}
                 counterPlural={counterPlural}
                 aprovarParceiro={aprovarParceiro}
                 excluirProfissional={excluirProfissional}
