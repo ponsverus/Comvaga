@@ -1,6 +1,6 @@
 import React from 'react';
 import { Clock, Plus } from 'lucide-react';
-import { formatHorariosResumo, normalizeKey, normalizeProfissionalHorarios, STATUS_COLOR_CLASS, WEEKDAYS } from '../utils';
+import { formatHorariosResumo, getSemanaResumo, normalizeKey, normalizeProfissionalHorarios, STATUS_COLOR_CLASS } from '../utils';
 
 function buildProfissionalForm(p) {
   return {
@@ -92,22 +92,24 @@ export default function ProfissionaisSection({
                   <div className="text-xs text-gray-500 mb-3">
                     <Clock className="w-4 h-4 inline mr-1" />{formatHorariosResumo(horarios, todayDow)}
                   </div>
-                  <div className="flex flex-wrap gap-1.5 mb-1">
-                    {WEEKDAYS.map((dia) => {
-                      const item = horarios.find((h) => h.dia_semana === dia.value);
-                      const ativo = item?.ativo !== false;
-                      const ehHoje = Number(todayDow) === dia.value;
-                      const chipClass = ehHoje
-                        ? (ativo ? 'bg-yellow-500/20 border-yellow-400 text-yellow-200' : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300')
-                        : (ativo ? 'bg-green-500/10 border-green-500/30 text-green-300' : 'bg-gray-900 border-gray-800 text-gray-500');
+                  <div className="text-xs text-gray-500 mb-1">
+                    {getSemanaResumo(horarios, todayDow).map((dia, idx, arr) => {
+                      const item = dia.item;
+                      const ativo = dia.ativo;
+                      const isHoje = dia.destaque;
+                      const cl = isHoje
+                        ? 'text-yellow-300'
+                        : ativo
+                          ? 'text-gray-400'
+                          : 'text-gray-600';
+                      const texto = item
+                        ? `${dia.label}${isHoje && ativo ? ` • ${String(item.horario_inicio || '08:00').slice(0, 5)} - ${String(item.horario_fim || '18:00').slice(0, 5)}` : ''}`
+                        : dia.label;
                       return (
-                        <span
-                          key={dia.value}
-                          className={`px-2 py-1 text-[10px] rounded-full border leading-none uppercase ${chipClass}`}
-                          title={item ? `${dia.label} ${ativo ? `${String(item.horario_inicio || '08:00').slice(0, 5)} - ${String(item.horario_fim || '18:00').slice(0, 5)}` : 'INATIVO'}` : `${dia.label} sem configuração`}
-                        >
-                          {dia.label}
-                        </span>
+                        <React.Fragment key={dia.value}>
+                          <span className={cl}>{texto}</span>
+                          {idx < arr.length - 1 && <span className="mx-1 text-gray-700">•</span>}
+                        </React.Fragment>
                       );
                     })}
                   </div>
