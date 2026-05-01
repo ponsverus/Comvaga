@@ -84,8 +84,8 @@ export function formatHorariosResumo(horarios) {
     grupos.set(key, [...(grupos.get(key) || []), Number(h.dia_semana)]);
   }
   const [range, dias] = [...grupos.entries()].sort((a, b) => b[1].length - a[1].length)[0];
-  const labels = dias.map((d) => WEEKDAYS.find((w) => w.value === d)?.label).filter(Boolean).join('/');
-  return grupos.size === 1 ? `${labels} ${range.replace('-', ' - ')}` : `${labels} ${range.replace('-', ' - ')} + outros`;
+  const labels = dias.map((d) => WEEKDAYS.find((w) => w.value === d)?.label).filter(Boolean).join(' • ');
+  return grupos.size === 1 ? `${labels} ${range.replace('-', ' - ')}` : `${labels} ${range.replace('-', ' - ')} + OUTROS`;
 }
 
 export const toNumberOrNull = (v) => {
