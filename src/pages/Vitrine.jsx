@@ -20,12 +20,6 @@ import VitrineTopSection from './vitrine/sections/VitrineTopSection';
 
 const NOW_RPC_SEQUENCE = ['now_sp', 'now_sp_fallback'];
 
-function timeToMinutes(t) {
-  if (!t) return 0;
-  const [h, m] = String(t).split(':').map(Number);
-  return (h * 60) + (m || 0);
-}
-
 function formatDateBR(ymd) {
   if (!ymd) return '';
   const [y, m, d] = String(ymd).split('-');
@@ -134,12 +128,6 @@ function gerarArquivoICS({ titulo, dataISO, inicioHHMM, fimHHMM, duracaoMin, det
     content,
     filename: `${slugifyFilePart(titulo)}-${String(dataISO || '').replace(/-/g, '')}.ics`,
   };
-}
-
-function normalizeDiasTrabalho(arr) {
-  const base = Array.isArray(arr) ? arr : [];
-  const cleaned = base.map((n) => Number(n)).filter((n) => Number.isFinite(n)).map((n) => (n === 7 ? 0 : n)).filter((n) => n >= 0 && n <= 6);
-  return Array.from(new Set(cleaned)).sort((a, b) => a - b);
 }
 
 function resolveInstagram(instaRaw) {
@@ -487,10 +475,8 @@ export default function Vitrine({ user, userType }) {
     getPublicUrl,
     getPrecoFinalServico,
     getDowFromDateSP,
-    normalizeDiasTrabalho,
     resolveInstagram,
     resolveFacebook,
-    timeToMinutes,
   });
 
   if (loading) return (<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-primary text-2xl font-normal animate-pulse">CARREGANDO...</div></div>);
