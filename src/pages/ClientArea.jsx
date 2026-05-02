@@ -39,7 +39,7 @@ const PAGE_SIZE = 50;
 
 const maskedPrivateValue = '••••••••';
 
-function HeartIcon({ filled = false, className = '', size = 20 }) {
+function Heart({ filled = false, className = '', size = 20 }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +78,7 @@ export default function ClientArea({ user, onLogout }) {
     if (feedback?.showMessage) feedback.showMessage(key, { variant, ...params });
   }, [feedback]);
 
-  const uiConfirm = async (key, variant = 'warning') => {
+  const ufirm = async (key, variant = 'warning') => {
     return !!(await feedback.confirm(key, { variant }));
   };
 
@@ -357,7 +357,7 @@ export default function ClientArea({ user, onLogout }) {
   };
 
   const cancelarAgendamento = async (agendamentoId) => {
-    const ok = await uiConfirm('clientArea.booking_cancel_confirm', 'warning');
+    const ok = await ufirm('clientArea.booking_cancel_confirm', 'warning');
     if (!ok) return;
     try {
       const { error } = await supabase.rpc('cancelar_agendamento', { p_agendamento_id: agendamentoId });
@@ -655,7 +655,7 @@ export default function ClientArea({ user, onLogout }) {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 items-start">
           <Link to="/" className="bg-gradient-to-r from-primary to-yellow-600 rounded-custom p-6 hover:shadow-lg hover:shadow-primary/50 transition-all">
-            <CalendarIcon className="w-8 h-8 text-black mb-3" />
+            <Calendar className="w-8 h-8 text-black mb-3" />
             <h3 className="text-lg font-normal text-black mb-1">NOVO AGENDAMENTO</h3>
           </Link>
           <button onClick={() => setActiveTab('favoritos')} className="bg-dark-100 border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all text-left">
@@ -695,7 +695,7 @@ export default function ClientArea({ user, onLogout }) {
                   </>
                 ) : (
                   <div className="text-center py-12">
-                    <AgendamentosIcon className="w-16 h-16 mx-auto mb-4 text-gray-500 opacity-40" />
+                    <CalendarIcon className="w-16 h-16 mx-auto mb-4 text-gray-500 opacity-40" />
                     <Link to="/" className="inline-block px-6 py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button hover:shadow-lg transition-all">
                       AGENDAR
                     </Link>
@@ -773,7 +773,7 @@ export default function ClientArea({ user, onLogout }) {
                       value={nomePerfil}
                       onChange={(e) => setNomePerfil(e.target.value)}
                       className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
-                      placeholder="Nome do perfil"
+                      placeholder="NOME DO PERFIL"
                     />
                   </div>
                   <button
@@ -795,7 +795,7 @@ export default function ClientArea({ user, onLogout }) {
                       onChange={(e) => setNovoEmail(e.target.value)}
                       readOnly={!emailVisivel}
                       className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
-                      placeholder="E-mail de acesso"
+                      placeholder="E-MAIL DE ACESSO"
                     />
                   </div>
                   {emailVisivel ? (
