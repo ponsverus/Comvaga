@@ -301,7 +301,7 @@ export default function ClientArea({ user, onLogout }) {
   };
 
   const salvarNome = async () => {
-    const nome = String(nomePerfil || '').trim();
+    const nome = String(nomePerfil || '').trim().toUpperCase();
     if (!nome) { uiAlert('clientArea.profile_name_required', 'error'); return; }
     try {
       setSavingPerfil(true);
@@ -794,7 +794,7 @@ export default function ClientArea({ user, onLogout }) {
                       value={emailVisivel ? novoEmail : maskedPrivateValue}
                       onChange={(e) => setNovoEmail(e.target.value)}
                       readOnly={!emailVisivel}
-                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase truncate max-w-[calc(100vw-13.75rem)] placeholder-gray-600 outline-none focus:text-white sm:max-w-none"
+                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase truncate pr-2 placeholder-gray-600 outline-none focus:text-white"
                       placeholder="E-MAIL DE ACESSO"
                     />
                   </div>
