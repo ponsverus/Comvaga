@@ -785,19 +785,27 @@ export default function ClientArea({ user, onLogout }) {
                     {savingPerfil ? 'SALVANDO' : 'SALVAR'}
                   </button>
                 </div>
-
+                
                 <div className="flex items-start gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
-                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">E-MAIL</span>
+                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">
+                    E-MAIL
+                  </span>
+
                   <div className="min-w-0 flex-1">
                     <input
                       type={emailVisivel ? 'email' : 'text'}
                       value={emailVisivel ? novoEmail : maskedPrivateValue}
                       onChange={(e) => setNovoEmail(e.target.value)}
                       readOnly={!emailVisivel}
-                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase truncate max-w-[calc(100vw-13.75rem)] placeholder-gray-600 outline-none focus:text-white sm:max-w-none"
+                      className="w-full min-w-0 bg-transparent px-0 py-2 text-[14px] text-white uppercase truncate placeholder-gray-600 outline-none focus:text-white"
                       placeholder="E-MAIL DE ACESSO"
                     />
                   </div>
+
+                 <button className="shrink-0">
+                   {/* botão */}
+                 </button>
+               </div>
                   {emailVisivel ? (
                     <button
                       type="button"
