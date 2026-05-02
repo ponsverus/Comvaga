@@ -659,7 +659,7 @@ export default function ClientArea({ user, onLogout }) {
             <h3 className="text-lg font-normal text-black mb-1">NOVO AGENDAMENTO</h3>
           </Link>
           <button onClick={() => setActiveTab('favoritos')} className="bg-dark-100 border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all text-left">
-            <HeartIcon filled size={32} className="text-red-500 mb-3" />
+            <Heart filled size={32} className="text-red-500 mb-3" />
             <h3 className="text-lg font-normal mb-1">{favoritos.length} FAVORITOS</h3>
           </button>
           <button onClick={() => setActiveTab('agendamentos')} className="bg-dark-100 border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all text-left">
@@ -729,7 +729,7 @@ export default function ClientArea({ user, onLogout }) {
                             <X className="w-4 h-4 text-red-400" />
                           </button>
                           <div className="mb-3">
-                            <HeartIcon filled size={24} className="text-red-500 mb-3" />
+                            <Heart filled size={24} className="text-red-500 mb-3" />
                             <h3 className="text-lg font-normal text-white mb-1">{nomeFav}</h3>
                             <p className="text-xs text-gray-500 uppercase">{tipoNegocio}</p>
                           </div>
@@ -744,7 +744,7 @@ export default function ClientArea({ user, onLogout }) {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <HeartIcon filled size={64} className="text-red-500/30 mx-auto mb-4" />
+                    <Heart filled size={64} className="text-red-500/30 mx-auto mb-4" />
                     <Link to="/" className="inline-block px-6 py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button hover:shadow-lg transition-all">
                       EXPLORAR
                     </Link>
