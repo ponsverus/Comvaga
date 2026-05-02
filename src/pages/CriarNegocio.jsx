@@ -152,7 +152,7 @@ export default function CriarNegocio({ user }) {
       navigate('/selecionar-negocio');
     } catch (err) {
       console.error('CriarNegocio error:', err);
-      showMessage('alerts.action_failed_support');
+      showMessage('signupProfessional.business_create_error');
     } finally {
       setLoading(false);
     }
