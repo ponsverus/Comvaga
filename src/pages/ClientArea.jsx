@@ -695,7 +695,7 @@ export default function ClientArea({ user, onLogout }) {
                   </>
                 ) : (
                   <div className="text-center py-12">
-                    <AgendamentosIcon className="w-16 h-16 mx-auto mb-4 text-gray-500 opacity-40" />
+                    <CalendarIcon className="w-16 h-16 mx-auto mb-4 text-gray-500 opacity-40" />
                     <Link to="/" className="inline-block px-6 py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button hover:shadow-lg transition-all">
                       AGENDAR
                     </Link>
@@ -773,7 +773,7 @@ export default function ClientArea({ user, onLogout }) {
                       value={nomePerfil}
                       onChange={(e) => setNomePerfil(e.target.value)}
                       className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
-                      placeholder="Nome do perfil"
+                      placeholder="NOME DO PERFIL"
                     />
                   </div>
                   <button
@@ -794,8 +794,8 @@ export default function ClientArea({ user, onLogout }) {
                       value={emailVisivel ? novoEmail : maskedPrivateValue}
                       onChange={(e) => setNovoEmail(e.target.value)}
                       readOnly={!emailVisivel}
-                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
-                      placeholder="E-mail de acesso"
+                      className={`${inputClass} uppercase max-w-[calc(100vw-13.75rem)] truncate pr-4 sm:max-w-none sm:pr-0`}
+                      placeholder="E-MAIL DE ACESSO"
                     />
                   </div>
                   {emailVisivel ? (
