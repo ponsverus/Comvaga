@@ -301,7 +301,7 @@ export default function ClientArea({ user, onLogout }) {
   };
 
   const salvarNome = async () => {
-    const nome = String(nomePerfil || '').trim().toUpperCase();
+    const nome = String(nomePerfil || '').trim();
     if (!nome) { uiAlert('clientArea.profile_name_required', 'error'); return; }
     try {
       setSavingPerfil(true);
