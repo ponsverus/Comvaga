@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { History, LogOut, X } from 'lucide-react';
+import { LogOut, X } from 'lucide-react';
 import { CalendarIcon, TimePastIcon } from '../components/icons';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
@@ -78,7 +78,7 @@ export default function ClientArea({ user, onLogout }) {
     if (feedback?.showMessage) feedback.showMessage(key, { variant, ...params });
   }, [feedback]);
 
-  const ufirm = async (key, variant = 'warning') => {
+  const uiConfirm = async (key, variant = 'warning') => {
     return !!(await feedback.confirm(key, { variant }));
   };
 
@@ -233,7 +233,7 @@ export default function ClientArea({ user, onLogout }) {
       setAgendamentosHasMore(false);
       setFavoritosHasMore(false);
       setAvaliacoesPorAgendamento({});
-      uiAlert('alerts.action_failed_support', 'warning');
+      uiAlert('clientArea.load_data_error', 'warning');
     } finally {
       setLoading(false);
     }
@@ -357,7 +357,7 @@ export default function ClientArea({ user, onLogout }) {
   };
 
   const cancelarAgendamento = async (agendamentoId) => {
-    const ok = await ufirm('clientArea.booking_cancel_confirm', 'warning');
+    const ok = await uiConfirm('clientArea.booking_cancel_confirm', 'warning');
     if (!ok) return;
     try {
       const { error } = await supabase.rpc('cancelar_agendamento', { p_agendamento_id: agendamentoId });
@@ -378,7 +378,7 @@ export default function ClientArea({ user, onLogout }) {
     const profissionalId = agendamento?.profissional_id || null;
     const entregaId = agendamento?.entrega_id || null;
     if (!slug || !profissionalId || !entregaId) {
-      uiAlert('alerts.action_failed_support', 'warning');
+      uiAlert('clientArea.rebook_unavailable', 'warning');
       return;
     }
     navigate(`/v/${slug}`, {
@@ -453,7 +453,7 @@ export default function ClientArea({ user, onLogout }) {
       setAgendamentosPage(nextPage);
       setAgendamentosHasMore(rows.length === PAGE_SIZE);
     } catch {
-      uiAlert('alerts.action_failed_support', 'warning');
+      uiAlert('clientArea.load_more_agendamentos_error', 'warning');
     } finally {
       setAgendamentosLoadingMore(false);
     }
@@ -469,7 +469,7 @@ export default function ClientArea({ user, onLogout }) {
       setFavoritosPage(nextPage);
       setFavoritosHasMore(rows.length === PAGE_SIZE);
     } catch {
-      uiAlert('alerts.action_failed_support', 'warning');
+      uiAlert('clientArea.load_more_favoritos_error', 'warning');
     } finally {
       setFavoritosLoadingMore(false);
     }
