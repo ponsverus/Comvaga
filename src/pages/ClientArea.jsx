@@ -655,7 +655,7 @@ export default function ClientArea({ user, onLogout }) {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 items-start">
           <Link to="/" className="bg-gradient-to-r from-primary to-yellow-600 rounded-custom p-6 hover:shadow-lg hover:shadow-primary/50 transition-all">
-            <Calendar className="w-8 h-8 text-black mb-3" />
+            <CalendarIcon className="w-8 h-8 text-black mb-3" />
             <h3 className="text-lg font-normal text-black mb-1">NOVO AGENDAMENTO</h3>
           </Link>
           <button onClick={() => setActiveTab('favoritos')} className="bg-dark-100 border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all text-left">
@@ -772,7 +772,7 @@ export default function ClientArea({ user, onLogout }) {
                       type="text"
                       value={nomePerfil}
                       onChange={(e) => setNomePerfil(e.target.value)}
-                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
+                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase placeholder-gray-600 outline-none focus:text-white"
                       placeholder="NOME DO PERFIL"
                     />
                   </div>
@@ -794,7 +794,7 @@ export default function ClientArea({ user, onLogout }) {
                       value={emailVisivel ? novoEmail : maskedPrivateValue}
                       onChange={(e) => setNovoEmail(e.target.value)}
                       readOnly={!emailVisivel}
-                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white"
+                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase truncate max-w-[calc(100vw-13.75rem)] placeholder-gray-600 outline-none focus:text-white sm:max-w-none"
                       placeholder="E-MAIL DE ACESSO"
                     />
                   </div>
