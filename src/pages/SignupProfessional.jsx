@@ -9,6 +9,16 @@ const PROFILE_TABLE = 'users';
 const isValidType = (t) => t === 'client' || t === 'professional';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+function isEmailAlreadyExistsError(err) {
+  const text = String(err?.message || err?.error_description || err?.details || '').toLowerCase();
+  return (
+    text.includes('already registered') ||
+    text.includes('already exists') ||
+    text.includes('email already exists') ||
+    text.includes('user already registered')
+  );
+}
+
 async function fetchProfileTypeWithRetry(userId) {
   const delays = [200, 300, 400, 500, 600, 600, 700, 800];
 
@@ -172,7 +182,13 @@ export default function SignupProfessional({ onLogin }) {
         options: { data: { type: 'professional', nome } },
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        if (isEmailAlreadyExistsError(authError)) {
+          showMessage('signupProfessional.email_already_exists');
+          return;
+        }
+        throw authError;
+      }
       if (!authData?.user?.id) throw new Error('Usuario nao retornado pelo Supabase.');
 
       if (!authData.session) {
