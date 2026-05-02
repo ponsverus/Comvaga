@@ -586,6 +586,42 @@ export const ptBR = {
   },
 
   clientArea: {
+    load_data_error: {
+      title: 'Erro ao carregar a área do cliente',
+      body:
+        'Houve uma falha ao carregar seus dados.\n\n' +
+        'Recarregue a página e tente novamente.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    load_more_agendamentos_error: {
+      title: 'Erro ao carregar agendamentos',
+      body:
+        'O carregamento de novos agendamentos falhou neste momento.\n\n' +
+        'Tente novamente em instantes.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    load_more_favoritos_error: {
+      title: 'Erro ao carregar favoritos',
+      body:
+        'O carregamento da lista de favoritos falhou agora.\n\n' +
+        'Tente novamente em instantes.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    rebook_unavailable: {
+      title: 'Reagendamento indisponível',
+      body:
+        'Dados insuficientes para reagendar.\n\n' +
+        'Tente abrir o negócio pela vitrine novamente.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
     avatar_invalid_format: {
       title: 'Formato inválido',
       body: 'Use PNG, JPG ou WEBP.',
@@ -845,6 +881,15 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    email_already_exists: {
+      title: 'Email já cadastrado',
+      body:
+        'Este email já possui uma conta.\n\n' +
+        'Use a tela de login para entrar ou recupere o acesso, se necessário.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
     password_too_short: {
       title: 'Senha muito curta',
       body: 'A senha deve ter no mínimo 7 caracteres.',
@@ -895,6 +940,15 @@ export const ptBR = {
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
+    },
+    email_already_exists: {
+      title: 'Email já cadastrado',
+      body:
+        'Este email já possui uma conta.\n\n' +
+        'Use a tela de login do parceiro ou recupere o acesso, se necessário.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
     },
     password_too_short: {
       title: 'Senha muito curta',
@@ -1011,6 +1065,24 @@ export const ptBR = {
         'Erro ao concluir o cadastro do profissional.\n\n' +
         'Tente novamente.\n\n' +
         'Se persistir, clique em SUPORTE na faixa amarela.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    resume_load_error: {
+      title: 'Erro ao carregar a retomada',
+      body:
+        'Houve uma falha ao carregar os dados de retomada.\n\n' +
+        'Recarregue a página e tente novamente.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    resume_error: {
+      title: 'Erro na retomada do cadastro',
+      body:
+        'O processo de retomada falhou neste momento.\n\n' +
+        'Tente novamente em alguns instantes.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'ENTENDI',
