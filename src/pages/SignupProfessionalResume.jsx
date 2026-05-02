@@ -137,7 +137,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         });
       } catch (err) {
         console.error('SignupProfessionalResume load error:', err);
-        showMessage('alerts.action_failed_support');
+        showMessage('signupProfessional.resume_load_error');
       } finally {
         if (active) setBooting(false);
       }
@@ -324,7 +324,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       navigate('/dashboard');
     } catch (err) {
       console.error('SignupProfessionalResume error:', err);
-      showMessage('alerts.action_failed_support');
+      showMessage('signupProfessional.resume_error');
     } finally {
       setLoading(false);
     }
