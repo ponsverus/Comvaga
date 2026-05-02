@@ -1,6 +1,6 @@
 import React from 'react';
 import { Clock, Plus } from 'lucide-react';
-import { formatHorariosResumo, getSemanaResumo, normalizeKey, normalizeProfissionalHorarios, STATUS_COLOR_CLASS } from '../utils';
+import { getHorarioPorDia, getSemanaResumo, normalizeKey, normalizeProfissionalHorarios, STATUS_COLOR_CLASS } from '../utils';
 
 function buildProfissionalForm(p) {
   return {
@@ -56,6 +56,10 @@ export default function ProfissionaisSection({
           const isEuMesmo = parceiroProfissional?.id === p.id;
           const isAdminOwnProfessionalCard = souDono && p.user_id && p.user_id === currentUserId;
           const horarios = normalizeProfissionalHorarios(p);
+          const horarioHoje = getHorarioPorDia(horarios, todayDow);
+          const almocoInicio = horarioHoje?.almoco_inicio ? String(horarioHoje.almoco_inicio).slice(0, 5) : null;
+          const almocoFim = horarioHoje?.almoco_fim ? String(horarioHoje.almoco_fim).slice(0, 5) : null;
+          const almocoTexto = almocoInicio && almocoFim ? `${almocoInicio} - ${almocoFim}` : 'SEM ALMOÇO';
           const openEditor = () => {
             setEditingProfissionalId(p.id);
             setFormProfissional(buildProfissionalForm(p));
@@ -90,7 +94,7 @@ export default function ProfissionaisSection({
                 <>
                   <div className="text-sm text-gray-400 mb-3">{entregas.filter((s) => s.profissional_id === p.id).length} {counterPlural}</div>
                   <div className="text-xs text-gray-500 mb-3">
-                    <Clock className="w-4 h-4 inline mr-1" />{formatHorariosResumo(horarios, todayDow)}
+                    <Clock className="w-4 h-4 inline mr-1" />ALMOÇO {almocoTexto}
                   </div>
                   <div className="text-xs text-gray-500 mb-1">
                     {getSemanaResumo(horarios, todayDow).map((dia, idx, arr) => {
