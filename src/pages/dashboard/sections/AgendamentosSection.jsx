@@ -14,6 +14,9 @@ export default function AgendamentosSection({
   hoje,
   confirmarAtendimento,
   cancelarAgendamento,
+  hasMore,
+  loadingMore,
+  onLoadMore,
 }) {
   return (
     <div>
@@ -68,6 +71,18 @@ export default function AgendamentosSection({
               </div>
             </div>
           ))}
+          {hasMore ? (
+            <div className="pt-2 text-center">
+              <button
+                type="button"
+                onClick={onLoadMore}
+                disabled={loadingMore}
+                className="rounded-button border border-primary/40 px-5 py-2 text-sm font-normal uppercase text-primary hover:border-primary disabled:opacity-50"
+              >
+                {loadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
+              </button>
+            </div>
+          ) : null}
         </div>
       ) : <p className="text-red-500 text-center py-12">:(</p>}
     </div>
