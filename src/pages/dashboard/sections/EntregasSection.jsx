@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
-const ENTREGAS_PER_PAGE = 5;
+const ENTREGAS_PER_PAGE = 6;
 
 function ProfissionalEntregasBlock({
   profissional,
