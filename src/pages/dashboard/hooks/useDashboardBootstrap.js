@@ -11,6 +11,8 @@ import {
   fetchProfissionaisComStatus,
 } from '../api/dashboardApi';
 
+const AGENDAMENTOS_PAGE_SIZE = 50;
+
 export function useDashboardBootstrap({
   userId,
   locationNegocioId,
@@ -23,6 +25,8 @@ export function useDashboardBootstrap({
   const [profissionais, setProfissionais] = useState([]);
   const [entregas, setEntregas] = useState([]);
   const [agendamentos, setAgendamentos] = useState([]);
+  const [agendamentosHasMore, setAgendamentosHasMore] = useState(false);
+  const [agendamentosLoadingMore, setAgendamentosLoadingMore] = useState(false);
   const [galeriaItems, setGaleriaItems] = useState([]);
   const [ownerBusinessCount, setOwnerBusinessCount] = useState(0);
   const [bootstrapState, setBootstrapState] = useState('loading');
@@ -30,13 +34,16 @@ export function useDashboardBootstrap({
   const [serverNow, setServerNow] = useState(() => ({ ts: null, dow: 0, date: '', source: 'db', minutes: 0 }));
   const [hoje, setHoje] = useState('');
 
+  const hojeRef = useRef('');
   const loadDataRunRef = useRef(0);
 
   const fetchNowFromDb = useCallback(async () => {
     const payload = await fetchOfficialDate(rpcSequence);
+    const date = String(payload.date || '');
+    hojeRef.current = date;
     setServerNow(payload);
-    setHoje(String(payload.date));
-    return String(payload.date);
+    setHoje(date);
+    return date;
   }, [rpcSequence]);
 
   const reloadNegocio = useCallback(async (negocioId) => {
@@ -79,16 +86,46 @@ export function useDashboardBootstrap({
   const reloadAgendamentos = useCallback(async (negocioId, profissionalIds, dataHoje) => {
     const id = negocioId || negocio?.id;
     const ids = profissionalIds || profissionais.map((item) => item.id);
-    const dataBase = dataHoje || hoje;
+    const dataBase = dataHoje || hojeRef.current;
     if (!id || !ids?.length || !dataBase) return;
     const rows = await fetchAgendamentosNegocio({
       negocioId: id,
       profissionalIds: ids,
       dataInicio: dataBase,
+      limit: AGENDAMENTOS_PAGE_SIZE + 1,
+      offset: 0,
     });
-    setAgendamentos(rows);
-    return rows;
-  }, [negocio?.id, profissionais, hoje]);
+    const visibleRows = rows.slice(0, AGENDAMENTOS_PAGE_SIZE);
+    setAgendamentos(visibleRows);
+    setAgendamentosHasMore(rows.length > AGENDAMENTOS_PAGE_SIZE);
+    return visibleRows;
+  }, [negocio?.id, profissionais]);
+
+  const loadMoreAgendamentos = useCallback(async () => {
+    const id = negocio?.id;
+    const ids = profissionais.map((item) => item.id);
+    const dataBase = hojeRef.current;
+    if (agendamentosLoadingMore || !agendamentosHasMore || !id || !ids.length || !dataBase) return;
+
+    try {
+      setAgendamentosLoadingMore(true);
+      const rows = await fetchAgendamentosNegocio({
+        negocioId: id,
+        profissionalIds: ids,
+        dataInicio: dataBase,
+        limit: AGENDAMENTOS_PAGE_SIZE + 1,
+        offset: agendamentos.length,
+      });
+      const visibleRows = rows.slice(0, AGENDAMENTOS_PAGE_SIZE);
+      setAgendamentos((current) => {
+        const existingIds = new Set(current.map((item) => item.id));
+        return [...current, ...visibleRows.filter((item) => !existingIds.has(item.id))];
+      });
+      setAgendamentosHasMore(rows.length > AGENDAMENTOS_PAGE_SIZE);
+    } finally {
+      setAgendamentosLoadingMore(false);
+    }
+  }, [agendamentos.length, agendamentosHasMore, agendamentosLoadingMore, negocio?.id, profissionais]);
 
   const reloadGaleria = useCallback(async (negocioId) => {
     const id = negocioId || negocio?.id;
@@ -116,6 +153,7 @@ export function useDashboardBootstrap({
     setProfissionais([]);
     setEntregas([]);
     setAgendamentos([]);
+    setAgendamentosHasMore(false);
     setGaleriaItems([]);
 
     try {
@@ -174,6 +212,7 @@ export function useDashboardBootstrap({
         setProfissionais([]);
         setEntregas([]);
         setAgendamentos([]);
+        setAgendamentosHasMore(false);
         setGaleriaItems([]);
         setError('Você não tem acesso a este negócio.');
         setBootstrapState('error');
@@ -185,31 +224,35 @@ export function useDashboardBootstrap({
       if (!scopedProfs.length) {
         setEntregas([]);
         setAgendamentos([]);
+        setAgendamentosHasMore(false);
         setBootstrapState('ready');
         return;
       }
 
       const ids = scopedProfs.map((item) => item.id);
-      const dataHoje = (typeof dataRef === 'string' && dataRef) ? dataRef : String(serverNow?.date || hoje || '');
+      const dataHoje = (typeof dataRef === 'string' && dataRef) ? dataRef : hojeRef.current;
       const [entregasRows, agendamentoRows] = await Promise.all([
         fetchEntregas(negocioData.id, ids),
         dataHoje ? fetchAgendamentosNegocio({
           negocioId: negocioData.id,
           profissionalIds: ids,
           dataInicio: dataHoje,
+          limit: AGENDAMENTOS_PAGE_SIZE + 1,
+          offset: 0,
         }) : Promise.resolve([]),
       ]);
 
       if (!isCurrentRun()) return;
       setEntregas(entregasRows);
-      setAgendamentos(agendamentoRows);
+      setAgendamentos(agendamentoRows.slice(0, AGENDAMENTOS_PAGE_SIZE));
+      setAgendamentosHasMore(agendamentoRows.length > AGENDAMENTOS_PAGE_SIZE);
       setBootstrapState('ready');
     } catch (e) {
       if (!isCurrentRun()) return;
       setError(e?.message || 'Erro inesperado.');
       setBootstrapState('error');
     }
-  }, [hoje, locationNegocioId, navigate, scopeProfissionais, serverNow?.date, uiAlert, userId]);
+  }, [locationNegocioId, navigate, scopeProfissionais, uiAlert, userId]);
 
   const reloadFull = useCallback(async () => {
     try {
@@ -249,6 +292,8 @@ export function useDashboardBootstrap({
     setEntregas,
     agendamentos,
     setAgendamentos,
+    agendamentosHasMore,
+    agendamentosLoadingMore,
     galeriaItems,
     setGaleriaItems,
     ownerBusinessCount,
@@ -263,6 +308,7 @@ export function useDashboardBootstrap({
     reloadProfissionais,
     reloadEntregas,
     reloadAgendamentos,
+    loadMoreAgendamentos,
     reloadGaleria,
     loadData,
     reloadFull,
