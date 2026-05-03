@@ -140,6 +140,8 @@ export default function Dashboard({ user, onLogout }) {
     setEntregas,
     agendamentos,
     setAgendamentos,
+    agendamentosHasMore,
+    agendamentosLoadingMore,
     galeriaItems,
     setGaleriaItems,
     ownerBusinessCount,
@@ -151,6 +153,7 @@ export default function Dashboard({ user, onLogout }) {
     reloadProfissionais,
     reloadEntregas,
     reloadAgendamentos,
+    loadMoreAgendamentos,
     reloadGaleria,
     reloadFull,
   } = useDashboardBootstrap({
@@ -678,6 +681,9 @@ export default function Dashboard({ user, onLogout }) {
                 hoje={hoje}
                 confirmarAtendimento={confirmarAtendimento}
                 cancelarAgendamento={cancelarAgendamento}
+                hasMore={agendamentosHasMore}
+                loadingMore={agendamentosLoadingMore}
+                onLoadMore={loadMoreAgendamentos}
               />
             )}
 
