@@ -74,6 +74,9 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    address_format_invalid_inline: {
+      body: 'Use o formato: RUA, NUMERO - CIDADE, ESTADO.',
+    },
     business_info_update_error: {
       title: 'Erro ao salvar',
       body: 'Erro ao salvar os dados do negócio agora.\n\nTente novamente.',
