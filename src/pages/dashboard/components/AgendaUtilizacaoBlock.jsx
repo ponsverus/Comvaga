@@ -143,14 +143,14 @@ export default function AgendaUtilizacaoBlock({
       </div>
 
       {souDono && porProfissional.length > 0 ? (
-        <div className="mt-4 relative md:px-12">
+        <div className="mt-4 relative md:px-16">
           {pageCount > 1 ? (
             <>
               <button
                 type="button"
                 onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
                 disabled={currentPage === 0}
-                className="hidden md:inline-flex absolute left-1 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
+                className="hidden md:inline-flex absolute left-3 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -158,7 +158,7 @@ export default function AgendaUtilizacaoBlock({
                 type="button"
                 onClick={() => setPage((prev) => Math.min(prev + 1, pageCount - 1))}
                 disabled={currentPage === pageCount - 1}
-                className="hidden md:inline-flex absolute right-1 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
+                className="hidden md:inline-flex absolute right-3 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
