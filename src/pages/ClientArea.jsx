@@ -37,6 +37,11 @@ const getValorAgendamento = (a) => {
 
 const PAGE_SIZE = 50;
 
+function isRateLimitError(error) {
+  const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
+  return raw.includes('rate_limit_exceeded') || raw.includes('limite diário') || raw.includes('too many requests');
+}
+
 const maskedPrivateValue = '••••••••';
 
 function Heart({ filled = false, className = '', size = 20 }) {
@@ -416,6 +421,10 @@ export default function ClientArea({ user, onLogout }) {
       setDepoimentoModalOpen(false);
       feedback.showMessage('vitrine.depoimento_sent', { variant: 'success' });
     } catch (e) {
+      if (isRateLimitError(e)) {
+        feedback.showMessage('clientArea.depoimento_rate_limit', { variant: 'warning' });
+        return;
+      }
       feedback.showMessage('clientArea.depoimento_send_error', { msg: e?.message || '' });
     } finally {
       setDepoimentoLoading(false);
