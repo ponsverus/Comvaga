@@ -767,6 +767,13 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    depoimento_rate_limit: {
+      title: 'Limite de depoimentos atingido',
+      body: 'Você já enviou muitos depoimentos hoje.\n\nTente novamente amanhã.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
   },
 
   home: {
@@ -1179,6 +1186,11 @@ export const ptBR = {
       title: 'Depoimento registrado',
       body: 'Seu depoimento foi enviado com sucesso.',
       buttonText: 'OK',
+    },
+    depoimento_rate_limit: {
+      title: 'Limite de depoimentos atingido',
+      body: 'Você já enviou muitos depoimentos hoje.\n\nTente novamente amanhã.',
+      buttonText: 'ENTENDI',
     },
     depoimento_send_error_title: 'Erro ao enviar depoimento',
     depoimento_send_error_body: 'Erro ao enviar seu depoimento:',
