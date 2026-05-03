@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   addFavoritoNegocio,
   createDepoimento,
@@ -16,8 +16,10 @@ export function useVitrineInteractions({
   refreshDepoimentos,
 }) {
   const [isFavorito, setIsFavorito] = useState(false);
+  const [favoritoLoading, setFavoritoLoading] = useState(false);
   const [depoimentoLoading, setDepoimentoLoading] = useState(false);
   const [clienteId, setClienteId] = useState(null);
+  const favoritoLockRef = useRef(false);
 
   useEffect(() => {
     if (!user || userType !== 'client' || !negocioId) {
@@ -52,17 +54,25 @@ export function useVitrineInteractions({
   }, [ensureClienteId, negocioId, user, userType]);
 
   const toggleFavorito = useCallback(async () => {
+    if (favoritoLockRef.current) return isFavorito;
     if (!user || userType !== 'client' || !negocioId) return false;
-    const currentClienteId = await ensureClienteId();
-    if (!currentClienteId) return false;
-    if (isFavorito) {
-      await removeFavoritoNegocio({ clienteId: currentClienteId, negocioId });
-      setIsFavorito(false);
-      return false;
+    favoritoLockRef.current = true;
+    setFavoritoLoading(true);
+    try {
+      const currentClienteId = await ensureClienteId();
+      if (!currentClienteId) return false;
+      if (isFavorito) {
+        await removeFavoritoNegocio({ clienteId: currentClienteId, negocioId });
+        setIsFavorito(false);
+        return false;
+      }
+      await addFavoritoNegocio({ clienteId: currentClienteId, negocioId });
+      setIsFavorito(true);
+      return true;
+    } finally {
+      favoritoLockRef.current = false;
+      setFavoritoLoading(false);
     }
-    await addFavoritoNegocio({ clienteId: currentClienteId, negocioId });
-    setIsFavorito(true);
-    return true;
   }, [ensureClienteId, isFavorito, negocioId, user, userType]);
 
   const enviarDepoimento = useCallback(async () => {
@@ -97,6 +107,7 @@ export function useVitrineInteractions({
 
   return {
     isFavorito,
+    favoritoLoading,
     depoimentoLoading,
     checkFavorito,
     toggleFavorito,
