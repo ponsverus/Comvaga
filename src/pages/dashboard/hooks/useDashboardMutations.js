@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { supabase } from '../../../supabase';
 import { getDiasTrabalhoFromHorarios, isEnderecoPadrao, timeToMinutes, toNumberOrNull, toUpperClean } from '../utils';
 import { aprovarParceiroProfissional, removeNegocioSeguramente, removeProfissionalSeguramente } from '../api/dashboardApi';
@@ -48,6 +48,17 @@ export function useDashboardMutations({
   const [submittingAdminProf, setSubmittingAdminProf] = useState(false);
   const [savingDados, setSavingDados] = useState(false);
   const [deletingBusiness, setDeletingBusiness] = useState(false);
+  const actionLocksRef = useRef(new Set());
+
+  const lockAction = (key) => {
+    if (actionLocksRef.current.has(key)) return false;
+    actionLocksRef.current.add(key);
+    return true;
+  };
+
+  const unlockAction = (key) => {
+    actionLocksRef.current.delete(key);
+  };
 
   const ensureOwnerAction = async () => {
     if (!negocio?.id) {
@@ -89,7 +100,7 @@ export function useDashboardMutations({
   };
 
   const uploadLogoNegocio = async (file) => {
-    if (!file || !userId) return;
+    if (!file || !userId || logoUploading) return;
     if (!(await ensureOwnerAction())) return;
     try {
       setLogoUploading(true);
@@ -115,6 +126,7 @@ export function useDashboardMutations({
   };
 
   const salvarInfoNegocio = async () => {
+    if (infoSaving) return;
     if (!(await ensureOwnerAction())) return;
     try {
       setInfoSaving(true);
@@ -142,6 +154,7 @@ export function useDashboardMutations({
   };
 
   const salvarTema = async (novoTema) => {
+    if (temaSaving) return;
     if (!(await ensureOwnerAction())) return;
     setFormInfo((prev) => ({ ...prev, tema: novoTema }));
     try {
@@ -195,7 +208,7 @@ export function useDashboardMutations({
   };
 
   const uploadGaleria = async (files) => {
-    if (!files?.length) return;
+    if (!files?.length || galleryUploading) return;
     if (!(await ensureOwnerAction())) return;
     try {
       setGalleryUploading(true);
@@ -231,9 +244,17 @@ export function useDashboardMutations({
   };
 
   const removerImagemGaleria = async (item) => {
-    if (!(await ensureOwnerAction())) return;
+    const lockKey = `galeria-remover:${item?.id || item?.path || 'item'}`;
+    if (!lockAction(lockKey)) return;
+    if (!(await ensureOwnerAction())) {
+      unlockAction(lockKey);
+      return;
+    }
     const ok = await uiConfirm('dashboard.gallery_remove_confirm', 'warning');
-    if (!ok) return;
+    if (!ok) {
+      unlockAction(lockKey);
+      return;
+    }
     try {
       const { error: dbErr } = await supabase.from('galerias').delete().eq('id', item.id);
       if (dbErr) throw dbErr;
@@ -241,6 +262,8 @@ export function useDashboardMutations({
       await uiAlert('dashboard.gallery_image_removed', 'success');
     } catch {
       await uiAlert('dashboard.gallery_remove_error', 'error');
+    } finally {
+      unlockAction(lockKey);
     }
   };
 
@@ -330,9 +353,17 @@ export function useDashboardMutations({
   };
 
   const deleteEntrega = async (entrega) => {
-    if (!await checarPermissao(entrega.profissional_id)) return;
+    const lockKey = `entrega-delete:${entrega?.id || 'item'}`;
+    if (!lockAction(lockKey)) return;
+    if (!await checarPermissao(entrega.profissional_id)) {
+      unlockAction(lockKey);
+      return;
+    }
     const ok = await uiConfirm(`dashboard.business.${businessGroup}.entrega_delete_confirm`, 'warning');
-    if (!ok) return;
+    if (!ok) {
+      unlockAction(lockKey);
+      return;
+    }
     try {
       const { error: delErr } = await supabase.from('entregas').delete().eq('id', entrega.id).eq('negocio_id', negocio.id);
       if (delErr) throw delErr;
@@ -340,11 +371,18 @@ export function useDashboardMutations({
       await reloadEntregas();
     } catch {
       await uiAlert(`dashboard.business.${businessGroup}.entrega_delete_error`, 'error');
+    } finally {
+      unlockAction(lockKey);
     }
   };
 
   const toggleStatusProfissional = async (p) => {
-    if (!await checarPermissao(p.id)) return;
+    const lockKey = `profissional-status:${p?.id || 'item'}`;
+    if (!lockAction(lockKey)) return;
+    if (!await checarPermissao(p.id)) {
+      unlockAction(lockKey);
+      return;
+    }
     try {
       const novoStatus = p.status === 'ativo' ? 'inativo' : 'ativo';
       let motivo = null;
@@ -363,13 +401,23 @@ export function useDashboardMutations({
       await reloadProfissionais();
     } catch {
       await uiAlert('dashboard.professional_toggle_error', 'error');
+    } finally {
+      unlockAction(lockKey);
     }
   };
 
   const excluirProfissional = async (p) => {
-    if (!await checarPermissao(p.id)) return;
+    const lockKey = `profissional-delete:${p?.id || 'item'}`;
+    if (!lockAction(lockKey)) return;
+    if (!await checarPermissao(p.id)) {
+      unlockAction(lockKey);
+      return;
+    }
     const ok = await uiConfirm('dashboard.professional_delete_confirm', 'warning');
-    if (!ok) return;
+    if (!ok) {
+      unlockAction(lockKey);
+      return;
+    }
     try {
       await removeProfissionalSeguramente(p.id);
       await uiAlert('dashboard.professional_deleted', 'success');
@@ -378,6 +426,8 @@ export function useDashboardMutations({
       else setEntregas([]);
     } catch {
       await uiAlert('dashboard.professional_delete_error', 'error');
+    } finally {
+      unlockAction(lockKey);
     }
   };
 
@@ -439,8 +489,11 @@ export function useDashboardMutations({
   };
 
   const aprovarParceiro = async (prof) => {
+    const lockKey = `parceiro-aprovar:${prof?.id || 'item'}`;
+    if (!lockAction(lockKey)) return;
     if (parceiroProfissional) {
       await uiAlert('dashboard.parceiro_acao_proibida', 'warning');
+      unlockAction(lockKey);
       return;
     }
     try {
@@ -449,11 +502,18 @@ export function useDashboardMutations({
       await reloadProfissionais();
     } catch {
       await uiAlert('dashboard.partner_approve_error', 'error');
+    } finally {
+      unlockAction(lockKey);
     }
   };
 
   const confirmarAtendimento = async (a) => {
-    if (!await checarPermissao(a.profissional_id)) return;
+    const lockKey = `agendamento-confirmar:${a?.id || 'item'}`;
+    if (!lockAction(lockKey)) return;
+    if (!await checarPermissao(a.profissional_id)) {
+      unlockAction(lockKey);
+      return;
+    }
     try {
       const { error } = await supabase.rpc('concluir_agendamento_profissional', { p_agendamento_id: a.id });
       if (error) throw error;
@@ -462,13 +522,23 @@ export function useDashboardMutations({
       loadHoje(negocio.id, parceiroProfissional?.id ?? null);
     } catch {
       await uiAlert('dashboard.booking_confirm_error', 'error');
+    } finally {
+      unlockAction(lockKey);
     }
   };
 
   const cancelarAgendamento = async (a) => {
-    if (!await checarPermissao(a.profissional_id)) return;
+    const lockKey = `agendamento-cancelar:${a?.id || 'item'}`;
+    if (!lockAction(lockKey)) return;
+    if (!await checarPermissao(a.profissional_id)) {
+      unlockAction(lockKey);
+      return;
+    }
     const ok = await uiConfirm('dashboard.booking_cancel_confirm', 'warning');
-    if (!ok) return;
+    if (!ok) {
+      unlockAction(lockKey);
+      return;
+    }
     try {
       const { error } = await supabase.rpc('cancelar_agendamento_profissional', { p_agendamento_id: a.id });
       if (error) throw error;
@@ -477,6 +547,8 @@ export function useDashboardMutations({
       loadHoje(negocio.id, parceiroProfissional?.id ?? null);
     } catch {
       await uiAlert('dashboard.booking_cancel_error', 'error');
+    } finally {
+      unlockAction(lockKey);
     }
   };
 
