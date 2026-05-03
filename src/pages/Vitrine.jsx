@@ -159,6 +159,24 @@ function sanitizeTel(raw) {
   return v.replace(/[^\d+]/g, '');
 }
 
+function buildMetaDescription(negocio) {
+  const nome = String(negocio?.nome || '').trim() || 'este negócio';
+  const descricao = String(negocio?.descricao || '').replace(/\s+/g, ' ').trim();
+  const base = descricao || `Agende horários, veja serviços, profissionais e depoimentos de ${nome}.`;
+  return base.length > 160 ? `${base.slice(0, 157).trim()}...` : base;
+}
+
+function setMetaTag(name, content) {
+  if (typeof document === 'undefined') return;
+  let meta = document.querySelector(`meta[name="${name}"]`);
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute('name', name);
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content', content);
+}
+
 function AlertModal({ open, onClose, title, body, buttonText, isLight }) {
   if (!open) return null;
   const bg = isLight ? 'bg-vcard border-vborder' : 'bg-dark-100 border-gray-800';
@@ -479,6 +497,13 @@ export default function Vitrine({ user, userType }) {
     resolveInstagram,
     resolveFacebook,
   });
+
+  useEffect(() => {
+    if (!negocio?.nome) return;
+    const nome = String(negocio.nome).trim();
+    document.title = `${nome} | Comvaga`;
+    setMetaTag('description', buildMetaDescription(negocio));
+  }, [negocio]);
 
   if (loading) return (<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-primary text-2xl font-normal animate-pulse">CARREGANDO...</div></div>);
   if (error) return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="max-w-md w-full bg-dark-100 border border-red-500/40 rounded-custom p-8 text-center"><AlertCircle className="w-14 h-14 text-red-400 mx-auto mb-4" /><h1 className="text-2xl font-normal text-white mb-2">Houve um erro ao carregar</h1><p className="text-gray-400 mb-6">{error}</p><button type="button" onClick={loadVitrine} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button font-normal uppercase">Tentar novamente</button></div></div>);
