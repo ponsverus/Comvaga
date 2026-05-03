@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import TemaToggle from '../components/TemaToggle';
+import { ptBR } from '../../../feedback/messages/ptBR';
+import { isEnderecoPadrao } from '../utils';
 
 function InfoRow({ label, children, action, last = false }) {
   return (
@@ -55,7 +57,9 @@ export default function InfoNegocioSection({
   });
   const [savingBusinessField, setSavingBusinessField] = useState(null);
   const [savingAccountField, setSavingAccountField] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
   const swipeStartRef = useRef(null);
+  const addressErrorMessage = ptBR?.dashboard?.address_format_invalid_inline?.body || 'Use o formato: RUA, NUMERO - CIDADE, ESTADO.';
 
   useEffect(() => {
     setGalleryIndex((current) => {
@@ -106,6 +110,15 @@ export default function InfoNegocioSection({
   const saveBusinessField = async (field) => {
     try {
       setSavingBusinessField(field);
+      if (field === 'endereco') {
+        const endereco = String(formInfo.endereco || '').trim();
+        if (endereco && !isEnderecoPadrao(endereco)) {
+          setFieldErrors((prev) => ({ ...prev, endereco: true }));
+          await Promise.resolve(salvarInfoNegocio());
+          return;
+        }
+        setFieldErrors((prev) => ({ ...prev, endereco: false }));
+      }
       await Promise.resolve(salvarInfoNegocio());
       if (field === 'instagram' || field === 'facebook') hidePrivateField(field);
     } finally {
@@ -209,10 +222,17 @@ export default function InfoNegocioSection({
       </InfoRow>
 
       <InfoRow label="ENDERE." action={businessSaveAction('endereco')}>
+        {fieldErrors.endereco ? (
+          <p className="mb-1 text-xs leading-4 text-red-400">{addressErrorMessage}</p>
+        ) : null}
         <input
           value={formInfo.endereco}
-          onChange={(e) => setFormInfo((prev) => ({ ...prev, endereco: e.target.value }))}
-          className={`${inputClass} max-w-[calc(100vw-13.75rem)] truncate pr-4 sm:max-w-none sm:pr-0`}
+          onChange={(e) => {
+            setFieldErrors((prev) => ({ ...prev, endereco: false }));
+            setFormInfo((prev) => ({ ...prev, endereco: e.target.value }));
+          }}
+          className={`${inputClass} max-w-[calc(100vw-13.75rem)] truncate border-b pr-4 sm:max-w-none sm:pr-0 ${fieldErrors.endereco ? 'border-red-500 text-red-200 focus:border-red-400' : 'border-transparent'}`}
+          aria-invalid={fieldErrors.endereco ? 'true' : 'false'}
           placeholder="RUA, NÚMERO - CIDADE, ESTADO"
         />
       </InfoRow>
