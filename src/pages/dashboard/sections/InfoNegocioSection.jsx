@@ -355,16 +355,10 @@ export default function InfoNegocioSection({
               </div>
             </div>
 
-            <div className="mt-3 flex justify-center gap-1.5">
-              {galeriaItems.map((item, index) => (
-                <button
-                  key={item.id || item.path}
-                  type="button"
-                  onClick={() => setGalleryIndex(index)}
-                  className={`h-1.5 rounded-full transition-all ${index === galleryIndex ? 'w-5 bg-primary' : 'w-1.5 bg-gray-700'}`}
-                  aria-label={`Ir para imagem ${index + 1}`}
-                />
-              ))}
+            <div className="mt-3 flex justify-center">
+              <div className="inline-flex items-center rounded-full border border-gray-700 bg-dark-200 px-3 py-1 text-xs text-gray-400">
+                {galleryIndex + 1} / {galeriaItems.length}
+              </div>
             </div>
           </div>
             ) : null}
