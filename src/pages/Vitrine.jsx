@@ -177,6 +177,11 @@ function setMetaTag(name, content) {
   meta.setAttribute('content', content);
 }
 
+function isRateLimitError(error) {
+  const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
+  return raw.includes('rate_limit_exceeded') || raw.includes('limite diário') || raw.includes('too many requests');
+}
+
 function AlertModal({ open, onClose, title, body, buttonText, isLight }) {
   if (!open) return null;
   const bg = isLight ? 'bg-vcard border-vborder' : 'bg-dark-100 border-gray-800';
@@ -428,6 +433,10 @@ export default function Vitrine({ user, userType }) {
       setShowDepoimento(false);
       alertKey('depoimento_sent', 'Depoimento registrado', 'Seu depoimento foi entregue com sucesso!', 'OK');
     } catch (e) {
+      if (isRateLimitError(e)) {
+        alertKey('depoimento_rate_limit', 'Limite de depoimentos atingido', 'Você já enviou muitos depoimentos hoje.\n\nTente novamente amanhã.', 'ENTENDI');
+        return;
+      }
       openAlert({
         title: getMsg('depoimento_send_error_title', 'Erro ao enviar depoimento'),
         body: `${getMsg('depoimento_send_error_body', 'Erro ao enviar depoimento:')} ${e?.message || ''}`,
