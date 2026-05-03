@@ -71,9 +71,9 @@ export default function VitrineTopSection({ header, business, actions }) {
                 <StarChar size={18} className="text-primary" />
                 <span className="hidden sm:inline">Depoimento</span>
               </button>
-              <button type="button" onClick={actions.onToggleFavorito} disabled={!!header.isProfessional} className={`h-9 flex items-center gap-2 px-5 rounded-button transition-all uppercase border focus:outline-none focus:ring-0 ${header.favoritoBtn}`}>
+              <button type="button" onClick={actions.onToggleFavorito} disabled={!!header.isProfessional || !!header.favoritoLoading} className={`h-9 flex items-center gap-2 px-5 rounded-button transition-all uppercase border focus:outline-none focus:ring-0 disabled:opacity-60 ${header.favoritoBtn}`}>
                 <HeartIcon filled={header.isFavorito} size={20} className={header.isFavorito ? 'text-red-500' : ''} />
-                <span className="hidden sm:inline">{header.isProfessional ? 'Somente Cliente' : (header.isFavorito ? 'Favoritado' : 'Favoritar')}</span>
+                <span className="hidden sm:inline">{header.isProfessional ? 'Somente Cliente' : header.favoritoLoading ? 'Salvando' : (header.isFavorito ? 'Favoritado' : 'Favoritar')}</span>
               </button>
             </div>
           </div>
