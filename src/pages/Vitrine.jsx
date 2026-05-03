@@ -334,6 +334,7 @@ export default function Vitrine({ user, userType }) {
 
   const {
     isFavorito,
+    favoritoLoading,
     depoimentoLoading,
     checkFavorito,
     toggleFavorito: toggleFavoritoState,
@@ -494,6 +495,7 @@ export default function Vitrine({ user, userType }) {
           depoimentoBtn: styles.depoimentoBtn,
           favoritoBtn: styles.favoritoBtn,
           isFavorito,
+          favoritoLoading,
           isProfessional,
           heroBg: styles.heroBg,
         }}
