@@ -36,6 +36,11 @@ function getDiasTrabalho(profissional) {
   return [1, 2, 3, 4, 5];
 }
 
+function isRateLimitError(error) {
+  const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
+  return raw.includes('rate_limit_exceeded') || raw.includes('muitas tentativas') || raw.includes('too many requests');
+}
+
 const MONTH_NAMES   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const WEEKDAY_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
@@ -199,6 +204,7 @@ export default function BookingCalendar({
       });
     } catch (e) {
       const msg     = String(e?.message || '').toLowerCase();
+      const limited = isRateLimitError(e);
       const expired = msg.includes('agendamento_horario_expirado')
         || msg.includes('horario_expirado');
       const overlap = msg.includes('conflito')
@@ -207,7 +213,9 @@ export default function BookingCalendar({
         || msg.includes('sobrepos')
         || msg.includes('exclusion')
         || String(e?.code || '') === '23P01';
-      if (expired) {
+      if (limited) {
+        setConfirmError('Muitas tentativas de agendamento. Aguarde um minuto e tente novamente.');
+      } else if (expired) {
         setConfirmError('Esse horário expirou. Escolha outro.');
         fetchSlots(selectedDay);
       } else if (overlap) {
