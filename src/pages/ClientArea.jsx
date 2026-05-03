@@ -92,10 +92,12 @@ export default function ClientArea({ user, onLogout }) {
   const [favoritosHasMore, setFavoritosHasMore] = useState(false);
   const [agendamentosLoadingMore, setAgendamentosLoadingMore] = useState(false);
   const [favoritosLoadingMore, setFavoritosLoadingMore] = useState(false);
+  const [removingFavoritoId, setRemovingFavoritoId] = useState(null);
 
   const [avatarPath,      setAvatarPath]      = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef(null);
+  const removingFavoritoRef = useRef(false);
 
   const [nomePerfil,   setNomePerfil]   = useState('');
   const [savingPerfil, setSavingPerfil] = useState(false);
@@ -421,14 +423,19 @@ export default function ClientArea({ user, onLogout }) {
   };
 
   const removerFavorito = async (favoritoId) => {
-    if (!clienteId) return;
+    if (!clienteId || removingFavoritoRef.current) return;
     try {
+      removingFavoritoRef.current = true;
+      setRemovingFavoritoId(favoritoId);
       const { error } = await supabase.from('favoritos').delete().eq('id', favoritoId).eq('cliente_id', clienteId);
       if (error) throw error;
       setFavoritos(prev => prev.filter(f => f.id !== favoritoId));
       uiAlert('clientArea.favorite_removed', 'success');
     } catch {
       uiAlert('clientArea.favorite_remove_error', 'error');
+    } finally {
+      removingFavoritoRef.current = false;
+      setRemovingFavoritoId(null);
     }
   };
 
@@ -725,7 +732,7 @@ export default function ClientArea({ user, onLogout }) {
                       const tipoNegocio = isNegocio ? (String(fav.negocios?.tipo_negocio || '').trim() || '—') : 'PROFISSIONAL';
                       return (
                         <div key={fav.id} className="bg-dark-200 border border-gray-800 rounded-custom p-4 relative group hover:border-primary/50 transition-all">
-                          <button onClick={() => removerFavorito(fav.id)} className="absolute top-2 right-2 w-8 h-8 bg-red-500/20 hover:bg-red-500/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                          <button onClick={() => removerFavorito(fav.id)} disabled={removingFavoritoId === fav.id} className="absolute top-2 right-2 w-8 h-8 bg-red-500/20 hover:bg-red-500/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all disabled:opacity-60">
                             <X className="w-4 h-4 text-red-400" />
                           </button>
                           <div className="mb-3">
