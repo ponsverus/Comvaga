@@ -39,52 +39,54 @@ function ProfissionalEntregasBlock({
       </div>
 
       {lista.length ? (
-        <div className="relative md:px-12">
-          {pageCount > 1 ? (
-            <>
-              <button
-                type="button"
-                onClick={goPrev}
-                disabled={currentPage === 0}
-                className="hidden md:inline-flex absolute left-1 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={goNext}
-                disabled={currentPage === pageCount - 1}
-                className="hidden md:inline-flex absolute right-1 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </>
-          ) : null}
+        <div>
+          <div className="relative md:px-16">
+            {pageCount > 1 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  disabled={currentPage === 0}
+                  className="hidden md:inline-flex absolute left-3 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={goNext}
+                  disabled={currentPage === pageCount - 1}
+                  className="hidden md:inline-flex absolute right-3 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            ) : null}
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
-            {visibleEntregas.map(s => {
-              const preco = Number(s.preco ?? 0);
-              const promo = s.preco_promocional == null ? null : Number(s.preco_promocional);
-              return (
-                <div key={s.id} className="bg-dark-100 border border-gray-800 rounded-custom p-5">
-                  <div className="flex justify-between items-start mb-3">
-                    {promo != null && promo > 0 && promo < preco ? (<div className="text-xl font-normal text-green-400">R$ {promo.toFixed(2)}</div>) : (<div className="text-xl font-normal text-primary">R$ {preco.toFixed(2)}</div>)}
-                    <span className="inline-flex items-center rounded-full border border-gray-700 bg-transparent px-3 py-1 text-xs text-gray-500">{s.duracao_minutos} MIN</span>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+              {visibleEntregas.map(s => {
+                const preco = Number(s.preco ?? 0);
+                const promo = s.preco_promocional == null ? null : Number(s.preco_promocional);
+                return (
+                  <div key={s.id} className="bg-dark-100 border border-gray-800 rounded-custom p-5">
+                    <div className="flex justify-between items-start mb-3">
+                      {promo != null && promo > 0 && promo < preco ? (<div className="text-xl font-normal text-green-400">R$ {promo.toFixed(2)}</div>) : (<div className="text-xl font-normal text-primary">R$ {preco.toFixed(2)}</div>)}
+                      <span className="inline-flex items-center rounded-full border border-gray-700 bg-transparent px-3 py-1 text-xs text-gray-500">{s.duracao_minutos} MIN</span>
+                    </div>
+                    <h3 className="text-sm font-normal text-white mb-0.5">{s.nome}</h3>
+                    <p className="text-xs text-gray-500 mb-4">PROF: {profissional.nome}</p>
+                    <div className="flex gap-2">
+                      <button onClick={async () => {
+                        if (!await checarPermissao(s.profissional_id)) return;
+                        setEditingEntregaId(s.id);
+                        setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: String(s.preco_promocional ?? ''), profissional_id: s.profissional_id || '' });
+                        setShowNovaEntrega(true);
+                      }} className="flex-1 py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
+                      <button onClick={() => deleteEntrega(s)} className="flex-1 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
+                    </div>
                   </div>
-                  <h3 className="text-sm font-normal text-white mb-0.5">{s.nome}</h3>
-                  <p className="text-xs text-gray-500 mb-4">PROF: {profissional.nome}</p>
-                  <div className="flex gap-2">
-                    <button onClick={async () => {
-                      if (!await checarPermissao(s.profissional_id)) return;
-                      setEditingEntregaId(s.id);
-                      setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: String(s.preco_promocional ?? ''), profissional_id: s.profissional_id || '' });
-                      setShowNovaEntrega(true);
-                    }} className="flex-1 py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
-                    <button onClick={() => deleteEntrega(s)} className="flex-1 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
 
           {pageCount > 1 ? (
