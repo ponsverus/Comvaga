@@ -96,7 +96,9 @@ export default function VitrineProfessionalsSection({
                 </span>
                 {prof.almoco?.ini && prof.almoco?.fim && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
-                    <span className={`ml-1 ${almocoBadge}`}> • {String(prof.almoco.ini).slice(0, 5)} - {String(prof.almoco.fim).slice(0, 5)}</span>
+                    <span className={almocoBadge}>
+                      PAUSA {String(prof.almoco.ini).slice(0, 5)} - {String(prof.almoco.fim).slice(0, 5)}
+                    </span>
                   </span>
                 )}
                 <span className="inline-flex items-center px-3 py-1 rounded-full bg-vcard2 border border-vborder text-xs text-vsub font-normal">
