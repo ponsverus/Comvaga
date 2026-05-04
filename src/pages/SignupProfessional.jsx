@@ -313,6 +313,7 @@ export default function SignupProfessional({ onLogin }) {
                 value={formData.nome}
                 onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                 className={`${fieldInputClass} uppercase`}
+                placeholder="NOME COMPLETO"
                 required
               />
             </SignupFieldRow>
@@ -425,7 +426,7 @@ export default function SignupProfessional({ onLogin }) {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className={fieldInputClass}
+                className={`${fieldInputClass} uppercase`}
                 required
                 placeholder="SEU E-MAIL"
               />
