@@ -722,8 +722,7 @@ export default function ClientArea({ user, onLogout }) {
                     type="button"
                     onClick={carregarMaisAgendamentos}
                     disabled={agendamentosLoadingMore}
-                    className="mt-2 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-
-  allowed"
+                    className="mt-2 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {agendamentosLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
                   </button>
@@ -772,7 +771,7 @@ export default function ClientArea({ user, onLogout }) {
                     type="button"
                     onClick={carregarMaisFavoritos}
                     disabled={favoritosLoadingMore}
-                    className="mt-4 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-60"
+                    className="mt-2 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {favoritosLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
                   </button>
