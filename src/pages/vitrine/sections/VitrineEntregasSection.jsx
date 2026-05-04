@@ -21,7 +21,7 @@ export default function VitrineEntregasSection({
               return (
                 <div key={card.id} className="bg-vcard border border-vborder rounded-custom p-6 hover:border-vprimary/50 transition-all">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="font-normal text-lg">{card.nome}</div>
+                    <div className="font-normal text-lg uppercase">{card.nome}</div>
                     <div className="text-xs text-vmuted font-normal">{card.lista.length} {card.lista.length === 1 ? counterSingular : counterPlural}</div>
                   </div>
                   <EntregasCarousel
