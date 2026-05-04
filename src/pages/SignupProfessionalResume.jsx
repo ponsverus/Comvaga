@@ -400,6 +400,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 value={profileName}
                 onChange={(e) => setProfileName(e.target.value)}
                 className={`${fieldInputClass} uppercase`}
+                placeholder="NOME COMPLETO"
                 required
               />
             </ResumeFieldRow>
