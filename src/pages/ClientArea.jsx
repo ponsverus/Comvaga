@@ -810,7 +810,7 @@ export default function ClientArea({ user, onLogout }) {
                       value={emailVisivel ? novoEmail : maskedPrivateValue}
                       onChange={(e) => setNovoEmail(e.target.value)}
                       readOnly={!emailVisivel}
-                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase truncate pr-2 placeholder-gray-600 outline-none focus:text-white"
+                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase truncate pr-4 placeholder-gray-600 outline-none focus:text-white"
                       placeholder="E-MAIL DE ACESSO"
                     />
                   </div>
