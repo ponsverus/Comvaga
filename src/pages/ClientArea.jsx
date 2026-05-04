@@ -35,7 +35,7 @@ const getValorAgendamento = (a) => {
   return getPrecoFinalEntrega(a?.entregas);
 };
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 15;
 
 function isRateLimitError(error) {
   const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
