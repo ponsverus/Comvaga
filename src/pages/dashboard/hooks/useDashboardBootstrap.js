@@ -11,7 +11,7 @@ import {
   fetchProfissionaisComStatus,
 } from '../api/dashboardApi';
 
-const AGENDAMENTOS_PAGE_SIZE = 5;
+const AGENDAMENTOS_PAGE_SIZE = 15;
 
 export function useDashboardBootstrap({
   userId,
