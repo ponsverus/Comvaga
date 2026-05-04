@@ -53,7 +53,7 @@ export default function HistoricoSection({
         </div>
       ) : <div className="text-gray-500 text-center py-12">...</div>}
       {historicoHasMore && (
-        <button onClick={loadMoreHistorico} disabled={historicoLoadingMore} className="mt-10 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed">
+        <button onClick={loadMoreHistorico} disabled={historicoLoadingMore} className="mt-12 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed">
           {historicoLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
         </button>
       )}
