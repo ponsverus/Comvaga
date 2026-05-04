@@ -144,7 +144,7 @@ export default function ClientesSection({
               type="button"
               onClick={loadMoreMobile}
               disabled={clientesLoadingMore}
-              className="md:hidden mt-4 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-60"
+              className="mt-2 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {clientesLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
             </button>
