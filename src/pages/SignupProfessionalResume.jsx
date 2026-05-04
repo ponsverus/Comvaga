@@ -398,7 +398,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
               <input
                 type="text"
                 value={profileName}
-                onChange={(e) => setProfileName(e.target.value.toUpperCase())}
+                onChange={(e) => setProfileName(e.target.value)}
                 className={`${fieldInputClass} uppercase`}
                 required
               />
