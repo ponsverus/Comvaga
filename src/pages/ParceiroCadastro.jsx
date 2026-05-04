@@ -48,7 +48,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
     e.preventDefault();
     setAlerta(null);
 
-    const nomeClean = nome.trim().toUpperCase().replace(/\s+/g, ' ');
+    const nomeClean = nome.trim().replace(/\s+/g, ' ');
     const emailClean = email.trim().toLowerCase();
     const slugClean = slug.trim().toLowerCase();
 
@@ -168,7 +168,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
               <input
                 type="text"
                 value={nome}
-                onChange={(e) => setNome(e.target.value.toUpperCase())}
+                onChange={(e) => setNome(e.target.value)}
                 placeholder="NOME COMPLETO"
                 className={`${fieldInputClass} uppercase`}
                 required
