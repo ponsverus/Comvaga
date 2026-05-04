@@ -84,7 +84,7 @@ export default function DepoimentosPaginados({ depoimentos, nomeNegocioLabel, is
                 </div>
               )}
               <div className="flex-1">
-                <p className="text-sm font-normal">{dep.users?.nome || 'Cliente'}</p>
+                <p className="text-sm font-normal uppercase">{dep.users?.nome || 'Cliente'}</p>
                 <Stars5Char value={dep.nota} size={14} />
               </div>
             </div>
