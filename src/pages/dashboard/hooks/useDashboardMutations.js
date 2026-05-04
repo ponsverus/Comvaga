@@ -133,7 +133,7 @@ export function useDashboardMutations({
       const endereco = String(formInfo.endereco || '').trim();
       if (endereco && !isEnderecoPadrao(endereco)) throw new Error('Endereco fora do padrao.');
       const payload = {
-        nome: String(formInfo.nome || '').trim(),
+        nome: toUpperClean(formInfo.nome),
         descricao: String(formInfo.descricao || '').trim(),
         telefone: String(formInfo.telefone || '').trim(),
         endereco,
