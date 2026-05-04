@@ -311,7 +311,7 @@ export default function SignupProfessional({ onLogin }) {
               <input
                 type="text"
                 value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value.toUpperCase() })}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                 className={`${fieldInputClass} uppercase`}
                 required
               />
