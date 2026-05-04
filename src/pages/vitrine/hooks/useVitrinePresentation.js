@@ -1,5 +1,15 @@
 import { useCallback, useMemo } from 'react';
 
+const normalizeStatusKey = (value) => String(value || '')
+  .trim()
+  .toUpperCase()
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '');
+
+const getStatusLabelView = (value) => (
+  normalizeStatusKey(value) === 'ALMOCO' ? 'PAUSA' : String(value || 'FECHADO')
+);
+
 export function useVitrinePresentation({
   negocio,
   profissionais,
@@ -90,7 +100,7 @@ export function useVitrinePresentation({
         ...prof,
         avatarUrl: getPublicUrl('avatars', prof.avatar_path),
         status: {
-          label: String(prof?.status_label || 'FECHADO'),
+          label: getStatusLabelView(prof?.status_label),
           color: String(prof?.status_color || 'bg-red-500'),
         },
         depInfo: depoimentosPorProf.get(prof.id),
