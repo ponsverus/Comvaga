@@ -151,7 +151,7 @@ export default function SignupClient({ onLogin }) {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="SEU E-MAIL"
-                className={fieldInputClass}
+                className={`${fieldInputClass} uppercase`}
                 required
               />
             </div>
