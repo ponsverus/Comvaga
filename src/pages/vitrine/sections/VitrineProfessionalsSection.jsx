@@ -64,7 +64,7 @@ export default function VitrineProfessionalsSection({
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="text-lg font-normal">{prof.nome}</h3>
+                    <h3 className="text-lg font-normal uppercase">{prof.nome}</h3>
                     {prof.profissaoLabel && (
                       <span className={`inline-block px-2 py-1 rounded-button text-[10px] font-normal uppercase whitespace-nowrap shrink-0 border ${profissaoTag}`}>
                         {prof.profissaoLabel}
