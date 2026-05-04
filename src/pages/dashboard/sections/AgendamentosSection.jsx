@@ -72,12 +72,12 @@ export default function AgendamentosSection({
             </div>
           ))}
           {hasMore ? (
-            <div className="pt-2 text-center">
+            <div className="pt-2">
               <button
                 type="button"
                 onClick={onLoadMore}
                 disabled={loadingMore}
-                className="rounded-button border border-primary/40 px-5 py-2 text-sm font-normal uppercase text-primary hover:border-primary disabled:opacity-50"
+                className="w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-60"
               >
                 {loadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
               </button>
