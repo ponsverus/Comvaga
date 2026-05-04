@@ -137,7 +137,7 @@ export default function SignupClient({ onLogin }) {
               <input
                 type="text"
                 value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value.toUpperCase() })}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                 placeholder="NOME COMPLETO"
                 className={`${fieldInputClass} uppercase`}
                 required
