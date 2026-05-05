@@ -78,7 +78,7 @@ export default function ProfissionaisSection({
               <div className="flex items-start gap-3 mb-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-primary to-yellow-600 rounded-custom flex items-center justify-center font-normal text-xl shrink-0">{p.nome?.[0] || 'P'}</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-normal pr-24">{p.nome}</h3>
+                  <h3 className="font-normal pr-24 uppercase">{p.nome}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isPendente ? 'bg-yellow-400' : dotClass}`} />
                     <span className={`text-xs ${isPendente ? 'text-yellow-400' : 'text-gray-400'}`}>{isPendente ? 'PENDENTE' : (statusLabelView || '-')}</span>
