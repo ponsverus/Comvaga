@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ChevronDown, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ChevronDown, Plus } from 'lucide-react';
 import TemaToggle from '../components/TemaToggle';
 import { ptBR } from '../../../feedback/messages/ptBR';
 import { isEnderecoPadrao } from '../utils';
@@ -33,6 +33,9 @@ export default function InfoNegocioSection({
   galleryUploading,
   uploadGaleria,
   galeriaItems,
+  galeriaHasMore,
+  galeriaLoadingMore,
+  loadMoreGaleria,
   getPublicUrl,
   removerImagemGaleria,
   novoEmail,
@@ -48,7 +51,6 @@ export default function InfoNegocioSection({
   excluirNegocio,
   navigate,
 }) {
-  const [galleryIndex, setGalleryIndex] = useState(0);
   const [sobreExpanded, setSobreExpanded] = useState(false);
   const [visiblePrivateFields, setVisiblePrivateFields] = useState({
     instagram: false,
@@ -58,46 +60,20 @@ export default function InfoNegocioSection({
   const [savingBusinessField, setSavingBusinessField] = useState(null);
   const [savingAccountField, setSavingAccountField] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
-  const swipeStartRef = useRef(null);
+  const gallerySentinelRef = useRef(null);
   const addressErrorMessage = ptBR?.dashboard?.address_format_invalid_inline?.body || 'Use o formato: RUA, NUMERO - CIDADE, ESTADO.';
 
   useEffect(() => {
-    setGalleryIndex((current) => {
-      if (!galeriaItems.length) return 0;
-      return Math.min(current, galeriaItems.length - 1);
-    });
-  }, [galeriaItems.length]);
+    const node = gallerySentinelRef.current;
+    if (!node || !galeriaHasMore || galeriaLoadingMore || typeof loadMoreGaleria !== 'function') return undefined;
 
-  const goToPreviousGalleryItem = useCallback(() => {
-    setGalleryIndex((current) => (current === 0 ? galeriaItems.length - 1 : current - 1));
-  }, [galeriaItems.length]);
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) loadMoreGaleria();
+    }, { rootMargin: '600px 0px' });
 
-  const goToNextGalleryItem = useCallback(() => {
-    setGalleryIndex((current) => (current === galeriaItems.length - 1 ? 0 : current + 1));
-  }, [galeriaItems.length]);
-
-  const handleGalleryPointerDown = (event) => {
-    if (galeriaItems.length <= 1) return;
-    swipeStartRef.current = { x: event.clientX, y: event.clientY };
-  };
-
-  const handleGalleryPointerUp = (event) => {
-    if (!swipeStartRef.current || galeriaItems.length <= 1) return;
-
-    const deltaX = event.clientX - swipeStartRef.current.x;
-    const deltaY = event.clientY - swipeStartRef.current.y;
-    swipeStartRef.current = null;
-
-    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) < Math.abs(deltaY)) return;
-    if (deltaX < 0) goToNextGalleryItem();
-    else goToPreviousGalleryItem();
-  };
-
-  const handleGalleryPointerCancel = () => {
-    swipeStartRef.current = null;
-  };
-
-  const activeGalleryItem = galeriaItems[galleryIndex] || null;
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [galeriaHasMore, galeriaLoadingMore, loadMoreGaleria]);
 
   const revealPrivateField = (field) => {
     setVisiblePrivateFields((current) => ({ ...current, [field]: true }));
@@ -302,65 +278,21 @@ export default function InfoNegocioSection({
 
         {galeriaItems.length > 0 ? (
           <>
-            <div className="hidden columns-2 gap-3 sm:block lg:columns-3">
+            <div className="columns-2 gap-3 lg:columns-3">
               {galeriaItems.map((item) => (
                 <div key={item.id || item.path} className="relative mb-3 w-full break-inside-avoid overflow-hidden rounded-custom border border-gray-800 bg-dark-200">
                   <img src={getPublicUrl('galerias', item.path)} alt="Galeria" className="h-auto w-full object-contain" loading="lazy" />
-                  <button type="button" onClick={() => removerImagemGaleria(item)} className="absolute right-2 top-2 rounded-full border border-gray-700 bg-black/60 px-3 py-1 text-[12px] font-normal uppercase text-red-200 hover:border-red-400">
+                  <button type="button" onClick={() => removerImagemGaleria(item)} className="absolute left-1/2 top-2 -translate-x-1/2 rounded-full border border-gray-700 bg-black/60 px-3 py-1 text-[12px] font-normal uppercase text-red-200 hover:border-red-400 sm:left-auto sm:right-2 sm:translate-x-0">
                     REMOVER
                   </button>
                 </div>
               ))}
             </div>
 
-            {activeGalleryItem ? (
-          <div className="sm:hidden">
-            <div className="relative flex justify-center">
-              <div
-                className="relative inline-flex max-w-full touch-pan-y overflow-hidden rounded-custom border border-gray-800"
-                onPointerDown={handleGalleryPointerDown}
-                onPointerUp={handleGalleryPointerUp}
-                onPointerCancel={handleGalleryPointerCancel}
-              >
-                <img
-                  key={activeGalleryItem.id || activeGalleryItem.path}
-                  src={getPublicUrl('galerias', activeGalleryItem.path)}
-                  alt="Galeria"
-                  className="h-auto max-h-[70vh] max-w-full object-contain"
-                  loading="lazy"
-                />
-                <button type="button" onClick={() => removerImagemGaleria(activeGalleryItem)} className="absolute right-2 top-2 rounded-full border border-gray-700 bg-black/60 px-3 py-1 text-[12px] font-normal uppercase text-red-200 hover:border-red-400">
-                  REMOVER
-                </button>
-                {galeriaItems.length > 1 && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={goToPreviousGalleryItem}
-                      className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-700 bg-black/60 text-white hover:border-primary hover:text-primary"
-                      aria-label="Imagem anterior"
-                    >
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={goToNextGalleryItem}
-                      className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-700 bg-black/60 text-white hover:border-primary hover:text-primary"
-                      aria-label="Proxima imagem"
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </button>
-                  </>
-                )}
+            {galeriaHasMore ? (
+              <div ref={gallerySentinelRef} className="flex h-12 items-center justify-center" aria-hidden="true">
+                {galeriaLoadingMore ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-800 border-t-primary" /> : null}
               </div>
-            </div>
-
-            <div className="mt-3 flex justify-center">
-              <div className="inline-flex items-center rounded-full border border-gray-700 bg-dark-200 px-3 py-1 text-xs text-gray-400">
-                {galleryIndex + 1} / {galeriaItems.length}
-              </div>
-            </div>
-          </div>
             ) : null}
           </>
         ) : null}
