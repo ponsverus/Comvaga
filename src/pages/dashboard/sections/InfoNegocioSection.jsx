@@ -278,9 +278,9 @@ export default function InfoNegocioSection({
 
         {galeriaItems.length > 0 ? (
           <>
-            <div className="columns-2 gap-1 lg:columns-3">
+            <div className="columns-2 gap-0.5 lg:columns-3">
               {galeriaItems.map((item) => (
-                <div key={item.id || item.path} className="relative mb-1 w-full break-inside-avoid overflow-hidden rounded-custom border border-gray-800 bg-dark-200">
+                <div key={item.id || item.path} className="relative mb-0.5 w-full break-inside-avoid overflow-hidden rounded-custom border border-gray-800 bg-dark-200">
                   <img src={getPublicUrl('galerias', item.path)} alt="Galeria" className="h-auto w-full object-contain" loading="lazy" />
                   <button type="button" onClick={() => removerImagemGaleria(item)} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gray-700 bg-black/60 px-3 py-1 text-[12px] font-normal uppercase text-red-200 hover:border-red-400 sm:left-auto sm:right-2 sm:top-2 sm:translate-x-0 sm:translate-y-0">
                     REMOVER
