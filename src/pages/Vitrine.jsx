@@ -278,11 +278,14 @@ export default function Vitrine({ user, userType }) {
     entregas,
     depoimentos,
     galeriaItems,
+    galeriaHasMore,
+    galeriaLoadingMore,
     loading,
     error,
     serverNow,
     fetchNowFromDb,
     refreshDepoimentos,
+    loadMoreGaleria,
     loadVitrine,
   } = useVitrineBootstrap({
     slug,
@@ -575,7 +578,12 @@ export default function Vitrine({ user, userType }) {
         }}
       />
 
-      <VitrineGallerySection items={galeriaView} />
+      <VitrineGallerySection
+        items={galeriaView}
+        hasMore={galeriaHasMore}
+        loadingMore={galeriaLoadingMore}
+        onLoadMore={loadMoreGaleria}
+      />
 
       <VitrineDepoimentosSection
         onAbrirDepoimento={abrirDepoimento}
