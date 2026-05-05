@@ -96,7 +96,7 @@ function SearchBox({
               }}
               className="block border-b border-white/5 px-5 py-4 transition-colors hover:bg-dark-200/90 last:border-b-0"
             >
-              <div className="font-bold text-white">{r.nome}</div>
+              <div className="font-normal text-white uppercase">{r.nome}</div>
               {r.subtitulo && (
                 <div className="mt-1 text-sm text-gray-400">{r.subtitulo}</div>
               )}
