@@ -84,14 +84,22 @@ export async function fetchVitrineEntregas(profissionalIds) {
   return data || [];
 }
 
-export async function fetchVitrineGaleria(negocioId) {
-  const { data, error } = await withTimeout(
-    supabase
+export async function fetchVitrineGaleria(negocioId, { limit = null, offset = 0 } = {}) {
+  let query = supabase
       .from('galerias')
       .select('id, path, ordem')
       .eq('negocio_id', negocioId)
       .order('ordem', { ascending: true })
-      .order('created_at', { ascending: true }),
+      .order('created_at', { ascending: true });
+
+  if (limit != null) {
+    const from = Math.max(0, Number(offset) || 0);
+    const to = from + Math.max(1, Number(limit) || 1) - 1;
+    query = query.range(from, to);
+  }
+
+  const { data, error } = await withTimeout(
+    query,
     7000,
     'galerias'
   );
