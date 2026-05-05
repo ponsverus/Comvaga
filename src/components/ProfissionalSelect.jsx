@@ -56,7 +56,7 @@ export default function ProfissionalSelect({
               {getInicial(selected.nome)}
             </div>
             <div className="flex-1 text-left min-w-0">
-              <div className="text-white truncate">{selected.nome}</div>
+              <div className="text-white truncate uppercase">{selected.nome}</div>
               {selected.profissao && (
                 <div className="text-[11px] text-gray-500 truncate">{selected.profissao}</div>
               )}
@@ -92,7 +92,7 @@ export default function ProfissionalSelect({
                     {getInicial(p.nome)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className={`text-sm truncate ${isSelected ? 'text-primary' : 'text-white'}`}>{p.nome}</div>
+                    <div className={`text-sm truncate uppercase ${isSelected ? 'text-primary' : 'text-white'}`}>{p.nome}</div>
                     {p.profissao && (
                       <div className="text-[11px] text-gray-500 truncate">{p.profissao}</div>
                     )}
