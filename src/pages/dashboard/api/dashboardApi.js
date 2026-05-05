@@ -112,13 +112,21 @@ export async function fetchPartnerNegocioIds(userId) {
   return [...new Set((data || []).map((item) => item.negocio_id).filter(Boolean))];
 }
 
-export async function fetchGaleria(negocioId) {
-  const { data, error } = await supabase
+export async function fetchGaleria(negocioId, { limit = null, offset = 0 } = {}) {
+  let query = supabase
     .from('galerias')
     .select('id, path, ordem')
     .eq('negocio_id', negocioId)
     .order('ordem', { ascending: true })
     .order('created_at', { ascending: true });
+
+  if (limit != null) {
+    const from = Math.max(0, Number(offset) || 0);
+    const to = from + Math.max(1, Number(limit) || 1) - 1;
+    query = query.range(from, to);
+  }
+
+  const { data, error } = await query;
 
   return { data: data || [], error };
 }
