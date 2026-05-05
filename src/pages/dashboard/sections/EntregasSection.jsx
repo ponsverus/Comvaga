@@ -34,7 +34,7 @@ function ProfissionalEntregasBlock({
   return (
     <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
       <div className="flex items-center justify-between mb-4">
-        <div className="font-normal text-lg">{profissional.nome}</div>
+        <div className="font-normal text-lg uppercase">{profissional.nome}</div>
         <div className="text-xs text-gray-500">{lista.length} {lista.length === 1 ? counterSingular : counterPlural}</div>
       </div>
 
@@ -73,7 +73,7 @@ function ProfissionalEntregasBlock({
                       <span className="inline-flex items-center rounded-full border border-gray-700 bg-transparent px-3 py-1 text-xs text-gray-500">{s.duracao_minutos} MIN</span>
                     </div>
                     <h3 className="text-sm font-normal text-white mb-0.5">{s.nome}</h3>
-                    <p className="text-xs text-gray-500 mb-4">PROF: {profissional.nome}</p>
+                    <p className="text-xs text-gray-500 mb-4 uppercase">PROF: {profissional.nome}</p>
                     <div className="flex gap-2">
                       <button onClick={async () => {
                         if (!await checarPermissao(s.profissional_id)) return;
