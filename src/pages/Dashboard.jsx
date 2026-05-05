@@ -144,6 +144,8 @@ export default function Dashboard({ user, onLogout }) {
     agendamentosLoadingMore,
     galeriaItems,
     setGaleriaItems,
+    galeriaHasMore,
+    galeriaLoadingMore,
     ownerBusinessCount,
     bootstrapState,
     error,
@@ -154,6 +156,7 @@ export default function Dashboard({ user, onLogout }) {
     reloadEntregas,
     reloadAgendamentos,
     loadMoreAgendamentos,
+    loadMoreGaleria,
     reloadGaleria,
     reloadFull,
   } = useDashboardBootstrap({
@@ -788,6 +791,9 @@ export default function Dashboard({ user, onLogout }) {
                 galleryUploading={galleryUploading}
                 uploadGaleria={uploadGaleria}
                 galeriaItems={galeriaItems}
+                galeriaHasMore={galeriaHasMore}
+                galeriaLoadingMore={galeriaLoadingMore}
+                loadMoreGaleria={loadMoreGaleria}
                 getPublicUrl={getPublicUrl}
                 removerImagemGaleria={removerImagemGaleria}
                 novoEmail={novoEmail}
