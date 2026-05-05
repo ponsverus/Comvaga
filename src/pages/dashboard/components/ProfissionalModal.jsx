@@ -62,7 +62,7 @@ export default function ProfissionalModal({
               type="text"
               value={formProfissional.nome}
               onChange={(e) => setFormProfissional({ ...formProfissional, nome: e.target.value })}
-              className={professionalInputClass}
+              className={`${professionalInputClass} uppercase`}
               required
             />
           </ProfessionalFieldRow>
