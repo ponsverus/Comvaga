@@ -1,6 +1,20 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
-export default function VitrineGallerySection({ items }) {
+export default function VitrineGallerySection({ items, hasMore = false, loadingMore = false, onLoadMore }) {
+  const sentinelRef = useRef(null);
+
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || !hasMore || loadingMore || typeof onLoadMore !== 'function') return undefined;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) onLoadMore();
+    }, { rootMargin: '600px 0px' });
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore, onLoadMore]);
+
   if (!items.length) return null;
 
   return (
@@ -13,6 +27,11 @@ export default function VitrineGallerySection({ items }) {
             </div>
           ))}
         </div>
+        {hasMore && (
+          <div ref={sentinelRef} className="flex h-12 items-center justify-center" aria-hidden="true">
+            {loadingMore && <div className="h-5 w-5 rounded-full border-2 border-vborder border-t-vtext animate-spin" />}
+          </div>
+        )}
       </div>
     </section>
   );
