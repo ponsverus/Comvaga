@@ -11,7 +11,8 @@ import {
   fetchProfissionaisComStatus,
 } from '../api/dashboardApi';
 
-const AGENDAMENTOS_PAGE_SIZE = 15;
+const AGENDAMENTOS_PAGE_SIZE = 50;
+const GALERIA_PAGE_SIZE = 12;
 
 export function useDashboardBootstrap({
   userId,
@@ -28,6 +29,8 @@ export function useDashboardBootstrap({
   const [agendamentosHasMore, setAgendamentosHasMore] = useState(false);
   const [agendamentosLoadingMore, setAgendamentosLoadingMore] = useState(false);
   const [galeriaItems, setGaleriaItems] = useState([]);
+  const [galeriaHasMore, setGaleriaHasMore] = useState(false);
+  const [galeriaLoadingMore, setGaleriaLoadingMore] = useState(false);
   const [ownerBusinessCount, setOwnerBusinessCount] = useState(0);
   const [bootstrapState, setBootstrapState] = useState('loading');
   const [error, setError] = useState(null);
@@ -127,13 +130,45 @@ export function useDashboardBootstrap({
     }
   }, [agendamentos.length, agendamentosHasMore, agendamentosLoadingMore, negocio?.id, profissionais]);
 
+  const applyGaleriaPage = useCallback((rows, mode = 'replace') => {
+    const safeRows = rows || [];
+    const visibleRows = safeRows.slice(0, GALERIA_PAGE_SIZE);
+    setGaleriaHasMore(safeRows.length > GALERIA_PAGE_SIZE);
+
+    if (mode === 'append') {
+      setGaleriaItems((current) => {
+        const existingIds = new Set(current.map((item) => item.id));
+        return [...current, ...visibleRows.filter((item) => !existingIds.has(item.id))];
+      });
+      return;
+    }
+
+    setGaleriaItems(visibleRows);
+  }, []);
+
   const reloadGaleria = useCallback(async (negocioId) => {
     const id = negocioId || negocio?.id;
     if (!id) return;
-    const { data } = await fetchGaleria(id);
-    setGaleriaItems(data || []);
-    return data || [];
-  }, [negocio?.id]);
+    const { data } = await fetchGaleria(id, { limit: GALERIA_PAGE_SIZE + 1, offset: 0 });
+    applyGaleriaPage(data || []);
+    return (data || []).slice(0, GALERIA_PAGE_SIZE);
+  }, [applyGaleriaPage, negocio?.id]);
+
+  const loadMoreGaleria = useCallback(async () => {
+    const id = negocio?.id;
+    if (galeriaLoadingMore || !galeriaHasMore || !id) return;
+
+    try {
+      setGaleriaLoadingMore(true);
+      const { data } = await fetchGaleria(id, {
+        limit: GALERIA_PAGE_SIZE + 1,
+        offset: galeriaItems.length,
+      });
+      applyGaleriaPage(data || [], 'append');
+    } finally {
+      setGaleriaLoadingMore(false);
+    }
+  }, [applyGaleriaPage, galeriaHasMore, galeriaItems.length, galeriaLoadingMore, negocio?.id]);
 
   const loadData = useCallback(async (dataRef) => {
     if (!userId) {
@@ -155,6 +190,8 @@ export function useDashboardBootstrap({
     setAgendamentos([]);
     setAgendamentosHasMore(false);
     setGaleriaItems([]);
+    setGaleriaHasMore(false);
+    setGaleriaLoadingMore(false);
 
     try {
       const totalOwnerBusinesses = await fetchOwnerBusinessCount(userId);
@@ -194,7 +231,7 @@ export function useDashboardBootstrap({
 
       setNegocio(negocioData);
       const [galeriaResult, allProfissionais] = await Promise.all([
-        fetchGaleria(negocioData.id),
+        fetchGaleria(negocioData.id, { limit: GALERIA_PAGE_SIZE + 1, offset: 0 }),
         fetchProfissionaisComStatus(negocioData.id),
       ]);
 
@@ -202,7 +239,7 @@ export function useDashboardBootstrap({
       if (galeriaResult.error) {
         await uiAlert('dashboard.gallery_load_warning', 'warning');
       }
-      setGaleriaItems(galeriaResult.data || []);
+      applyGaleriaPage(galeriaResult.data || []);
 
       const { scoped: scopedProfs, parceiro: meuProfissional } = scopeProfissionais(allProfissionais, negocioData.owner_id);
       const souDonoDoNegocio = negocioData.owner_id === userId;
@@ -214,6 +251,8 @@ export function useDashboardBootstrap({
         setAgendamentos([]);
         setAgendamentosHasMore(false);
         setGaleriaItems([]);
+        setGaleriaHasMore(false);
+        setGaleriaLoadingMore(false);
         setError('Você não tem acesso a este negócio.');
         setBootstrapState('error');
         return;
@@ -252,7 +291,7 @@ export function useDashboardBootstrap({
       setError(e?.message || 'Erro inesperado.');
       setBootstrapState('error');
     }
-  }, [locationNegocioId, navigate, scopeProfissionais, uiAlert, userId]);
+  }, [applyGaleriaPage, locationNegocioId, navigate, scopeProfissionais, uiAlert, userId]);
 
   const reloadFull = useCallback(async () => {
     try {
@@ -296,6 +335,8 @@ export function useDashboardBootstrap({
     agendamentosLoadingMore,
     galeriaItems,
     setGaleriaItems,
+    galeriaHasMore,
+    galeriaLoadingMore,
     ownerBusinessCount,
     bootstrapState,
     error,
@@ -309,6 +350,7 @@ export function useDashboardBootstrap({
     reloadEntregas,
     reloadAgendamentos,
     loadMoreAgendamentos,
+    loadMoreGaleria,
     reloadGaleria,
     loadData,
     reloadFull,
