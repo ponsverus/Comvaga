@@ -181,7 +181,7 @@ export default function AgendaUtilizacaoBlock({
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="text-[12px] text-gray-500 uppercase tracking-wide">Profissional</div>
-                    <div className="mt-1 font-normal text-white leading-snug">{String(item?.nome || 'PROFISSIONAL')}</div>
+                    <div className="mt-1 font-normal text-white leading-snug uppercase">{String(item?.nome || 'PROFISSIONAL')}</div>
                   </div>
                   <div className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-normal text-primary">
                     {formatPercent(item?.taxa_ocupacao)}
