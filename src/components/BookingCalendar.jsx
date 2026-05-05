@@ -275,7 +275,7 @@ export default function BookingCalendar({
           <div className="min-w-0">
             <div className={`text-xs uppercase tracking-wide ${labelColor}`}>Agendamento</div>
             <div className={`font-normal truncate ${titleColor}`}>{entrega?.nome}</div>
-            <div className={`text-xs mt-0.5 ${subtitleColor}`}>
+            <div className={`text-xs mt-0.5 uppercase ${subtitleColor}`}>
               {profissional?.nome}
               {entrega?.duracao_minutos && <span className={`ml-2 ${subMutedColor}`}>• {entrega.duracao_minutos} MIN</span>}
               <span className="ml-2" style={{ color: 'var(--vpromo-text)' }}>• R$ {valorExibido}</span>
@@ -425,7 +425,7 @@ export default function BookingCalendar({
               <div className="space-y-2 text-sm mb-4">
                 <div className="flex justify-between">
                   <span className={resumeLabel}>PROFISSIONAL</span>
-                  <span className={resumeValue}>{profissional?.nome}</span>
+                  <span className={resumeValue}>{profissional?.nome?.toUpperCase()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className={resumeLabel}>DATA</span>
