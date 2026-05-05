@@ -150,7 +150,7 @@ export default function Home({ user, userType, onLogout }) {
       try {
         const { data, error } = await supabase.rpc('search_home', {
           p_term: term,
-          p_limit: 2,
+          p_limit: 10,
         });
 
         if (error) throw error;
