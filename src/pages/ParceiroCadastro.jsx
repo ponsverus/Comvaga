@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { ptBR } from '../feedback/messages/ptBR';
 
@@ -39,6 +40,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
   const [alerta, setAlerta] = useState(null);
@@ -187,15 +189,24 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
             </FieldRow>
 
             <FieldRow label="SENHA">
-              <input
-                type="password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                placeholder="MÍNIMO 7 CARACTERES"
-                className={fieldInputClass}
-                required
-                minLength={7}
-              />
+              <div className="relative min-w-0">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  placeholder="MÍNIMO 7 CARACTERES"
+                  className={`${fieldInputClass} pr-10`}
+                  required
+                  minLength={7}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-600 transition-colors hover:text-gray-400"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </FieldRow>
 
             <FieldRow label="SLUG" last>
