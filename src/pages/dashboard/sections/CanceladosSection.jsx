@@ -11,8 +11,8 @@ export default function CanceladosSection({ hojeCancelados }) {
             const valorReal = getValorAgendamento(a);
             return (
               <div key={a.id} className="bg-dark-200 border border-red-500/30 rounded-custom p-4">
-                <div className="flex items-start justify-between gap-2 mb-1"><p className="text-sm font-normal text-white truncate">{a.cliente?.nome || '—'}</p><div className="px-3 py-1 rounded-button text-xs bg-red-500/20 border border-red-500/50 text-red-400 shrink-0">CANCELADO</div></div>
-                <p className="text-xs text-gray-500 truncate mb-0.5">PROF: {a.profissionais?.nome || '—'}</p>
+                <div className="flex items-start justify-between gap-2 mb-1"><p className="text-sm font-normal text-white truncate uppercase">{a.cliente?.nome || '—'}</p><div className="px-3 py-1 rounded-button text-xs bg-red-500/20 border border-red-500/50 text-red-400 shrink-0">CANCELADO</div></div>
+                <p className="text-xs text-gray-500 truncate mb-0.5 uppercase">PROF: {a.profissionais?.nome || '—'}</p>
                 <p className="text-xs text-primary truncate mb-3">{a.entregas?.nome || '—'}</p>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div><div className="text-xs text-gray-500">DATA</div><div className="text-white">{formatDateBRFromISO(getAgDate(a))}</div></div>
