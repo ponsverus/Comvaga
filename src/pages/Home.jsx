@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { ProtectionIcon, UserIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon } from '../components/icons';
+import { ProtectionIcon, UsersIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon } from '../components/icons';
 
 const SUPORTE_PHONE_E164 = '5533999037979';
 const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
@@ -96,7 +96,7 @@ function SearchBox({
               }}
               className="block border-b border-white/5 px-5 py-4 transition-colors hover:bg-dark-200/90 last:border-b-0"
             >
-              <div className="font-normal text-white uppercase">{r.nome}</div>
+              <div className="font-bold text-white uppercase">{r.nome}</div>
               {r.subtitulo && (
                 <div className="mt-1 text-sm text-gray-400">{r.subtitulo}</div>
               )}
@@ -273,7 +273,7 @@ export default function Home({ user, userType, onLogout }) {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
-            O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span> antes que aconteçam. Se um serviço vai ultrapassar o próximo horário agendado, o sistema bloqueia automaticamente a reserva. Mas vai além: quando há um cancelamento, a tecnologia fragmenta esse tempo livre em múltiplas oportunidades de agendamento, respeitando o tempo exato de cada serviço oferecido. Resultado: sua agenda trabalha no máximo da capacidade, sem desperdício.
+            O Comvaga organiza agenda, vitrine, equipe e cliente em uma experiência só. O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita a duração real de cada serviço e transforma horários livres em oportunidades reais de atendimento.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -316,9 +316,9 @@ export default function Home({ user, userType, onLogout }) {
 
           <div className="grid md:grid-cols-3 gap-10 md:gap-14">
             {[
-              { num: 1, title: 'PAINEL DE SERVIÇOS', text: 'Cadastre seus serviços e tempos exatos. O sistema transforma esses dados em uma grade totalmente moldável e fluida.' },
-              { num: 2, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
-              { num: 3, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
+              { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários, pausas e serviços. O sistema não força uma agenda genérica para todo mundo.' },
+              { num: 2, title: 'VAGAS POSSÍVEIS', text: 'O cliente vê somente horários que cabem de verdade no expediente e na duração do serviço escolhido.' },
+              { num: 3, title: 'DECISÃO SEGURA', text: 'Antes de confirmar, o sistema verifica conflito, horário vencido e encaixe com os próximos atendimentos.' },
             ].map(({ num, title, text }) => (
               <div key={num} className="relative">
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 md:-top-10 md:-left-4 w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 z-10">
@@ -340,7 +340,7 @@ export default function Home({ user, userType, onLogout }) {
               <div>
                 <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO AUTOMÁTICO DE HORÁRIOS</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos. O horário vago é imediatamente redistribuído na vitrine como novas vagas disponíveis, cada uma dimensionada conforme seus serviços. Um espaço de 60 minutos pode se transformar em três oportunidades de 20 minutos ou duas de 30 minutos. Seus clientes veem essas vagas especiais identificadas com um ícone discreto, garantindo transparência total.
+                  <span className="text-primary">CANCELOU?</span> O espaço volta para a vitrine como nova oportunidade de agenda, respeitando o tempo dos serviços disponíveis. Um intervalo que antes virava prejuízo pode voltar a ser vendido sem o profissional reorganizar tudo manualmente.
                 </p>
               </div>
             </div>
@@ -359,12 +359,12 @@ export default function Home({ user, userType, onLogout }) {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: TrendingUpIcon, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
-              { icon: UserIcon, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
-              { icon: ProtectionIcon, title: 'AGENDA INTELIGENTE', text: 'O sistema lê o futuro: se o serviço escolhido vai invadir o próximo horário, a reserva é bloqueada automaticamente.' },
-              { icon: TimeIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
-              { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
-              { icon: CheckDoubleIcon, title: 'GEOMETRIA DE TEMPO', text: 'Substituímos os blocos fixos e obsoletos pelo uso do tempo real de cada serviço, garantindo o encaixe perfeito.' },
+              { icon: TrendingUpIcon, title: 'MENOS TEMPO PERDIDO', text: 'A agenda deixa de depender de blocos fixos e passa a trabalhar com a duração real de cada atendimento.' },
+              { icon: UsersIcon, title: 'CLIENTE COM CLAREZA', text: 'Quem agenda entende profissional, serviço, horário e status sem precisar chamar no WhatsApp para confirmar tudo.' },
+              { icon: ProtectionIcon, title: 'MENOS ERRO MANUAL', text: 'O sistema barra reservas que não fazem sentido antes que elas virem atraso, remarcação ou desgaste.' },
+              { icon: TimeIcon, title: 'CANCELAMENTO ÚTIL', text: 'Quando uma vaga abre, ela pode voltar para a vitrine e ser aproveitada por outro cliente.' },
+              { icon: StarGlyph, title: 'CONFIANÇA PÚBLICA', text: 'Galeria, depoimentos e profissionais dão contexto para o cliente decidir antes do agendamento.' },
+              { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
             ].map(({ icon: Icon, title, text }, i) => (
               <div
                 key={i}
@@ -381,10 +381,83 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
+      <section className="py-24 px-4 bg-dark-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-black mb-4">
+              CONTROLE <span className="text-primary">DO NEGÓCIO</span>
+            </h2>
+            <p className="text-xl text-gray-400">O painel existe para operar o dia, não apenas cadastrar dados</p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: TrendingUpIcon, title: 'LEITURA DO DIA', text: 'Faturamento, agenda, utilização e próximos atendimentos aparecem sem o dono precisar juntar informação em vários lugares.' },
+              { icon: UsersIcon, title: 'PARCERIAS SOB CONTROLE', text: 'Profissionais solicitam acesso ao negócio; o admin aprova, acompanha e mantém a equipe organizada.' },
+              { icon: TimeIcon, title: 'ROTINA INDIVIDUAL', text: 'Cada profissional pode ter expediente e pausa próprios, dia por dia, sem afetar a agenda dos demais.' },
+              { icon: CheckDoubleIcon, title: 'OPERAÇÃO ASSISTIDA', text: 'O painel permite acompanhar clientes, histórico, cancelados e criar agendamentos quando o atendimento acontece por fora.' },
+            ].map(({ icon: Icon, title, text }, i) => (
+              <div key={i} className="bg-dark-200 border border-gray-800 rounded-custom p-7 hover:border-primary/50 transition-all">
+                <div className="w-14 h-14 bg-primary/20 rounded-custom flex items-center justify-center mb-5">
+                  <Icon className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="text-xl font-normal mb-3 text-white">{title}</h3>
+                <p className="text-gray-400 leading-relaxed text-sm">{text}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 grid md:grid-cols-2 gap-6">
+            <div className="bg-gradient-to-br from-primary/15 to-yellow-600/10 border border-primary/25 rounded-custom p-8">
+              <h3 className="text-2xl font-normal mb-3 text-white">VITRINE QUE AJUDA A DECIDIR</h3>
+              <p className="text-gray-300 leading-relaxed">
+                A vitrine não é só uma página bonita: ela mostra prova, equipe, serviços e disponibilidade para reduzir dúvida antes do cliente escolher um horário.
+              </p>
+            </div>
+            <div className="bg-gradient-to-br from-primary/15 to-yellow-600/10 border border-primary/25 rounded-custom p-8">
+              <h3 className="text-2xl font-normal mb-3 text-white">SERVIÇO NO TEMPO CERTO</h3>
+              <p className="text-gray-300 leading-relaxed">
+                O tempo de cada serviço vira regra de agenda. Isso evita encaixe falso, reduz atraso e melhora a ocupação do expediente.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 px-4 bg-black">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-black mb-4">
+              CLIENTE <span className="text-primary">NO CONTROLE</span>
+            </h2>
+            <p className="text-xl text-gray-400">O cliente não precisa aprender sistema; ele só precisa conseguir resolver</p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { icon: SearchIcon, title: 'ENCONTRAR', text: 'A busca leva o cliente direto ao negócio ou profissional certo, sem depender de link perdido em conversa.' },
+              { icon: StarGlyph, title: 'VOLTAR', text: 'Favoritos e marcação recorrente encurtam o caminho para quem já conhece e quer repetir.' },
+              { icon: TimeIcon, title: 'ACOMPANHAR', text: 'Agendamentos em aberto, concluídos e cancelados ficam organizados na área do cliente.' },
+              { icon: CheckDoubleIcon, title: 'REPETIR', text: 'Depois do atendimento, o cliente consegue marcar novamente com menos passos e menos dúvida.' },
+              { icon: UsersIcon, title: 'AVALIAR', text: 'Depoimentos alimentam a confiança da vitrine e ajudam o bom profissional a provar qualidade.' },
+              { icon: ProtectionIcon, title: 'EVITAR SURPRESA', text: 'Horários expirados, conflitos e encaixes impossíveis são bloqueados antes da confirmação.' },
+            ].map(({ icon: Icon, title, text }, i) => (
+              <div key={i} className="bg-dark-100/70 border border-gray-800 rounded-custom p-8 hover:border-primary/50 transition-all">
+                <div className="w-16 h-16 bg-primary/20 rounded-custom flex items-center justify-center mb-6">
+                  <Icon className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
+                <p className="text-gray-400 leading-relaxed">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-5xl font-black text-black mb-6">ELEVE SEU NÍVEL PROFISSIONAL</h2>
-          <p className="text-2xl text-black/80 mb-8">Sincronia automática, cliente pontual e agenda cheia.</p>
+          <p className="text-2xl text-black/80 mb-8">Uma vitrine para vender, um painel para operar e uma agenda que pensa antes de confirmar.</p>
           <Link
             to="/cadastro"
             className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all hover:scale-105"
