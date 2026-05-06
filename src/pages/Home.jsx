@@ -96,7 +96,7 @@ function SearchBox({
               }}
               className="block border-b border-white/5 px-5 py-4 transition-colors hover:bg-dark-200/90 last:border-b-0"
             >
-              <div className="font-normal text-white uppercase">{r.nome}</div>
+              <div className="font-bold text-white uppercase">{r.nome}</div>
               {r.subtitulo && (
                 <div className="mt-1 text-sm text-gray-400">{r.subtitulo}</div>
               )}
@@ -370,6 +370,79 @@ export default function Home({ user, userType, onLogout }) {
                 key={i}
                 className="bg-gradient-to-br from-primary/10 to-yellow-600/10 border border-primary/20 rounded-custom p-8 hover:border-primary/50 transition-all hover:scale-105"
               >
+                <div className="w-16 h-16 bg-primary/20 rounded-custom flex items-center justify-center mb-6">
+                  <Icon className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
+                <p className="text-gray-400 leading-relaxed">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 px-4 bg-dark-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-black mb-4">
+              CONTROLE <span className="text-primary">DO NEGÓCIO</span>
+            </h2>
+            <p className="text-xl text-gray-400">Tudo que o profissional precisa para vender, organizar e acompanhar</p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: TrendingUpIcon, title: 'VISÃO GERAL', text: 'Acompanhe faturamento, agendamentos, profissionais, serviços e próximos horários em um painel direto.' },
+              { icon: UsersIcon, title: 'EQUIPE ORGANIZADA', text: 'Cadastre profissionais, parceiros e permissões. Cada profissional pode ter sua própria rotina de atendimento.' },
+              { icon: TimeIcon, title: 'HORÁRIOS POR DIA', text: 'Entrada, saída, dias ativos e pausa são definidos por profissional, sem travar o horário dos outros.' },
+              { icon: CheckDoubleIcon, title: 'CLIENTES E HISTÓRICO', text: 'Veja clientes atendidos, cancelamentos, histórico completo e marque novamente sem perder contexto.' },
+            ].map(({ icon: Icon, title, text }, i) => (
+              <div key={i} className="bg-dark-200 border border-gray-800 rounded-custom p-7 hover:border-primary/50 transition-all">
+                <div className="w-14 h-14 bg-primary/20 rounded-custom flex items-center justify-center mb-5">
+                  <Icon className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="text-xl font-normal mb-3 text-white">{title}</h3>
+                <p className="text-gray-400 leading-relaxed text-sm">{text}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 grid md:grid-cols-2 gap-6">
+            <div className="bg-gradient-to-br from-primary/15 to-yellow-600/10 border border-primary/25 rounded-custom p-8">
+              <h3 className="text-2xl font-normal mb-3 text-white">VITRINE PRONTA PARA VENDER</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Seu negócio ganha uma página pública com profissionais, serviços, preços, galeria, depoimentos, redes sociais, telefone, endereço e botão de agendamento.
+              </p>
+            </div>
+            <div className="bg-gradient-to-br from-primary/15 to-yellow-600/10 border border-primary/25 rounded-custom p-8">
+              <h3 className="text-2xl font-normal mb-3 text-white">SERVIÇOS POR PROFISSIONAL</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Cada profissional pode ter seus próprios serviços, valores e duração. A agenda usa esses tempos reais para mostrar apenas vagas possíveis.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 px-4 bg-black">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-black mb-4">
+              CLIENTE <span className="text-primary">NO CONTROLE</span>
+            </h2>
+            <p className="text-xl text-gray-400">Uma experiência simples para encontrar, agendar e voltar</p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { icon: SearchIcon, title: 'BUSCA RÁPIDA', text: 'O cliente encontra negócios e profissionais direto pela home e entra na vitrine sem instalar aplicativo.' },
+              { icon: StarGlyph, title: 'FAVORITOS', text: 'Negócios preferidos ficam salvos na área do cliente para voltar e agendar com menos atrito.' },
+              { icon: TimeIcon, title: 'AGENDA PESSOAL', text: 'O cliente acompanha agendamentos em aberto, concluídos e cancelados em um só lugar.' },
+              { icon: CheckDoubleIcon, title: 'MARCAR NOVAMENTE', text: 'Depois de um atendimento, o cliente pode repetir o serviço com o mesmo profissional com poucos cliques.' },
+              { icon: UsersIcon, title: 'DEPOIMENTOS', text: 'Avaliações reais fortalecem a vitrine e ajudam novos clientes a escolherem com mais confiança.' },
+              { icon: ProtectionIcon, title: 'HORÁRIO PROTEGIDO', text: 'O sistema bloqueia horários vencidos ou impossíveis, evitando reserva errada e reduzindo frustração.' },
+            ].map(({ icon: Icon, title, text }, i) => (
+              <div key={i} className="bg-dark-100/70 border border-gray-800 rounded-custom p-8 hover:border-primary/50 transition-all">
                 <div className="w-16 h-16 bg-primary/20 rounded-custom flex items-center justify-center mb-6">
                   <Icon className="w-8 h-8 text-primary" />
                 </div>
