@@ -273,7 +273,7 @@ export default function Home({ user, userType, onLogout }) {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
-            O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span> antes que aconteçam. Se um serviço vai ultrapassar o próximo horário agendado, o sistema bloqueia automaticamente a reserva. Mas vai além: quando há um cancelamento, a tecnologia fragmenta esse tempo livre em múltiplas oportunidades de agendamento, respeitando o tempo exato de cada serviço oferecido. Resultado: sua agenda trabalha no máximo da capacidade, sem desperdício.
+            Comvaga organiza agenda, vitrine, equipe e cliente em uma experiência só. O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita a duração real de cada serviço e transforma horários livres em oportunidades reais de atendimento.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
