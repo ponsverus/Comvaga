@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { ProtectionIcon, UsersIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon } from '../components/icons';
+import { ProtectionIcon, UsersIcon, UserIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon } from '../components/icons';
 
 const SUPORTE_PHONE_E164 = '5533999037979';
 const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
@@ -360,7 +360,7 @@ export default function Home({ user, userType, onLogout }) {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { icon: TrendingUpIcon, title: 'MENOS TEMPO PERDIDO', text: 'A agenda deixa de depender de blocos fixos e passa a trabalhar com a duração real de cada atendimento.' },
-              { icon: UsersIcon, title: 'CLIENTE COM CLAREZA', text: 'Quem agenda entende profissional, serviço, horário e status sem precisar chamar no WhatsApp para confirmar tudo.' },
+              { icon: UserIcon, title: 'CLIENTE COM CLAREZA', text: 'Quem agenda entende profissional, serviço, horário e status sem precisar chamar no WhatsApp para confirmar tudo.' },
               { icon: ProtectionIcon, title: 'MENOS ERRO MANUAL', text: 'O sistema barra reservas que não fazem sentido antes que elas virem atraso, remarcação ou desgaste.' },
               { icon: TimeIcon, title: 'CANCELAMENTO ÚTIL', text: 'Quando uma vaga abre, ela pode voltar para a vitrine e ser aproveitada por outro cliente.' },
               { icon: StarGlyph, title: 'CONFIANÇA PÚBLICA', text: 'Galeria, depoimentos e profissionais dão contexto para o cliente decidir antes do agendamento.' },
