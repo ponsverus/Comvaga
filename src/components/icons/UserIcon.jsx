@@ -29,14 +29,16 @@ export default function UserIcon({
         cx="512" 
         cy="256" 
         r="185" 
-        fill="#1e2c4c" 
+        fill="currentColor"
+        opacity="0.9"
       />
       <ellipse 
         cx="512" 
         cy="712" 
         rx="292" 
         ry="170" 
-        fill="#9499ad" 
+        fill="currentColor"
+        opacity="0.45"
       />
     </svg>
   );
