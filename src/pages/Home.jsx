@@ -229,7 +229,7 @@ export default function Home({ user, userType, onLogout }) {
         `}</style>
       </div>
 
-      <header className="absolute top-16 left-0 w-full z-40 bg-transparent border-none">
+      <header className="absolute top-24 left-0 w-full z-40 bg-transparent border-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-center h-16 sm:h-20">
             <Link to="/" className="flex flex-col items-center justify-center gap-1">
