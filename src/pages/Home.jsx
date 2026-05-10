@@ -236,7 +236,7 @@ export default function Home({ user, userType, onLogout }) {
               <img
                 src="/Comvaga Logo.png"
                 alt="Comvaga"
-                className="h-9 w-auto object-contain sm:h-11"
+                className="h-15 w-auto object-contain sm:h-17"
               />
               <h1 className="text-2xl sm:text-3xl font-black">COMVAGA</h1>
             </Link>
