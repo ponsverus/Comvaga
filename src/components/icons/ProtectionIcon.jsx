@@ -1,11 +1,6 @@
 import React from 'react';
 
-export default function ShieldIcon({
-  className = '',
-  title,
-  style = {},
-  ...props
-}) {
+export default function ProtectionIcon({ className = '', title, style = {}, ...props }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -20,8 +15,9 @@ export default function ShieldIcon({
 
       <path
         d="M12 2.5C9.5 2.5 6.5 3.5 5 4.5V12.5C5 16.5 8 20 12 21.5C16 20 19 16.5 19 12.5V4.5C17.5 3.5 14.5 2.5 12 2.5Z"
-        fill="#FDE68A"
-        stroke="#EAB308"
+        fill="currentColor"
+        opacity="0.35"
+        stroke="currentColor"
         strokeWidth="0.9"
         strokeLinejoin="round"
         strokeLinecap="round"
