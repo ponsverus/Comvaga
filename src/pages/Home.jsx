@@ -273,7 +273,7 @@ export default function Home({ user, userType, onLogout }) {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
-            Comvaga organiza agenda, vitrine, equipe e cliente em uma experiência só. O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita a duração real de cada serviço e transforma horários livres em oportunidades reais de atendimento.
+            Comvaga organiza agenda, vitrine, equipe e cliente em uma experiência só. O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -316,9 +316,9 @@ export default function Home({ user, userType, onLogout }) {
 
           <div className="grid md:grid-cols-3 gap-10 md:gap-14">
             {[
-              { num: 1, title: 'PAINEL DE SERVIÇOS', text: 'Cadastre seus serviços e tempos exatos. O sistema transforma esses dados em uma grade totalmente moldável e fluida.' },
-              { num: 2, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
-              { num: 3, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
+              { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
+              { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
+              { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
             ].map(({ num, title, text }) => (
               <div key={num} className="relative">
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 md:-top-10 md:-left-4 w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 z-10">
@@ -340,7 +340,7 @@ export default function Home({ user, userType, onLogout }) {
               <div>
                 <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO AUTOMÁTICO DE HORÁRIOS</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos. O horário vago é imediatamente redistribuído na vitrine como novas vagas disponíveis, cada uma dimensionada conforme seus serviços. Um espaço de 60 minutos pode se transformar em três oportunidades de 20 minutos ou duas de 30 minutos. Seus clientes veem essas vagas especiais identificadas com um ícone discreto, garantindo transparência total.
+                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades de agendamento. Assim, 60 minutos podem se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas vagas identificadas com um ícone discreto, garantindo total transparência.
                 </p>
               </div>
             </div>
@@ -361,10 +361,10 @@ export default function Home({ user, userType, onLogout }) {
             {[
               { icon: TrendingUpIcon, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
               { icon: UserIcon, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
-              { icon: ProtectionIcon, title: 'AGENDA INTELIGENTE', text: 'O sistema lê o futuro: se o serviço escolhido vai invadir o próximo horário, a reserva é bloqueada automaticamente.' },
+              { icon: ProtectionIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
               { icon: TimeIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
               { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
-              { icon: CheckDoubleIcon, title: 'GEOMETRIA DE TEMPO', text: 'Substituímos os blocos fixos e obsoletos pelo uso do tempo real de cada serviço, garantindo o encaixe perfeito.' },
+              { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
             ].map(({ icon: Icon, title, text }, i) => (
               <div
                 key={i}
