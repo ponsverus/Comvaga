@@ -71,7 +71,7 @@ function SearchBox({
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="BUSQUE UM PROFISSIONAL OU NEGÓCIO :)"
           className={[
-            'bg-transparent pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300',
+            'bg-transparent pr-4 text-sm text-white uppercase placeholder:text-gray-500 focus:outline-none transition-all duration-300',
             searchOpen ? 'w-full opacity-100' : 'w-0 opacity-0',
           ].join(' ')}
         />
@@ -240,7 +240,7 @@ export default function Home({ user, userType, onLogout }) {
               />
               <h1 className="text-2xl sm:text-3xl font-black">COMVAGA</h1>
             </Link>
-            <div className="absolute right-0 top-[42%] -translate-y-1/2">
+            <div className="absolute right-0 top-[40%] -translate-y-1/2">
               <SearchBox
                 searchOpen={searchOpen}
                 setSearchOpen={setSearchOpen}
