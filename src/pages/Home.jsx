@@ -387,7 +387,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      {/* ─── SEÇÃO DE PLANOS ─── inserida após VANTAGEM MÚTUA ─── */}
+      {/* ─── SEÇÃO DE PLANOS ─── */}
       <section className="py-24 px-4 bg-dark-100">
         <div className="max-w-7xl mx-auto">
 
@@ -398,9 +398,13 @@ export default function Home({ user, userType, onLogout }) {
             <p className="text-xl text-gray-400">Simples assim: um único plano ativo com acesso completo</p>
           </div>
 
-          {/* Desktop: 3 colunas alinhadas ao topo | Mobile: carrossel snap centrado no card do meio */}
+          {/*
+            Mobile: flex com scroll horizontal snap.
+            Cada card usa w-max (largura pelo próprio conteúdo), não um vw fixo.
+            Desktop (sm:): grid 3 colunas, itens alinhados ao topo.
+          */}
           <div className="
-            flex gap-5 overflow-x-auto scroll-snap-x-mandatory
+            flex gap-5 overflow-x-auto scroll-snap-type-x-mandatory
             sm:grid sm:grid-cols-3 sm:items-start sm:overflow-visible
             pb-4 sm:pb-0
             [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
@@ -408,14 +412,12 @@ export default function Home({ user, userType, onLogout }) {
 
             {/* ── CARD 1 — ESSENCIAL ── */}
             <div className="
-              flex-shrink-0 w-[78vw] max-w-xs scroll-snap-align-center
-              sm:w-auto sm:max-w-none sm:scroll-snap-align-none
+              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
+              sm:w-auto sm:max-w-none
               bg-dark-200 border border-gray-800 rounded-[3px]
-              p-7 opacity-60
-              flex flex-col
+              p-7 flex flex-col
             ">
               <div className="mb-5">
-                {/* pílula */}
                 <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
                   Essencial
                 </span>
@@ -443,36 +445,29 @@ export default function Home({ user, userType, onLogout }) {
                     <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
                       <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span className="text-sm text-gray-500 leading-snug">{item}</span>
+                    <span className="text-sm text-gray-400 leading-snug">{item}</span>
                   </div>
                 ))}
               </div>
 
-              {/* botão WhatsApp — Essencial */}
               <a
                 href={WHATSAPP_ESSENCIAL_HREF}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-wider rounded-full hover:border-gray-500 hover:text-gray-300 transition-all"
+                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-bold uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
               >
                 Tenho interesse
               </a>
             </div>
 
-            {/* ── CARD 2 — PROFISSIONAL (destaque / único ativo) ── */}
+            {/* ── CARD 2 — PROFISSIONAL (destaque) ── */}
             <div className="
-              flex-shrink-0 w-[78vw] max-w-xs scroll-snap-align-center
-              sm:w-auto sm:max-w-none sm:scroll-snap-align-none
+              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
+              sm:w-auto sm:max-w-none
               bg-dark-200 border border-primary/60 rounded-[3px]
               p-7 relative flex flex-col
             ">
-              {/* badge flutuante topo */}
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-primary text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                ✦ Plano Ativo
-              </span>
-
-              <div className="mb-5 mt-2">
-                {/* pílula — sem ícone de etiqueta, sem "Plano Ativo" duplicado */}
+              <div className="mb-5">
                 <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
                   Profissional
                 </span>
@@ -507,7 +502,7 @@ export default function Home({ user, userType, onLogout }) {
                 ))}
               </div>
 
-              {/* aviso paridade Premium — ícone estrela mantido intacto */}
+              {/* aviso paridade Premium — ícone estrela mantido */}
               <div className="mt-5 flex items-center gap-2.5 bg-primary/10 border border-primary/20 rounded-[3px] px-4 py-3">
                 <svg className="w-4 h-4 text-primary shrink-0" viewBox="0 0 16 16" fill="none">
                   <path d="M8 2l1.5 3 3.5.5-2.5 2.5.5 3.5L8 10l-3 1.5.5-3.5L3 5.5 6.5 5 8 2z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
@@ -517,7 +512,6 @@ export default function Home({ user, userType, onLogout }) {
                 </span>
               </div>
 
-              {/* CTA — menor, arredondado, texto compacto */}
               <Link
                 to="/cadastro"
                 className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black font-black text-xs uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
@@ -528,14 +522,12 @@ export default function Home({ user, userType, onLogout }) {
 
             {/* ── CARD 3 — PREMIUM REAL ── */}
             <div className="
-              flex-shrink-0 w-[78vw] max-w-xs scroll-snap-align-center
-              sm:w-auto sm:max-w-none sm:scroll-snap-align-none
+              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
+              sm:w-auto sm:max-w-none
               bg-dark-200 border border-gray-800 rounded-[3px]
-              p-7 opacity-60
-              flex flex-col
+              p-7 flex flex-col
             ">
               <div className="mb-5">
-                {/* pílula */}
                 <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
                   Premium Real
                 </span>
@@ -566,17 +558,16 @@ export default function Home({ user, userType, onLogout }) {
                     <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
                       <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span className="text-sm text-gray-500 leading-snug">{item}</span>
+                    <span className="text-sm text-gray-400 leading-snug">{item}</span>
                   </div>
                 ))}
               </div>
 
-              {/* botão WhatsApp — Premium Real */}
               <a
                 href={WHATSAPP_PREMIUM_HREF}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-wider rounded-full hover:border-gray-500 hover:text-gray-300 transition-all"
+                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-bold uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
               >
                 Tenho interesse
               </a>
