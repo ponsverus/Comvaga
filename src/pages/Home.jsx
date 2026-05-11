@@ -9,6 +9,12 @@ const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
 const SUPORTE_HREF =
   `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent(SUPORTE_MSG)}`;
 
+const WHATSAPP_ESSENCIAL_HREF =
+  `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent('Olá! Sou um profissional e tenho interesse em assinar o plano Essencial por R$ 29,99/mês. Pode me orientar?')}`;
+
+const WHATSAPP_PREMIUM_HREF =
+  `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent('Olá! Sou um profissional e tenho interesse em assinar o plano Premium Real por R$ 87,39/mês. Pode me orientar?')}`;
+
 function SearchBox({
   searchOpen,
   setSearchOpen,
@@ -380,6 +386,208 @@ export default function Home({ user, userType, onLogout }) {
           </div>
         </div>
       </section>
+
+      {/* ─── SEÇÃO DE PLANOS ─── inserida após VANTAGEM MÚTUA ─── */}
+      <section className="py-24 px-4 bg-dark-100">
+        <div className="max-w-7xl mx-auto">
+
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-black mb-4">
+              PLANOS E <span className="text-primary">PREÇOS</span>
+            </h2>
+            <p className="text-xl text-gray-400">Simples assim: um único plano ativo com acesso completo</p>
+          </div>
+
+          {/* Desktop: 3 colunas alinhadas ao topo | Mobile: carrossel snap centrado no card do meio */}
+          <div className="
+            flex gap-5 overflow-x-auto scroll-snap-x-mandatory
+            sm:grid sm:grid-cols-3 sm:items-start sm:overflow-visible
+            pb-4 sm:pb-0
+            [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+          ">
+
+            {/* ── CARD 1 — ESSENCIAL ── */}
+            <div className="
+              flex-shrink-0 w-[78vw] max-w-xs scroll-snap-align-center
+              sm:w-auto sm:max-w-none sm:scroll-snap-align-none
+              bg-dark-200 border border-gray-800 rounded-[3px]
+              p-7 opacity-60
+              flex flex-col
+            ">
+              <div className="mb-5">
+                {/* pílula */}
+                <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
+                  Essencial
+                </span>
+                <p className="text-2xl font-black text-white mb-1">
+                  R$ 29<span className="text-base font-normal text-gray-500">,99/mês</span>
+                </p>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Para autônomos que estão começando a organizar sua agenda.
+                </p>
+              </div>
+
+              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
+                {[
+                  'Agendamento assistido pelo profissional',
+                  'Agenda individual (dias, horários e pausas)',
+                  'Vitrine digital com galeria e serviços',
+                  'Links para redes sociais',
+                  'Área do cliente com histórico',
+                  'Notificações por e-mail em tempo real',
+                  'Lembrete automático 30 min antes',
+                  'Integração com Google Agenda',
+                  'Cobrança via Pix ou dinheiro (sem cartão)',
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-2.5">
+                    <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-sm text-gray-500 leading-snug">{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* botão WhatsApp — Essencial */}
+              <a
+                href={WHATSAPP_ESSENCIAL_HREF}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-wider rounded-full hover:border-gray-500 hover:text-gray-300 transition-all"
+              >
+                Tenho interesse
+              </a>
+            </div>
+
+            {/* ── CARD 2 — PROFISSIONAL (destaque / único ativo) ── */}
+            <div className="
+              flex-shrink-0 w-[78vw] max-w-xs scroll-snap-align-center
+              sm:w-auto sm:max-w-none sm:scroll-snap-align-none
+              bg-dark-200 border border-primary/60 rounded-[3px]
+              p-7 relative flex flex-col
+            ">
+              {/* badge flutuante topo */}
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-primary text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
+                ✦ Plano Ativo
+              </span>
+
+              <div className="mb-5 mt-2">
+                {/* pílula — sem ícone de etiqueta, sem "Plano Ativo" duplicado */}
+                <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
+                  Profissional
+                </span>
+                <p className="text-2xl font-black text-white mb-1">
+                  R$ 39<span className="text-base font-normal text-gray-400">,99/mês</span>
+                </p>
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  Gestão completa para negócios em crescimento, com métricas e equipe ilimitada.
+                </p>
+              </div>
+
+              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
+                {[
+                  'Tudo do plano Essencial',
+                  'Painel admin — gestão de múltiplos profissionais',
+                  'Painel individual para cada profissional parceiro',
+                  'Profissionais ilimitados (sem custo extra por membro)',
+                  'Métricas do dia com comparativo do dia anterior',
+                  'Utilização da agenda e receita futura projetada',
+                  'Faturamento por data e por período (7, 15, 30, 180 e 365 dias)',
+                  'Taxa de fechamento de agendamentos por período',
+                  'Criação de ofertas e promoções nos serviços',
+                  'Avaliações independentes por profissional e por negócio',
+                  'Reagendamento rápido pela área do cliente',
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-2.5">
+                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-sm text-gray-300 leading-snug">{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* aviso paridade Premium — ícone estrela mantido intacto */}
+              <div className="mt-5 flex items-center gap-2.5 bg-primary/10 border border-primary/20 rounded-[3px] px-4 py-3">
+                <svg className="w-4 h-4 text-primary shrink-0" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2l1.5 3 3.5.5-2.5 2.5.5 3.5L8 10l-3 1.5.5-3.5L3 5.5 6.5 5 8 2z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+                </svg>
+                <span className="text-xs font-bold text-primary uppercase tracking-wide">
+                  Inclui todos os benefícios do plano Premium Real
+                </span>
+              </div>
+
+              {/* CTA — menor, arredondado, texto compacto */}
+              <Link
+                to="/cadastro"
+                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black font-black text-xs uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
+              >
+                Assinar por R$ 39,99/mês <ZapIcon className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* ── CARD 3 — PREMIUM REAL ── */}
+            <div className="
+              flex-shrink-0 w-[78vw] max-w-xs scroll-snap-align-center
+              sm:w-auto sm:max-w-none sm:scroll-snap-align-none
+              bg-dark-200 border border-gray-800 rounded-[3px]
+              p-7 opacity-60
+              flex flex-col
+            ">
+              <div className="mb-5">
+                {/* pílula */}
+                <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
+                  Premium Real
+                </span>
+                <p className="text-2xl font-black text-white mb-1">
+                  R$ 87<span className="text-base font-normal text-gray-500">,39/mês</span>
+                </p>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Versão com acesso total a todos os recursos avançados da plataforma.
+                </p>
+              </div>
+
+              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
+                {[
+                  'Tudo do plano Profissional',
+                  'Painel admin — gestão de múltiplos profissionais',
+                  'Painel individual para cada profissional parceiro',
+                  'Profissionais ilimitados (sem custo extra por membro)',
+                  'Métricas avançadas com comparativo do dia anterior',
+                  'Utilização da agenda e receita futura projetada',
+                  'Faturamento completo por data e por período',
+                  'Taxa de fechamento de agendamentos por período',
+                  'Criação de ofertas e promoções nos serviços',
+                  'Avaliações independentes por profissional e por negócio',
+                  'Reagendamento rápido pela área do cliente',
+                  'Acesso antecipado a novos recursos e integrações',
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-2.5">
+                    <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-sm text-gray-500 leading-snug">{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* botão WhatsApp — Premium Real */}
+              <a
+                href={WHATSAPP_PREMIUM_HREF}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-wider rounded-full hover:border-gray-500 hover:text-gray-300 transition-all"
+              >
+                Tenho interesse
+              </a>
+            </div>
+
+          </div>
+          {/* ─── fim dos cards ─── */}
+
+        </div>
+      </section>
+      {/* ─── FIM SEÇÃO DE PLANOS ─── */}
 
       <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
         <div className="max-w-4xl mx-auto text-center">
