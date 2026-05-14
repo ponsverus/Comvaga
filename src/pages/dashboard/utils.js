@@ -1,18 +1,13 @@
 import { ptBR } from '../../feedback/messages/ptBR.js';
+import { PROFISSIONAL_STATUS_DOT_CLASS } from '../../utils/profissionalStatus.js';
 
-export const STATUS_COLOR_CLASS = {
-  ABERTO: 'bg-green-500',
-  FECHADO: 'bg-red-500',
-  ALMOCO: 'bg-yellow-400',
-  PAUSA: 'bg-yellow-400',
-  INATIVO: 'bg-gray-600',
-};
+export const STATUS_COLOR_CLASS = PROFISSIONAL_STATUS_DOT_CLASS;
 
 export const SUPORTE_PHONE_E164 = '5533999037979';
 export const SUPORTE_MSG = 'Olá, sou cadastrado como Profissional e gostaria de uma ajuda especializada para o meu perfil. Pode me orientar?';
 export const SUPORTE_HREF = `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent(SUPORTE_MSG)}`;
 
-export const AG_PAGE_SIZE = 50;
+export const AG_PAGE_SIZE = 15;
 export const IMAGE_EXT_BY_MIME = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
