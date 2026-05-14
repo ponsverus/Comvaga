@@ -120,9 +120,9 @@ function SearchBox({
   );
 }
 
-function StarGlyph({ className = '' }) {
+function StarGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
   return (
-    <span className={`inline-flex h-8 w-8 items-center justify-center text-[32px] font-normal leading-none text-primary ${className}`}>
+    <span className={`inline-flex items-center justify-center font-normal leading-none text-primary ${sizeClass} ${className}`}>
       {'\u2606'}
     </span>
   );
@@ -502,11 +502,9 @@ export default function Home({ user, userType, onLogout }) {
                 ))}
               </div>
 
-              {/* aviso paridade Premium — ícone estrela mantido */}
+              {/* aviso paridade Premium */}
               <div className="mt-5 flex items-center gap-2.5 bg-primary/10 border border-primary/20 rounded-[3px] px-4 py-3">
-                <svg className="w-4 h-4 text-primary shrink-0" viewBox="0 0 16 16" fill="none">
-                  <path d="M8 2l1.5 3 3.5.5-2.5 2.5.5 3.5L8 10l-3 1.5.5-3.5L3 5.5 6.5 5 8 2z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
-                </svg>
+                <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
                 <span className="text-xs font-bold text-primary uppercase tracking-wide">
                   Inclui todos os benefícios do plano Premium Real
                 </span>
