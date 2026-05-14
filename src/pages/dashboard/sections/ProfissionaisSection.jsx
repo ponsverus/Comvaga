@@ -1,6 +1,13 @@
 import React from 'react';
 import { Clock, Plus } from 'lucide-react';
-import { getHorarioPorDia, getSemanaResumo, normalizeKey, normalizeProfissionalHorarios, STATUS_COLOR_CLASS } from '../utils';
+import {
+  getHorarioPorDia,
+  getSemanaResumo,
+  normalizeKey,
+  normalizeProfissionalHorarios,
+  STATUS_COLOR_CLASS,
+} from '../utils';
+import { resolveProfissionalStatusKey } from '../../../utils/profissionalStatus';
 
 function buildProfissionalForm(p) {
   return {
@@ -50,7 +57,7 @@ export default function ProfissionaisSection({
           const isPendente = p.status === 'pendente';
           const isInativo = p.status === 'inativo';
           const isAtivo = p.status === 'ativo';
-          const label = normalizeKey(p.status_label);
+          const label = resolveProfissionalStatusKey(p) || normalizeKey(p.status_label);
           const dotClass = STATUS_COLOR_CLASS[label] || 'bg-gray-500';
           const statusLabelView = label === 'ALMOCO' ? 'PAUSA' : p.status_label;
           const isEuMesmo = parceiroProfissional?.id === p.id;
@@ -85,7 +92,7 @@ export default function ProfissionaisSection({
                   </div>
                   {p.profissao && <p className="text-xs text-gray-500 mt-1">{p.profissao}</p>}
                   {!isPendente && p.anos_experiencia != null && (
-                    <p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIÊNCIA</p>
+                    <p className="text-xs text-gray-500 mt-1">{p.anos_experiencia} ANOS DE EXPERIENCIA</p>
                   )}
                 </div>
               </div>
