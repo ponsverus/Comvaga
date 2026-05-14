@@ -459,7 +459,6 @@ export default function Home({ user, userType, onLogout }) {
               </a>
             </div>
 
-            {/* ── CARD 2 — PROFISSIONAL (destaque) ── */}
             <div className="
               shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
               sm:w-auto sm:max-w-none
@@ -467,10 +466,10 @@ export default function Home({ user, userType, onLogout }) {
               p-7 relative flex flex-col
             ">
               <div className="mb-5">
-                <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
+                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
                   Profissional
                 </span>
-                <p className="text-2xl font-black text-white mb-1">
+                <p className="text-2xl font-normal text-white mb-1">
                   R$ 39<span className="text-base font-normal text-gray-400">,99/mês</span>
                 </p>
                 <p className="text-sm text-gray-400 leading-relaxed">
@@ -501,11 +500,10 @@ export default function Home({ user, userType, onLogout }) {
                 ))}
               </div>
 
-              {/* aviso paridade Premium */}
-              <div className="mt-5 flex items-center gap-2.5 bg-primary/10 border border-primary/20 rounded-[3px] px-4 py-3">
+              <div className="mt-5 flex items-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
                 <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
                 <span className="text-xs font-bold text-primary uppercase tracking-wide">
-                  Inclui todos os benefícios do plano Premium Real
+                  Vantagens do Premium Real inclusas
                 </span>
               </div>
 
@@ -517,7 +515,6 @@ export default function Home({ user, userType, onLogout }) {
               </Link>
             </div>
 
-            {/* ── CARD 3 — PREMIUM REAL ── */}
             <div className="
               shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
               sm:w-auto sm:max-w-none
@@ -528,7 +525,7 @@ export default function Home({ user, userType, onLogout }) {
                 <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
                   Premium Real
                 </span>
-                <p className="text-2xl font-black text-white mb-1">
+                <p className="text-2xl font-normal text-white mb-1">
                   R$ 87<span className="text-base font-normal text-gray-500">,39/mês</span>
                 </p>
                 <p className="text-sm text-gray-500 leading-relaxed">
@@ -537,7 +534,8 @@ export default function Home({ user, userType, onLogout }) {
               </div>
 
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
-                {[                
+                {[
+                  'Tudo do plano Profissional',
                   'Painel Admin: Controle de Múltiplos Profissionais',
                   'Painel individual para cada profissional parceiro',
                   'Profissionais ilimitados e sem custo extra por parceiro',
