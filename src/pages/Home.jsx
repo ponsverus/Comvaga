@@ -425,7 +425,7 @@ export default function Home({ user, userType, onLogout }) {
                   R$ 29<span className="text-base font-normal text-gray-500">,99/mês</span>
                 </p>
                 <p className="text-sm text-gray-500 leading-relaxed">
-                  Para autônomos que estão começando a organizar sua agenda.
+                  Para autônomos que buscam organizar sua agenda.
                 </p>
               </div>
 
@@ -433,13 +433,12 @@ export default function Home({ user, userType, onLogout }) {
                 {[
                   'Agendamento assistido pelo profissional',
                   'Agenda individual (dias, horários e pausas)',
-                  'Vitrine digital com galeria e serviços',
+                  'Vitrine digital com galeria e trabalhos',
                   'Links para redes sociais',
                   'Área do cliente com histórico',
-                  'Notificações por e-mail em tempo real',
+                  'Alertas por e-mail em tempo real',
                   'Lembrete automático 30 min antes',
-                  'Integração com Google Agenda',
-                  'Cobrança via Pix ou dinheiro (sem cartão)',
+                  'Sincronia total com o Google Agenda.',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
                     <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
@@ -475,22 +474,22 @@ export default function Home({ user, userType, onLogout }) {
                   R$ 39<span className="text-base font-normal text-gray-400">,99/mês</span>
                 </p>
                 <p className="text-sm text-gray-400 leading-relaxed">
-                  Gestão completa para negócios em crescimento, com métricas e equipe ilimitada.
+                  Controle total para negócios em crescimento, com métricas e equipe ILIMITADA.
                 </p>
               </div>
 
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
                   'Tudo do plano Essencial',
-                  'Painel admin — gestão de múltiplos profissionais',
+                  'Painel Admin: Controle de Múltiplos Profissionais',
                   'Painel individual para cada profissional parceiro',
-                  'Profissionais ilimitados (sem custo extra por membro)',
+                  'Profissionais ilimitados e sem custo extra por parceiro',
                   'Métricas do dia com comparativo do dia anterior',
-                  'Utilização da agenda e receita futura projetada',
-                  'Faturamento por data e por período (7, 15, 30, 180 e 365 dias)',
+                  'Comprometimento da agenda e receita futura projetada',
+                  'Análise evolutiva de faturamento com filtros temporais estratégicos',
                   'Taxa de fechamento de agendamentos por período',
-                  'Criação de ofertas e promoções nos serviços',
-                  'Avaliações independentes por profissional e por negócio',
+                  'Montagem de ofertas nos trabalhos oferecidos',
+                  'Depoimentos independentes por profissional e por negócio',
                   'Reagendamento rápido pela área do cliente',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
@@ -512,7 +511,7 @@ export default function Home({ user, userType, onLogout }) {
 
               <Link
                 to="/cadastro"
-                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black font-black text-xs uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
+                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
               >
                 Assinar por R$ 39,99/mês <ZapIcon className="w-3.5 h-3.5" />
               </Link>
@@ -526,31 +525,30 @@ export default function Home({ user, userType, onLogout }) {
               p-7 flex flex-col
             ">
               <div className="mb-5">
-                <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
+                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
                   Premium Real
                 </span>
                 <p className="text-2xl font-black text-white mb-1">
                   R$ 87<span className="text-base font-normal text-gray-500">,39/mês</span>
                 </p>
                 <p className="text-sm text-gray-500 leading-relaxed">
-                  Versão com acesso total a todos os recursos avançados da plataforma.
+                  Experiência completa com acesso ilimitado a todos os recursos.
                 </p>
               </div>
 
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
-                {[
-                  'Tudo do plano Profissional',
-                  'Painel admin — gestão de múltiplos profissionais',
+                {[                
+                  'Painel Admin: Controle de Múltiplos Profissionais',
                   'Painel individual para cada profissional parceiro',
-                  'Profissionais ilimitados (sem custo extra por membro)',
+                  'Profissionais ilimitados e sem custo extra por parceiro',
                   'Métricas avançadas com comparativo do dia anterior',
-                  'Utilização da agenda e receita futura projetada',
-                  'Faturamento completo por data e por período',
+                  'Comprometimento da agenda e receita futura projetada',
+                  'Análise evolutiva de faturamento com filtros temporais estratégicos.',
                   'Taxa de fechamento de agendamentos por período',
-                  'Criação de ofertas e promoções nos serviços',
-                  'Avaliações independentes por profissional e por negócio',
+                  'Montagem de ofertas nos trabalhos oferecidos',
+                  'Depoimentos independentes por profissional e por negócio',
                   'Reagendamento rápido pela área do cliente',
-                  'Acesso antecipado a novos recursos e integrações',
+                  'Acesso antecipado a novos recursos',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
                     <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
@@ -565,7 +563,7 @@ export default function Home({ user, userType, onLogout }) {
                 href={WHATSAPP_PREMIUM_HREF}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-bold uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
+                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
               >
                 Tenho interesse
               </a>
