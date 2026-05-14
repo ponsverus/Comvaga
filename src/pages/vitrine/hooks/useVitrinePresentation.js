@@ -1,14 +1,9 @@
 import { useCallback, useMemo } from 'react';
-
-const normalizeStatusKey = (value) => String(value || '')
-  .trim()
-  .toUpperCase()
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '');
-
-const getStatusLabelView = (value) => (
-  normalizeStatusKey(value) === 'ALMOCO' ? 'PAUSA' : String(value || 'FECHADO')
-);
+import {
+  getProfissionalStatusDotClass,
+  getProfissionalStatusLabel,
+  resolveProfissionalStatusKey,
+} from '../../../utils/profissionalStatus';
 
 export function useVitrinePresentation({
   negocio,
@@ -96,12 +91,13 @@ export function useVitrinePresentation({
     profissionais.map((prof) => {
       const totalEntregas = (entregasPorProf.get(prof.id) || []).length;
       const horarioExibicao = getHorarioExibicao(prof);
+      const statusKey = resolveProfissionalStatusKey(prof);
       return {
         ...prof,
         avatarUrl: getPublicUrl('avatars', prof.avatar_path),
         status: {
-          label: getStatusLabelView(prof?.status_label),
-          color: String(prof?.status_color || 'bg-red-500'),
+          label: getProfissionalStatusLabel(statusKey),
+          color: getProfissionalStatusDotClass(statusKey),
         },
         depInfo: depoimentosPorProf.get(prof.id),
         profissaoLabel: String(prof?.profissao ?? '').trim(),
