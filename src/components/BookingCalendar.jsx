@@ -275,7 +275,7 @@ export default function BookingCalendar({
           <div className="min-w-0">
             <div className={`text-xs uppercase tracking-wide ${labelColor}`}>Agendamento</div>
             <div className={`font-normal truncate ${titleColor}`}>{entrega?.nome}</div>
-            <div className={`text-xs mt-0.5 uppercase ${subtitleColor}`}>
+            <div className={`text-xs mt-0.5 ${subtitleColor}`}>
               {profissional?.nome}
               {entrega?.duracao_minutos && <span className={`ml-2 ${subMutedColor}`}>• {entrega.duracao_minutos} MIN</span>}
               <span className="ml-2" style={{ color: 'var(--vpromo-text)' }}>• R$ {valorExibido}</span>
@@ -425,7 +425,7 @@ export default function BookingCalendar({
               <div className="space-y-2 text-sm mb-4">
                 <div className="flex justify-between">
                   <span className={resumeLabel}>PROFISSIONAL</span>
-                  <span className={resumeValue}>{profissional?.nome?.toUpperCase()}</span>
+                  <span className={resumeValue}>{profissional?.nome}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className={resumeLabel}>DATA</span>
@@ -442,7 +442,7 @@ export default function BookingCalendar({
               </div>
 
               {confirmError && (
-                <div className="text-xs text-red-600 mb-3 bg-red-50 border border-red-200 rounded p-2">
+                <div className={`-mx-4 mb-3 border-y px-4 py-3 text-xs ${isLight ? 'border-red-200 bg-red-50/60 text-red-600' : 'border-red-500/20 bg-red-500/5 text-red-300'}`}>
                   {confirmError}
                 </div>
               )}
