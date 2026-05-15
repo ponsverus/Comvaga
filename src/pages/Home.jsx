@@ -387,22 +387,16 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      {/* ─── SEÇÃO DE PLANOS ─── */}
       <section className="py-24 px-4 bg-dark-100">
         <div className="max-w-7xl mx-auto">
 
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-black mb-4">
+            <h2 className="text-5xl font-normal mb-4">
               PLANOS E <span className="text-primary">PREÇOS</span>
             </h2>
-            <p className="text-xl text-gray-400">Simples assim: um único plano ativo com acesso completo</p>
+            <p className="text-xl text-gray-400">Acesso liberado sem necessidade de dados bancários. Simples assim :)</p>
           </div>
-
-          {/*
-            Mobile: flex com scroll horizontal snap.
-            Cada card usa w-max (largura pelo próprio conteúdo), não um vw fixo.
-            Desktop (sm:): grid 3 colunas, itens alinhados ao topo.
-          */}
+         
           <div className="
             flex gap-5 overflow-x-auto scroll-snap-type-x-mandatory
             sm:grid sm:grid-cols-3 sm:items-start sm:overflow-visible
@@ -410,7 +404,6 @@ export default function Home({ user, userType, onLogout }) {
             [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
           ">
 
-            {/* ── CARD 1 — ESSENCIAL ── */}
             <div className="
               shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
               sm:w-auto sm:max-w-none
@@ -421,7 +414,7 @@ export default function Home({ user, userType, onLogout }) {
                 <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
                   Essencial
                 </span>
-                <p className="text-2xl font-black text-white mb-1">
+                <p className="text-2xl font-normal text-white mb-1">
                   R$ 29<span className="text-base font-normal text-gray-500">,99/mês</span>
                 </p>
                 <p className="text-sm text-gray-500 leading-relaxed">
@@ -479,7 +472,7 @@ export default function Home({ user, userType, onLogout }) {
 
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
-                  'Tudo do plano Essencial',
+                  'Tudo do plano ESSENCIAL',
                   'Painel Admin: Controle de Múltiplos Profissionais',
                   'Painel individual para cada profissional parceiro',
                   'Profissionais ilimitados e sem custo extra por parceiro',
@@ -535,7 +528,7 @@ export default function Home({ user, userType, onLogout }) {
 
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
-                  'Tudo do plano Profissional',
+                  'Tudo do plano PROFISSIONAL',
                   'Painel Admin: Controle de Múltiplos Profissionais',
                   'Painel individual para cada profissional parceiro',
                   'Profissionais ilimitados e sem custo extra por parceiro',
@@ -568,11 +561,9 @@ export default function Home({ user, userType, onLogout }) {
             </div>
 
           </div>
-          {/* ─── fim dos cards ─── */}
 
         </div>
       </section>
-      {/* ─── FIM SEÇÃO DE PLANOS ─── */}
 
       <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
         <div className="max-w-4xl mx-auto text-center">
