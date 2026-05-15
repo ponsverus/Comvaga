@@ -4,6 +4,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { ptBR } from '../feedback/messages/ptBR';
 import { fetchUserAccessProfile } from '../utils/profileAccess';
+import { clearPasswordRecoveryState } from '../utils/auth';
 
 const msgs = ptBR.parceiroLogin;
 
@@ -159,7 +160,7 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
     setAlerta(null);
     try {
       const { error: resetErr } = await supabase.auth.resetPasswordForEmail(emailClean, {
-        redirectTo: `${window.location.origin}/parceiro/login`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       if (resetErr) throw resetErr;
       setAlerta(msgs.reset_sent);
@@ -183,6 +184,7 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
       const { error: upErr } = await supabase.auth.updateUser({ password: newPassword });
       if (upErr) throw upErr;
       await supabase.auth.signOut();
+      clearPasswordRecoveryState();
       setIsRecovery(false);
       setNewPassword('');
       setNewPassword2('');
@@ -250,7 +252,7 @@ export default function ParceiroLogin({ onLogin, suppressAuthRef, inRecovery: in
         <div className="text-center mb-8">
           <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-20 w-auto object-contain mx-auto mb-4" />
           <h1 className="text-3xl font-normal text-white uppercase">LOGIN PARCEIRO</h1>
-          <p className="text-gray-500 text-sm mt-2 font-normal">ACESSE O PAINEL DO SEU NEGÓCIO AGORA</p>
+          <p className="text-gray-500 text-sm mt-2 font-normal">ACESSE O PAINEL DO SEU NEGOCIO AGORA</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
