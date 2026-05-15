@@ -149,17 +149,23 @@ export default function App() {
   const [booting,          setBooting]          = useState(true);
   const [typeLoading,      setTypeLoading]      = useState(false);
   const [fatalError,       setFatalError]       = useState(null);
-  const [inRecovery,       setInRecovery]       = useState(false);
+  const [inRecovery,       setInRecovery]       = useState(() => isPasswordRecoveryUrl());
   const [postLogoutRedirect, setPostLogoutRedirect] = useState(null);
 
   const aliveRef        = useRef(true);
   const loadedUserRef   = useRef(null);
   const suppressAuthRef = useRef(false);
+  const inRecoveryRef   = useRef(inRecovery);
 
   const isLoggedIn = !!user;
 
   const safeSet = useCallback((fn) => {
     if (aliveRef.current) fn();
+  }, []);
+
+  const setRecoveryMode = useCallback((next) => {
+    inRecoveryRef.current = !!next;
+    setInRecovery(!!next);
   }, []);
 
   const getPostLoginPath = useCallback((type, currentAccessState, status) => {
@@ -244,12 +250,26 @@ export default function App() {
         if (suppressAuthRef.current) return;
 
         if (event === 'PASSWORD_RECOVERY') {
-          safeSet(() => { setInRecovery(true); setBooting(false); });
+          safeSet(() => { setRecoveryMode(true); setBooting(false); });
           return;
         }
 
         if (event === 'INITIAL_SESSION') {
           const sessionUser = session?.user || null;
+          if (isPasswordRecoveryUrl() || inRecoveryRef.current) {
+            safeSet(() => {
+              setRecoveryMode(true);
+              setUser(sessionUser);
+              setUserType(null);
+              setOnboardingStatus(null);
+              setAccessState('active');
+              setFatalError(null);
+              setTypeLoading(false);
+              setBooting(false);
+            });
+            return;
+          }
+
           if (!sessionUser) {
             safeSet(() => {
               setUser(null);
@@ -283,7 +303,7 @@ export default function App() {
       });
 
     return () => { aliveRef.current = false; subscription?.unsubscribe(); };
-  }, [loadProfile, safeSet]);
+  }, [loadProfile, safeSet, setRecoveryMode]);
 
   const handleLogin = useCallback((userData, type, nextOnboardingStatus = 'completed', nextAccessState = 'active') => {
     loadedUserRef.current = userData?.id || null;
@@ -305,7 +325,7 @@ export default function App() {
     try {
       await supabase.auth.signOut();
     } finally {
-      setInRecovery(false);
+      setRecoveryMode(false);
       setUser(null);
       setUserType(null);
       setOnboardingStatus(null);
@@ -313,7 +333,7 @@ export default function App() {
       setFatalError(null);
       setTypeLoading(false);
     }
-  }, []);
+  }, [setRecoveryMode]);
 
   const handleRetry = useCallback(async () => {
     safeSet(() => { setFatalError(null); setBooting(true); });
@@ -351,7 +371,7 @@ export default function App() {
   return (
     <Router>
       <FeedbackProvider>
-        <RecoveryWatcher onChange={setInRecovery} />
+        <RecoveryWatcher onChange={setRecoveryMode} />
         <LogoutRedirectResetter redirectPath={postLogoutRedirect} onClear={() => setPostLogoutRedirect(null)} />
         <ScrollToTopOnRouteChange />
 
