@@ -23,7 +23,7 @@ export default function BookingConfirmedModal({
           <h3 className={`text-2xl font-normal mb-2 ${styles.title}`}>AGENDADO :)</h3>
           <p className="font-normal mb-1">
             {booking.lastSlot?.label && <span className={`font-normal ${styles.hora}`}>{booking.lastSlot.label}</span>}
-            {booking.lastSlot?.dataISO && <span className={styles.data}> - {formatDateBR(booking.lastSlot.dataISO)}</span>}
+            {booking.lastSlot?.dataISO && <span className={styles.data}> • {formatDateBR(booking.lastSlot.dataISO)}</span>}
           </p>
           {!assistedBooking && (
             <div className={`rounded-custom border p-4 text-left mb-6 ${styles.box}`}>
