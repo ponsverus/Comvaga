@@ -4,6 +4,7 @@ import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { fetchUserAccessProfile } from '../utils/profileAccess';
+import { clearPasswordRecoveryState } from '../utils/auth';
 import { CrownIcon, UserIcon } from '../components/icons';
 
 export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
@@ -113,7 +114,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
       }
 
       const { error: resetErr } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/login`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
 
       if (resetErr) throw resetErr;
@@ -148,6 +149,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
       showMessage('login.recovery_password_updated');
 
       await supabase.auth.signOut();
+      clearPasswordRecoveryState();
       navigate('/login');
     } catch (e2) {
       showMessage('login.recovery_password_update_error', { msg: e2?.message || '' });
