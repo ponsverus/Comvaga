@@ -392,7 +392,7 @@ export default function Home({ user, userType, onLogout }) {
 
           <div className="text-center mb-16">
             <h2 className="text-5xl font-normal mb-4">
-              PLANOS E <span className="text-primary">VALORES</span>
+              SEM <span className="text-primary">BUROCRACIA</span>
             </h2>
             <p className="text-xl text-gray-400">Acesso liberado sem necessidade de dados bancários. Simples assim :)</p>
           </div>
