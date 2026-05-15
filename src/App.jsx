@@ -14,6 +14,7 @@ import SignupProfessional     from './pages/SignupProfessional';
 import ParceiroCadastro       from './pages/ParceiroCadastro';
 import ParceiroLogin          from './pages/ParceiroLogin';
 import PartnerPendingApproval from './pages/PartnerPendingApproval';
+import ResetPassword          from './pages/ResetPassword';
 
 const Dashboard                 = lazy(() => import('./pages/Dashboard'));
 const Vitrine                   = lazy(() => import('./pages/Vitrine'));
@@ -287,6 +288,19 @@ export default function App() {
           return;
         }
 
+        if (inRecoveryRef.current) {
+          safeSet(() => {
+            setUser(session?.user || null);
+            setUserType(null);
+            setOnboardingStatus(null);
+            setAccessState('active');
+            setFatalError(null);
+            setTypeLoading(false);
+            setBooting(false);
+          });
+          return;
+        }
+
         const sessionUser = session?.user || null;
         if (!sessionUser) {
           loadedUserRef.current = null;
@@ -378,6 +392,8 @@ export default function App() {
         <Suspense fallback={<FullScreenLoading />}>
           <Routes>
             <Route path="/" element={<Home user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} onLogout={handleLogout} />} />
+
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             <Route path="/login" element={
               inRecovery ? <Login onLogin={handleLogin} inRecovery={true} />
