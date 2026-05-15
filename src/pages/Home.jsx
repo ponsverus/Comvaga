@@ -425,7 +425,7 @@ export default function Home({ user, userType, onLogout }) {
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
                   'Agendamento assistido pelo profissional',
-                  'Agenda individual (dias, horários e pausas)',
+                  'Agenda individual, incluindo dias, horários e pausas',
                   'Vitrine digital com galeria e trabalhos',
                   'Links para redes sociais',
                   'Área do cliente com histórico',
