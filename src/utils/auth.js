@@ -1,6 +1,9 @@
 export function isPasswordRecoveryUrl() {
+  const storageKey = 'comvaga-password-recovery';
   try {
+    if (window.sessionStorage?.getItem(storageKey) === '1') return true;
     const url = new URL(window.location.href);
+    if (url.pathname === '/reset-password') return true;
     const s = url.searchParams;
     const hashRaw = (url.hash || '').replace(/^#/, '');
     const hashParams = new URLSearchParams(
@@ -16,9 +19,19 @@ export function isPasswordRecoveryUrl() {
   } catch {
     const href = window.location.href || '';
     return (
+      window.sessionStorage?.getItem(storageKey) === '1' ||
+      href.includes('/reset-password') ||
       href.includes('type=recovery') ||
       href.includes('access_token=') ||
       href.includes('code=')
     );
+  }
+}
+
+export function clearPasswordRecoveryState() {
+  try {
+    window.sessionStorage?.removeItem('comvaga-password-recovery');
+  } catch {
+    // Ignore browser storage issues.
   }
 }
