@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
+import { clearPasswordRecoveryState } from '../utils/auth';
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ export default function ResetPassword() {
 
       showMessage('login.recovery_password_updated');
       await supabase.auth.signOut();
+      clearPasswordRecoveryState();
       navigate('/login', { replace: true });
     } catch (error) {
       showMessage('login.recovery_password_update_error', { msg: error?.message || '' });
@@ -54,7 +56,10 @@ export default function ResetPassword() {
       <div className="w-full max-w-md relative z-10">
         <Link
           to="/login"
-          onClick={() => { supabase.auth.signOut(); }}
+          onClick={() => {
+            clearPasswordRecoveryState();
+            supabase.auth.signOut();
+          }}
           className="inline-flex items-center gap-2 text-gray-400 hover:text-primary mb-12 transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
