@@ -504,7 +504,7 @@ export default function Home({ user, userType, onLogout }) {
                 to="/cadastro"
                 className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
               >
-                Assinar por R$ 39,99/mês <ZapIcon className="w-3.5 h-3.5" />
+                Assinar por R$ 39,99•mês <ZapIcon className="w-3.5 h-3.5" />
               </Link>
             </div>
 
@@ -573,7 +573,7 @@ export default function Home({ user, userType, onLogout }) {
             to="/cadastro"
             className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all hover:scale-105"
           >
-            COMEÇAR AGORA GRÁTIS <ZapIcon className="w-6 h-6" />
+            ACESSAR AGORA SEM CUSTO <ZapIcon className="w-6 h-6" />
           </Link>
           <p className="text-black/60 text-sm mt-6">Eficiência comprovada em barbearias, estúdios e clínicas.</p>
         </div>
