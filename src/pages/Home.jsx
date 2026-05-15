@@ -392,7 +392,7 @@ export default function Home({ user, userType, onLogout }) {
 
           <div className="text-center mb-16">
             <h2 className="text-5xl font-normal mb-4">
-              PLANOS E <span className="text-primary">PREÇOS</span>
+              PLANOS E <span className="text-primary">VALORES</span>
             </h2>
             <p className="text-xl text-gray-400">Acesso liberado sem necessidade de dados bancários. Simples assim :)</p>
           </div>
@@ -411,7 +411,7 @@ export default function Home({ user, userType, onLogout }) {
               p-7 flex flex-col
             ">
               <div className="mb-5">
-                <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
+                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
                   Essencial
                 </span>
                 <p className="text-2xl font-normal text-white mb-1">
@@ -462,7 +462,7 @@ export default function Home({ user, userType, onLogout }) {
                 <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
                   Profissional
                 </span>
-                <p className="text-2xl font-normal text-white mb-1">
+                <p className="text-2xl font-normal text-green mb-1">
                   R$ 39<span className="text-base font-normal text-gray-400">,99/mês</span>
                 </p>
                 <p className="text-sm text-gray-400 leading-relaxed">
@@ -502,7 +502,7 @@ export default function Home({ user, userType, onLogout }) {
 
               <Link
                 to="/cadastro"
-                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
+                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black font-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
               >
                 Assinar por R$ 39,99/mês <ZapIcon className="w-3.5 h-3.5" />
               </Link>
