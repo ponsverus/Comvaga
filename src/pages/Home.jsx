@@ -446,7 +446,7 @@ export default function Home({ user, userType, onLogout }) {
                 href={WHATSAPP_ESSENCIAL_HREF}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-bold uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
+                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
               >
                 Tenho interesse
               </a>
@@ -462,8 +462,8 @@ export default function Home({ user, userType, onLogout }) {
                 <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
                   Profissional
                 </span>
-                <p className="text-2xl font-normal text-green mb-1">
-                  R$ 39<span className="text-base font-normal text-gray-400">,99/mês</span>
+                <p className="text-2xl font-black text-green-400 mb-1">
+                  R$ 39<span className="text-base font-normal text-green-400">,99/mês</span>
                 </p>
                 <p className="text-sm text-gray-400 leading-relaxed">
                   Controle total para negócios em crescimento, com métricas e equipe ILIMITADA.
@@ -502,7 +502,7 @@ export default function Home({ user, userType, onLogout }) {
 
               <Link
                 to="/cadastro"
-                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black font-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
+                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
               >
                 Assinar por R$ 39,99/mês <ZapIcon className="w-3.5 h-3.5" />
               </Link>
