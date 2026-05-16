@@ -563,6 +563,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
+      {/* SESSÃO DE PREVIEW - TEXTOS MANTIDOS, COMPONENTE DE CARD ATUALIZADO */}
       <section className="py-24 px-4 bg-black overflow-hidden border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <div className="relative bg-dark-200 rounded-custom border border-gray-800 overflow-hidden">
@@ -609,36 +610,49 @@ export default function Home({ user, userType, onLogout }) {
                     </div>
                   </div>
 
-                  <div className="pt-12 pb-6 px-6">
-                    <div className="mb-6">
+                  <div className="pt-12 pb-6 px-4 sm:px-6">
+                    <div className="mb-6 px-2">
                       <div className="text-lg font-normal text-white uppercase tracking-tight">VIKINGS</div>
                       <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                         <StarGlyph sizeClass="h-3 w-3 text-[12px]" /> 4.9
                       </div>
                     </div>
 
-                    <div className="space-y-3 mb-6">
-                      <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs Disponíveis</div>
+                    <div className="space-y-4 mb-6">
+                      <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2 px-2">Servs Disponíveis</div>
+                      
                       {[
                         { n: 'CORTE', p: 'R$ 45,00', d: '30 min' },
                         { n: 'BARBA TERAPIA', p: 'R$ 35,00', d: '20 min' }
                       ].map((s, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-[3px]">
-                          <div className="min-w-0">
-                            <div className="text-sm font-normal text-white truncate">{s.n}</div>
-                            <div className="text-[10px] text-gray-500 uppercase">{s.d}</div>
+                        <div key={idx} className="bg-white/5 border border-white/10 rounded-[3px] p-4 flex flex-col gap-4">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="text-sm font-normal text-white uppercase">{s.n}</div>
+                              <div className="flex items-center gap-1.5 mt-1">
+                                <TimeIcon className="w-3 h-3 text-gray-500" />
+                                <span className="text-[10px] text-gray-500 font-bold uppercase">{s.d}</span>
+                              </div>
+                            </div>
+                            <div className="text-primary font-normal text-sm">{s.p}</div>
                           </div>
-                          <div className="text-right shrink-0">
-                            <div className="text-sm font-normal text-primary">{s.p}</div>
-                            <div className="text-[10px] text-gray-400 flex items-center gap-1 justify-end">
-                              <CalendarIcon className="w-3 h-3" /> AGENDAR
+
+                          <div className="flex gap-2">
+                            {/* BOTÃO AGENDAR (ESQUERDA) */}
+                            <div className="flex-1 h-8 rounded-full border border-white/15 flex items-center justify-center gap-2 px-3 hover:bg-white/5 transition-colors cursor-pointer">
+                              <CalendarIcon className="w-3.5 h-3.5 text-white/40" />
+                              <span className="text-[10px] font-bold text-white/70 uppercase">Agendar</span>
+                            </div>
+                            {/* BOTÃO SELECIONAR (DIREITA) */}
+                            <div className="flex-1 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center gap-2 px-3 hover:bg-primary/20 transition-colors cursor-pointer">
+                              <span className="text-[10px] font-black text-primary uppercase">Selecionar</span>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    <div className="h-24 bg-gray-800/40 rounded-[3px] border border-dashed border-white/10 flex items-center justify-center relative group overflow-hidden">
+                    <div className="h-24 bg-gray-800/40 rounded-[3px] border border-dashed border-white/10 flex items-center justify-center relative group overflow-hidden mx-2">
                        <div className="text-white/20 font-normal text-xs uppercase tracking-widest group-hover:text-primary/40 transition-colors">GALERIA DE TRABALHOS</div>
                        <div className="absolute bottom-2 right-2 flex gap-1">
                           <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
@@ -784,5 +798,4 @@ export default function Home({ user, userType, onLogout }) {
       </footer>
     </div>
   );
-  
 }
