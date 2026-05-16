@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { ProtectionIcon, UserIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon, CalendarIcon } from '../components/icons';
+import { ProtectionIcon, UserIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon } from '../components/icons';
 
 const SUPORTE_PHONE_E164 = '5533999037979';
 const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
@@ -642,6 +642,7 @@ export default function Home({ user, userType, onLogout }) {
                               <span className="text-[10px] font-bold text-white/70 uppercase">Agendar</span>
                             </div>
                             <div className="flex-1 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center gap-2 px-3 hover:bg-primary/20 transition-colors cursor-pointer">
+                              <SelectIcon className="w-3.5 h-3.5 text-white/40" />
                               <span className="text-[10px] font-black text-primary uppercase">Selecionar</span>
                             </div>
                           </div>
