@@ -563,7 +563,6 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      {/* SESSÃO DE PREVIEW - TEXTOS MANTIDOS, COMPONENTE DE CARD ATUALIZADO */}
       <section className="py-24 px-4 bg-black overflow-hidden border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <div className="relative bg-dark-200 rounded-custom border border-gray-800 overflow-hidden">
@@ -618,8 +617,8 @@ export default function Home({ user, userType, onLogout }) {
                       </div>
                     </div>
 
-                    <div className="space-y-4 mb-6">
-                      <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2 px-2">Servs Disponíveis</div>
+                    <div className="space-y-4 mb-6 px-2">
+                      <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs Disponíveis</div>
                       
                       {[
                         { n: 'CORTE', p: 'R$ 45,00', d: '30 min' },
@@ -638,12 +637,10 @@ export default function Home({ user, userType, onLogout }) {
                           </div>
 
                           <div className="flex gap-2">
-                            {/* BOTÃO AGENDAR (ESQUERDA) */}
                             <div className="flex-1 h-8 rounded-full border border-white/15 flex items-center justify-center gap-2 px-3 hover:bg-white/5 transition-colors cursor-pointer">
                               <CalendarIcon className="w-3.5 h-3.5 text-white/40" />
                               <span className="text-[10px] font-bold text-white/70 uppercase">Agendar</span>
                             </div>
-                            {/* BOTÃO SELECIONAR (DIREITA) */}
                             <div className="flex-1 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center gap-2 px-3 hover:bg-primary/20 transition-colors cursor-pointer">
                               <span className="text-[10px] font-black text-primary uppercase">Selecionar</span>
                             </div>
