@@ -576,7 +576,7 @@ export default function Home({ user, userType, onLogout }) {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">VEJA AO VIVO</span>
+                  <span className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">VEJA AO VIVO</span>
                 </div>
                 
                 <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 leading-tight">
@@ -630,7 +630,7 @@ export default function Home({ user, userType, onLogout }) {
                               <div className="text-sm font-normal text-white uppercase">{s.n}</div>
                               <div className="flex items-center gap-1.5 mt-1">
                                 <TimeIcon className="w-3 h-3 text-gray-500" />
-                                <span className="text-[10px] text-gray-500 font-bold uppercase">{s.d}</span>
+                                <span className="text-[10px] text-gray-500 font-normal uppercase">{s.d}</span>
                               </div>
                             </div>
                             <div className="text-primary font-normal text-sm">{s.p}</div>
@@ -639,11 +639,11 @@ export default function Home({ user, userType, onLogout }) {
                           <div className="flex gap-2">
                             <div className="flex-1 h-8 rounded-full border border-white/15 flex items-center justify-center gap-2 px-3 hover:bg-white/5 transition-colors cursor-pointer">
                               <CalendarIcon className="w-3.5 h-3.5 text-white/40" />
-                              <span className="text-[10px] font-bold text-white/70 uppercase">Agendar</span>
+                              <span className="text-[10px] font-normal text-white/70 uppercase">Agendar</span>
                             </div>
                             <div className="flex-1 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center gap-2 px-3 hover:bg-primary/20 transition-colors cursor-pointer">
                               <SelectIcon className="w-3.5 h-3.5 text-white/40" />
-                              <span className="text-[10px] font-black text-primary uppercase">Selecionar</span>
+                              <span className="text-[10px] font-normal text-primary uppercase">Selecionar</span>
                             </div>
                           </div>
                         </div>
