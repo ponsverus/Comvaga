@@ -75,24 +75,30 @@ export default function ResetPassword() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-4">
-            <input
-              type="password"
-              placeholder="NOVA SENHA"
-              value={newPassword}
-              onChange={(event) => setNewPassword(event.target.value)}
-              className="w-full px-5 py-4 bg-dark-100/50 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all backdrop-blur-sm"
-              required
-            />
+          <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-100/50 backdrop-blur-sm">
+            <div className="flex items-center gap-3 border-b border-gray-800 px-5 py-3">
+              <label className="w-[86px] shrink-0 text-sm tracking-wide text-white-500">SENHA</label>
+              <input
+                type="password"
+                placeholder="NOVA SENHA"
+                value={newPassword}
+                onChange={(event) => setNewPassword(event.target.value)}
+                className="w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white"
+                required
+              />
+            </div>
 
-            <input
-              type="password"
-              placeholder="CONFIRMAR"
-              value={newPassword2}
-              onChange={(event) => setNewPassword2(event.target.value)}
-              className="w-full px-5 py-4 bg-dark-100/50 border border-gray-800 rounded-custom text-white placeholder-gray-600 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all backdrop-blur-sm"
-              required
-            />
+            <div className="flex items-center gap-3 px-5 py-3">
+              <label className="w-[86px] shrink-0 text-sm tracking-wide text-white-500">CONFIRM.</label>
+              <input
+                type="password"
+                placeholder="REPETIR SENHA"
+                value={newPassword2}
+                onChange={(event) => setNewPassword2(event.target.value)}
+                className="w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white"
+                required
+              />
+            </div>
           </div>
 
           <button
