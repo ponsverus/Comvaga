@@ -559,9 +559,79 @@ export default function Home({ user, userType, onLogout }) {
                 Tenho interesse
               </a>
             </div>
-
           </div>
+        </div>
+      </section>
 
+      <section className="py-24 px-4 bg-black overflow-hidden border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="relative bg-dark-200 rounded-custom border border-gray-800 overflow-hidden">
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
+            <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
+
+            <div className="grid lg:grid-cols-2 gap-12 items-center p-8 sm:p-16">
+              <div className="relative z-10 text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  </span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Demonstração ao Vivo</span>
+                </div>
+                
+                <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 leading-tight">
+                  NÃO APENAS UMA AGENDA, <br/>
+                  <span className="text-primary">UMA VITRINE DE ELITE.</span>
+                </h2>
+                
+                <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                  Sua marca merece mais do que um link cinza. Veja como seus clientes visualizarão seus serviços, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <a
+                    href="https://comvaga.com.br/v/vikings"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-8 py-4 bg-primary text-black font-black rounded-button hover:shadow-[0_0_30px_rgba(255,209,26,0.3)] transition-all hover:scale-105 flex items-center justify-center gap-3 group"
+                  >
+                    VER VITRINE EXEMPLO 
+                    <ZapIcon className="w-5 h-5 group-hover:animate-bounce" />
+                  </a>
+                  <div className="flex items-center justify-center gap-2 text-gray-500 text-sm italic">
+                    <CheckDoubleIcon className="w-4 h-4" />
+                    Interface 100% Mobile Ready
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative perspective-1000 hidden lg:block">
+                <div className="relative z-10 transform rotate-2 hover:rotate-0 transition-transform duration-700">
+                  <div className="bg-dark-100 border border-gray-700 rounded-2xl p-4 shadow-2xl shadow-black">
+                    <div className="flex items-center gap-3 mb-6 border-b border-white/5 pb-4">
+                      <div className="w-12 h-12 rounded-full bg-gray-800 border border-primary/50 flex items-center justify-center font-black text-primary">V</div>
+                      <div>
+                        <div className="text-sm font-bold text-white uppercase">Vikings Barber Shop</div>
+                        <div className="text-[10px] text-gray-500 uppercase tracking-tighter">Barbearia & Estilo</div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="h-32 bg-gray-800/50 rounded-xl animate-pulse flex items-center justify-center">
+                         <StarGlyph sizeClass="h-8 w-8 text-[32px]" className="opacity-20" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="h-20 bg-primary/10 rounded-xl border border-primary/20"></div>
+                        <div className="h-20 bg-gray-800/50 rounded-xl"></div>
+                      </div>
+                      <div className="h-12 bg-gradient-to-r from-primary to-yellow-600 rounded-full opacity-50"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -inset-4 bg-primary/20 blur-3xl -z-10 rounded-full"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
