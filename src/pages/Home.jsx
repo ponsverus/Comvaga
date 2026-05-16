@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { ProtectionIcon, UserIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon } from '../components/icons';
+import { ProtectionIcon, UserIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon, CalendarIcon } from '../components/icons';
 
 const SUPORTE_PHONE_E164 = '5533999037979';
 const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
@@ -569,7 +569,7 @@ export default function Home({ user, userType, onLogout }) {
             <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
             <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
 
-            <div className="grid lg:grid-cols-2 gap-12 items-center p-8 sm:p-16">
+            <div className="grid lg:grid-cols-2 gap-12 items-center p-6 sm:p-16">
               <div className="relative z-10 text-center lg:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6">
                   <span className="relative flex h-2 w-2">
@@ -588,7 +588,7 @@ export default function Home({ user, userType, onLogout }) {
                   Sua marca merece mais do que um link cinza. Veja como seus clientes visualizarão seus serviços, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8 lg:mb-0">
                   <a
                     href="https://comvaga.com.br/v/vikings"
                     target="_blank"
@@ -598,37 +598,62 @@ export default function Home({ user, userType, onLogout }) {
                     VER VITRINE EXEMPLO 
                     <ZapIcon className="w-5 h-5 group-hover:animate-bounce" />
                   </a>
-                  <div className="flex items-center justify-center gap-2 text-gray-500 text-sm italic">
-                    <CheckDoubleIcon className="w-4 h-4" />
-                    Interface 100% Mobile Ready
-                  </div>
                 </div>
               </div>
 
-              <div className="relative perspective-1000 hidden lg:block">
-                <div className="relative z-10 transform rotate-2 hover:rotate-0 transition-transform duration-700">
-                  <div className="bg-dark-100 border border-gray-700 rounded-2xl p-4 shadow-2xl shadow-black">
-                    <div className="flex items-center gap-3 mb-6 border-b border-white/5 pb-4">
-                      <div className="w-12 h-12 rounded-full bg-gray-800 border border-primary/50 flex items-center justify-center font-black text-primary">V</div>
-                      <div>
-                        <div className="text-sm font-bold text-white uppercase">Vikings Barber Shop</div>
-                        <div className="text-[10px] text-gray-500 uppercase tracking-tighter">Barbearia & Estilo</div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="h-32 bg-gray-800/50 rounded-xl animate-pulse flex items-center justify-center">
-                         <StarGlyph sizeClass="h-8 w-8 text-[32px]" className="opacity-20" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="h-20 bg-primary/10 rounded-xl border border-primary/20"></div>
-                        <div className="h-20 bg-gray-800/50 rounded-xl"></div>
-                      </div>
-                      <div className="h-12 bg-gradient-to-r from-primary to-yellow-600 rounded-full opacity-50"></div>
+              <div className="relative z-10 w-full max-w-[380px] mx-auto lg:max-w-none">
+                <div className="relative bg-dark-100 border border-gray-700 rounded-3xl overflow-hidden shadow-2xl transform lg:rotate-2 hover:rotate-0 transition-transform duration-700">
+                  <div className="h-24 sm:h-32 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
+                    <div className="absolute -bottom-10 left-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
+                       <div className="w-full h-full bg-gray-800 flex items-center justify-center font-black text-primary text-2xl">V</div>
                     </div>
                   </div>
+
+                  <div className="pt-12 pb-6 px-6">
+                    <div className="mb-6">
+                      <div className="text-lg font-black text-white uppercase tracking-tight">Vikings Barber Shop</div>
+                      <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                        <StarGlyph sizeClass="h-3 w-3 text-[12px]" /> 4.9 (128 avaliações)
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 mb-6">
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Serviços Disponíveis</div>
+                      {[
+                        { n: 'Corte Moderno', p: 'R$ 45,00', d: '30 min' },
+                        { n: 'Barba Terapia', p: 'R$ 35,00', d: '20 min' }
+                      ].map((s, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
+                          <div className="min-w-0">
+                            <div className="text-sm font-bold text-white truncate">{s.n}</div>
+                            <div className="text-[10px] text-gray-500 uppercase">{s.d}</div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-sm font-bold text-primary">{s.p}</div>
+                            <div className="text-[10px] text-gray-400 flex items-center gap-1 justify-end">
+                              <CalendarIcon className="w-3 h-3" /> AGENDAR
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="h-24 bg-gray-800/40 rounded-2xl border border-dashed border-white/10 flex items-center justify-center relative group overflow-hidden">
+                       <div className="text-white/20 font-black text-xs uppercase tracking-widest group-hover:text-primary/40 transition-colors">Galeria de Trabalhos</div>
+                       <div className="absolute bottom-2 right-2 flex gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
+                          <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
+                          <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
+                       </div>
+                    </div>
+                  </div>
+                  
+                  <div className="absolute top-4 right-4 flex gap-2">
+                     <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white/40"><UserIcon className="w-4 h-4" /></div>
+                     <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-primary"><StarGlyph sizeClass="h-4 w-4 text-[16px]" /></div>
+                  </div>
                 </div>
-                <div className="absolute -inset-4 bg-primary/20 blur-3xl -z-10 rounded-full"></div>
+                <div className="absolute -inset-10 bg-primary/10 blur-[80px] -z-10 rounded-full"></div>
               </div>
             </div>
           </div>
@@ -759,4 +784,5 @@ export default function Home({ user, userType, onLogout }) {
       </footer>
     </div>
   );
+  
 }
