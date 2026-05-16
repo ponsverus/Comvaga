@@ -261,6 +261,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </header>
 
+      {/* Hero Section */}
       <section className="relative pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pt-48 lg:pb-32 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-yellow-600/10"></div>
         <div className="absolute top-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
@@ -311,6 +312,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
+      {/* Como Funciona Section */}
       <section id="como-funciona" className="py-24 px-4 bg-dark-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -354,6 +356,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
+      {/* Vantagens Section */}
       <section className="py-24 px-4 bg-dark-200">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -387,9 +390,9 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
+      {/* Planos Section */}
       <section className="py-24 px-4 bg-dark-100">
         <div className="max-w-7xl mx-auto">
-
           <div className="text-center mb-16">
             <h2 className="text-5xl font-normal mb-4">
               SEM <span className="text-primary">BUROCRACIA</span>
@@ -397,42 +400,16 @@ export default function Home({ user, userType, onLogout }) {
             <p className="text-xl text-gray-400">Acesso liberado sem necessidade de dados bancários. Simples assim :)</p>
           </div>
          
-          <div className="
-            flex gap-5 overflow-x-auto scroll-snap-type-x-mandatory
-            sm:grid sm:grid-cols-3 sm:items-start sm:overflow-visible
-            pb-4 sm:pb-0
-            [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-          ">
-
-            <div className="
-              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
-              sm:w-auto sm:max-w-none
-              bg-dark-200 border border-gray-800 rounded-[3px]
-              p-7 flex flex-col
-            ">
+          <div className="flex gap-5 overflow-x-auto scroll-snap-type-x-mandatory sm:grid sm:grid-cols-3 sm:items-start sm:overflow-visible pb-4 sm:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {/* Essencial */}
+            <div className="shrink-0 w-max max-w-[85vw] [scroll-snap-align:center] sm:w-auto sm:max-w-none bg-dark-200 border border-gray-800 rounded-[3px] p-7 flex flex-col">
               <div className="mb-5">
-                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-                  Essencial
-                </span>
-                <p className="text-2xl font-normal text-white mb-1">
-                  R$ 29<span className="text-base font-normal text-gray-500">,99/mês</span>
-                </p>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  Para autônomos que buscam organizar sua agenda.
-                </p>
+                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">Essencial</span>
+                <p className="text-2xl font-normal text-white mb-1">R$ 29<span className="text-base font-normal text-gray-500">,99/mês</span></p>
+                <p className="text-sm text-gray-500 leading-relaxed">Para autônomos que buscam organizar sua agenda.</p>
               </div>
-
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
-                {[
-                  'Agendamento assistido pelo profissional',
-                  'Agenda individual, incluindo dias, horários e pausas',
-                  'Vitrine digital com galeria e trabalhos',
-                  'Links para redes sociais',
-                  'Área do cliente com histórico',
-                  'Alertas por e-mail em tempo real',
-                  'Lembrete automático 30 min antes',
-                  'Sincronia total com o Google Agenda.',
-                ].map((item) => (
+                {['Agendamento assistido pelo profissional', 'Agenda individual, incluindo dias, horários e pausas', 'Vitrine digital com galeria e trabalhos', 'Links para redes sociais', 'Área do cliente com histórico', 'Alertas por e-mail em tempo real', 'Lembrete automático 30 min antes', 'Sincronia total com o Google Agenda.'].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
                     <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
                       <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -441,49 +418,18 @@ export default function Home({ user, userType, onLogout }) {
                   </div>
                 ))}
               </div>
-
-              <a
-                href={WHATSAPP_ESSENCIAL_HREF}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
-              >
-                Tenho interesse
-              </a>
+              <a href={WHATSAPP_ESSENCIAL_HREF} target="_blank" rel="noreferrer" className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all">Tenho interesse</a>
             </div>
 
-            <div className="
-              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
-              sm:w-auto sm:max-w-none
-              bg-dark-200 border border-primary/60 rounded-[3px]
-              p-7 relative flex flex-col
-            ">
+            {/* Profissional */}
+            <div className="shrink-0 w-max max-w-[85vw] [scroll-snap-align:center] sm:w-auto sm:max-w-none bg-dark-200 border border-primary/60 rounded-[3px] p-7 relative flex flex-col">
               <div className="mb-5">
-                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
-                  Profissional
-                </span>
-                <p className="text-2xl font-normal text-white mb-1">
-                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
-                </p>
-                <p className="text-sm text-gray-400 leading-relaxed">
-                  Controle total para negócios em crescimento, com métricas e equipe ILIMITADA.
-                </p>
+                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">Profissional</span>
+                <p className="text-2xl font-normal text-white mb-1">R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span></p>
+                <p className="text-sm text-gray-400 leading-relaxed">Controle total para negócios em crescimento, com métricas e equipe ILIMITADA.</p>
               </div>
-
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
-                {[
-                  'Tudo do plano ESSENCIAL',
-                  'Painel Admin: Controle de Múltiplos Profissionais',
-                  'Painel individual para cada profissional parceiro',
-                  'Profissionais ilimitados e sem custo extra por parceiro',
-                  'Métricas do dia com comparativo do dia anterior',
-                  'Comprometimento da agenda e receita futura projetada',
-                  'Análise evolutiva de faturamento com filtros temporais estratégicos',
-                  'Taxa de fechamento de agendamentos por período',
-                  'Montagem de ofertas nos trabalhos oferecidos',
-                  'Depoimentos independentes por profissional e por negócio',
-                  'Reagendamento rápido pela área do cliente',
-                ].map((item) => (
+                {['Tudo do plano ESSENCIAL', 'Painel Admin: Controle de Múltiplos Profissionais', 'Painel individual para cada profissional parceiro', 'Profissionais ilimitados e sem custo extra por parceiro', 'Métricas do dia com comparativo do dia anterior', 'Comprometimento da agenda e receita futura projetada', 'Análise evolutiva de faturamento com filtros temporais estratégicos', 'Taxa de fechamento de agendamentos por período', 'Montagem de ofertas nos trabalhos oferecidos', 'Depoimentos independentes por profissional e por negócio', 'Reagendamento rápido pela área do cliente'].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
                     <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
                       <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -492,55 +438,22 @@ export default function Home({ user, userType, onLogout }) {
                   </div>
                 ))}
               </div>
-
               <div className="mt-5 flex items-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
                 <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
-                <span className="text-xs font-bold text-primary uppercase tracking-wide">
-                  Vantagens do Premium Real inclusas
-                </span>
+                <span className="text-xs font-bold text-primary uppercase tracking-wide">Vantagens do Premium Real inclusas</span>
               </div>
-
-              <Link
-                to="/cadastro"
-                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
-              >
-                Assinar por R$ 39,99•mês <ZapIcon className="w-3.5 h-3.5" />
-              </Link>
+              <Link to="/cadastro" className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all">Assinar por R$ 39,99•mês <ZapIcon className="w-3.5 h-3.5" /></Link>
             </div>
 
-            <div className="
-              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
-              sm:w-auto sm:max-w-none
-              bg-dark-200 border border-gray-800 rounded-[3px]
-              p-7 flex flex-col
-            ">
+            {/* Premium Real */}
+            <div className="shrink-0 w-max max-w-[85vw] [scroll-snap-align:center] sm:w-auto sm:max-w-none bg-dark-200 border border-gray-800 rounded-[3px] p-7 flex flex-col">
               <div className="mb-5">
-                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-                  Premium Real
-                </span>
-                <p className="text-2xl font-normal text-white mb-1">
-                  R$ 87<span className="text-base font-normal text-gray-500">,39/mês</span>
-                </p>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  Experiência completa com acesso ilimitado a todos os recursos.
-                </p>
+                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">Premium Real</span>
+                <p className="text-2xl font-normal text-white mb-1">R$ 87<span className="text-base font-normal text-gray-500">,39/mês</span></p>
+                <p className="text-sm text-gray-500 leading-relaxed">Experiência completa com acesso ilimitado a todos os recursos.</p>
               </div>
-
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
-                {[
-                  'Tudo do plano PROFISSIONAL',
-                  'Painel Admin: Controle de Múltiplos Profissionais',
-                  'Painel individual para cada profissional parceiro',
-                  'Profissionais ilimitados e sem custo extra por parceiro',
-                  'Métricas avançadas com comparativo do dia anterior',
-                  'Comprometimento da agenda e receita futura projetada',
-                  'Análise evolutiva de faturamento com filtros temporais estratégicos.',
-                  'Taxa de fechamento de agendamentos por período',
-                  'Montagem de ofertas nos trabalhos oferecidos',
-                  'Depoimentos independentes por profissional e por negócio',
-                  'Reagendamento rápido pela área do cliente',
-                  'Acesso antecipado a novos recursos',
-                ].map((item) => (
+                {['Tudo do plano PROFISSIONAL', 'Painel Admin: Controle de Múltiplos Profissionais', 'Painel individual para cada profissional parceiro', 'Profissionais ilimitados e sem custo extra por parceiro', 'Métricas avançadas com comparativo do dia anterior', 'Comprometimento da agenda e receita futura projetada', 'Análise evolutiva de faturamento com filtros temporais estratégicos.', 'Taxa de fechamento de agendamentos por período', 'Montagem de ofertas nos trabalhos oferecidos', 'Depoimentos independentes por profissional e por negócio', 'Reagendamento rápido pela área do cliente', 'Acesso antecipado a novos recursos'].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
                     <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
                       <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -549,21 +462,13 @@ export default function Home({ user, userType, onLogout }) {
                   </div>
                 ))}
               </div>
-
-              <a
-                href={WHATSAPP_PREMIUM_HREF}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
-              >
-                Tenho interesse
-              </a>
+              <a href={WHATSAPP_PREMIUM_HREF} target="_blank" rel="noreferrer" className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all">Tenho interesse</a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SESSÃO DE PREVIEW - TEXTOS MANTIDOS, COMPONENTE DE CARD ATUALIZADO */}
+      {/* SESSÃO DE PREVIEW - CORRIGIDA (PROPORÇÃO E ÍCONE) */}
       <section className="py-24 px-4 bg-black overflow-hidden border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <div className="relative bg-dark-200 rounded-custom border border-gray-800 overflow-hidden">
@@ -602,78 +507,78 @@ export default function Home({ user, userType, onLogout }) {
                 </div>
               </div>
 
-              <div className="relative z-10 w-full max-w-[380px] mx-auto lg:max-w-none">
-                <div className="relative bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
-                  <div className="h-24 sm:h-32 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
-                    <div className="absolute -bottom-10 left-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
-                       <div className="w-full h-full bg-gray-800 flex items-center justify-center font-black text-primary text-2xl">V</div>
+              <div className="relative z-10 w-full max-w-[320px] mx-auto lg:max-w-none lg:w-[350px]">
+                <div className="relative bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-700">
+                  <div className="h-20 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
+                    <div className="absolute -bottom-8 left-6 w-16 h-16 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
+                       <div className="w-full h-full bg-gray-800 flex items-center justify-center font-black text-primary text-xl">V</div>
                     </div>
                   </div>
 
-                  <div className="pt-12 pb-6 px-4 sm:px-6">
-                    <div className="mb-6 px-2">
-                      <div className="text-lg font-normal text-white uppercase tracking-tight">VIKINGS</div>
-                      <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                        <StarGlyph sizeClass="h-3 w-3 text-[12px]" /> 4.9
+                  <div className="pt-10 pb-6 px-4">
+                    <div className="mb-4 px-1">
+                      <div className="text-base font-normal text-white uppercase tracking-tight">VIKINGS</div>
+                      <div className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
+                        <StarGlyph sizeClass="h-2.5 w-2.5 text-[10px]" /> 4.9
                       </div>
                     </div>
 
-                    <div className="space-y-4 mb-6">
-                      <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2 px-2">Servs Disponíveis</div>
+                    <div className="space-y-3 mb-5">
+                      <div className="text-[9px] font-normal text-gray-400 uppercase tracking-widest px-1">Servs Disponíveis</div>
                       
                       {[
                         { n: 'CORTE', p: 'R$ 45,00', d: '30 min' },
                         { n: 'BARBA TERAPIA', p: 'R$ 35,00', d: '20 min' }
                       ].map((s, idx) => (
-                        <div key={idx} className="bg-white/5 border border-white/10 rounded-[3px] p-4 flex flex-col gap-4">
+                        <div key={idx} className="bg-white/[0.03] border border-white/10 rounded-[2px] p-3 flex flex-col gap-3">
                           <div className="flex justify-between items-start">
                             <div>
-                              <div className="text-sm font-normal text-white uppercase">{s.n}</div>
-                              <div className="flex items-center gap-1.5 mt-1">
-                                <TimeIcon className="w-3 h-3 text-gray-500" />
-                                <span className="text-[10px] text-gray-500 font-bold uppercase">{s.d}</span>
+                              <div className="text-xs font-normal text-white uppercase tracking-wide">{s.n}</div>
+                              <div className="flex items-center gap-1 mt-0.5">
+                                <TimeIcon className="w-2.5 h-2.5 text-gray-500" />
+                                <span className="text-[9px] text-gray-500 uppercase font-bold">{s.d}</span>
                               </div>
                             </div>
-                            <div className="text-primary font-normal text-sm">{s.p}</div>
+                            <div className="text-primary font-normal text-xs">{s.p}</div>
                           </div>
 
                           <div className="flex gap-2">
-                            {/* BOTÃO AGENDAR (ESQUERDA) */}
-                            <div className="flex-1 h-8 rounded-full border border-white/15 flex items-center justify-center gap-2 px-3 hover:bg-white/5 transition-colors cursor-pointer">
-                              <CalendarIcon className="w-3.5 h-3.5 text-white/40" />
-                              <span className="text-[10px] font-bold text-white/70 uppercase">Agendar</span>
+                            <div className="flex-1 h-7 rounded-full border border-white/10 flex items-center justify-center gap-1.5 px-2 hover:bg-white/5 transition-colors cursor-pointer">
+                              <CalendarIcon className="w-3 h-3 text-white/30" />
+                              <span className="text-[9px] font-bold text-white/60 uppercase">Agendar</span>
                             </div>
-                            {/* BOTÃO SELECIONAR (DIREITA) */}
-                            <div className="flex-1 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center gap-2 px-3 hover:bg-primary/20 transition-colors cursor-pointer">
-                              <span className="text-[10px] font-black text-primary uppercase">Selecionar</span>
+                            <div className="flex-1 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center gap-1.5 px-2 hover:bg-primary/20 transition-colors cursor-pointer">
+                              <CheckDoubleIcon className="w-3 h-3 text-primary" />
+                              <span className="text-[9px] font-black text-primary uppercase">Selecionar</span>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    <div className="h-24 bg-gray-800/40 rounded-[3px] border border-dashed border-white/10 flex items-center justify-center relative group overflow-hidden mx-2">
-                       <div className="text-white/20 font-normal text-xs uppercase tracking-widest group-hover:text-primary/40 transition-colors">GALERIA DE TRABALHOS</div>
-                       <div className="absolute bottom-2 right-2 flex gap-1">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
-                          <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
-                          <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
+                    <div className="h-16 bg-gray-800/20 rounded-[2px] border border-dashed border-white/5 flex items-center justify-center relative group overflow-hidden mx-1">
+                       <div className="text-white/10 font-normal text-[10px] uppercase tracking-widest group-hover:text-primary/30 transition-colors">GALERIA DE TRABALHOS</div>
+                       <div className="absolute bottom-2 right-2 flex gap-1 scale-75">
+                          <div className="w-1 h-1 rounded-full bg-primary/30"></div>
+                          <div className="w-1 h-1 rounded-full bg-white/5"></div>
+                          <div className="w-1 h-1 rounded-full bg-white/5"></div>
                        </div>
                     </div>
                   </div>
                   
-                  <div className="absolute top-4 right-4 flex gap-2">
-                     <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white/40"><UserIcon className="w-4 h-4" /></div>
-                     <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-primary"><StarGlyph sizeClass="h-4 w-4 text-[16px]" /></div>
+                  <div className="absolute top-3 right-3 flex gap-1.5">
+                     <div className="w-7 h-7 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white/30"><UserIcon className="w-3.5 h-3.5" /></div>
+                     <div className="w-7 h-7 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-primary"><StarGlyph sizeClass="h-3.5 w-3.5 text-[14px]" /></div>
                   </div>
                 </div>
-                <div className="absolute -inset-10 bg-primary/10 blur-[80px] -z-10 rounded-full"></div>
+                <div className="absolute -inset-8 bg-primary/5 blur-[60px] -z-10 rounded-full"></div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Footer CTA */}
       <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-5xl font-black text-black mb-6">ELEVE SEU NÍVEL PROFISSIONAL</h2>
@@ -688,20 +593,15 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <footer className="bg-black py-12 px-4">
+      {/* Footer Final */}
+      <footer className="bg-black py-12 px-4 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div className="flex flex-col justify-start">
               <Link to="/" className="inline-block hover:opacity-75 transition-opacity">
-                <img
-                  src="/Comvaga Logo.png"
-                  alt="Comvaga"
-                  className="h-16 w-auto object-contain"
-                />
+                <img src="/Comvaga Logo.png" alt="Comvaga" className="h-16 w-auto object-contain" />
               </Link>
-              <p className="text-gray-600 text-xs mt-3 uppercase leading-relaxed">
-                Sua agenda,<br />matematicamente perfeita.
-              </p>
+              <p className="text-gray-600 text-xs mt-3 uppercase leading-relaxed">Sua agenda,<br />matematicamente perfeita.</p>
             </div>
 
             <div>
@@ -709,56 +609,17 @@ export default function Home({ user, userType, onLogout }) {
               <ul className="space-y-2">
                 {isLogged ? (
                   <>
-                    <li>
-                      <Link
-                        to={userType === 'professional' ? '/dashboard' : '/minha-area'}
-                        className="text-gray-500 hover:text-primary transition-colors text-sm"
-                      >
-                        {userType === 'professional' ? 'DASHBOARD' : 'MINHA ÁREA'}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/parceiro/login" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        LOGIN PARCEIRO
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/parceiro/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        CADASTRO PARCEIRO
-                      </Link>
-                    </li>
-                    <li>
-                      <button
-                        type="button"
-                        onClick={handleLogoutClick}
-                        className="text-gray-500 hover:text-primary transition-colors text-sm"
-                      >
-                        SAIR
-                      </button>
-                    </li>
+                    <li><Link to={userType === 'professional' ? '/dashboard' : '/minha-area'} className="text-gray-500 hover:text-primary transition-colors text-sm">{userType === 'professional' ? 'DASHBOARD' : 'MINHA ÁREA'}</Link></li>
+                    <li><Link to="/parceiro/login" className="text-gray-500 hover:text-primary transition-colors text-sm">LOGIN PARCEIRO</Link></li>
+                    <li><Link to="/parceiro/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">CADASTRO PARCEIRO</Link></li>
+                    <li><button type="button" onClick={handleLogoutClick} className="text-gray-500 hover:text-primary transition-colors text-sm">SAIR</button></li>
                   </>
                 ) : (
                   <>
-                    <li>
-                      <Link to="/login" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        ENTRAR
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        CADASTRAR GRÁTIS
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/parceiro/login" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        LOGIN PARCEIRO
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/parceiro/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        CADASTRO PARCEIRO
-                      </Link>
-                    </li>
+                    <li><Link to="/login" className="text-gray-500 hover:text-primary transition-colors text-sm">ENTRAR</Link></li>
+                    <li><Link to="/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">CADASTRAR GRÁTIS</Link></li>
+                    <li><Link to="/parceiro/login" className="text-gray-500 hover:text-primary transition-colors text-sm">LOGIN PARCEIRO</Link></li>
+                    <li><Link to="/parceiro/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">CADASTRO PARCEIRO</Link></li>
                   </>
                 )}
               </ul>
@@ -768,11 +629,7 @@ export default function Home({ user, userType, onLogout }) {
               <h4 className="text-white font-normal mb-4">EMPRESA</h4>
               <ul className="space-y-2">
                 {['SOBRE', 'BLOG'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-primary transition-colors text-sm">
-                      {link}
-                    </a>
-                  </li>
+                  <li key={link}><a href="#" className="text-gray-400 hover:text-primary transition-colors text-sm">{link}</a></li>
                 ))}
               </ul>
             </div>
@@ -781,11 +638,7 @@ export default function Home({ user, userType, onLogout }) {
               <h4 className="text-white font-normal mb-4">LEGAL</h4>
               <ul className="space-y-2">
                 {['PRIVACIDADE', 'TERMOS'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                      {link}
-                    </a>
-                  </li>
+                  <li key={link}><a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm">{link}</a></li>
                 ))}
               </ul>
             </div>
