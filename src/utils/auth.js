@@ -11,19 +11,13 @@ export function isPasswordRecoveryUrl() {
     );
 
     const type = s.get('type') || hashParams.get('type');
-    const code = s.get('code') || hashParams.get('code');
-    const accessToken =
-      s.get('access_token') || hashParams.get('access_token');
-
-    return type === 'recovery' || !!code || !!accessToken;
+    return type === 'recovery';
   } catch {
     const href = window.location.href || '';
     return (
       window.sessionStorage?.getItem(storageKey) === '1' ||
       href.includes('/reset-password') ||
-      href.includes('type=recovery') ||
-      href.includes('access_token=') ||
-      href.includes('code=')
+      href.includes('type=recovery')
     );
   }
 }
@@ -32,6 +26,5 @@ export function clearPasswordRecoveryState() {
   try {
     window.sessionStorage?.removeItem('comvaga-password-recovery');
   } catch {
-    // Ignore browser storage issues.
   }
 }
