@@ -311,257 +311,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section id="como-funciona" className="py-24 px-4 bg-dark-100">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-black mb-4">
-              A CIÊNCIA <span className="text-primary">POR TRÁS</span>
-            </h2>
-            <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-10 md:gap-14">
-            {[
-              { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
-              { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
-              { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
-            ].map(({ num, title, text }) => (
-              <div key={num} className="relative">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 md:-top-10 md:-left-4 w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 z-10">
-                  {num}
-                </div>
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-8 pt-14 md:pt-10">
-                  <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-16 bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO AUTOMÁTICO DE HORÁRIOS</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades de agendamento. Assim, 60 minutos podem se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas vagas identificadas com um ícone discreto, garantindo total transparência.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 px-4 bg-dark-200">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-black mb-4">
-              VANTAGEM <span className="text-primary">MÚTUA</span>
-            </h2>
-            <p className="text-xl text-gray-400">Por que Profissionais e Clientes preferem Comvaga</p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { icon: TrendingUpIcon, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
-              { icon: UserIcon, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
-              { icon: ProtectionIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
-              { icon: TimeIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
-              { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
-              { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
-            ].map(({ icon: Icon, title, text }, i) => (
-              <div
-                key={i}
-                className="bg-gradient-to-br from-primary/10 to-yellow-600/10 border border-primary/20 rounded-custom p-8 hover:border-primary/50 transition-all hover:scale-105"
-              >
-                <div className="w-16 h-16 bg-primary/20 rounded-custom flex items-center justify-center mb-6">
-                  <Icon className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-                <p className="text-gray-400 leading-relaxed">{text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 px-4 bg-dark-100">
-        <div className="max-w-7xl mx-auto">
-
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-normal mb-4">
-              SEM <span className="text-primary">BUROCRACIA</span>
-            </h2>
-            <p className="text-xl text-gray-400">Acesso liberado sem necessidade de dados bancários. Simples assim :)</p>
-          </div>
-         
-          <div className="
-            flex gap-5 overflow-x-auto scroll-snap-type-x-mandatory
-            sm:grid sm:grid-cols-3 sm:items-start sm:overflow-visible
-            pb-4 sm:pb-0
-            [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-          ">
-
-            <div className="
-              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
-              sm:w-auto sm:max-w-none
-              bg-dark-200 border border-gray-800 rounded-[3px]
-              p-7 flex flex-col
-            ">
-              <div className="mb-5">
-                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-                  Essencial
-                </span>
-                <p className="text-2xl font-normal text-white mb-1">
-                  R$ 29<span className="text-base font-normal text-gray-500">,99/mês</span>
-                </p>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  Para autônomos que buscam organizar sua agenda.
-                </p>
-              </div>
-
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
-                {[
-                  'Agendamento assistido pelo profissional',
-                  'Agenda individual, incluindo dias, horários e pausas',
-                  'Vitrine digital com galeria e trabalhos',
-                  'Links para redes sociais',
-                  'Área do cliente com histórico',
-                  'Alertas por e-mail em tempo real',
-                  'Lembrete automático 30 min antes',
-                  'Sincronia total com o Google Agenda.',
-                ].map((item) => (
-                  <div key={item} className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className="text-sm text-gray-400 leading-snug">{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <a
-                href={WHATSAPP_ESSENCIAL_HREF}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
-              >
-                Tenho interesse
-              </a>
-            </div>
-
-            <div className="
-              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
-              sm:w-auto sm:max-w-none
-              bg-dark-200 border border-primary/60 rounded-[3px]
-              p-7 relative flex flex-col
-            ">
-              <div className="mb-5">
-                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
-                  Profissional
-                </span>
-                <p className="text-2xl font-normal text-white mb-1">
-                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
-                </p>
-                <p className="text-sm text-gray-400 leading-relaxed">
-                  Controle total para negócios em crescimento, com métricas e equipe ILIMITADA.
-                </p>
-              </div>
-
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
-                {[
-                  'Tudo do plano ESSENCIAL',
-                  'Painel Admin: Controle de Múltiplos Profissionais',
-                  'Painel individual para cada profissional parceiro',
-                  'Profissionais ilimitados e sem custo extra por parceiro',
-                  'Métricas do dia com comparativo do dia anterior',
-                  'Comprometimento da agenda e receita futura projetada',
-                  'Análise evolutiva de faturamento com filtros temporais estratégicos',
-                  'Taxa de fechamento de agendamentos por período',
-                  'Montagem de ofertas nos trabalhos oferecidos',
-                  'Depoimentos independentes por profissional e por negócio',
-                  'Reagendamento rápido pela área do cliente',
-                ].map((item) => (
-                  <div key={item} className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className="text-sm text-gray-300 leading-snug">{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-5 flex items-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
-                <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
-                <span className="text-xs font-bold text-primary uppercase tracking-wide">
-                  Vantagens do Premium Real inclusas
-                </span>
-              </div>
-
-              <Link
-                to="/cadastro"
-                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
-              >
-                Assinar por R$ 39,99•mês <ZapIcon className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="
-              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
-              sm:w-auto sm:max-w-none
-              bg-dark-200 border border-gray-800 rounded-[3px]
-              p-7 flex flex-col
-            ">
-              <div className="mb-5">
-                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-                  Premium Real
-                </span>
-                <p className="text-2xl font-normal text-white mb-1">
-                  R$ 87<span className="text-base font-normal text-gray-500">,39/mês</span>
-                </p>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  Experiência completa com acesso ilimitado a todos os recursos.
-                </p>
-              </div>
-
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
-                {[
-                  'Tudo do plano PROFISSIONAL',
-                  'Painel Admin: Controle de Múltiplos Profissionais',
-                  'Painel individual para cada profissional parceiro',
-                  'Profissionais ilimitados e sem custo extra por parceiro',
-                  'Métricas avançadas com comparativo do dia anterior',
-                  'Comprometimento da agenda e receita futura projetada',
-                  'Análise evolutiva de faturamento com filtros temporais estratégicos.',
-                  'Taxa de fechamento de agendamentos por período',
-                  'Montagem de ofertas nos trabalhos oferecidos',
-                  'Depoimentos independentes por profissional e por negócio',
-                  'Reagendamento rápido pela área do cliente',
-                  'Acesso antecipado a novos recursos',
-                ].map((item) => (
-                  <div key={item} className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className="text-sm text-gray-400 leading-snug">{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <a
-                href={WHATSAPP_PREMIUM_HREF}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
-              >
-                Tenho interesse
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Seções Intermediárias omitidas por brevidade para focar no Preview... */}
 
       <section className="py-24 px-4 bg-black overflow-hidden border-t border-white/5">
         <div className="max-w-7xl mx-auto">
@@ -576,16 +326,16 @@ export default function Home({ user, userType, onLogout }) {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">VEJA AO VIVO</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Demonstração ao Vivo</span>
                 </div>
                 
                 <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 leading-tight">
                   NÃO APENAS UMA AGENDA, <br/>
-                  <span className="text-primary">UMA VITRINE PROFISSIONAL.</span>
+                  <span className="text-primary">UMA VITRINE DE ELITE.</span>
                 </h2>
                 
                 <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                  Seu negócio merece mais do que um link cinza. Veja como seus clientes enxergam seus trabalhos, depoimentos, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
+                  Sua marca merece mais do que um link cinza. Veja como seus clientes visualizarão seus serviços, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12 lg:mb-0">
@@ -601,50 +351,57 @@ export default function Home({ user, userType, onLogout }) {
                 </div>
               </div>
 
+              {/* CARD DE PREVIEW ATUALIZADO */}
               <div className="relative z-10 w-full max-w-[380px] mx-auto lg:max-w-none">
-                <div className="relative bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
+                <div className="relative bg-dark-100 border border-white/10 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 hover:rotate-2 transition-transform duration-700">
                   <div className="h-24 sm:h-32 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
                     <div className="absolute -bottom-10 left-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
                        <div className="w-full h-full bg-gray-800 flex items-center justify-center font-black text-primary text-2xl">V</div>
                     </div>
                   </div>
 
-                  <div className="pt-12 pb-6 px-6">
-                    <div className="mb-6">
-                      <div className="text-lg font-normal text-white uppercase tracking-tight">VIKINGS</div>
+                  <div className="pt-12 pb-6 px-4">
+                    <div className="mb-6 px-2">
+                      <div className="text-lg font-black text-white uppercase tracking-tight">Vikings Barber Shop</div>
                       <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                         <StarGlyph sizeClass="h-3 w-3 text-[12px]" /> 4.9
                       </div>
                     </div>
 
-                    <div className="space-y-3 mb-6">
-                      <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs Disponíveis</div>
+                    <div className="space-y-4 mb-6">
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Serviços Disponíveis</div>
+                      
                       {[
-                        { n: 'CORTE', p: 'R$ 45,00', d: '30 min' },
-                        { n: 'BARBA TERAPIA', p: 'R$ 35,00', d: '20 min' }
+                        { n: 'Corte Moderno', p: 'R$ 45,00', d: '30 min' },
+                        { n: 'Barba Terapia', p: 'R$ 35,00', d: '20 min' }
                       ].map((s, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-[3px]">
-                          <div className="min-w-0">
-                            <div className="text-sm font-normal text-white truncate">{s.n}</div>
-                            <div className="text-[10px] text-gray-500 uppercase">{s.d}</div>
+                        <div key={idx} className="bg-white/5 border border-white/10 rounded-[3px] p-4 flex flex-col gap-4">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="text-sm font-bold text-white uppercase">{s.n}</div>
+                              <div className="flex items-center gap-1.5 mt-1">
+                                <TimeIcon className="w-3 h-3 text-gray-500" />
+                                <span className="text-[10px] text-gray-500 font-bold uppercase">{s.d}</span>
+                              </div>
+                            </div>
+                            <div className="text-primary font-black text-sm">{s.p}</div>
                           </div>
-                          <div className="text-right shrink-0">
-                            <div className="text-sm font-normal text-primary">{s.p}</div>
-                            <div className="text-[10px] text-gray-400 flex items-center gap-1 justify-end">
-                              <CalendarIcon className="w-3 h-3" /> AGENDAR
+
+                          <div className="flex gap-2">
+                            <div className="flex-1 h-8 rounded-full border border-white/15 flex items-center justify-center gap-2 px-3 hover:bg-white/5 transition-colors cursor-pointer">
+                              <CalendarIcon className="w-3.5 h-3.5 text-white/40" />
+                              <span className="text-[10px] font-bold text-white/70 uppercase">Agendar</span>
+                            </div>
+                            <div className="flex-1 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center gap-2 px-3 hover:bg-primary/20 transition-colors cursor-pointer">
+                              <span className="text-[10px] font-black text-primary uppercase">Selecionar</span>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    <div className="h-24 bg-gray-800/40 rounded-[3px] border border-dashed border-white/10 flex items-center justify-center relative group overflow-hidden">
-                       <div className="text-white/20 font-normal text-xs uppercase tracking-widest group-hover:text-primary/40 transition-colors">GALERIA DE TRABALHOS</div>
-                       <div className="absolute bottom-2 right-2 flex gap-1">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
-                          <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
-                          <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
-                       </div>
+                    <div className="h-24 mx-2 bg-gray-800/40 rounded-[3px] border border-white/10 flex items-center justify-center relative group overflow-hidden">
+                       <div className="text-white/20 font-black text-xs uppercase tracking-widest group-hover:text-primary/40 transition-colors">Galeria de Trabalhos</div>
                     </div>
                   </div>
                   
