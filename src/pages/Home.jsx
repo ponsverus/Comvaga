@@ -576,19 +576,19 @@ export default function Home({ user, userType, onLogout }) {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Demonstração ao Vivo</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">VEJA AO VIVO</span>
                 </div>
                 
                 <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 leading-tight">
                   NÃO APENAS UMA AGENDA, <br/>
-                  <span className="text-primary">UMA VITRINE DE ELITE.</span>
+                  <span className="text-primary">UMA VITRINE PROFISSIONAL.</span>
                 </h2>
                 
                 <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                  Sua marca merece mais do que um link cinza. Veja como seus clientes visualizarão seus serviços, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
+                  Seu negócio merece mais do que um link cinza. Veja como seus clientes enxergam seus trabalhos, depoimentos, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8 lg:mb-0">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12 lg:mb-0">
                   <a
                     href="https://comvaga.com.br/v/vikings"
                     target="_blank"
@@ -602,7 +602,7 @@ export default function Home({ user, userType, onLogout }) {
               </div>
 
               <div className="relative z-10 w-full max-w-[380px] mx-auto lg:max-w-none">
-                <div className="relative bg-dark-100 border border-gray-700 rounded-3xl overflow-hidden shadow-2xl transform lg:rotate-2 hover:rotate-0 transition-transform duration-700">
+                <div className="relative bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
                   <div className="h-24 sm:h-32 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
                     <div className="absolute -bottom-10 left-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
                        <div className="w-full h-full bg-gray-800 flex items-center justify-center font-black text-primary text-2xl">V</div>
@@ -611,25 +611,25 @@ export default function Home({ user, userType, onLogout }) {
 
                   <div className="pt-12 pb-6 px-6">
                     <div className="mb-6">
-                      <div className="text-lg font-black text-white uppercase tracking-tight">Vikings Barber Shop</div>
+                      <div className="text-lg font-normal text-white uppercase tracking-tight">VIKINGS</div>
                       <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                        <StarGlyph sizeClass="h-3 w-3 text-[12px]" /> 4.9 (128 avaliações)
+                        <StarGlyph sizeClass="h-3 w-3 text-[12px]" /> 4.9
                       </div>
                     </div>
 
                     <div className="space-y-3 mb-6">
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Serviços Disponíveis</div>
+                      <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs Disponíveis</div>
                       {[
-                        { n: 'Corte Moderno', p: 'R$ 45,00', d: '30 min' },
-                        { n: 'Barba Terapia', p: 'R$ 35,00', d: '20 min' }
+                        { n: 'CORTE', p: 'R$ 45,00', d: '30 min' },
+                        { n: 'BARBA TERAPIA', p: 'R$ 35,00', d: '20 min' }
                       ].map((s, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
+                        <div key={idx} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-[3px]">
                           <div className="min-w-0">
-                            <div className="text-sm font-bold text-white truncate">{s.n}</div>
+                            <div className="text-sm font-normal text-white truncate">{s.n}</div>
                             <div className="text-[10px] text-gray-500 uppercase">{s.d}</div>
                           </div>
                           <div className="text-right shrink-0">
-                            <div className="text-sm font-bold text-primary">{s.p}</div>
+                            <div className="text-sm font-normal text-primary">{s.p}</div>
                             <div className="text-[10px] text-gray-400 flex items-center gap-1 justify-end">
                               <CalendarIcon className="w-3 h-3" /> AGENDAR
                             </div>
@@ -638,8 +638,8 @@ export default function Home({ user, userType, onLogout }) {
                       ))}
                     </div>
 
-                    <div className="h-24 bg-gray-800/40 rounded-2xl border border-dashed border-white/10 flex items-center justify-center relative group overflow-hidden">
-                       <div className="text-white/20 font-black text-xs uppercase tracking-widest group-hover:text-primary/40 transition-colors">Galeria de Trabalhos</div>
+                    <div className="h-24 bg-gray-800/40 rounded-[3px] border border-dashed border-white/10 flex items-center justify-center relative group overflow-hidden">
+                       <div className="text-white/20 font-normal text-xs uppercase tracking-widest group-hover:text-primary/40 transition-colors">GALERIA DE TRABALHOS</div>
                        <div className="absolute bottom-2 right-2 flex gap-1">
                           <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
                           <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
