@@ -15,15 +15,11 @@ try {
     hashRaw.startsWith('?') ? hashRaw.slice(1) : hashRaw
   );
   const type = url.searchParams.get('type') || hashParams.get('type');
-  const hasRecoveryToken = url.searchParams.has('code')
-    || url.searchParams.has('access_token')
-    || hashParams.has('access_token');
 
-  if (url.pathname === '/reset-password' || type === 'recovery' || hasRecoveryToken) {
+  if (url.pathname === '/reset-password' || type === 'recovery') {
     window.sessionStorage?.setItem(PASSWORD_RECOVERY_STORAGE_KEY, '1');
   }
 } catch {
-  // Ignore browser storage/url parsing issues and let Supabase handle auth normally.
 }
 
 export const supabase = createClient(
