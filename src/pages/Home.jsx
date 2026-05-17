@@ -624,13 +624,13 @@ export default function Home({ user, userType, onLogout }) {
                   'Painel Admin: Controle de Múltiplos Profissionais',
                   'Painel individual para cada profissional parceiro',
                   'Profissionais ilimitados e sem custo extra por parceiro',
-                  'Métricas do dia com comparativo do dia anterior',
+                  'Métricas em tempo real com contraste de desempenho diário',
                   'Comprometimento da agenda e receita futura projetada',
                   'Análise evolutiva de faturamento com filtros temporais estratégicos',
                   'Taxa de fechamento de agendamentos por período',
                   'Montagem de ofertas nos trabalhos oferecidos',
-                  'Depoimentos independentes por profissional e por negócio',
-                  'Reagendamento rápido pela área do cliente',
+                  'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
+                  'Reagendamento inteligente em um clique pela área exclusiva do cliente',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
                     <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
@@ -680,13 +680,13 @@ export default function Home({ user, userType, onLogout }) {
                   'Painel Admin: Controle de Múltiplos Profissionais',
                   'Painel individual para cada profissional parceiro',
                   'Profissionais ilimitados e sem custo extra por parceiro',
-                  'Métricas avançadas com comparativo do dia anterior',
+                  'Métricas em tempo real com contraste de desempenho diário',
                   'Comprometimento da agenda e receita futura projetada',
                   'Análise evolutiva de faturamento com filtros temporais estratégicos.',
                   'Taxa de fechamento de agendamentos por período',
                   'Montagem de ofertas nos trabalhos oferecidos',
-                  'Depoimentos independentes por profissional e por negócio',
-                  'Reagendamento rápido pela área do cliente',
+                  'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
+                  'Reagendamento inteligente em um clique pela área exclusiva do cliente',
                   'Acesso antecipado a novos recursos',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
