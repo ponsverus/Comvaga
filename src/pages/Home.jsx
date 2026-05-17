@@ -371,10 +371,9 @@ export default function Home({ user, userType, onLogout }) {
                 <ZapIcon className="w-8 h-8 text-primary" />
               </div>
               <div>
-                <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO AUTOMÁTICO DE HORÁRIOS</h3>
+                <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades de agendamento. Assim, 60 minutos podem se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas vagas identificadas com um ícone discreto, garantindo total transparência.
-                </p>
+                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, 60 minutos podem se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
               </div>
             </div>
           </div>
@@ -573,8 +572,7 @@ export default function Home({ user, userType, onLogout }) {
                 {[
                   'Reabertura automática de horários cancelados na agenda',
                   'Agendamento assistido pelo profissional',
-                  'Agenda individual, incluindo dias, horários e pausas',
-                  'Vitrine Profissional',
+                  'Vitrine profissional',
                   'Alertas por e-mail em tempo real',
                   'Lembrete automático 30 min antes',
                   'Sincronia total com o Google Agenda.',
