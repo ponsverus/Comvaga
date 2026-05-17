@@ -128,6 +128,40 @@ function StarGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
   );
 }
 
+function PreviewHeartIcon({ className = '' }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  );
+}
+
+function PreviewInstagramIcon({ className = '' }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
+      <path d="M16.5 7.5h.01" />
+      <circle cx="12" cy="12" r="4" />
+    </svg>
+  );
+}
+
+function PreviewFacebookIcon({ className = '' }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  );
+}
+
+function PreviewCheckedIcon({ className = '' }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={13} height={13} viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    </svg>
+  );
+}
+
 export default function Home({ user, userType, onLogout }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -402,9 +436,20 @@ export default function Home({ user, userType, onLogout }) {
 
                   <div className="pt-12 pb-6 px-4 sm:px-6">
                     <div className="mb-6 px-2">
-                      <div className="text-lg font-normal text-white uppercase tracking-tight">VIKINGS</div>
+                      <div className="flex items-center gap-1">
+                        <div className="text-lg font-normal text-white uppercase tracking-tight">VIKINGS</div>
+                        <PreviewCheckedIcon className="text-primary shrink-0" />
+                      </div>
                       <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                         <StarGlyph sizeClass="h-3 w-3 text-[12px]" /> 4.9
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <div className="w-[22px] h-[22px] rounded-full border border-white/15 flex items-center justify-center text-gray-400">
+                          <PreviewInstagramIcon />
+                        </div>
+                        <div className="w-[22px] h-[22px] rounded-full border border-white/15 flex items-center justify-center text-gray-400">
+                          <PreviewFacebookIcon />
+                        </div>
                       </div>
                     </div>
 
@@ -452,8 +497,8 @@ export default function Home({ user, userType, onLogout }) {
                   </div>
                   
                   <div className="absolute top-4 right-4 flex gap-2">
-                     <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white/40"><UserIcon className="w-4 h-4" /></div>
                      <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-primary"><StarGlyph sizeClass="h-4 w-4 text-[16px]" /></div>
+                     <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white/40"><PreviewHeartIcon /></div>
                   </div>
                 </div>
                 <div className="absolute -inset-10 bg-primary/10 blur-[80px] -z-10 rounded-full"></div>
