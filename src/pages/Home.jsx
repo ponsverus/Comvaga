@@ -507,7 +507,7 @@ export default function Home({ user, userType, onLogout }) {
           </div>
          
           <div className="
-            flex gap-5 overflow-x-auto scroll-snap-type-x-mandatory
+            flex items-start gap-5 overflow-x-auto scroll-snap-type-x-mandatory
             sm:grid sm:grid-cols-3 sm:items-start sm:overflow-visible
             pb-4 sm:pb-0
             [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
@@ -582,6 +582,7 @@ export default function Home({ user, userType, onLogout }) {
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
                   'Tudo do plano ESSENCIAL',
+                  'Tudo do plano PREMIUM REAL',
                   'Painel Admin: Controle de Múltiplos Profissionais',
                   'Painel individual para cada profissional parceiro',
                   'Profissionais ilimitados e sem custo extra por parceiro',
@@ -602,10 +603,10 @@ export default function Home({ user, userType, onLogout }) {
                 ))}
               </div>
 
-              <div className="mt-5 flex items-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
+              <div className="mt-5 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
                 <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
-                <span className="text-xs font-bold text-primary uppercase tracking-wide">
-                  Vantagens do Premium Real inclusas
+                <span className="text-xs font-normal text-primary uppercase tracking-wide">
+                  Vantagens do <strong className="font-bold">Premium Real</strong> inclusas
                 </span>
               </div>
 
@@ -613,7 +614,7 @@ export default function Home({ user, userType, onLogout }) {
                 to="/cadastro"
                 className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
               >
-                Assinar por R$ 39,99•mês <ZapIcon className="w-3.5 h-3.5" />
+                ASSINAR AGORA <ZapIcon className="w-3.5 h-3.5" />
               </Link>
             </div>
 
@@ -628,7 +629,7 @@ export default function Home({ user, userType, onLogout }) {
                   Premium Real
                 </span>
                 <p className="text-2xl font-normal text-white mb-1">
-                  R$ 87<span className="text-base font-normal text-gray-500">,39/mês</span>
+                  R$ 69<span className="text-base font-normal text-gray-500">,99/mês</span>
                 </p>
                 <p className="text-sm text-gray-500 leading-relaxed">
                   Experiência completa com acesso ilimitado a todos os recursos.
