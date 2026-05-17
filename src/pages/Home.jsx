@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { ProtectionIcon, UserIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckIcon } from '../components/icons';
+import { ProtectionIcon, UserIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon } from '../components/icons';
 
 const SUPORTE_PHONE_E164 = '5533999037979';
 const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
@@ -431,7 +431,7 @@ export default function Home({ user, userType, onLogout }) {
                     <div className="mb-6 px-2">
                       <div className="flex items-center gap-1">
                         <div className="text-lg font-normal text-white uppercase tracking-tight">VIKINGS</div>
-                        <CheckIcon className="w-[13px] h-[13px] text-primary shrink-0" />
+                        <CheckedIcon className="w-[13px] h-[13px] text-primary shrink-0" />
                       </div>
                       <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                         <StarGlyph sizeClass="h-3 w-3 text-[12px]" /> 4.9
