@@ -365,16 +365,46 @@ export default function Home({ user, userType, onLogout }) {
             ))}
           </div>
 
-          <div className="mt-16 bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
+          <div className="mt-16 space-y-6">
+            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
+                  <ZapIcon className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
-                </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
+                  <ZapIcon className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-normal mb-2 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    <span className="text-primary">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados — as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
+                  <ZapIcon className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-normal mb-2 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM SERVIÇO.</span> O motor calcula a duração acumulada de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional — antes de confirmar qualquer coisa. Se couber, todos os serviços são gravados em sequência, sem sobreposição, sem brecha. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
