@@ -640,7 +640,7 @@ export default function ClientArea({ user, onLogout }) {
                     </div>
 
                     <label className="shrink-0 text-sm font-normal uppercase tracking-wide text-gray-500">
-                      Adicionar comentário:
+                      Add comentário abaixo:
                     </label>
 
                     <input
