@@ -5,7 +5,6 @@ import { CalendarIcon, TimePastIcon } from '../components/icons';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { convertImageToWebp, isImageFile } from '../utils/media';
-import DepoimentoModal from './vitrine/components/DepoimentoModal';
 import { createBookingReview, fetchReviewedBookings } from './clientArea/api/clientAreaApi';
 
 function formatDateBRFromISO(dateStr) {
@@ -35,7 +34,7 @@ const getValorAgendamento = (a) => {
   return getPrecoFinalEntrega(a?.entregas);
 };
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 50;
 
 function isRateLimitError(error) {
   const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
@@ -61,6 +60,24 @@ function Heart({ filled = false, className = '', size = 20 }) {
     >
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
+  );
+}
+
+function ReviewStar({ active, onClick, label }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex h-8 w-8 items-center justify-center border-0 bg-transparent p-0 transition-transform hover:scale-105 focus:outline-none"
+      aria-label={label}
+    >
+      <span
+        aria-hidden="true"
+        className={`text-[26px] leading-none transition-opacity ${active ? 'text-primary opacity-100' : 'text-primary opacity-25'}`}
+      >
+        {'\u2605'}
+      </span>
+    </button>
   );
 }
 
@@ -116,7 +133,6 @@ export default function ClientArea({ user, onLogout }) {
   const [loadError, setLoadError] = useState('');
   const [clienteId, setClienteId] = useState(null);
   const [avaliacoesPorAgendamento, setAvaliacoesPorAgendamento] = useState({});
-  const [depoimentoModalOpen, setDepoimentoModalOpen] = useState(false);
   const [depoimentoLoading, setDepoimentoLoading] = useState(false);
   const [depoimentoAlvo, setDepoimentoAlvo] = useState(null);
   const [depoimentoNota, setDepoimentoNota] = useState(5);
@@ -399,10 +415,10 @@ export default function ClientArea({ user, onLogout }) {
   };
 
   const abrirDepoimento = (agendamento) => {
-    setDepoimentoAlvo(agendamento);
+    const jaAberto = depoimentoAlvo?.id === agendamento?.id;
+    setDepoimentoAlvo(jaAberto ? null : agendamento);
     setDepoimentoNota(5);
     setDepoimentoTexto('');
-    setDepoimentoModalOpen(true);
   };
 
   const enviarDepoimentoAgendamento = async () => {
@@ -418,7 +434,9 @@ export default function ClientArea({ user, onLogout }) {
         ...prev,
         [depoimentoAlvo.id]: true,
       }));
-      setDepoimentoModalOpen(false);
+      setDepoimentoAlvo(null);
+      setDepoimentoTexto('');
+      setDepoimentoNota(5);
       feedback.showMessage('vitrine.depoimento_sent', { variant: 'success' });
     } catch (e) {
       if (isRateLimitError(e)) {
@@ -534,14 +552,6 @@ export default function ClientArea({ user, onLogout }) {
   const avatarUrl      = getPublicUrl('avatars', avatarPath);
   const nomeCabecalho  = String(nomePerfil || user?.user_metadata?.nome || '—').trim();
   const avatarFallback = nomeCabecalho?.[0]?.toUpperCase() || '?';
-  const depoimentoModalStyles = {
-    modalBg: 'bg-dark-100 border-gray-800',
-    modalTitle: 'text-white',
-    modalClose: 'text-gray-400 hover:text-white',
-    modalLabel: 'text-gray-400',
-    textarea: 'bg-dark-200 border-gray-800 text-white placeholder-gray-500 focus:border-primary',
-    sendBtn: 'bg-gradient-to-r from-primary to-yellow-600 text-black',
-  };
   const renderSecaoAgendamentos = (titulo, lista) => {
     if (!lista.length) return null;
     return (
@@ -560,12 +570,14 @@ export default function ClientArea({ user, onLogout }) {
             const podeAvaliar =
               String(ag.status || '') === 'concluido' &&
               !avaliacoesPorAgendamento[ag.id];
+            const depoimentoAberto = podeAvaliar && depoimentoAlvo?.id === ag.id;
             return (
-            <div key={ag.id} className="bg-dark-200 border border-gray-800 rounded-custom p-4 sm:p-5">
+            <div key={ag.id} className="overflow-hidden bg-dark-200 border border-gray-800 rounded-custom">
+              <div className="p-4 sm:p-5">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-normal text-white mb-1">{ag.profissionais?.negocios?.nome || '—'}</h3>
-                  <p className="text-sm text-gray-400 mb-2 uppercase">PROF: {ag.profissionais?.nome || '—'}</p>
+                  <p className="text-sm text-gray-400 mb-2">PROF: {ag.profissionais?.nome || '—'}</p>
                   <p className="text-sm text-primary">{ag.entregas?.nome || '—'}</p>
                 </div>
                 <div className={`shrink-0 inline-flex px-3 py-1 rounded-button text-xs border ${getStatusColor(ag.status)}`}>
@@ -612,6 +624,44 @@ export default function ClientArea({ user, onLogout }) {
                   </button>
                 )}
               </div>
+              </div>
+              {depoimentoAberto && (
+                <div className="border-t border-gray-800 px-4 py-3 sm:px-5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="flex shrink-0 items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((nota) => (
+                        <ReviewStar
+                          key={nota}
+                          active={depoimentoNota >= nota}
+                          onClick={() => setDepoimentoNota(nota)}
+                          label={`${nota} estrela${nota > 1 ? 's' : ''}`}
+                        />
+                      ))}
+                    </div>
+
+                    <label className="shrink-0 text-xs font-normal uppercase tracking-wide text-gray-500">
+                      Adicionar comentário:
+                    </label>
+
+                    <input
+                      type="text"
+                      value={depoimentoTexto}
+                      onChange={(event) => setDepoimentoTexto(event.target.value)}
+                      placeholder="OPCIONAL"
+                      className="min-w-0 flex-1 bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={enviarDepoimentoAgendamento}
+                      disabled={depoimentoLoading}
+                      className="shrink-0 rounded-button border border-primary/30 px-4 py-2 text-xs font-normal uppercase text-primary transition-colors hover:border-primary disabled:opacity-60"
+                    >
+                      {depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )})}
         </div>
@@ -722,7 +772,7 @@ export default function ClientArea({ user, onLogout }) {
                     type="button"
                     onClick={carregarMaisAgendamentos}
                     disabled={agendamentosLoadingMore}
-                    className="mt-2 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="mt-2 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-60"
                   >
                     {agendamentosLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
                   </button>
@@ -771,7 +821,7 @@ export default function ClientArea({ user, onLogout }) {
                     type="button"
                     onClick={carregarMaisFavoritos}
                     disabled={favoritosLoadingMore}
-                    className="mt-2 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="mt-4 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-60"
                   >
                     {favoritosLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
                   </button>
@@ -810,7 +860,7 @@ export default function ClientArea({ user, onLogout }) {
                       value={emailVisivel ? novoEmail : maskedPrivateValue}
                       onChange={(e) => setNovoEmail(e.target.value)}
                       readOnly={!emailVisivel}
-                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase max-w-[calc(100vw-14rem)] truncate pr-4 sm:max-w-none sm:pr-0 placeholder-gray-600 outline-none focus:text-white"
+                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase truncate pr-2 placeholder-gray-600 outline-none focus:text-white"
                       placeholder="E-MAIL DE ACESSO"
                     />
                   </div>
@@ -870,25 +920,6 @@ export default function ClientArea({ user, onLogout }) {
           </div>
         </div>
       </div>
-
-      <DepoimentoModal
-        open={depoimentoModalOpen}
-        onClose={() => setDepoimentoModalOpen(false)}
-        title="Deixe um depoimento para este profissional"
-        styles={depoimentoModalStyles}
-        state={{
-          nota: depoimentoNota,
-          texto: depoimentoTexto,
-          loading: depoimentoLoading,
-        }}
-        actions={{
-          setNota: setDepoimentoNota,
-          setTexto: setDepoimentoTexto,
-          onEnviar: enviarDepoimentoAgendamento,
-        }}
-        submitLabel="ENVIAR DEPOIMENTO"
-        showSectionTitles
-      />
     </div>
   );
 }
