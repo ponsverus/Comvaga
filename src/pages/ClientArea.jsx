@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, X } from 'lucide-react';
 import { CalendarIcon, TimePastIcon } from '../components/icons';
+import AppFooter from '../components/AppFooter';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { convertImageToWebp, isImageFile } from '../utils/media';
@@ -92,7 +93,7 @@ function getPublicUrl(bucket, path) {
   }
 }
 
-export default function ClientArea({ user, onLogout }) {
+export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const navigate = useNavigate();
   const feedback = useFeedback();
 
@@ -924,6 +925,8 @@ export default function ClientArea({ user, onLogout }) {
           </div>
         </div>
       </div>
+
+      <AppFooter userType={userType} onLogout={onLogout} />
     </div>
   );
 }
