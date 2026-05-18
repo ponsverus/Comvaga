@@ -3,6 +3,7 @@ import { AlertCircle, ChevronRight, X } from 'lucide-react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import BookingCalendar from '../components/BookingCalendar';
 import { CalendarIcon } from '../components/icons';
+import AppFooter from '../components/AppFooter';
 import { ptBR } from '../feedback/messages/ptBR';
 import { getBusinessGroup } from '../businessTerms';
 import { getPublicUrl } from './vitrine/api/vitrineApi';
@@ -265,7 +266,7 @@ function SelectionBar({ itens, counterSingular, counterPlural, onConfirm, onClea
   );
 }
 
-export default function Vitrine({ user, userType }) {
+export default function Vitrine({ user, userType, onLogout }) {
   const { slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -657,6 +658,8 @@ export default function Vitrine({ user, userType }) {
           onEnviar: enviarDepoimento,
         }}
       />
+
+      <AppFooter userType={userType} onLogout={onLogout} vitrinePath={`${location.pathname}${location.search}`} />
     </div>
   );
 }
