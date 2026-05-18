@@ -577,7 +577,7 @@ export default function ClientArea({ user, onLogout }) {
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-normal text-white mb-1">{ag.profissionais?.negocios?.nome || '—'}</h3>
-                  <p className="text-sm text-gray-400 mb-2">PROF: {ag.profissionais?.nome || '—'}</p>
+                  <p className="text-sm text-gray-400 mb-2 uppercase">PROF: {ag.profissionais?.nome || '—'}</p>
                   <p className="text-sm text-primary">{ag.entregas?.nome || '—'}</p>
                 </div>
                 <div className={`shrink-0 inline-flex px-3 py-1 rounded-button text-xs border ${getStatusColor(ag.status)}`}>
@@ -627,7 +627,7 @@ export default function ClientArea({ user, onLogout }) {
               </div>
               {depoimentoAberto && (
                 <div className="border-t border-gray-800 px-3 py-3 sm:px-5">
-                  <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                  <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                     <div className="flex shrink-0 items-center gap-0.5">
                       {[1, 2, 3, 4, 5].map((nota) => (
                         <ReviewStar
@@ -639,26 +639,28 @@ export default function ClientArea({ user, onLogout }) {
                       ))}
                     </div>
 
-                    <label className="shrink-0 whitespace-nowrap text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">
-                      Adicionar comentário:
-                    </label>
+                    <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                      <label className="shrink-0 whitespace-nowrap text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">
+                        Adicionar comentário:
+                      </label>
 
-                    <input
-                      type="text"
-                      value={depoimentoTexto}
-                      onChange={(event) => setDepoimentoTexto(event.target.value)}
-                      placeholder="OPCIONAL"
-                      className="min-w-[42px] flex-1 bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white"
-                    />
+                      <input
+                        type="text"
+                        value={depoimentoTexto}
+                        onChange={(event) => setDepoimentoTexto(event.target.value)}
+                        placeholder="OPCIONAL"
+                        className="min-w-[42px] flex-1 bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white"
+                      />
 
-                    <button
-                      type="button"
-                      onClick={enviarDepoimentoAgendamento}
-                      disabled={depoimentoLoading}
-                      className="shrink-0 rounded-button border border-primary/30 px-2.5 py-2 text-[10px] font-normal uppercase text-primary transition-colors hover:border-primary disabled:opacity-60 sm:px-4 sm:text-xs"
-                    >
-                      {depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR'}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={enviarDepoimentoAgendamento}
+                        disabled={depoimentoLoading}
+                        className="shrink-0 rounded-button border border-primary/30 px-2.5 py-2 text-[10px] font-normal uppercase text-primary transition-colors hover:border-primary disabled:opacity-60 sm:px-4 sm:text-xs"
+                      >
+                        {depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -923,4 +925,3 @@ export default function ClientArea({ user, onLogout }) {
     </div>
   );
 }
-
