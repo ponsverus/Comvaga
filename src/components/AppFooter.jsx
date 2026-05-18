@@ -78,7 +78,7 @@ export default function AppFooter({
               ) : isClient ? (
                 <>
                   <li><FooterLink to="/minha-area">MINHA AREA</FooterLink></li>
-                  <li><FooterLink to={vitrinePath}>VITRINE</FooterLink></li>
+                  <li><FooterLink to="/">HOME</FooterLink></li>
                   <li><FooterLink href={supportHref}>SUPORTE</FooterLink></li>
                   <li><FooterLink onClick={() => onLogout?.()}>SAIR</FooterLink></li>
                 </>
