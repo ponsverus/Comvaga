@@ -460,7 +460,7 @@ export default function App() {
                     ? <Navigate to="/cadastro/profissional/retomada" />
                     : accessState === 'partner_pending'
                       ? <Navigate to="/parceiro/aguardando" />
-                      : <Dashboard user={user} onLogout={handleLogout} />
+                    : <Dashboard user={user} onLogout={handleLogout} userType={userType} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to={postLogoutRedirect || "/login"} />
               ) : <Navigate to={postLogoutRedirect || "/login"} />
@@ -469,13 +469,13 @@ export default function App() {
             <Route path="/minha-area" element={
               isLoggedIn ? (
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
-                : userType === 'client' ? <ClientArea user={user} onLogout={handleLogout} />
+                : userType === 'client' ? <ClientArea user={user} onLogout={handleLogout} userType={userType} />
                 : userType ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                 : <Navigate to="/login" />
               ) : <Navigate to="/login" />
             } />
 
-            <Route path="/v/:slug" element={<Vitrine user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} />} />
+            <Route path="/v/:slug" element={<Vitrine user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} onLogout={handleLogout} />} />
 
             <Route path="/criar-negocio" element={
               isLoggedIn ? (
