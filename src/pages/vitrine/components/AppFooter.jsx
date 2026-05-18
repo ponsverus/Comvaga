@@ -1,0 +1,120 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+const SUPPORT_PHONE_E164 = '5533999037979';
+
+const SUPPORT_MESSAGES = {
+  client: 'Olá, eu sou cliente e estou com um problema. Pode me ajudar?',
+  professional: 'Olá, sou profissional e preciso de ajuda.',
+  public: 'Olá, preciso de ajuda. Pode me orientar?',
+};
+
+function buildSupportHref(userType) {
+  const message = SUPPORT_MESSAGES[userType] || SUPPORT_MESSAGES.public;
+  return `https://wa.me/${SUPPORT_PHONE_E164}?text=${encodeURIComponent(message)}`;
+}
+
+function FooterLink({ to, href, children, onClick }) {
+  const className = 'text-gray-500 hover:text-primary transition-colors text-sm uppercase';
+
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={className}>
+        {children}
+      </button>
+    );
+  }
+
+  if (href) {
+    return (
+      <a href={href} target={href.startsWith('https://wa.me/') ? '_blank' : undefined} rel={href.startsWith('https://wa.me/') ? 'noreferrer' : undefined} className={className}>
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <Link to={to} className={className}>
+      {children}
+    </Link>
+  );
+}
+
+export default function AppFooter({
+  userType = null,
+  onLogout,
+  vitrinePath = '/',
+}) {
+  const isClient = userType === 'client';
+  const isProfessional = userType === 'professional';
+  const supportHref = buildSupportHref(userType);
+
+  return (
+    <footer className="bg-black py-12 px-4 border-t border-gray-900">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+          <div className="flex flex-col justify-start">
+            <Link to="/" className="inline-block hover:opacity-75 transition-opacity">
+              <img
+                src="/Comvaga Logo.png"
+                alt="Comvaga"
+                className="h-16 w-auto object-contain"
+              />
+            </Link>
+            <p className="text-gray-600 text-xs mt-3 uppercase leading-relaxed">
+              Sua agenda,<br />matematicamente perfeita.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-white font-normal mb-4">PARA VOCE</h4>
+            <ul className="space-y-2">
+              {isProfessional ? (
+                <>
+                  <li><FooterLink to="/dashboard">DASHBOARD</FooterLink></li>
+                  <li><FooterLink href={supportHref}>SUPORTE</FooterLink></li>
+                  <li><FooterLink onClick={() => onLogout?.()}>SAIR</FooterLink></li>
+                </>
+              ) : isClient ? (
+                <>
+                  <li><FooterLink to="/minha-area">MINHA AREA</FooterLink></li>
+                  <li><FooterLink to={vitrinePath}>VITRINE</FooterLink></li>
+                  <li><FooterLink href={supportHref}>SUPORTE</FooterLink></li>
+                  <li><FooterLink onClick={() => onLogout?.()}>SAIR</FooterLink></li>
+                </>
+              ) : (
+                <>
+                  <li><FooterLink to="/login">ENTRAR</FooterLink></li>
+                  <li><FooterLink to="/cadastro">CADASTRAR GRATIS</FooterLink></li>
+                  <li><FooterLink to="/parceiro/login">LOGIN PARCEIRO</FooterLink></li>
+                  <li><FooterLink to="/parceiro/cadastro">CADASTRO PARCEIRO</FooterLink></li>
+                  <li><FooterLink href={supportHref}>SUPORTE</FooterLink></li>
+                </>
+              )}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white font-normal mb-4">EMPRESA</h4>
+            <ul className="space-y-2">
+              <li><FooterLink href="#">SOBRE</FooterLink></li>
+              <li><FooterLink href="#">BLOG</FooterLink></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white font-normal mb-4">LEGAL</h4>
+            <ul className="space-y-2">
+              <li><FooterLink to="/privacidade">PRIVACIDADE</FooterLink></li>
+              <li><FooterLink to="/termos">TERMOS</FooterLink></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="pt-6">
+          <p className="text-gray-600 text-sm">© 2026 COMVAGA. Todos os direitos reservados.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
