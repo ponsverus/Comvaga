@@ -642,7 +642,7 @@ export default function ClientArea({ user, onLogout }) {
                     <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                       <div className="flex min-w-0 flex-1 items-center gap-2">
                       <label className="shrink-0 whitespace-nowrap text-sm font-normal uppercase text-gray-500 sm:text-xs sm:tracking-wide">
-                        Adicionar comentário:
+                        Comentário:
                       </label>
 
                       <input
