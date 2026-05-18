@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { CalendarIcon, CrownIcon, TrendingUpIcon, UsersIcon } from '../components/icons';
+import AppFooter from '../components/AppFooter';
 import { X, Eye, LogOut, AlertCircle, } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
@@ -119,7 +120,7 @@ function DashboardTopCard({ icon, label, value, children, highlight = false }) {
   );
 }
 
-export default function Dashboard({ user, onLogout }) {
+export default function Dashboard({ user, onLogout, userType = 'professional' }) {
   const navigate = useNavigate();
   const location = useLocation();
   const feedback = useFeedback();
@@ -845,6 +846,8 @@ export default function Dashboard({ user, onLogout }) {
         }}
         onSubmit={updateProfissional}
       />
+
+      <AppFooter userType={userType} onLogout={onLogout} />
 
     </div>
   );
