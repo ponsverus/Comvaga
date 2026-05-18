@@ -109,19 +109,33 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
         throw new Error(msgs.account_create_error.body);
       }
 
-      const { error: profErr } = await supabase.from('profissionais').insert({
-        negocio_id: signupStatus.negocio_id,
-        user_id: uid,
-        nome: nomeClean,
-        status: 'pendente',
+      const { data: accessData, error: accessErr } = await supabase.rpc('solicitar_acesso_parceiro', {
+        p_negocio_id: signupStatus.negocio_id,
+        p_nome: nomeClean,
       });
 
-      if (profErr) {
+      if (accessErr) {
         await supabase.auth.signOut();
-        if (profErr.code === '23505') {
+        const code = String(accessErr.message || '').split(':')[0].trim();
+        if (code === 'access_inactive') {
+          return setAlerta(msgs.access_inactive);
+        }
+        if (code === 'usuario_nao_encontrado') {
+          return setAlerta(msgs.account_create_error);
+        }
+        if (code === 'negocio_nao_encontrado' || code === 'negocio_nao_informado') {
+          return setAlerta(msgs.negocio_not_found);
+        }
+        if (accessErr.code === '23505') {
           return setAlerta(msgs.access_unavailable);
         }
-        throw profErr;
+        throw accessErr;
+      }
+
+      const accessStatus = String(accessData?.status || '').trim();
+      if (accessStatus !== 'pending_approval' && accessStatus !== 'ok') {
+        await supabase.auth.signOut();
+        throw new Error(msgs.unexpected_error.body);
       }
 
       await supabase.auth.signOut();
