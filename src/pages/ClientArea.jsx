@@ -639,16 +639,16 @@ export default function ClientArea({ user, onLogout }) {
                       ))}
                     </div>
 
-                    <label className="shrink-0 text-sm font-normal uppercase tracking-wide text-gray-500">
-                      Add comentário abaixo:
+                    <label className="shrink-0 text-xs font-normal uppercase tracking-wide text-gray-500">
+                      Comentário opcional:
                     </label>
 
                     <input
                       type="text"
                       value={depoimentoTexto}
                       onChange={(event) => setDepoimentoTexto(event.target.value)}
-                      placeholder="..."
-                      className="min-w-0 flex-1 bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white"
+                      placeholder="Escreva"
+                      className="min-w-0 flex-1 bg-transparent px-0 py-2 text-xs text-white placeholder-gray-600 outline-none focus:text-white"
                     />
 
                     <button
