@@ -12,7 +12,6 @@ import { useVitrineBooking } from './vitrine/hooks/useVitrineBooking';
 import { useVitrineInteractions } from './vitrine/hooks/useVitrineInteractions';
 import { useVitrinePresentation } from './vitrine/hooks/useVitrinePresentation';
 import BookingConfirmedModal from './vitrine/components/BookingConfirmedModal';
-import DepoimentoModal from './vitrine/components/DepoimentoModal';
 import VitrineDepoimentosSection from './vitrine/sections/VitrineDepoimentosSection';
 import VitrineEntregasSection from './vitrine/sections/VitrineEntregasSection';
 import VitrineGallerySection from './vitrine/sections/VitrineGallerySection';
@@ -307,9 +306,9 @@ export default function Vitrine({ user, userType, onLogout }) {
   const [nativeConfirmData, setNativeConfirmData] = useState({ title: '', body: '', confirmText: 'CONFIRMAR', cancelText: 'CANCELAR' });
   const confirmResolverRef = useRef(null);
 
-  const [showDepoimento, setShowDepoimento] = useState(false);
   const [depoimentoNota, setDepoimentoNota] = useState(5);
   const [depoimentoTexto, setDepoimentoTexto] = useState('');
+  const reviewFormRef = useRef(null);
 
   const closeAlert = () => setNativeAlertOpen(false);
 
@@ -422,11 +421,25 @@ export default function Vitrine({ user, userType, onLogout }) {
     }
     setDepoimentoNota(5);
     setDepoimentoTexto('');
-    setShowDepoimento(true);
+    reviewFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   const enviarDepoimento = async () => {
-    if (!user || userType !== 'client') return;
+    if (!user) {
+      const ok = await confirmKey(
+        'depoimento_need_login_confirm',
+        'Login necessário',
+        'Você precisa fazer login para deixar um depoimento. Deseja fazer login agora?',
+        'IR PARA LOGIN',
+        'MAIS TARDE'
+      );
+      if (ok) navigate('/login');
+      return;
+    }
+    if (userType !== 'client') {
+      alertKey('depoimento_only_client', 'Acesso exclusivo', 'Apenas CLIENTE pode deixar depoimentos.', 'ENTENDI');
+      return;
+    }
     if (!negocio?.id) {
       alertKey('depoimento_invalid_business', 'Negócio inválido', 'Negócio inválido.', 'ENTENDI');
       return;
@@ -434,7 +447,8 @@ export default function Vitrine({ user, userType, onLogout }) {
     try {
       const ok = await enviarDepoimentoState();
       if (!ok) return;
-      setShowDepoimento(false);
+      setDepoimentoNota(5);
+      setDepoimentoTexto('');
       alertKey('depoimento_sent', 'Depoimento registrado', 'Seu depoimento foi entregue com sucesso!', 'OK');
     } catch (e) {
       if (isRateLimitError(e)) {
@@ -587,12 +601,21 @@ export default function Vitrine({ user, userType, onLogout }) {
       />
 
       <VitrineDepoimentosSection
-        onAbrirDepoimento={abrirDepoimento}
         isProfessional={isProfessional}
-        depBtn={styles.depBtn}
         depoimentos={depoimentosView}
         nomeNegocioLabel={nomeNegocioLabel}
         isLight={isLight}
+        reviewRef={reviewFormRef}
+        reviewState={{
+          nota: depoimentoNota,
+          texto: depoimentoTexto,
+          loading: depoimentoLoading,
+        }}
+        reviewActions={{
+          setNota: setDepoimentoNota,
+          setTexto: setDepoimentoTexto,
+          onEnviar: enviarDepoimento,
+        }}
       />
 
       <SelectionBar itens={servicosSelecionados} counterSingular={counterSingular} counterPlural={counterPlural} onConfirm={handleConfirmarSelecao} onClear={handleLimparSelecao} isLight={isLight} />
@@ -635,31 +658,8 @@ export default function Vitrine({ user, userType, onLogout }) {
         negocioId={negocio.id}
       />
 
-      <DepoimentoModal
-        open={showDepoimento}
-        onClose={() => setShowDepoimento(false)}
-        title="Deixe um depoimento para este negócio"
-        styles={{
-          modalBg: styles.depoModalBg,
-          modalTitle: styles.depoModalTitle,
-          modalClose: styles.depoModalClose,
-          modalLabel: styles.depoModalLabel,
-          textarea: styles.depoTextarea,
-          sendBtn: styles.depoSendBtn,
-        }}
-        state={{
-          nota: depoimentoNota,
-          texto: depoimentoTexto,
-          loading: depoimentoLoading,
-        }}
-        actions={{
-          setNota: setDepoimentoNota,
-          setTexto: setDepoimentoTexto,
-          onEnviar: enviarDepoimento,
-        }}
-      />
 
-      <AppFooter userType={userType} onLogout={onLogout} vitrinePath={`${location.pathname}${location.search}`} />
+      <AppFooter userType={userType} onLogout={onLogout} />
     </div>
   );
 }
