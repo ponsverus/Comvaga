@@ -388,7 +388,7 @@ export default function Home({ user, userType, onLogout }) {
                 <div>
                   <h3 className="text-2xl font-normal mb-2 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
                   <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados — as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
+                    <span className="text-primary">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
                   </p>
                 </div>
               </div>
@@ -402,7 +402,7 @@ export default function Home({ user, userType, onLogout }) {
                 <div>
                   <h3 className="text-2xl font-normal mb-2 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
                   <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM SERVIÇO.</span> O motor calcula a duração acumulada de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional — antes de confirmar qualquer coisa. Se couber, todos os serviços são gravados em sequência, sem sobreposição, sem brecha. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
+                    <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
                   </p>
                 </div>
               </div>
