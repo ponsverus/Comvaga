@@ -42,7 +42,7 @@ export default function VitrineDepoimentosSection({
   return (
     <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
       <div className="max-w-7xl mx-auto">
-        <div ref={reviewRef} className={`mb-6 border-y ${lineClass} py-4`}>
+        <div ref={reviewRef} className="mb-6 py-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
             <div className="flex shrink-0 items-center gap-1">
               {[1, 2, 3, 4, 5].map((n) => (
@@ -57,7 +57,7 @@ export default function VitrineDepoimentosSection({
             </div>
 
             <div className="flex min-w-0 flex-1 items-center gap-2">
-              <span className={`shrink-0 text-sm uppercase ${labelClass}`}>Comentario:</span>
+              <span className={`shrink-0 text-sm uppercase ${labelClass}`}>Comentário:</span>
               <input
                 type="text"
                 value={reviewState?.texto || ''}
@@ -72,7 +72,7 @@ export default function VitrineDepoimentosSection({
               type="button"
               onClick={reviewActions?.onEnviar}
               disabled={disabled}
-              className={`w-full shrink-0 rounded-button border px-4 py-2 text-sm font-normal uppercase transition-colors disabled:opacity-60 sm:w-auto sm:bg-transparent sm:px-4 sm:text-xs ${buttonClass}`}
+              className={`w-full shrink-0 rounded-button border px-4 py-2 text-sm font-normal uppercase transition-colors disabled:opacity-60 sm:w-auto sm:bg-transparent sm:px-4 sm:text-sm ${buttonClass}`}
             >
               {reviewState?.loading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}
             </button>
