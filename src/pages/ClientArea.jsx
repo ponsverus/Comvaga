@@ -639,8 +639,9 @@ export default function ClientArea({ user, onLogout }) {
                       ))}
                     </div>
 
-                    <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-                      <label className="shrink-0 whitespace-nowrap text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">
+                    <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
+                      <label className="shrink-0 whitespace-nowrap text-sm font-normal uppercase text-gray-500 sm:text-xs sm:tracking-wide">
                         Adicionar comentário:
                       </label>
 
@@ -651,14 +652,15 @@ export default function ClientArea({ user, onLogout }) {
                         placeholder="OPCIONAL"
                         className="min-w-[42px] flex-1 bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white"
                       />
+                      </div>
 
                       <button
                         type="button"
                         onClick={enviarDepoimentoAgendamento}
                         disabled={depoimentoLoading}
-                        className="shrink-0 rounded-button border border-primary/30 px-2.5 py-2 text-[10px] font-normal uppercase text-primary transition-colors hover:border-primary disabled:opacity-60 sm:px-4 sm:text-xs"
+                        className="w-full shrink-0 rounded-button border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-normal uppercase text-primary transition-colors hover:bg-primary/30 hover:border-primary disabled:opacity-60 sm:w-auto sm:bg-transparent sm:px-4 sm:text-xs"
                       >
-                        {depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR'}
+                        {depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}
                       </button>
                     </div>
                   </div>
