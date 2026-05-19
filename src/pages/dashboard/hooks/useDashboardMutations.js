@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { supabase } from '../../../supabase';
 import { getDiasTrabalhoFromHorarios, isEnderecoPadrao, timeToMinutes, toNumberOrNull, toUpperClean } from '../utils';
-import { aprovarParceiroProfissional, removeNegocioSeguramente, removeProfissionalSeguramente } from '../api/dashboardApi';
+import { aprovarParceiroProfissional, removeEntregaSeguramente, removeNegocioSeguramente, removeProfissionalSeguramente } from '../api/dashboardApi';
 import { convertImageToWebp, isImageFile } from '../../../utils/media';
 
 export function useDashboardMutations({
@@ -365,8 +365,7 @@ export function useDashboardMutations({
       return;
     }
     try {
-      const { error: delErr } = await supabase.from('entregas').delete().eq('id', entrega.id).eq('negocio_id', negocio.id);
-      if (delErr) throw delErr;
+      await removeEntregaSeguramente(entrega.id);
       await uiAlert(`dashboard.business.${businessGroup}.entrega_deleted`, 'success');
       await reloadEntregas();
     } catch {
