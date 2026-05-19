@@ -208,7 +208,7 @@ export const ptBR = {
         aulas:     'AULA',
       },
       counter_plural: {
-        servicos:  'SERV',
+        servicos:  'SERVS',
         consultas: 'CONSULTAS',
         aulas:     'AULAS',
       },
@@ -723,6 +723,29 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    account_delete_confirm: {
+      title: 'Excluir conta',
+      body: 'Tem certeza que deseja excluir sua conta de cliente?\n\nSeus dados de acesso serao removidos, mas os registros necessarios para historico e prestacao de contas serao preservados.',
+      variant: 'danger',
+      screen: 'dark',
+      confirmText: 'EXCLUIR CONTA',
+      cancelText: 'VOLTAR',
+      buttonText: 'EXCLUIR CONTA',
+    },
+    account_deleted: {
+      title: 'Conta excluida',
+      body: 'Sua conta de cliente foi excluida com sucesso.',
+      variant: 'success',
+      screen: 'light',
+      buttonText: 'OK',
+    },
+    account_delete_error: {
+      title: 'Erro ao excluir conta',
+      body: 'Nao foi possivel excluir sua conta agora.\n\nTente novamente em alguns instantes.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
     booking_cancel_confirm: {
       title: 'Cancelar agendamento',
       body: 'Tem certeza que deseja cancelar este agendamento?',
@@ -1155,7 +1178,7 @@ export const ptBR = {
         aulas:     'AULA',
       },
       counter_plural: {
-        servicos:  'SERV',
+        servicos:  'SERVS',
         consultas: 'CONSULTAS',
         aulas:     'AULAS',
       },
