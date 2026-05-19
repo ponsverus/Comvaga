@@ -725,7 +725,7 @@ export const ptBR = {
     },
     account_delete_confirm: {
       title: 'Excluir conta',
-      body: 'Tem certeza que deseja excluir sua conta de cliente?\n\nSeus dados de acesso serao removidos, mas os registros necessarios para historico e prestacao de contas serao preservados.',
+      body: 'Tem certeza de que deseja excluir sua conta de cliente?\n\nEsse processo remove seus dados do sistema e impede seu acesso de forma definitiva.',
       variant: 'danger',
       screen: 'dark',
       confirmText: 'EXCLUIR CONTA',
