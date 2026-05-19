@@ -787,8 +787,8 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                     {renderSecaoAgendamentos('CANCELADOS', agendamentosPorStatus.cancelados)}
                   </>
                 ) : (
-                  <div className="text-center py-12">
-                    <CalendarIcon className="w-16 h-16 mx-auto mb-4 text-gray-500 opacity-40" />
+                  <div className="flex flex-col items-center py-12 gap-4">
+                    <CalendarIcon className="block w-16 h-16 text-gray-500 opacity-40" />
                     <Link to="/" className="inline-block px-6 py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button hover:shadow-lg transition-all">
                       AGENDAR
                     </Link>
@@ -948,12 +948,12 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                   </div>
                 </div>
 
-                <div className="flex justify-center px-4 py-4 sm:px-6">
+                <div className="border-t border-gray-800 px-4 py-4 sm:px-6">
                   <button
                     type="button"
                     onClick={excluirContaCliente}
                     disabled={deletingAccount}
-                    className="min-w-[180px] rounded-full border border-red-500/30 px-8 py-3 text-center text-[12px] font-normal uppercase text-red-400 transition-colors hover:border-red-400/60 hover:text-red-300 disabled:opacity-50"
+                    className="w-full rounded-full border border-red-500/30 py-3 text-center text-[12px] font-normal uppercase text-red-400 transition-colors hover:border-red-400/60 hover:text-red-300 disabled:opacity-50"
                   >
                     {deletingAccount ? 'EXCLUINDO' : 'EXCLUIR CONTA'}
                   </button>
