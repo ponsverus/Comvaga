@@ -98,7 +98,8 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const feedback = useFeedback();
 
   const uiAlert = useCallback((key, variant = 'info', params = {}) => {
-    if (feedback?.showMessage) feedback.showMessage(key, { variant, ...params });
+    if (feedback?.showMessage) return feedback.showMessage(key, { variant, ...params });
+    return Promise.resolve();
   }, [feedback]);
 
   const uiConfirm = async (key, variant = 'warning') => {
@@ -129,6 +130,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const [novaSenha,      setNovaSenha]      = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [savingDados,    setSavingDados]    = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const [emailVisivel,   setEmailVisivel]   = useState(false);
 
   const [loadError, setLoadError] = useState('');
@@ -467,6 +469,26 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     }
   };
 
+  const excluirContaCliente = async () => {
+    if (deletingAccount) return;
+    const ok = await uiConfirm('clientArea.account_delete_confirm', 'danger');
+    if (!ok) return;
+
+    try {
+      setDeletingAccount(true);
+      const { error } = await supabase.rpc('remove_cliente_seguro');
+      if (error) throw error;
+      await uiAlert('clientArea.account_deleted', 'success');
+      const logoutResult = onLogout?.('/');
+      if (logoutResult?.catch) logoutResult.catch(() => {});
+      navigate('/', { replace: true });
+    } catch {
+      uiAlert('clientArea.account_delete_error', 'error');
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
+
   const mergeById = (current, incoming) => {
     const seen = new Set();
     return [...current, ...incoming].filter(item => {
@@ -796,7 +818,13 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                       const tipoNegocio = isNegocio ? (String(fav.negocios?.tipo_negocio || '').trim() || '—') : 'PROFISSIONAL';
                       return (
                         <div key={fav.id} className="bg-dark-200 border border-gray-800 rounded-custom p-4 relative group hover:border-primary/50 transition-all">
-                          <button onClick={() => removerFavorito(fav.id)} disabled={removingFavoritoId === fav.id} className="absolute top-2 right-2 w-8 h-8 bg-red-500/20 hover:bg-red-500/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all disabled:opacity-60">
+                          <button
+                            type="button"
+                            aria-label="Remover favorito"
+                            onClick={() => removerFavorito(fav.id)}
+                            disabled={removingFavoritoId === fav.id}
+                            className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500/20 opacity-100 transition-all hover:bg-red-500/30 focus:outline-none sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 disabled:opacity-60"
+                          >
                             <X className="w-4 h-4 text-red-400" />
                           </button>
                           <div className="mb-3">
@@ -918,6 +946,17 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                       placeholder="CONFIRMAR"
                     />
                   </div>
+                </div>
+
+                <div className="flex justify-center px-4 py-4 sm:px-6">
+                  <button
+                    type="button"
+                    onClick={excluirContaCliente}
+                    disabled={deletingAccount}
+                    className="min-w-[180px] rounded-full border border-red-500/30 px-8 py-3 text-center text-[12px] font-normal uppercase text-red-400 transition-colors hover:border-red-400/60 hover:text-red-300 disabled:opacity-50"
+                  >
+                    {deletingAccount ? 'EXCLUINDO' : 'EXCLUIR CONTA'}
+                  </button>
                 </div>
               </>
             )}
