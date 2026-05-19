@@ -30,6 +30,7 @@ import {
   getValorAgendamento,
   getValorEntrega,
   isCancelStatus,
+  normalizeStatus,
   sameDay,
   timeToMinutes,
 } from './dashboard/utils';
@@ -118,6 +119,22 @@ function DashboardTopCard({ icon, label, value, children, highlight = false }) {
       </div>
     </div>
   );
+}
+
+function didTransitionToCancelStatus(payload, knownStatuses) {
+  const novo = payload?.new;
+  if (!novo?.id || !isCancelStatus(novo.status)) return false;
+
+  const oldStatus = payload?.old?.status;
+  if (oldStatus !== undefined && oldStatus !== null) {
+    return !isCancelStatus(oldStatus);
+  }
+
+  if (knownStatuses.has(novo.id)) {
+    return !isCancelStatus(knownStatuses.get(novo.id));
+  }
+
+  return false;
 }
 
 export default function Dashboard({ user, onLogout, userType = 'professional' }) {
@@ -308,6 +325,15 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
   const reloadAgendamentosRef = useRef(reloadAgendamentos);
   useEffect(() => { reloadAgendamentosRef.current = reloadAgendamentos; }, [reloadAgendamentos]);
 
+  const agendamentosStatusRef = useRef(new Map());
+  useEffect(() => {
+    agendamentosStatusRef.current = new Map(
+      agendamentos
+        .filter((ag) => ag?.id)
+        .map((ag) => [ag.id, normalizeStatus(ag.status)])
+    );
+  }, [agendamentos]);
+
   const agProfIdsKey = useMemo(() => profissionais.map(p => p.id).sort().join(','), [profissionais]);
   const {
     historicoAgendamentos,
@@ -412,10 +438,15 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'agendamentos', filter: channelFilter }, (payload) => {
         const ev = payload?.eventType;
         const novo = payload?.new;
-        if (ev === 'INSERT') setNotifAgendamentos(prev => prev + 1);
+        if (ev === 'INSERT') {
+          if (novo?.id) agendamentosStatusRef.current.set(novo.id, normalizeStatus(novo.status));
+          setNotifAgendamentos(prev => prev + 1);
+        }
         if (ev === 'UPDATE') {
-          const st = String(novo?.status || '').toLowerCase();
-          if (st.includes('cancelado') && !st.includes('profissional')) setNotifCancelados(prev => prev + 1);
+          if (didTransitionToCancelStatus(payload, agendamentosStatusRef.current)) {
+            setNotifCancelados(prev => prev + 1);
+          }
+          if (novo?.id) agendamentosStatusRef.current.set(novo.id, normalizeStatus(novo.status));
         }
         reloadAgendamentosRef.current();
         loadHoje(negocio.id, parceiroProfissionalId);
