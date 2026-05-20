@@ -4,8 +4,6 @@ import { Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { ptBR } from '../feedback/messages/ptBR';
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
 const msgs = ptBR.parceiroCadastro;
 
 function Alerta({ msg }) {
@@ -37,11 +35,9 @@ const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white plac
 export default function ParceiroCadastro({ suppressAuthRef }) {
   const navigate = useNavigate();
 
-  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
   const [alerta, setAlerta] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
@@ -50,37 +46,24 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
     e.preventDefault();
     setAlerta(null);
 
-    const nomeClean = nome.trim().replace(/\s+/g, ' ');
     const emailClean = email.trim().toLowerCase();
-    const slugClean = slug.trim().toLowerCase();
 
-    if (!nomeClean) return setAlerta(msgs.nome_required);
     if (!emailClean || !emailClean.includes('@')) return setAlerta(msgs.email_invalid);
     if (senha.length < 7) return setAlerta(msgs.senha_too_short);
-    if (!slugClean) return setAlerta(msgs.slug_required);
 
     setLoading(true);
     if (suppressAuthRef) suppressAuthRef.current = true;
 
     try {
-      const { data: signupStatus, error: signupStatusErr } = await supabase.rpc('get_partner_signup_context', {
-        p_slug: slugClean,
-      });
-
-      if (signupStatusErr) throw signupStatusErr;
-      if (signupStatus?.status === 'negocio_not_found') return setAlerta(msgs.negocio_not_found);
-      if (signupStatus?.status !== 'available' || !signupStatus?.negocio_id) {
-        throw new Error(msgs.unexpected_error.body);
-      }
-
       const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
         email: emailClean,
         password: senha,
         options: {
           data: {
-            nome: nomeClean,
             type: 'professional',
+            partner_signup: true,
           },
+          emailRedirectTo: `${window.location.origin}/cadastro/profissional-parceiro/retomada`,
         },
       });
 
@@ -94,52 +77,12 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
       const uid = signUpData?.user?.id;
       if (!uid) throw new Error(msgs.account_create_error.body);
 
-      let userReady = false;
-      for (let i = 0; i < 6; i++) {
-        const { data } = await supabase.from('users').select('id').eq('id', uid).maybeSingle();
-        if (data?.id) {
-          userReady = true;
-          break;
-        }
-        await sleep(400);
+      if (!signUpData?.session) {
+        setShowAlert(true);
+        return;
       }
 
-      if (!userReady) {
-        await supabase.auth.signOut();
-        throw new Error(msgs.account_create_error.body);
-      }
-
-      const { data: accessData, error: accessErr } = await supabase.rpc('solicitar_acesso_parceiro', {
-        p_negocio_id: signupStatus.negocio_id,
-        p_nome: nomeClean,
-      });
-
-      if (accessErr) {
-        await supabase.auth.signOut();
-        const code = String(accessErr.message || '').split(':')[0].trim();
-        if (code === 'access_inactive') {
-          return setAlerta(msgs.access_inactive);
-        }
-        if (code === 'usuario_nao_encontrado') {
-          return setAlerta(msgs.account_create_error);
-        }
-        if (code === 'negocio_nao_encontrado' || code === 'negocio_nao_informado') {
-          return setAlerta(msgs.negocio_not_found);
-        }
-        if (accessErr.code === '23505') {
-          return setAlerta(msgs.access_unavailable);
-        }
-        throw accessErr;
-      }
-
-      const accessStatus = String(accessData?.status || '').trim();
-      if (accessStatus !== 'pending_approval' && accessStatus !== 'ok') {
-        await supabase.auth.signOut();
-        throw new Error(msgs.unexpected_error.body);
-      }
-
-      await supabase.auth.signOut();
-      setShowAlert(true);
+      navigate('/cadastro/profissional-parceiro/retomada', { replace: true });
     } catch (e) {
       setAlerta({ body: e?.message || msgs.unexpected_error.body, variant: 'erro' });
       await supabase.auth.signOut();
@@ -175,22 +118,11 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
         <div className="text-center mb-8">
           <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-20 w-auto object-contain mx-auto mb-4" />
           <h1 className="text-3xl font-normal text-white uppercase">CADASTRO PARCEIRO</h1>
-          <p className="text-gray-500 text-sm mt-2 font-normal">SOLICITE ACESSO AO NEGÓCIO</p>
+          <p className="text-gray-500 text-sm mt-2 font-normal">CONFIRME SEU E-MAIL PARA CONTINUAR</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-100">
-            <FieldRow label="NOME">
-              <input
-                type="text"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                placeholder="NOME COMPLETO"
-                className={`${fieldInputClass} uppercase`}
-                required
-              />
-            </FieldRow>
-
             <FieldRow label="E-MAIL">
               <input
                 type="email"
@@ -202,7 +134,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
               />
             </FieldRow>
 
-            <FieldRow label="SENHA">
+            <FieldRow label="SENHA" last>
               <div className="relative min-w-0">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -223,16 +155,6 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
               </div>
             </FieldRow>
 
-            <FieldRow label="SLUG" last>
-              <input
-                type="text"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value.toLowerCase())}
-                placeholder="EX: BARBEARIA-TORRES"
-                className={fieldInputClass}
-                required
-              />
-            </FieldRow>
           </div>
 
           <Alerta msg={alerta} />
@@ -243,7 +165,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
               disabled={loading}
               className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? 'ENVIANDO...' : 'SOLICITAR ACESSO'}
+              {loading ? 'ENVIANDO...' : 'CONTINUAR'}
             </button>
 
             <Link
