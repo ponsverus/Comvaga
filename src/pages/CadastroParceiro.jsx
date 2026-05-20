@@ -32,7 +32,7 @@ function FieldRow({ label, children, last = false }) {
 
 const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white';
 
-export default function ParceiroCadastro({ suppressAuthRef }) {
+export default function CadastroParceiro({ suppressAuthRef }) {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -169,7 +169,7 @@ export default function ParceiroCadastro({ suppressAuthRef }) {
             </button>
 
             <Link
-              to="/parceiro/login"
+              to="/login-parceiro"
               className="flex w-full items-center justify-center rounded-button border border-primary/30 bg-transparent py-3 text-sm font-normal uppercase tracking-wider text-primary transition-all hover:border-primary hover:text-yellow-500"
             >
               FAZER LOGIN
