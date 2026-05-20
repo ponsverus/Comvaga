@@ -11,8 +11,6 @@ import Login                  from './pages/Login';
 import SignupChoice           from './pages/SignupChoice';
 import SignupClient           from './pages/SignupClient';
 import SignupProfessional     from './pages/SignupProfessional';
-import ParceiroCadastro       from './pages/ParceiroCadastro';
-import ParceiroLogin          from './pages/ParceiroLogin';
 import PartnerPendingApproval from './pages/PartnerPendingApproval';
 import ResetPassword          from './pages/ResetPassword';
 
@@ -466,8 +464,8 @@ export default function App() {
                     ? <SignupProfessionalParceiroResume user={user} onLogout={handleLogout} />
                     : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                   : userType ? <Navigate to="/minha-area" />
-                  : <Navigate to="/parceiro/login" />
-              ) : <Navigate to="/parceiro/login" />
+                  : <Navigate to="/login" />
+              ) : <Navigate to="/login" />
             } />
 
             <Route path="/dashboard" element={
