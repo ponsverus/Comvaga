@@ -22,6 +22,7 @@ const ClientArea                = lazy(() => import('./pages/ClientArea'));
 const CriarNegocio              = lazy(() => import('./pages/CriarNegocio'));
 const SelecionarNegocio         = lazy(() => import('./pages/SelecionarNegocio'));
 const SignupProfessionalResume  = lazy(() => import('./pages/SignupProfessionalResume'));
+const SignupProfessionalParceiroResume = lazy(() => import('./pages/SignupProfessionalParceiroResume'));
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -159,6 +160,8 @@ export default function App() {
   const inRecoveryRef   = useRef(inRecovery);
 
   const isLoggedIn = !!user;
+  const isPartnerSignup = user?.user_metadata?.partner_signup === true
+    || String(user?.user_metadata?.partner_signup || '').toLowerCase() === 'true';
 
   const safeSet = useCallback((fn) => {
     if (aliveRef.current) fn();
@@ -172,11 +175,12 @@ export default function App() {
   const getPostLoginPath = useCallback((type, currentAccessState, status) => {
     if (type !== 'professional') return '/minha-area';
     if (currentAccessState === 'partner_pending') return '/parceiro/aguardando';
+    if (isPartnerSignup && currentAccessState === 'owner_resume') return '/cadastro/profissional-parceiro/retomada';
     if (currentAccessState === 'owner_resume' || normalizeOnboardingStatus(type, status) === 'pending') {
       return '/cadastro/profissional/retomada';
     }
     return '/dashboard';
-  }, []);
+  }, [isPartnerSignup]);
 
   const loadProfile = useCallback(async (sessionUser) => {
     if (!sessionUser?.id) return null;
@@ -444,7 +448,9 @@ export default function App() {
               isLoggedIn ? (
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'professional'
-                  ? accessState === 'owner_resume'
+                  ? isPartnerSignup && accessState === 'owner_resume'
+                    ? <Navigate to="/cadastro/profissional-parceiro/retomada" />
+                    : accessState === 'owner_resume'
                     ? <SignupProfessionalResume user={user} onLogin={handleLogin} />
                     : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                   : userType ? <Navigate to="/minha-area" />
@@ -452,12 +458,24 @@ export default function App() {
               ) : <Navigate to="/login" />
             } />
 
+            <Route path="/cadastro/profissional-parceiro/retomada" element={
+              isLoggedIn ? (
+                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'professional'
+                  ? isPartnerSignup && accessState === 'owner_resume'
+                    ? <SignupProfessionalParceiroResume user={user} onLogout={handleLogout} />
+                    : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                  : userType ? <Navigate to="/minha-area" />
+                  : <Navigate to="/parceiro/login" />
+              ) : <Navigate to="/parceiro/login" />
+            } />
+
             <Route path="/dashboard" element={
               isLoggedIn ? (
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'professional'
                   ? accessState === 'owner_resume'
-                    ? <Navigate to="/cadastro/profissional/retomada" />
+                    ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                     : accessState === 'partner_pending'
                       ? <Navigate to="/parceiro/aguardando" />
                     : <Dashboard user={user} onLogout={handleLogout} userType={userType} />
@@ -482,7 +500,7 @@ export default function App() {
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'professional'
                   ? accessState === 'owner_resume'
-                    ? <Navigate to="/cadastro/profissional/retomada" />
+                    ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                     : accessState === 'partner_pending'
                       ? <Navigate to="/parceiro/aguardando" />
                       : <CriarNegocio user={user} />
@@ -496,7 +514,7 @@ export default function App() {
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'professional'
                   ? accessState === 'owner_resume'
-                    ? <Navigate to="/cadastro/profissional/retomada" />
+                    ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                     : accessState === 'partner_pending'
                       ? <Navigate to="/parceiro/aguardando" />
                       : <SelecionarNegocioRouteGuard user={user} onLogout={handleLogout} />
