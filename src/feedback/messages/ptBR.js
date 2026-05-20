@@ -578,7 +578,6 @@ export const ptBR = {
     credentials_invalid:            { body: 'Email ou senha incorretos.', variant: 'erro' },
     auth_error:                     { body: 'Erro ao autenticar agora.\n\nTente novamente.', variant: 'erro' },
     not_partner:                    { body: 'Este login pertence a outro tipo de conta para este negócio.', variant: 'erro' },
-    pending_approval:               { body: 'Seu acesso ainda aguarda aval do responsável do negócio.', variant: 'aviso' },
     access_inactive:                { body: 'Seu acesso está inativo.\n\nEntre em contato com o responsável pelo negócio.', variant: 'erro' },
     unexpected_error:               { body: 'Ocorreu um erro inesperado.\n\nTente novamente.', variant: 'erro' },
     reset_email_required:           { body: 'Digite seu email antes de solicitar o resgate de senha.', variant: 'aviso' },
@@ -727,7 +726,7 @@ export const ptBR = {
     },
     account_delete_confirm: {
       title: 'Excluir conta',
-      body: 'Tem certeza de que deseja excluir sua conta de cliente?\n\nEsse processo remove seus dados do sistema e impede seu acesso de forma definitiva.',
+      body: 'Tem certeza que deseja excluir sua conta de cliente?\n\nIsso removerá permanentemente seus dados de acesso.',
       variant: 'danger',
       screen: 'dark',
       confirmText: 'EXCLUIR CONTA',
@@ -743,7 +742,7 @@ export const ptBR = {
     },
     account_delete_error: {
       title: 'Erro ao excluir conta',
-      body: 'Nao foi possivel excluir sua conta agora.\n\nTente novamente em alguns instantes.',
+      body: 'Houve um erro ao tentar excluir sua conta.\n\nTente novamente em alguns instantes.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
