@@ -11,8 +11,8 @@ import Login                  from './pages/Login';
 import SignupChoice           from './pages/SignupChoice';
 import SignupClient           from './pages/SignupClient';
 import SignupProfessional     from './pages/SignupProfessional';
-import ParceiroCadastro       from './pages/ParceiroCadastro';
-import ParceiroLogin          from './pages/ParceiroLogin';
+import CadastroParceiro       from './pages/CadastroParceiro';
+import LoginParceiro          from './pages/LoginParceiro';
 import PartnerPendingApproval from './pages/PartnerPendingApproval';
 import ResetPassword          from './pages/ResetPassword';
 
@@ -405,18 +405,22 @@ export default function App() {
               : <Login onLogin={handleLogin} inRecovery={false} />
             } />
 
-            <Route path="/parceiro/cadastro" element={
+            <Route path="/parceiro/cadastro" element={<Navigate to="/cadastro-parceiro" replace />} />
+
+            <Route path="/cadastro-parceiro" element={
               isLoggedIn && userType
                 ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
-                : <ParceiroCadastro suppressAuthRef={suppressAuthRef} />
+                : <CadastroParceiro suppressAuthRef={suppressAuthRef} />
             } />
 
-            <Route path="/parceiro/login" element={
+            <Route path="/parceiro/login" element={<Navigate to="/login-parceiro" replace />} />
+
+            <Route path="/login-parceiro" element={
               inRecovery
-                ? <ParceiroLogin onLogin={handleLogin} suppressAuthRef={suppressAuthRef} inRecovery={true} />
+                ? <LoginParceiro onLogin={handleLogin} suppressAuthRef={suppressAuthRef} inRecovery={true} />
                 : isLoggedIn && userType
                   ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
-                  : <ParceiroLogin onLogin={handleLogin} suppressAuthRef={suppressAuthRef} />
+                  : <LoginParceiro onLogin={handleLogin} suppressAuthRef={suppressAuthRef} />
             } />
 
             <Route path="/parceiro/aguardando" element={
@@ -466,8 +470,8 @@ export default function App() {
                     ? <SignupProfessionalParceiroResume user={user} onLogout={handleLogout} />
                     : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                   : userType ? <Navigate to="/minha-area" />
-                  : <Navigate to="/parceiro/login" />
-              ) : <Navigate to="/parceiro/login" />
+                  : <Navigate to="/login-parceiro" />
+              ) : <Navigate to="/login-parceiro" />
             } />
 
             <Route path="/dashboard" element={
