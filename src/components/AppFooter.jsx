@@ -86,8 +86,8 @@ export default function AppFooter({
                 <>
                   <li><FooterLink to="/login">ENTRAR</FooterLink></li>
                   <li><FooterLink to="/cadastro">CADASTRAR GRATIS</FooterLink></li>
-                  <li><FooterLink to="/parceiro/login">LOGIN PARCEIRO</FooterLink></li>
-                  <li><FooterLink to="/parceiro/cadastro">CADASTRO PARCEIRO</FooterLink></li>
+                  <li><FooterLink to="/login/parceiro">LOGIN PARCEIRO</FooterLink></li>
+                  <li><FooterLink to="/cadastro/parceiro">CADASTRO PARCEIRO</FooterLink></li>
                   <li><FooterLink href={supportHref}>SUPORTE</FooterLink></li>
                 </>
               )}
