@@ -564,8 +564,10 @@ export const ptBR = {
     account_create_error: { body: 'Erro ao criar sua conta agora.\n\nTente novamente.', variant: 'erro' },
     access_inactive:      { body: 'Seu acesso está inativo.\n\nEntre em contato com o responsável pelo negócio.', variant: 'erro' },
     unexpected_error:     { body: 'Ocorreu um erro inesperado.\n\nTente novamente.', variant: 'erro' },
-    success_title:        'Cadastro enviado',
-    success_body:         'Aguarde o aval do responsável pelo negócio para acessar o painel.',
+    success_title:        'Confirme seu email',
+    success_body:         'Enviamos um link para seu email.\n\nConfirme o acesso para finalizar sua solicitação de parceria.',
+    access_sent_title:    'Solicitação enviada',
+    access_sent_body:     'Aguarde o aval do responsável pelo negócio para acessar o painel.',
   },
 
   parceiroLogin: {
