@@ -125,8 +125,15 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
         return setAlerta(msgs.not_partner);
       }
       if (partnerStatus === 'pendente') {
-        await supabase.auth.signOut();
-        return setAlerta(msgs.pending_approval);
+        if (suppressAuthRef) suppressAuthRef.current = false;
+        onLogin(
+          signInData.user,
+          'professional',
+          accessProfile.onboardingStatus,
+          'partner_pending'
+        );
+        navigate('/parceiro/aguardando', { replace: true });
+        return;
       }
       if (partnerStatus === 'inativo') {
         await supabase.auth.signOut();
