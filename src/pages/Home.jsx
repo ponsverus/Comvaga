@@ -783,12 +783,12 @@ export default function Home({ user, userType, onLogout }) {
                       </Link>
                     </li>
                     <li>
-                      <Link to="/parceiro/login" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
                         LOGIN PARCEIRO
                       </Link>
                     </li>
                     <li>
-                      <Link to="/parceiro/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
                         CADASTRO PARCEIRO
                       </Link>
                     </li>
@@ -815,12 +815,12 @@ export default function Home({ user, userType, onLogout }) {
                       </Link>
                     </li>
                     <li>
-                      <Link to="/parceiro/login" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
                         LOGIN PARCEIRO
                       </Link>
                     </li>
                     <li>
-                      <Link to="/parceiro/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
                         CADASTRO PARCEIRO
                       </Link>
                     </li>
