@@ -82,8 +82,14 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
       }
 
       if (profile.accessState === 'partner_pending') {
-        await supabase.auth.signOut();
-        throw new Error('Seu acesso de parceiro ainda está em fase de análise.');
+        onLogin?.(
+          authUser,
+          profile.type,
+          profile.onboardingStatus,
+          profile.accessState
+        );
+        navigate('/parceiro/aguardando', { replace: true });
+        return;
       }
 
       onLogin?.(
