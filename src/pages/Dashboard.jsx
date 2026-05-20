@@ -524,7 +524,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
       },
     });
   }, [navigate, negocio?.id, negocio?.slug]);
-  const handleDashboardLogout = useCallback(() => onLogout(parceiroProfissional ? '/parceiro/login' : '/login'), [onLogout, parceiroProfissional]);
+  const handleDashboardLogout = useCallback(() => onLogout(parceiroProfissional ? '/login/parceiro' : '/login'), [onLogout, parceiroProfissional]);
 
   if (bootstrapState === 'loading') return (
     <div className="min-h-screen bg-black flex items-center justify-center">
