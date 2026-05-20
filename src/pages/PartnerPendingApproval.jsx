@@ -24,7 +24,7 @@ export default function PartnerPendingApproval({ onLogout }) {
           </Link>
           <button
             type="button"
-            onClick={() => onLogout('/parceiro/login')}
+            onClick={() => onLogout('/login/parceiro')}
             className="w-full py-3 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button font-normal uppercase transition-all hover:bg-red-500/20"
           >
             SAIR
