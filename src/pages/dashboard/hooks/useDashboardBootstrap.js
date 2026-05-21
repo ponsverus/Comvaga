@@ -14,6 +14,19 @@ import {
 const AGENDAMENTOS_PAGE_SIZE = 50;
 const GALERIA_PAGE_SIZE = 12;
 
+function getLastPartnerNegocioId(userId) {
+  if (!userId) return null;
+  try {
+    return window.localStorage?.getItem(`comvaga:last-partner-negocio:${userId}`) || null;
+  } catch {
+    return null;
+  }
+}
+
+function isValidPartnerNegocioId(negocioId, negocioIds) {
+  return !!negocioId && negocioIds.includes(negocioId);
+}
+
 export function useDashboardBootstrap({
   userId,
   locationNegocioId,
@@ -210,7 +223,14 @@ export function useDashboardBootstrap({
         }
 
         const negocioIds = await fetchPartnerNegocioIds(userId);
-        if (negocioIds.length >= 1) return fetchNegocioById(negocioIds[0]);
+        const savedNegocioId = getLastPartnerNegocioId(userId);
+        const selectedNegocioId = isValidPartnerNegocioId(locationNegocioId, negocioIds)
+          ? locationNegocioId
+          : isValidPartnerNegocioId(savedNegocioId, negocioIds)
+            ? savedNegocioId
+            : negocioIds[0];
+
+        if (selectedNegocioId) return fetchNegocioById(selectedNegocioId);
         return null;
       };
 
