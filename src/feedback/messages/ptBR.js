@@ -221,44 +221,44 @@ export const ptBR = {
 
       servicos: {
         entrega_created: {
-          title: 'Serviço criado',
-          body: 'O novo serviço já está disponível para agendamento.',
+          title: 'Serv. criado',
+          body: 'O novo serv. já está disponível para agendamento.',
           variant: 'success', screen: 'light', buttonText: 'OK',
         },
         entrega_updated: {
-          title: 'Serviço atualizado',
+          title: 'Serv. atualizado',
           body: 'Os ajustes foram salvos com sucesso.',
           variant: 'success', screen: 'light', buttonText: 'OK',
         },
         entrega_create_error: {
           title: 'Erro ao criar',
-          body: 'Ocorreu uma falha ao criar este serviço. Tente novamente.',
+          body: 'Ocorreu uma falha ao criar este serv. Tente novamente.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
         },
         entrega_update_error: {
           title: 'Erro ao salvar',
-          body: 'Ocorreu uma falha ao atualizar este serviço. Tente novamente.',
+          body: 'Ocorreu uma falha ao atualizar este serv. Tente novamente.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
         },
         entrega_delete_confirm: {
-          title: 'Excluir serviço?',
-          body: 'Tem certeza que deseja excluir este serviço?',
+          title: 'Excluir serv?',
+          body: 'Tem certeza que deseja excluir este serv?',
           variant: 'warning', screen: 'dark',
           confirmText: 'EXCLUIR', cancelText: 'CANCELAR', buttonText: 'EXCLUIR',
         },
         entrega_deleted: {
-          title: 'Serviço excluído',
-          body: 'O serviço foi removido da lista.',
+          title: 'Serv. excluído',
+          body: 'O serv. foi removido da lista.',
           variant: 'success', screen: 'light', buttonText: 'OK',
         },
         entrega_delete_error: {
           title: 'Erro',
-          body: 'Houve um erro ao excluir o serviço. Tente novamente.',
+          body: 'Houve um erro ao excluir o serv. Tente novamente.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
         },
         entrega_prof_required: {
           title: 'Selecione um profissional',
-          body: 'Escolha um profissional para o serviço.',
+          body: 'Escolha um profissional para o serv.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
         },
       },
