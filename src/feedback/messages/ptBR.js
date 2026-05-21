@@ -75,7 +75,7 @@ export const ptBR = {
       buttonText: 'OK',
     },
     address_format_invalid_inline: {
-      body: 'Use o formato: RUA, NUMERO - CIDADE, ESTADO.',
+      body: 'Use o formato: RUA, NÚMERO - CIDADE, ESTADO.',
     },
     business_info_update_error: {
       title: 'Erro ao salvar',
@@ -214,7 +214,7 @@ export const ptBR = {
       },
 
       empty_list: {
-        servicos:  'Sem serviços para este profissional.',
+        servicos:  ':(',
         consultas: 'Sem consultas para este profissional.',
         aulas:     'Sem aulas para este profissional.',
       },
@@ -1182,7 +1182,7 @@ export const ptBR = {
         aulas:     'AULAS',
       },
       empty_list: {
-        servicos:  'Sem serviços para este profissional.',
+        servicos:  ':(',
         consultas: 'Sem consultas para este profissional.',
         aulas:     'Sem aulas para este profissional.',
       },
