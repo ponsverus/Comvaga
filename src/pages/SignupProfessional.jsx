@@ -126,7 +126,7 @@ export default function SignupProfessional({ onLogin }) {
         <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
-      <div className="relative z-10 w-full max-w-2xl mx-auto">
+      <div className="relative z-10 w-full max-w-md mx-auto">
         <Link
           to="/cadastro"
           className="inline-flex items-center gap-2 text-gray-400 hover:text-primary mb-12 transition-colors group"
