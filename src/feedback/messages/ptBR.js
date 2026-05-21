@@ -566,8 +566,6 @@ export const ptBR = {
     unexpected_error:     { body: 'Ocorreu um erro inesperado. Tente novamente.', variant: 'erro' },
     success_title:        'Confirme seu email',
     success_body:         'Enviamos um link para seu email.\nConfirme o acesso para finalizar sua solicitação de parceria.',
-    access_sent_title:    'Solicitação enviada',
-    access_sent_body:     'Aguarde o aval do responsável pelo negócio para acessar o painel.',
   },
 
   parceiroLogin: {
