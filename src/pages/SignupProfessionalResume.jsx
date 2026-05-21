@@ -504,6 +504,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                   onChange={(e) => setFormData((prev) => ({ ...prev, estado: e.target.value }))}
                   className={fieldInputClass}
                   required
+                  placeholder="EXEMPLO: MG"
                 />
               </ResumeSplitField>
             </ResumeSplitRow>
