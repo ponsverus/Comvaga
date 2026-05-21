@@ -154,7 +154,6 @@ function PreviewFacebookIcon({ className = '' }) {
   );
 }
 
-
 export default function Home({ user, userType, onLogout }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -338,75 +337,78 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section id="como-funciona" className="py-24 px-4 bg-dark-100">
+      <section id="como-funciona" className="py-24 px-4 bg-dark-100 overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-20">
             <h2 className="text-5xl font-black mb-4">
               A CIÊNCIA <span className="text-primary">POR TRÁS</span>
             </h2>
             <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-10 md:gap-14">
-            {[
-              { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
-              { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
-              { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
-            ].map(({ num, title, text }) => (
-              <div key={num} className="relative">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 md:-top-10 md:-left-4 w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 z-10">
-                  {num}
+          <div className="relative">
+            <div className="hidden md:block absolute top-8 left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+            
+            <div className="grid md:grid-cols-3 gap-10 md:gap-14 relative z-10">
+              {[
+                { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
+                { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
+                { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
+              ].map(({ num, title, text }) => (
+                <div key={num} className="relative mt-8 md:mt-0">
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 z-20">
+                    {num}
+                  </div>
+                  <div className="bg-dark-200 border border-gray-800 rounded-custom p-8 pt-12 md:pt-14 h-full">
+                    <h3 className="text-2xl font-normal mb-3 text-white text-center md:text-left">{title}</h3>
+                    <p className="text-gray-400 leading-relaxed text-center md:text-left">{text}</p>
+                  </div>
                 </div>
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-8 pt-14 md:pt-10">
-                  <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{text}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          <div className="mt-16 space-y-6">
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                  <ZapIcon className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
-                  </p>
-                </div>
+          <div className="mt-24 space-y-8 md:space-y-12">
+            
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 bg-gradient-to-br from-primary/10 to-yellow-600/5 border border-primary/20 rounded-custom p-8 hover:border-primary/40 transition-colors">
+              <div className="w-24 h-24 md:w-32 md:h-32 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
+                <ZapIcon className="w-10 h-10 md:w-12 md:h-12 text-primary relative z-10" />
+              </div>
+              <div className="flex-1 text-center md:text-left">
+                <h3 className="text-3xl font-normal mb-4 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
+                <p className="text-gray-300 leading-relaxed text-lg">
+                  <span className="text-primary font-bold">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
+                </p>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                  <ZapIcon className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
-                  </p>
-                </div>
+            <div className="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12 bg-gradient-to-br from-primary/10 to-yellow-600/5 border border-primary/20 rounded-custom p-8 hover:border-primary/40 transition-colors">
+              <div className="w-24 h-24 md:w-32 md:h-32 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
+                <ZapIcon className="w-10 h-10 md:w-12 md:h-12 text-primary relative z-10" />
+              </div>
+              <div className="flex-1 text-center md:text-right">
+                <h3 className="text-3xl font-normal mb-4 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
+                <p className="text-gray-300 leading-relaxed text-lg">
+                  <span className="text-primary font-bold">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
+                </p>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                  <ZapIcon className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
-                  </p>
-                </div>
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 bg-gradient-to-br from-primary/10 to-yellow-600/5 border border-primary/20 rounded-custom p-8 hover:border-primary/40 transition-colors">
+              <div className="w-24 h-24 md:w-32 md:h-32 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
+                <ZapIcon className="w-10 h-10 md:w-12 md:h-12 text-primary relative z-10" />
+              </div>
+              <div className="flex-1 text-center md:text-left">
+                <h3 className="text-3xl font-normal mb-4 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
+                <p className="text-gray-300 leading-relaxed text-lg">
+                  <span className="text-primary font-bold">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
+                </p>
               </div>
             </div>
+
           </div>
         </div>
       </section>
