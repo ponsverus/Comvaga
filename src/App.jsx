@@ -464,7 +464,7 @@ export default function App() {
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'professional'
                   ? isPartnerSignup && accessState === 'owner_resume'
-                    ? <SignupProfessionalParceiroResume user={user} onLogout={handleLogout} />
+                    ? <SignupProfessionalParceiroResume user={user} onLogin={handleLogin} />
                     : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                   : userType ? <Navigate to="/minha-area" />
                   : <Navigate to="/login/parceiro" />
