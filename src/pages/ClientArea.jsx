@@ -585,6 +585,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
         </div>
         <div className="space-y-4">
           {lista.map(ag => {
+            const nomeProfissionalDepoimento = String(ag.profissionais?.nome || '').trim();
             const podeMarcarNovamente =
               ['concluido', 'cancelado_cliente', 'cancelado_profissional'].includes(String(ag.status || '')) &&
               !!ag.negocio_slug &&
@@ -683,7 +684,9 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                         disabled={depoimentoLoading}
                         className="w-full shrink-0 rounded-button border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-normal uppercase text-primary transition-colors hover:bg-primary/30 hover:border-primary disabled:opacity-60 sm:w-auto sm:bg-transparent sm:px-4 sm:text-xs"
                       >
-                        {depoimentoLoading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}
+                        {depoimentoLoading
+                          ? 'ENVIANDO...'
+                          : `ENVIAR DEPOIMENTO${nomeProfissionalDepoimento ? ` PARA ${nomeProfissionalDepoimento}` : ''}`}
                       </button>
                     </div>
                   </div>
