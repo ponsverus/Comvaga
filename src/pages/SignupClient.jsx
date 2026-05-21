@@ -96,7 +96,7 @@ export default function SignupClient({ onLogin }) {
   };
 
   const fieldRowClass = 'flex items-center gap-3 px-5 py-3 border-b border-gray-800/50';
-  const fieldLabelClass = 'w-[76px] shrink-0 text-sm text-gray-500 tracking-wide';
+  const fieldLabelClass = 'w-[76px] shrink-0 text-sm text-white tracking-wide';
   const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white';
 
   return (
@@ -133,7 +133,7 @@ export default function SignupClient({ onLogin }) {
           <div className="space-y-5">
             <div className="overflow-hidden rounded-custom border border-gray-800/50 bg-dark-100/40 backdrop-blur-sm">
               <div className={fieldRowClass}>
-              <label className={fieldLabelClass}>NOME</label>
+              <label className={fieldLabelClass}>SEU NOME</label>
               <input
                 type="text"
                 value={formData.nome}
