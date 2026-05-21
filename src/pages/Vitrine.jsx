@@ -534,7 +534,19 @@ export default function Vitrine({ user, userType, onLogout }) {
 
   if (loading) return (<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-primary text-2xl font-normal animate-pulse">CARREGANDO...</div></div>);
   if (error) return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="max-w-md w-full bg-dark-100 border border-red-500/40 rounded-custom p-8 text-center"><AlertCircle className="w-14 h-14 text-red-400 mx-auto mb-4" /><h1 className="text-2xl font-normal text-white mb-2">Houve um erro ao carregar</h1><p className="text-gray-400 mb-6">{error}</p><button type="button" onClick={loadVitrine} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button font-normal uppercase">Tentar novamente</button></div></div>);
-  if (!negocio) return (<div className="min-h-screen bg-black flex items-center justify-center p-4"><div className="text-center"><h1 className="text-3xl font-normal text-white mb-4">Negócio inexistente.</h1><Link to="/" className="text-primary hover:text-yellow-500 font-normal">Voltar para Home</Link></div></div>);
+  if (!negocio) return (
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="text-center">
+        <h1 className="text-3xl font-normal text-white mb-6">Negócio inexistente.</h1>
+        <Link
+          to="/"
+          className="inline-flex items-center justify-center rounded-full border border-primary/40 bg-primary/10 px-6 py-3 text-sm font-normal uppercase tracking-wide text-primary transition-colors hover:border-primary hover:bg-primary/20 hover:text-yellow-500"
+        >
+          VOLTAR PARA HOME
+        </Link>
+      </div>
+    </div>
+  );
 
   return (
     <div className={`min-h-screen bg-vbg text-vtext${isLight ? ' vitrine-light' : ''}`} style={hasSelecao ? { paddingBottom: 72 } : undefined}>
