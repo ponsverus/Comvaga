@@ -34,6 +34,14 @@ function FieldRow({ label, children, last = false }) {
 
 const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white';
 
+function saveLastPartnerNegocio(userId, negocioId) {
+  if (!userId || !negocioId) return;
+  try {
+    window.localStorage?.setItem(`comvaga:last-partner-negocio:${userId}`, negocioId);
+  } catch {
+  }
+}
+
 export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: inRecoveryProp = false }) {
   const navigate = useNavigate();
 
@@ -145,6 +153,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
       }
 
       if (suppressAuthRef) suppressAuthRef.current = false;
+      saveLastPartnerNegocio(uid, negocio.id);
       onLogin(signInData.user, 'professional');
       navigate('/dashboard', { state: { negocioId: negocio.id } });
     } catch (e2) {
