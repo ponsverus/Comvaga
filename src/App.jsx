@@ -15,6 +15,7 @@ import CadastroParceiro       from './pages/CadastroParceiro';
 import LoginParceiro          from './pages/LoginParceiro';
 import PartnerPendingApproval from './pages/PartnerPendingApproval';
 import ResetPassword          from './pages/ResetPassword';
+import NotFound               from './pages/NotFound';
 
 const Dashboard                 = lazy(() => import('./pages/Dashboard'));
 const Vitrine                   = lazy(() => import('./pages/Vitrine'));
@@ -522,6 +523,8 @@ export default function App() {
                 : <Navigate to={postLogoutRedirect || "/login"} />
               ) : <Navigate to={postLogoutRedirect || "/login"} />
             } />
+
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </FeedbackProvider>
