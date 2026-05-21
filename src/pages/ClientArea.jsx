@@ -686,7 +686,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                       >
                         {depoimentoLoading
                           ? 'ENVIANDO...'
-                          : `ENVIAR DEPOIMENTO${nomeProfissionalDepoimento ? ` PARA ${nomeProfissionalDepoimento}` : ''}`}
+                          : `ENVIAR${nomeProfissionalDepoimento ? ` PARA ${nomeProfissionalDepoimento}` : ''}`}
                       </button>
                     </div>
                   </div>
