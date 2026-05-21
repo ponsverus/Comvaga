@@ -31,14 +31,13 @@ function FieldRow({ label, children, last = false }) {
 
 const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white';
 
-export default function SignupProfessionalParceiroResume({ user, onLogout }) {
+export default function SignupProfessionalParceiroResume({ user, onLogin }) {
   const navigate = useNavigate();
 
   const [nome, setNome] = useState('');
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
   const [alerta, setAlerta] = useState(null);
-  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const fallbackNome = String(user?.user_metadata?.nome || '').trim();
@@ -88,39 +87,23 @@ export default function SignupProfessionalParceiroResume({ user, onLogout }) {
         throw new Error(msgs.unexpected_error.body);
       }
 
-      setShowSuccess(true);
+      if (accessStatus === 'ok') {
+        onLogin?.(user, 'professional', 'completed', 'active');
+        navigate('/dashboard', {
+          replace: true,
+          state: { negocioId: signupStatus.negocio_id },
+        });
+        return;
+      }
+
+      onLogin?.(user, 'professional', 'pending', 'partner_pending');
+      navigate('/parceiro/aguardando', { replace: true });
     } catch (err) {
       setAlerta({ body: err?.message || msgs.unexpected_error.body, variant: 'erro' });
     } finally {
       setLoading(false);
     }
   };
-
-  const finishAndExit = async () => {
-    await onLogout?.('/');
-    navigate('/', { replace: true });
-  };
-
-  if (showSuccess) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <div className="w-full max-w-md text-center">
-          <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-green-400 text-2xl font-normal">:)</span>
-          </div>
-          <h1 className="text-3xl font-normal text-white uppercase mb-4">{msgs.access_sent_title}</h1>
-          <p className="text-gray-400 font-normal mb-8">{msgs.access_sent_body}</p>
-          <button
-            type="button"
-            onClick={finishAndExit}
-            className="w-full py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-normal uppercase"
-          >
-            OK
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
