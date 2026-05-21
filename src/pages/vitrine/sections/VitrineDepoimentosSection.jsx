@@ -38,6 +38,8 @@ export default function VitrineDepoimentosSection({
     ? 'border-vprimary/60 bg-vprimary/15 text-vprimary hover:bg-vprimary/25'
     : 'border-primary/50 bg-primary/20 text-primary hover:bg-primary/30 hover:border-primary';
   const disabled = !!isProfessional || !!reviewState?.loading;
+  const nomeDestino = String(nomeNegocioLabel || '').trim();
+  const sendLabel = `ENVIAR${nomeDestino ? ` PARA ${nomeDestino}` : ''}`;
 
   return (
     <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
@@ -74,7 +76,7 @@ export default function VitrineDepoimentosSection({
               disabled={disabled}
               className={`w-full shrink-0 rounded-button border px-4 py-2 text-sm font-normal uppercase transition-colors disabled:opacity-60 sm:w-auto sm:bg-transparent sm:px-4 sm:text-sm ${buttonClass}`}
             >
-              {reviewState?.loading ? 'ENVIANDO...' : 'ENVIAR DEPOIMENTO'}
+              {reviewState?.loading ? 'ENVIANDO...' : sendLabel}
             </button>
           </div>
         </div>
