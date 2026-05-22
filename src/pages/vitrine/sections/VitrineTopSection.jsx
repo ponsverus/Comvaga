@@ -41,7 +41,7 @@ export default function VitrineTopSection({ header, business, actions }) {
             <div className="flex items-center shrink-0">
               {[...Array(20)].map((_, i) => (
                 <div key={`a-${i}`} className="flex items-center">
-                  <span className="text-black font-normal text-sm uppercase mx-4">É DE MINAS</span>
+                  <span className="text-black font-normal text-sm uppercase mx-4">COMVAGA</span>
                   <span className="text-black text-sm">•</span>
                 </div>
               ))}
@@ -49,7 +49,7 @@ export default function VitrineTopSection({ header, business, actions }) {
             <div className="flex items-center shrink-0" aria-hidden="true">
               {[...Array(20)].map((_, i) => (
                 <div key={`b-${i}`} className="flex items-center">
-                  <span className="text-black font-normal text-sm uppercase mx-4">É DE MINAS</span>
+                  <span className="text-black font-normal text-sm uppercase mx-4">COMVAGA</span>
                   <span className="text-black text-sm">•</span>
                 </div>
               ))}
