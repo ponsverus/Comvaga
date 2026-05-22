@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { UserIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon } from '../components/icons';
+import { ProtectionIcon, UserIcon, TimeIcon, TrendingUpIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon } from '../components/icons';
 
 const SUPORTE_PHONE_E164 = '5533999037979';
 const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
@@ -211,7 +211,8 @@ export default function Home({ user, userType, onLogout }) {
   const handleLogoutClick = () => onLogout?.();
 
   return (
-    <div className="min-h-screen bg-black text-white relative">
+    <div className="min-h-screen bg-black text-white">
+
       <div className="relative z-50 w-full bg-yellow-400 border-b border-yellow-300/50 overflow-hidden h-10 flex items-center">
         <div className="announcement-bar-wrapper flex">
           {[1, 2].map((i) => (
@@ -262,151 +263,151 @@ export default function Home({ user, userType, onLogout }) {
         `}</style>
       </div>
 
-      <header className="absolute top-20 left-0 w-full z-40 bg-transparent border-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex items-center justify-center h-16 sm:h-20">
-            <Link to="/" className="flex flex-col items-center justify-center gap-1">
+      <header className="absolute top-10 left-0 w-full z-40">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="relative flex items-center justify-between h-20 border-b border-white/5">
+            <Link to="/" className="flex items-center gap-3 hover:opacity-75 transition-opacity">
               <img
                 src="/Comvaga Logo.png"
                 alt="Comvaga"
-                className="h-15 w-auto object-contain sm:h-17"
+                className="h-8 w-auto object-contain"
               />
-              <h1 className="text-2xl sm:text-3xl font-black">COMVAGA</h1>
+              <h1 className="text-xl font-black tracking-tight">COMVAGA</h1>
             </Link>
-            <div className="absolute right-0 top-[40%] -translate-y-1/2">
-              <SearchBox
-                searchOpen={searchOpen}
-                setSearchOpen={setSearchOpen}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                resultadosBusca={resultadosBusca}
-                setResultadosBusca={setResultadosBusca}
-                buscando={buscando}
-              />
-            </div>
+            <SearchBox
+              searchOpen={searchOpen}
+              setSearchOpen={setSearchOpen}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              resultadosBusca={resultadosBusca}
+              setResultadosBusca={setResultadosBusca}
+              buscando={buscando}
+            />
           </div>
         </div>
       </header>
 
-      <section className="relative pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pt-48 lg:pb-32 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-yellow-600/10"></div>
-        <div className="absolute top-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+      <section
+        className="relative min-h-screen flex items-center pt-40 pb-28 px-6 overflow-hidden"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(255,209,26,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,209,26,0.025) 1px, transparent 1px)',
+          backgroundSize: '64px 64px',
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black pointer-events-none" />
+        <div className="absolute top-0 left-0 w-2/3 h-2/3 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
 
-        <div className="relative z-10 max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 border border-primary/30 rounded-button mb-8 backdrop-blur-sm">
-            <ZapIcon className="w-4 h-4 text-primary" />
-            <span className="text-primary font-bold text-sm">O FIM DA AGENDA ESBURACADA</span>
+        <div className="relative z-10 max-w-5xl mx-auto w-full">
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 border border-primary/40 rounded-[3px] mb-12">
+            <ZapIcon className="w-3 h-3 text-primary" />
+            <span className="text-primary text-[11px] font-normal tracking-[0.2em] uppercase">O FIM DA AGENDA ESBURACADA</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-tight drop-shadow-lg">
+          <h1 className="text-5xl sm:text-6xl md:text-[82px] font-black mb-8 leading-[0.92] tracking-tighter">
             SUA AGENDA,<br />
-            <span className="bg-gradient-to-r from-primary to-yellow-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-yellow-500 bg-clip-text text-transparent">
               MATEMATICAMENTE PERFEITA
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
-            Comvaga organiza agenda, vitrine, equipe e cliente em uma experiência só. O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
+          <p className="text-base md:text-lg text-gray-500 mb-12 max-w-2xl leading-relaxed">
+            Comvaga organiza agenda, vitrine, equipe e cliente em uma experiência só. O sistema{' '}
+            <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-3 mb-24">
             <Link
               to="/cadastro"
-              className="px-10 py-5 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-black text-lg hover:shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105 flex items-center justify-center gap-3"
+              className="px-10 py-4 bg-primary text-black font-black text-sm tracking-widest uppercase rounded-[3px] hover:bg-yellow-300 transition-colors flex items-center justify-center gap-2.5"
             >
-              MAXIMIZAR MEUS GANHOS <ZapIcon className="w-5 h-5" />
+              MAXIMIZAR MEUS GANHOS <ZapIcon className="w-4 h-4" />
             </Link>
             <button
               type="button"
               onClick={() => document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-10 py-5 bg-white/10 border border-white/20 text-white rounded-button font-bold text-lg hover:bg-white/20 backdrop-blur-sm"
+              className="px-10 py-4 border border-white/15 text-white text-sm tracking-widest uppercase rounded-[3px] hover:border-white/30 hover:bg-white/5 transition-all"
             >
               ENTENDER A LÓGICA
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {['100%', '0%'].map((stat, i) => (
-              <div key={i} className="bg-dark-100/50 backdrop-blur-md border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all">
-                <div className="text-4xl font-normal text-primary mb-2">{stat}</div>
-                <div className="text-sm text-gray-500 uppercase">
-                  {['Aproveitamento de Tempo', 'Conflito de Horários'][i]}
-                </div>
+          <div className="grid grid-cols-2 gap-3 max-w-xs">
+            {[
+              { val: '100%', label: 'Aproveitamento de Tempo' },
+              { val: '0%', label: 'Conflito de Horários' },
+            ].map((s) => (
+              <div key={s.val} className="border border-white/8 rounded-[3px] p-5">
+                <div className="text-3xl font-black text-primary mb-1.5">{s.val}</div>
+                <div className="text-[10px] text-gray-600 uppercase tracking-widest leading-snug">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="como-funciona" className="py-24 px-4 bg-dark-100">
+      <section id="como-funciona" className="py-28 px-6 bg-dark-100">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-black mb-4">
+          <div className="mb-20">
+            <span className="text-primary text-[11px] tracking-[0.25em] uppercase font-normal block mb-4">Como funciona</span>
+            <h2 className="text-4xl sm:text-5xl font-black mb-4">
               A CIÊNCIA <span className="text-primary">POR TRÁS</span>
             </h2>
-            <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
+            <p className="text-gray-500 text-base">Como o sistema protege seu faturamento e respeita o cliente</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-10 md:gap-14">
+          <div className="grid md:grid-cols-3 gap-px bg-white/5 rounded-[3px] overflow-hidden mb-10">
             {[
-              { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
-              { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
-              { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
+              { num: '01', title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },
+              { num: '02', title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
+              { num: '03', title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
             ].map(({ num, title, text }) => (
-              <div key={num} className="relative">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 md:-top-10 md:-left-4 w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 z-10">
-                  {num}
-                </div>
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-8 pt-14 md:pt-10">
-                  <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{text}</p>
-                </div>
+              <div key={num} className="bg-dark-100 p-10">
+                <div className="text-6xl font-black text-white/5 mb-8 leading-none tabular-nums">{num}</div>
+                <h3 className="text-sm font-black text-white mb-3 tracking-widest">{title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{text}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-16 space-y-6">
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                  <ZapIcon className="w-8 h-8 text-primary" />
+          <div className="space-y-3">
+            {[
+              {
+                title: 'REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS',
+                body: (
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    <span className="text-primary font-bold">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
+                  </p>
+                ),
+              },
+              {
+                title: 'ZONA DE CALOR: AGENDA SEM BURACOS',
+                body: (
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    <span className="text-primary font-bold">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
+                  </p>
+                ),
+              },
+              {
+                title: 'AGENDAMENTO MÚLTIPLO SEQUENCIAL',
+                body: (
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    <span className="text-primary font-bold">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
+                  </p>
+                ),
+              },
+            ].map(({ title, body }, i) => (
+              <div key={i} className="relative border border-white/8 rounded-[3px] bg-dark-200/40 p-8 flex gap-5 overflow-hidden">
+                <span className="absolute left-0 inset-y-0 w-[2px] bg-primary/50 rounded-l-[3px]" aria-hidden="true" />
+                <div className="w-8 h-8 rounded-[3px] bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <ZapIcon className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
-                  </p>
+                  <h3 className="text-xs font-black text-white mb-3 tracking-widest">{title}</h3>
+                  {body}
                 </div>
               </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                  <ZapIcon className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                  <ZapIcon className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
-                  </p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -514,7 +515,6 @@ export default function Home({ user, userType, onLogout }) {
                        <div className="absolute bottom-2 right-2 flex gap-1">
                           <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
                           <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
-                          <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
                        </div>
                     </div>
                   </div>
@@ -531,51 +531,52 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-24 px-4 bg-dark-200">
+      <section className="py-28 px-6 bg-dark-200">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-black mb-4">
+          <div className="mb-20">
+            <span className="text-primary text-[11px] tracking-[0.25em] uppercase font-normal block mb-4">Por que escolher</span>
+            <h2 className="text-4xl sm:text-5xl font-black mb-4">
               VANTAGEM <span className="text-primary">MÚTUA</span>
             </h2>
-            <p className="text-xl text-gray-400">Por que Profissionais e Clientes preferem Comvaga</p>
+            <p className="text-gray-500 text-base">Por que Profissionais e Clientes preferem Comvaga</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5 rounded-[3px] overflow-hidden">
             {[
               { icon: TrendingUpIcon, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
               { icon: UserIcon, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
-              { icon: ZapIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
+              { icon: ProtectionIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
               { icon: TimeIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
               { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
               { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
             ].map(({ icon: Icon, title, text }, i) => (
               <div
                 key={i}
-                className="bg-gradient-to-br from-primary/10 to-yellow-600/10 border border-primary/20 rounded-custom p-8 hover:border-primary/50 transition-all hover:scale-105"
+                className="bg-dark-200 p-8 hover:bg-dark-100 transition-colors duration-200"
               >
-                <div className="w-16 h-16 bg-primary/20 rounded-custom flex items-center justify-center mb-6">
-                  <Icon className="w-8 h-8 text-primary" />
+                <div className="mb-5 text-primary">
+                  <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-                <p className="text-gray-400 leading-relaxed">{text}</p>
+                <h3 className="text-xs font-black text-white mb-3 tracking-widest">{title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{text}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-24 px-4 bg-dark-100">
+      <section className="py-28 px-6 bg-dark-100">
         <div className="max-w-7xl mx-auto">
-
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-normal mb-4">
+          <div className="mb-20">
+            <span className="text-primary text-[11px] tracking-[0.25em] uppercase font-normal block mb-4">Planos</span>
+            <h2 className="text-4xl sm:text-5xl font-normal mb-4">
               SEM <span className="text-primary">BUROCRACIA</span>
             </h2>
-            <p className="text-xl text-gray-400">Acesso liberado sem necessidade de dados bancários. Simples assim :)</p>
+            <p className="text-gray-500 text-base">Acesso liberado sem necessidade de dados bancários. Simples assim :)</p>
           </div>
-         
+
           <div className="
-            flex items-start gap-5 overflow-x-auto scroll-snap-type-x-mandatory
+            flex items-start gap-4 overflow-x-auto scroll-snap-type-x-mandatory
             sm:grid sm:grid-cols-3 sm:items-start sm:overflow-visible
             pb-4 sm:pb-0
             [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
@@ -584,22 +585,22 @@ export default function Home({ user, userType, onLogout }) {
             <div className="
               shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
               sm:w-auto sm:max-w-none
-              bg-dark-200 border border-gray-800 rounded-[3px]
-              p-7 flex flex-col
+              bg-dark-200 border border-white/8 rounded-[3px]
+              p-8 flex flex-col
             ">
-              <div className="mb-5">
-                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
+              <div className="mb-6">
+                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-500 bg-white/5 rounded-[3px] px-3 py-1 mb-5">
                   Essencial
                 </span>
-                <p className="text-2xl font-normal text-white mb-1">
+                <p className="text-3xl font-black text-white mb-1">
                   R$ 29<span className="text-base font-normal text-gray-500">,99/mês</span>
                 </p>
-                <p className="text-sm text-gray-500 leading-relaxed">
+                <p className="text-sm text-gray-500 leading-relaxed mt-2">
                   Para autônomos que buscam organizar sua agenda.
                 </p>
               </div>
 
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
+              <div className="border-t border-white/6 pt-6 flex flex-col gap-3 flex-1">
                 {[
                   'Reabertura automática de horários cancelados na agenda',
                   'Agendamento assistido pelo profissional',
@@ -608,11 +609,11 @@ export default function Home({ user, userType, onLogout }) {
                   'Lembrete automático 30 min antes',
                   'Sincronia total com o Google Agenda.',
                 ].map((item) => (
-                  <div key={item} className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <div key={item} className="flex items-start gap-3">
+                    <svg className="w-3.5 h-3.5 text-primary/50 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span className="text-sm text-gray-400 leading-snug">{item}</span>
+                    <span className="text-sm text-gray-500 leading-snug">{item}</span>
                   </div>
                 ))}
               </div>
@@ -621,7 +622,7 @@ export default function Home({ user, userType, onLogout }) {
                 href={WHATSAPP_ESSENCIAL_HREF}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
+                className="mt-8 flex items-center justify-center px-5 py-3 border border-white/12 text-gray-400 text-xs font-normal uppercase tracking-widest rounded-[3px] hover:border-primary/40 hover:text-primary transition-all"
               >
                 Tenho interesse
               </a>
@@ -630,22 +631,24 @@ export default function Home({ user, userType, onLogout }) {
             <div className="
               shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
               sm:w-auto sm:max-w-none
-              bg-dark-200 border border-primary/60 rounded-[3px]
-              p-7 relative flex flex-col
+              bg-dark-200 border border-primary/40 rounded-[3px]
+              p-8 relative flex flex-col
             ">
-              <div className="mb-5">
-                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
+              <span className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-primary/40 via-primary to-primary/40 rounded-t-[3px]" />
+
+              <div className="mb-6">
+                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/10 rounded-[3px] px-3 py-1 mb-5">
                   Profissional
                 </span>
-                <p className="text-2xl font-normal text-white mb-1">
-                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
+                <p className="text-3xl font-black text-white mb-1">
+                  R$ <span className="text-green-400">39</span><span className="text-base font-black text-green-400">,99</span><span className="text-base font-normal text-gray-500">/mês</span>
                 </p>
-                <p className="text-sm text-gray-400 leading-relaxed">
+                <p className="text-sm text-gray-400 leading-relaxed mt-2">
                   Controle total para negócios em crescimento, com métricas e equipe ILIMITADA.
                 </p>
               </div>
 
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
+              <div className="border-t border-white/6 pt-6 flex flex-col gap-3 flex-1">
                 {[
                   'Tudo do plano ESSENCIAL',
                   'Tudo do plano PREMIUM REAL',
@@ -660,17 +663,17 @@ export default function Home({ user, userType, onLogout }) {
                   'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
                   'Reagendamento inteligente em um clique pela área exclusiva do cliente',
                 ].map((item) => (
-                  <div key={item} className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <div key={item} className="flex items-start gap-3">
+                    <svg className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     <span className="text-sm text-gray-300 leading-snug">{item}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-5 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
-                <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
+              <div className="mt-6 flex items-center gap-2.5 bg-primary/8 border border-primary/15 rounded-[3px] px-4 py-3">
+                <StarGlyph sizeClass="h-4 w-4 text-[16px]" className="shrink-0" />
                 <span className="text-xs font-normal text-primary uppercase tracking-wide">
                   Vantagens do <strong className="font-bold">Premium Real</strong> inclusas
                 </span>
@@ -678,7 +681,7 @@ export default function Home({ user, userType, onLogout }) {
 
               <Link
                 to="/cadastro"
-                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
+                className="mt-4 flex items-center justify-center gap-2 px-5 py-3 bg-primary text-black text-xs font-black uppercase tracking-widest rounded-[3px] hover:bg-yellow-300 transition-colors"
               >
                 ASSINAR AGORA <ZapIcon className="w-3.5 h-3.5" />
               </Link>
@@ -687,22 +690,22 @@ export default function Home({ user, userType, onLogout }) {
             <div className="
               shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
               sm:w-auto sm:max-w-none
-              bg-dark-200 border border-gray-800 rounded-[3px]
-              p-7 flex flex-col
+              bg-dark-200 border border-white/8 rounded-[3px]
+              p-8 flex flex-col
             ">
-              <div className="mb-5">
-                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
+              <div className="mb-6">
+                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-500 bg-white/5 rounded-[3px] px-3 py-1 mb-5">
                   Premium Real
                 </span>
-                <p className="text-2xl font-normal text-white mb-1">
+                <p className="text-3xl font-black text-white mb-1">
                   R$ 69<span className="text-base font-normal text-gray-500">,99/mês</span>
                 </p>
-                <p className="text-sm text-gray-500 leading-relaxed">
+                <p className="text-sm text-gray-500 leading-relaxed mt-2">
                   Experiência completa com acesso ilimitado a todos os recursos.
                 </p>
               </div>
 
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
+              <div className="border-t border-white/6 pt-6 flex flex-col gap-3 flex-1">
                 {[
                   'Tudo do plano PROFISSIONAL',
                   'Painel admin: controle de múltiplos profissionais',
@@ -717,11 +720,11 @@ export default function Home({ user, userType, onLogout }) {
                   'Reagendamento inteligente em um clique pela área exclusiva do cliente',
                   'Acesso antecipado a novos recursos',
                 ].map((item) => (
-                  <div key={item} className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <div key={item} className="flex items-start gap-3">
+                    <svg className="w-3.5 h-3.5 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span className="text-sm text-gray-400 leading-snug">{item}</span>
+                    <span className="text-sm text-gray-500 leading-snug">{item}</span>
                   </div>
                 ))}
               </div>
@@ -730,7 +733,7 @@ export default function Home({ user, userType, onLogout }) {
                 href={WHATSAPP_PREMIUM_HREF}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
+                className="mt-8 flex items-center justify-center px-5 py-3 border border-white/12 text-gray-400 text-xs font-normal uppercase tracking-widest rounded-[3px] hover:border-primary/40 hover:text-primary transition-all"
               >
                 Tenho interesse
               </a>
@@ -739,13 +742,13 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
+      <section className="py-24 px-6 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-5xl font-black text-black mb-6">ELEVE SEU NÍVEL PROFISSIONAL</h2>
           <p className="text-2xl text-black/80 mb-8">Uma vitrine para vender, um painel para operar e uma agenda que pensa antes de confirmar.</p>
           <Link
             to="/cadastro"
-            className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all hover:scale-105"
+            className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-[3px] font-black text-xl hover:shadow-2xl transition-all"
           >
             ACESSAR AGORA SEM CUSTO <ZapIcon className="w-6 h-6" />
           </Link>
@@ -753,42 +756,42 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <footer className="bg-black py-12 px-4">
+      <footer className="bg-black border-t border-white/5 py-16 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div className="flex flex-col justify-start">
-              <Link to="/" className="inline-block hover:opacity-75 transition-opacity">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
+            <div className="col-span-2 md:col-span-1">
+              <Link to="/" className="inline-block hover:opacity-70 transition-opacity mb-4">
                 <img
                   src="/Comvaga Logo.png"
                   alt="Comvaga"
-                  className="h-16 w-auto object-contain"
+                  className="h-14 w-auto object-contain"
                 />
               </Link>
-              <p className="text-gray-600 text-xs mt-3 uppercase leading-relaxed">
+              <p className="text-gray-600 text-xs uppercase leading-relaxed tracking-wider">
                 Sua agenda,<br />matematicamente perfeita.
               </p>
             </div>
 
             <div>
-              <h4 className="text-white font-normal mb-4">PARA VOCÊ</h4>
-              <ul className="space-y-2">
+              <h4 className="text-white text-xs font-black tracking-widest mb-5">PARA VOCÊ</h4>
+              <ul className="space-y-3">
                 {isLogged ? (
                   <>
                     <li>
                       <Link
                         to={userType === 'professional' ? '/dashboard' : '/minha-area'}
-                        className="text-gray-500 hover:text-primary transition-colors text-sm"
+                        className="text-gray-600 hover:text-primary transition-colors text-xs tracking-wider"
                       >
                         {userType === 'professional' ? 'DASHBOARD' : 'MINHA ÁREA'}
                       </Link>
                     </li>
                     <li>
-                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/login/parceiro" className="text-gray-600 hover:text-primary transition-colors text-xs tracking-wider">
                         LOGIN PARCEIRO
                       </Link>
                     </li>
                     <li>
-                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/cadastro/parceiro" className="text-gray-600 hover:text-primary transition-colors text-xs tracking-wider">
                         CADASTRO PARCEIRO
                       </Link>
                     </li>
@@ -796,7 +799,7 @@ export default function Home({ user, userType, onLogout }) {
                       <button
                         type="button"
                         onClick={handleLogoutClick}
-                        className="text-gray-500 hover:text-primary transition-colors text-sm"
+                        className="text-gray-600 hover:text-primary transition-colors text-xs tracking-wider"
                       >
                         SAIR
                       </button>
@@ -805,22 +808,22 @@ export default function Home({ user, userType, onLogout }) {
                 ) : (
                   <>
                     <li>
-                      <Link to="/login" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/login" className="text-gray-600 hover:text-primary transition-colors text-xs tracking-wider">
                         ENTRAR
                       </Link>
                     </li>
                     <li>
-                      <Link to="/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/cadastro" className="text-gray-600 hover:text-primary transition-colors text-xs tracking-wider">
                         CADASTRAR GRÁTIS
                       </Link>
                     </li>
                     <li>
-                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/login/parceiro" className="text-gray-600 hover:text-primary transition-colors text-xs tracking-wider">
                         LOGIN PARCEIRO
                       </Link>
                     </li>
                     <li>
-                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/cadastro/parceiro" className="text-gray-600 hover:text-primary transition-colors text-xs tracking-wider">
                         CADASTRO PARCEIRO
                       </Link>
                     </li>
@@ -830,11 +833,11 @@ export default function Home({ user, userType, onLogout }) {
             </div>
 
             <div>
-              <h4 className="text-white font-normal mb-4">EMPRESA</h4>
-              <ul className="space-y-2">
+              <h4 className="text-white text-xs font-black tracking-widest mb-5">EMPRESA</h4>
+              <ul className="space-y-3">
                 {['SOBRE', 'BLOG'].map((link) => (
                   <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-primary transition-colors text-sm">
+                    <a href="#" className="text-gray-600 hover:text-primary transition-colors text-xs tracking-wider">
                       {link}
                     </a>
                   </li>
@@ -843,11 +846,11 @@ export default function Home({ user, userType, onLogout }) {
             </div>
 
             <div>
-              <h4 className="text-white font-normal mb-4">LEGAL</h4>
-              <ul className="space-y-2">
+              <h4 className="text-white text-xs font-black tracking-widest mb-5">LEGAL</h4>
+              <ul className="space-y-3">
                 {['PRIVACIDADE', 'TERMOS'].map((link) => (
                   <li key={link}>
-                    <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                    <a href="#" className="text-gray-600 hover:text-primary transition-colors text-xs tracking-wider">
                       {link}
                     </a>
                   </li>
@@ -856,8 +859,8 @@ export default function Home({ user, userType, onLogout }) {
             </div>
           </div>
 
-          <div className="pt-6">
-            <p className="text-gray-600 text-sm">© 2026 COMVAGA. Todos os direitos reservados.</p>
+          <div className="border-t border-white/5 pt-8">
+            <p className="text-gray-700 text-xs tracking-wider">© 2026 COMVAGA. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>
