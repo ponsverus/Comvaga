@@ -46,13 +46,13 @@ function SearchBox({
   }, [searchOpen, setResultadosBusca, setSearchOpen, setSearchTerm]);
 
   return (
-    <div ref={wrapRef} className="relative">
+    <div ref={wrapRef} className="relative z-50">
       <div
         className={[
-          'relative flex items-center overflow-hidden rounded-full bg-black/40 backdrop-blur-md transition-all duration-300 ease-out',
+          'relative flex items-center overflow-hidden rounded-full transition-all duration-300 ease-out',
           searchOpen
-            ? 'w-[min(24rem,calc(100vw-2rem))] border border-white/10 shadow-[0_0_0_1px_rgba(255,209,26,0.18)]'
-            : 'w-11 border border-transparent bg-transparent backdrop-blur-0',
+            ? 'w-[min(24rem,calc(100vw-2rem))] bg-dark-200/80 backdrop-blur-xl border border-primary/30 shadow-[0_0_15px_rgba(255,209,26,0.15)]'
+            : 'w-11 border border-white/5 bg-white/5 backdrop-blur-md hover:bg-white/10 hover:border-primary/30',
         ].join(' ')}
       >
         <button
@@ -67,7 +67,7 @@ function SearchBox({
           className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-300 transition-colors hover:text-primary"
           aria-label="Pesquisar"
         >
-          <SearchIcon strokeWidth={1.6} className="h-[18px] w-[18px]" />
+          <SearchIcon strokeWidth={1.8} className="h-[18px] w-[18px]" />
         </button>
 
         <input
@@ -90,7 +90,7 @@ function SearchBox({
       </div>
 
       {searchOpen && resultadosBusca.length > 0 && (
-        <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl">
+        <div className="absolute right-0 top-full mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[8px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-2xl">
           {resultadosBusca.map((r, i) => (
             <Link
               key={`${r.tipo}-${r.id}-${i}`}
@@ -100,11 +100,11 @@ function SearchBox({
                 setSearchTerm('');
                 setResultadosBusca([]);
               }}
-              className="block border-b border-white/5 px-5 py-4 transition-colors hover:bg-dark-200/90 last:border-b-0"
+              className="block border-b border-white/5 px-5 py-4 transition-colors hover:bg-primary/10 last:border-b-0 group"
             >
-              <div className="font-normal text-white uppercase">{r.nome}</div>
+              <div className="font-bold text-white uppercase group-hover:text-primary transition-colors">{r.nome}</div>
               {r.subtitulo && (
-                <div className="mt-1 text-sm text-gray-400">{r.subtitulo}</div>
+                <div className="mt-1 text-xs text-gray-400 font-medium">{r.subtitulo}</div>
               )}
             </Link>
           ))}
@@ -112,8 +112,8 @@ function SearchBox({
       )}
 
       {searchOpen && !buscando && searchTerm.trim().length >= 3 && resultadosBusca.length === 0 && (
-        <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[3px] border border-white/10 bg-dark-100/95 px-5 py-4 text-sm text-gray-400 shadow-2xl backdrop-blur-xl">
-          :(
+        <div className="absolute right-0 top-full mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[8px] border border-white/10 bg-dark-100/95 px-5 py-4 text-sm text-gray-400 shadow-2xl backdrop-blur-2xl text-center font-medium">
+          Nenhum resultado encontrado :(
         </div>
       )}
     </div>
@@ -153,7 +153,6 @@ function PreviewFacebookIcon({ className = '' }) {
     </svg>
   );
 }
-
 
 export default function Home({ user, userType, onLogout }) {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -211,8 +210,10 @@ export default function Home({ user, userType, onLogout }) {
   const handleLogoutClick = () => onLogout?.();
 
   return (
-    <div className="min-h-screen bg-black text-white relative">
-      <div className="relative z-50 w-full bg-yellow-400 border-b border-yellow-300/50 overflow-hidden h-10 flex items-center">
+    <div className="min-h-screen bg-[#050505] text-white relative selection:bg-primary selection:text-black font-sans">
+      
+      {/* ANNOUNCEMENT BAR - Sleeker, higher contrast */}
+      <div className="relative z-50 w-full bg-primary border-b border-yellow-300 overflow-hidden h-10 flex items-center shadow-[0_0_15px_rgba(255,209,26,0.3)]">
         <div className="announcement-bar-wrapper flex">
           {[1, 2].map((i) => (
             <div
@@ -222,17 +223,17 @@ export default function Home({ user, userType, onLogout }) {
             >
               {[...Array(14)].map((_, index) => (
                 <div key={index} className="flex items-center">
-                  <span className="text-black font-bold text-sm uppercase mx-4">CLIQUE PARA IR</span>
-                  <span className="text-black mx-4">●</span>
+                  <span className="text-black font-black text-sm uppercase mx-4 tracking-wider">CLIQUE PARA IR</span>
+                  <span className="text-black/50 mx-4 text-xs">◆</span>
                   <a
                     href={SUPORTE_HREF}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-black font-normal text-sm uppercase hover:underline underline-offset-4 transition-all mx-4"
+                    className="text-black font-bold text-sm uppercase hover:bg-black hover:text-primary px-3 py-1 rounded-full transition-all mx-4"
                   >
                     SUPORTE
                   </a>
-                  <span className="text-black mx-4">●</span>
+                  <span className="text-black/50 mx-4 text-xs">◆</span>
                 </div>
               ))}
             </div>
@@ -247,7 +248,7 @@ export default function Home({ user, userType, onLogout }) {
           .announcement-bar-wrapper {
             display: flex;
             width: max-content;
-            animation: announcement-scroll 50s linear infinite;
+            animation: announcement-scroll 45s linear infinite;
           }
           .announcement-bar-wrapper:hover { animation-play-state: paused; }
           .announcement-bar-track a {
@@ -262,18 +263,19 @@ export default function Home({ user, userType, onLogout }) {
         `}</style>
       </div>
 
-      <header className="absolute top-20 left-0 w-full z-40 bg-transparent border-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex items-center justify-center h-16 sm:h-20">
-            <Link to="/" className="flex flex-col items-center justify-center gap-1">
+      {/* HEADER - Glassmorphism */}
+      <header className="absolute top-10 left-0 w-full z-40 bg-transparent border-none">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+          <div className="relative flex items-center justify-between h-16 sm:h-20 bg-dark-100/30 backdrop-blur-lg border border-white/5 rounded-2xl px-6 shadow-2xl">
+            <Link to="/" className="flex items-center gap-3 group">
               <img
                 src="/Comvaga Logo.png"
                 alt="Comvaga"
-                className="h-15 w-auto object-contain sm:h-17"
+                className="h-10 w-auto object-contain sm:h-12 drop-shadow-md group-hover:scale-105 transition-transform"
               />
-              <h1 className="text-2xl sm:text-3xl font-black">COMVAGA</h1>
+              <h1 className="text-xl sm:text-2xl font-black tracking-tighter text-white">COMVAGA</h1>
             </Link>
-            <div className="absolute right-0 top-[40%] -translate-y-1/2">
+            <div>
               <SearchBox
                 searchOpen={searchOpen}
                 setSearchOpen={setSearchOpen}
@@ -288,38 +290,41 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </header>
 
-      <section className="relative pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pt-48 lg:pb-32 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-yellow-600/10"></div>
-        <div className="absolute top-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+      {/* HERO SECTION - Aggressive Grid & Glow */}
+      <section className="relative pt-40 pb-20 sm:pt-48 sm:pb-28 lg:pt-56 lg:pb-36 px-4 overflow-hidden border-b border-white/5">
+        {/* Background Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
+        {/* Glowing Orbs */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-primary/20 rounded-[100%] blur-[120px] opacity-60 pointer-events-none"></div>
 
-        <div className="relative z-10 max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 border border-primary/30 rounded-button mb-8 backdrop-blur-sm">
-            <ZapIcon className="w-4 h-4 text-primary" />
-            <span className="text-primary font-bold text-sm">O FIM DA AGENDA ESBURACADA</span>
+        <div className="relative z-10 max-w-5xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-5 py-2 bg-black border border-primary/40 shadow-[0_0_20px_rgba(255,209,26,0.1)] rounded-full mb-10 backdrop-blur-md">
+            <ZapIcon className="w-4 h-4 text-primary animate-pulse" />
+            <span className="text-primary font-bold text-xs uppercase tracking-widest">O FIM DA AGENDA ESBURACADA</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-tight drop-shadow-lg">
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-black mb-8 leading-[1.05] tracking-tight">
             SUA AGENDA,<br />
-            <span className="bg-gradient-to-r from-primary to-yellow-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-br from-white via-primary to-yellow-600 bg-clip-text text-transparent drop-shadow-2xl">
               MATEMATICAMENTE PERFEITA
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
-            Comvaga organiza agenda, vitrine, equipe e cliente em uma experiência só. O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
+          <p className="text-lg md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
+            Comvaga organiza agenda, vitrine, equipe e cliente em uma experiência só. O sistema <span className="text-white font-bold border-b border-primary/50">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center mb-20">
             <Link
               to="/cadastro"
-              className="px-10 py-5 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-black text-lg hover:shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105 flex items-center justify-center gap-3"
+              className="px-10 py-5 bg-primary text-black rounded-full font-black text-lg hover:shadow-[0_0_40px_rgba(255,209,26,0.4)] transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3 group"
             >
-              MAXIMIZAR MEUS GANHOS <ZapIcon className="w-5 h-5" />
+              MAXIMIZAR MEUS GANHOS <ZapIcon className="w-5 h-5 group-hover:animate-bounce" />
             </Link>
             <button
               type="button"
               onClick={() => document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-10 py-5 bg-white/10 border border-white/20 text-white rounded-button font-bold text-lg hover:bg-white/20 backdrop-blur-sm"
+              className="px-10 py-5 bg-white/5 border border-white/10 text-white rounded-full font-bold text-lg hover:bg-white/10 hover:border-white/20 transition-all duration-300 backdrop-blur-md"
             >
               ENTENDER A LÓGICA
             </button>
@@ -327,9 +332,10 @@ export default function Home({ user, userType, onLogout }) {
 
           <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
             {['100%', '0%'].map((stat, i) => (
-              <div key={i} className="bg-dark-100/50 backdrop-blur-md border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all">
-                <div className="text-4xl font-normal text-primary mb-2">{stat}</div>
-                <div className="text-sm text-gray-500 uppercase">
+              <div key={i} className="bg-gradient-to-b from-dark-100/80 to-black backdrop-blur-xl border border-white/10 rounded-2xl p-8 hover:border-primary/50 transition-colors shadow-2xl relative overflow-hidden group">
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10 text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-primary to-yellow-700 mb-3 drop-shadow-md">{stat}</div>
+                <div className="relative z-10 text-sm text-gray-400 font-bold uppercase tracking-widest">
                   {['Aproveitamento de Tempo', 'Conflito de Horários'][i]}
                 </div>
               </div>
@@ -338,79 +344,61 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section id="como-funciona" className="py-24 px-4 bg-dark-100">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-black mb-4">
+      {/* HOW IT WORKS SECTION - Linear/Tech Style */}
+      <section id="como-funciona" className="py-28 px-4 bg-[#0a0a0a] border-b border-white/5 relative">
+        <div className="absolute right-0 top-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl sm:text-6xl font-black mb-6 tracking-tight">
               A CIÊNCIA <span className="text-primary">POR TRÁS</span>
             </h2>
-            <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
+            <p className="text-xl text-gray-400 font-medium">Como o sistema protege seu faturamento e respeita o cliente</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-10 md:gap-14">
+          {/* 3 Steps */}
+          <div className="grid md:grid-cols-3 gap-8 md:gap-10 mb-24">
             {[
-              { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
-              { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
-              { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
+              { num: '01', title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
+              { num: '02', title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
+              { num: '03', title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
             ].map(({ num, title, text }) => (
-              <div key={num} className="relative">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 md:-top-10 md:-left-4 w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 z-10">
-                  {num}
-                </div>
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-8 pt-14 md:pt-10">
-                  <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{text}</p>
-                </div>
+              <div key={num} className="group bg-dark-200/50 backdrop-blur-sm border border-white/5 rounded-2xl p-10 hover:bg-dark-100 transition-all duration-300 hover:border-primary/30 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="text-5xl font-black text-white/5 mb-6 group-hover:text-primary/20 transition-colors">{num}</div>
+                <h3 className="text-2xl font-bold mb-4 text-white tracking-tight">{title}</h3>
+                <p className="text-gray-400 leading-relaxed font-medium">{text}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-16 space-y-6">
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                  <ZapIcon className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                  <ZapIcon className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
-                  </p>
+          {/* Deep Dive Features */}
+          <div className="space-y-6">
+            {[
+              { title: 'REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS', lead: 'CANCELOU?', text: 'O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.' },
+              { title: 'ZONA DE CALOR: AGENDA SEM BURACOS', lead: 'A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.', text: 'A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.' },
+              { title: 'AGENDAMENTO MÚLTIPLO SEQUENCIAL', lead: 'O CLIENTE SELECIONA MAIS DE UM TRABALHO.', text: 'O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.' }
+            ].map((item, idx) => (
+              <div key={idx} className="bg-black border-l-4 border-l-primary border-y border-r border-white/5 rounded-r-2xl p-8 sm:p-10 hover:bg-dark-100/50 transition-colors group">
+                <div className="flex flex-col md:flex-row items-start gap-6">
+                  <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-300">
+                    <ZapIcon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-bold mb-3 text-white tracking-tight">{item.title}</h3>
+                    <p className="text-gray-400 leading-relaxed font-medium">
+                      <span className="text-primary font-bold mr-2">{item.lead}</span>
+                      {item.text}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
-                  <ZapIcon className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
-                  </p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
+      {/* PREVIEW SECTION - NÃO TOCADO CONFORME REGRAS */}
       <section className="py-24 px-4 bg-black overflow-hidden border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <div className="relative bg-dark-200 rounded-custom border border-gray-800 overflow-hidden">
@@ -531,16 +519,19 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-24 px-4 bg-dark-200">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-black mb-4">
+      {/* MUTUAL ADVANTAGE - Hover Cards */}
+      <section className="py-28 px-4 bg-[#080808] border-t border-white/5 relative">
+        <div className="absolute left-0 bottom-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl sm:text-6xl font-black mb-6 tracking-tight">
               VANTAGEM <span className="text-primary">MÚTUA</span>
             </h2>
-            <p className="text-xl text-gray-400">Por que Profissionais e Clientes preferem Comvaga</p>
+            <p className="text-xl text-gray-400 font-medium">Por que Profissionais e Clientes preferem Comvaga</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {[
               { icon: TrendingUpIcon, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
               { icon: UserIcon, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
@@ -551,19 +542,20 @@ export default function Home({ user, userType, onLogout }) {
             ].map(({ icon: Icon, title, text }, i) => (
               <div
                 key={i}
-                className="bg-gradient-to-br from-primary/10 to-yellow-600/10 border border-primary/20 rounded-custom p-8 hover:border-primary/50 transition-all hover:scale-105"
+                className="group bg-dark-200/40 backdrop-blur-md border border-white/5 rounded-2xl p-8 hover:bg-dark-100 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(255,209,26,0.1)]"
               >
-                <div className="w-16 h-16 bg-primary/20 rounded-custom flex items-center justify-center mb-6">
-                  <Icon className="w-8 h-8 text-primary" />
+                <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 group-hover:border-primary/50 transition-colors">
+                  <Icon className="w-7 h-7 text-gray-400 group-hover:text-primary transition-colors" />
                 </div>
-                <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-                <p className="text-gray-400 leading-relaxed">{text}</p>
+                <h3 className="text-xl font-bold mb-3 text-white tracking-tight">{title}</h3>
+                <p className="text-gray-400 leading-relaxed font-medium">{text}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* PLANOS SECTION - NÃO TOCADO CONFORME REGRAS */}
       <section className="py-24 px-4 bg-dark-100">
         <div className="max-w-7xl mx-auto">
 
@@ -739,56 +731,66 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-black text-black mb-6">ELEVE SEU NÍVEL PROFISSIONAL</h2>
-          <p className="text-2xl text-black/80 mb-8">Uma vitrine para vender, um painel para operar e uma agenda que pensa antes de confirmar.</p>
+      {/* FINAL CTA - Aggressive Dark & Gold Focus */}
+      <section className="py-32 px-4 bg-black relative overflow-hidden border-y border-white/5">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/30 via-black to-black pointer-events-none"></div>
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <h2 className="text-4xl sm:text-6xl font-black text-white mb-6 tracking-tight drop-shadow-2xl">
+            ELEVE SEU NÍVEL <span className="text-primary">PROFISSIONAL</span>
+          </h2>
+          <p className="text-xl sm:text-2xl text-gray-300 mb-10 font-medium max-w-2xl mx-auto">
+            Uma vitrine para vender, um painel para operar e uma agenda que pensa antes de confirmar.
+          </p>
           <Link
             to="/cadastro"
-            className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all hover:scale-105"
+            className="inline-flex items-center gap-3 px-12 py-6 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-full font-black text-xl hover:shadow-[0_0_50px_rgba(255,209,26,0.5)] transition-all duration-300 hover:scale-105 group"
           >
-            ACESSAR AGORA SEM CUSTO <ZapIcon className="w-6 h-6" />
+            ACESSAR AGORA SEM CUSTO <ZapIcon className="w-6 h-6 group-hover:animate-pulse" />
           </Link>
-          <p className="text-black/60 text-sm mt-6">Eficiência comprovada em barbearias, estúdios e clínicas.</p>
+          <p className="text-gray-500 text-sm mt-8 font-medium uppercase tracking-widest">
+            Eficiência comprovada em barbearias, estúdios e clínicas.
+          </p>
         </div>
       </section>
 
-      <footer className="bg-black py-12 px-4">
+      {/* FOOTER - Clean & Minimal */}
+      <footer className="bg-black py-16 px-4 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div className="flex flex-col justify-start">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
+            <div className="flex flex-col justify-start col-span-2 md:col-span-1">
               <Link to="/" className="inline-block hover:opacity-75 transition-opacity">
                 <img
                   src="/Comvaga Logo.png"
                   alt="Comvaga"
-                  className="h-16 w-auto object-contain"
+                  className="h-12 w-auto object-contain grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all"
                 />
               </Link>
-              <p className="text-gray-600 text-xs mt-3 uppercase leading-relaxed">
+              <p className="text-gray-500 text-sm mt-5 leading-relaxed font-medium">
                 Sua agenda,<br />matematicamente perfeita.
               </p>
             </div>
 
             <div>
-              <h4 className="text-white font-normal mb-4">PARA VOCÊ</h4>
-              <ul className="space-y-2">
+              <h4 className="text-white font-bold tracking-widest text-xs uppercase mb-6">PARA VOCÊ</h4>
+              <ul className="space-y-4">
                 {isLogged ? (
                   <>
                     <li>
                       <Link
                         to={userType === 'professional' ? '/dashboard' : '/minha-area'}
-                        className="text-gray-500 hover:text-primary transition-colors text-sm"
+                        className="text-gray-500 hover:text-primary transition-colors text-sm font-medium"
                       >
                         {userType === 'professional' ? 'DASHBOARD' : 'MINHA ÁREA'}
                       </Link>
                     </li>
                     <li>
-                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">
                         LOGIN PARCEIRO
                       </Link>
                     </li>
                     <li>
-                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">
                         CADASTRO PARCEIRO
                       </Link>
                     </li>
@@ -796,7 +798,7 @@ export default function Home({ user, userType, onLogout }) {
                       <button
                         type="button"
                         onClick={handleLogoutClick}
-                        className="text-gray-500 hover:text-primary transition-colors text-sm"
+                        className="text-gray-500 hover:text-primary transition-colors text-sm font-medium"
                       >
                         SAIR
                       </button>
@@ -805,22 +807,22 @@ export default function Home({ user, userType, onLogout }) {
                 ) : (
                   <>
                     <li>
-                      <Link to="/login" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/login" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">
                         ENTRAR
                       </Link>
                     </li>
                     <li>
-                      <Link to="/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">
                         CADASTRAR GRÁTIS
                       </Link>
                     </li>
                     <li>
-                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">
                         LOGIN PARCEIRO
                       </Link>
                     </li>
                     <li>
-                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">
                         CADASTRO PARCEIRO
                       </Link>
                     </li>
@@ -830,11 +832,11 @@ export default function Home({ user, userType, onLogout }) {
             </div>
 
             <div>
-              <h4 className="text-white font-normal mb-4">EMPRESA</h4>
-              <ul className="space-y-2">
+              <h4 className="text-white font-bold tracking-widest text-xs uppercase mb-6">EMPRESA</h4>
+              <ul className="space-y-4">
                 {['SOBRE', 'BLOG'].map((link) => (
                   <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-primary transition-colors text-sm">
+                    <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">
                       {link}
                     </a>
                   </li>
@@ -843,11 +845,11 @@ export default function Home({ user, userType, onLogout }) {
             </div>
 
             <div>
-              <h4 className="text-white font-normal mb-4">LEGAL</h4>
-              <ul className="space-y-2">
+              <h4 className="text-white font-bold tracking-widest text-xs uppercase mb-6">LEGAL</h4>
+              <ul className="space-y-4">
                 {['PRIVACIDADE', 'TERMOS'].map((link) => (
                   <li key={link}>
-                    <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                    <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">
                       {link}
                     </a>
                   </li>
@@ -856,8 +858,8 @@ export default function Home({ user, userType, onLogout }) {
             </div>
           </div>
 
-          <div className="pt-6">
-            <p className="text-gray-600 text-sm">© 2026 COMVAGA. Todos os direitos reservados.</p>
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-gray-600 text-sm font-medium">© 2026 COMVAGA. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>
