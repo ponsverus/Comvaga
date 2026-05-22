@@ -643,7 +643,7 @@ export default function Home({ user, userType, onLogout }) {
                   Profissional
                 </span>
                 <p className="text-2xl font-normal text-white mb-1">
-                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês o que dá R$ 1,33 </span>
+                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês o que dá R$ 1,33 por dia</span>
                 </p>
                 <p className="text-sm text-gray-400 leading-relaxed">
                   Para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.
