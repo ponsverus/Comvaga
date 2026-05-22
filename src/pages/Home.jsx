@@ -643,7 +643,7 @@ export default function Home({ user, userType, onLogout }) {
                   Profissional
                 </span>
                 <p className="text-2xl font-normal text-white mb-1">
-                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
+                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês o que dá R$ 1,33 </span>
                 </p>
                 <p className="text-sm text-gray-400 leading-relaxed">
                   Para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.
@@ -673,7 +673,7 @@ export default function Home({ user, userType, onLogout }) {
               <div className="mt-5 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
                 <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
                 <span className="text-xs font-normal text-primary uppercase tracking-wide">
-                  MESMO <strong className="font-bold">VALOR</strong> E BENEFÍCIOS DO PLANO DO ESSENCIAL
+                  MESMO <strong className="font-bold">VALOR</strong> E BENEFÍCIOS DO ESSENCIAL
                 </span>
               </div>
 
