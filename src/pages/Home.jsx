@@ -592,7 +592,7 @@ export default function Home({ user, userType, onLogout }) {
                   Essencial
                 </span>
                 <p className="text-2xl font-normal text-white mb-1">
-                  R$ 29<span className="text-base font-normal text-gray-500">,99/mês</span>
+                  R$ 39<span className="text-base font-normal text-gray-500">,99/mês</span>
                 </p>
                 <p className="text-sm text-gray-500 leading-relaxed">
                   Para autônomos que buscam organizar sua agenda.
@@ -604,6 +604,7 @@ export default function Home({ user, userType, onLogout }) {
                   'Reabertura automática de horários cancelados na agenda',
                   'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
                   'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
+                  'Controle individual para um único profissional com indicadores básicos de agendamentos e receita',
                   'Agendamento assistido pelo profissional',
                   'Vitrine profissional',
                   'Alertas por e-mail em tempo real',
