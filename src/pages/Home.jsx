@@ -607,6 +607,8 @@ export default function Home({ user, userType, onLogout }) {
                   'Controle individual para um único profissional com indicadores básicos de agendamentos e receita',
                   'Agendamento assistido pelo profissional',
                   'Vitrine profissional',
+                  'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
+                  'Reagendamento inteligente em um clique pela área exclusiva do cliente',
                   'Alertas por e-mail em tempo real',
                   'Lembrete automático 30 min antes',
                   'Sincronia total com o Google Agenda.',
@@ -644,24 +646,20 @@ export default function Home({ user, userType, onLogout }) {
                   R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
                 </p>
                 <p className="text-sm text-gray-400 leading-relaxed">
-                  Controle total para negócios em crescimento, com métricas e equipe ILIMITADA.
+                  Controle total para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.
                 </p>
               </div>
 
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
                   'Tudo do plano ESSENCIAL',
-                  'Tudo do plano PREMIUM REAL',
                   'Painel admin: controle de múltiplos profissionais',
                   'Painel individual para cada profissional parceiro',
-                  'Profissionais ilimitados e sem custo extra por parceiro',
+                  'Até 5 profissionais parceiros sem taxas ou custos adicionais',
                   'Métricas em tempo real com contraste de desempenho diário',
-                  'Comprometimento da agenda e receita futura projetada',
                   'Análise evolutiva de faturamento com filtros temporais estratégicos',
-                  'Taxa de fechamento de agendamentos por período',
-                  'Montagem de ofertas nos trabalhos oferecidos',
-                  'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
-                  'Reagendamento inteligente em um clique pela área exclusiva do cliente',
+                  'Relatório de faturamento volumétrico agrupado por período selecionado',
+                  'Montagem de ofertas nos trabalhos oferecidos',                  
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
                     <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
@@ -675,7 +673,7 @@ export default function Home({ user, userType, onLogout }) {
               <div className="mt-5 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
                 <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
                 <span className="text-xs font-normal text-primary uppercase tracking-wide">
-                  Vantagens do <strong className="font-bold">Premium Real</strong> inclusas
+                  MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL
                 </span>
               </div>
 
@@ -708,16 +706,8 @@ export default function Home({ user, userType, onLogout }) {
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
                   'Tudo do plano PROFISSIONAL',
-                  'Painel admin: controle de múltiplos profissionais',
-                  'Painel individual para cada profissional parceiro',
-                  'Profissionais ilimitados e sem custo extra por parceiro',
-                  'Métricas em tempo real com contraste de desempenho diário',
+                  'Profissionais ilimitados e sem custo extra por parceiro',                 
                   'Comprometimento da agenda e receita futura projetada',
-                  'Análise evolutiva de faturamento com filtros temporais estratégicos.',
-                  'Taxa de fechamento de agendamentos por período',
-                  'Montagem de ofertas nos trabalhos oferecidos',
-                  'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
-                  'Reagendamento inteligente em um clique pela área exclusiva do cliente',
                   'Acesso antecipado a novos recursos',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
