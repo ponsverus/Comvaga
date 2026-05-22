@@ -646,7 +646,7 @@ export default function Home({ user, userType, onLogout }) {
                   R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
                 </p>
                 <p className="text-sm text-gray-400 leading-relaxed">
-                  Controle total para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.
+                  Para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.
                 </p>
               </div>
 
