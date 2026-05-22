@@ -602,6 +602,8 @@ export default function Home({ user, userType, onLogout }) {
               <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
                   'Reabertura automática de horários cancelados na agenda',
+                  'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
+                  'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
                   'Agendamento assistido pelo profissional',
                   'Vitrine profissional',
                   'Alertas por e-mail em tempo real',
