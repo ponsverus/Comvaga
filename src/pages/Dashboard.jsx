@@ -410,6 +410,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     setFormInfo,
     formEntrega,
     setFormEntrega,
+    entregas,
     editingEntregaId,
     setEditingEntregaId,
     setShowNovaEntrega,
