@@ -32,7 +32,7 @@ function FieldRow({ label, children, last = false }) {
 
 const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white';
 
-export default function CadastroParceiro({ suppressAuthRef }) {
+export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -82,6 +82,8 @@ export default function CadastroParceiro({ suppressAuthRef }) {
         return;
       }
 
+      if (suppressAuthRef) suppressAuthRef.current = false;
+      onLogin?.(signUpData.user, 'professional', 'pending', 'owner_resume');
       navigate('/cadastro/profissional-parceiro/retomada', { replace: true });
     } catch (e) {
       setAlerta({ body: e?.message || msgs.unexpected_error.body, variant: 'erro' });
