@@ -28,6 +28,7 @@ export function useDashboardMutations({
   setFormInfo,
   formEntrega,
   setFormEntrega,
+  entregas,
   editingEntregaId,
   setEditingEntregaId,
   setShowNovaEntrega,
@@ -335,9 +336,22 @@ export function useDashboardMutations({
         preco_promocional: promo,
         profissional_id: profId,
       };
-      const { error: updErr } = await supabase.from('entregas').update(payload).eq('id', editingEntregaId).eq('negocio_id', negocio.id);
-      if (updErr) throw updErr;
-      await uiAlert(`dashboard.business.${businessGroup}.entrega_updated`, 'success');
+      const entregaAtual = (entregas || []).find((item) => item.id === editingEntregaId);
+      const mudouProfissional = entregaAtual?.profissional_id && entregaAtual.profissional_id !== profId;
+
+      if (mudouProfissional) {
+        const { error: insErr } = await supabase.from('entregas').insert([{
+          ...payload,
+          ativo: true,
+          negocio_id: negocio.id,
+        }]);
+        if (insErr) throw insErr;
+        await uiAlert(`dashboard.business.${businessGroup}.entrega_created`, 'success');
+      } else {
+        const { error: updErr } = await supabase.from('entregas').update(payload).eq('id', editingEntregaId).eq('negocio_id', negocio.id);
+        if (updErr) throw updErr;
+        await uiAlert(`dashboard.business.${businessGroup}.entrega_updated`, 'success');
+      }
       resetEntregaForm();
       await reloadEntregas();
     } catch (e2) {
