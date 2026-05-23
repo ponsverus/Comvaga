@@ -81,6 +81,8 @@ export default function BookingCalendar({
   const containerRef = useRef(null);
   const slotsRef     = useRef(null);
   const resumeRef    = useRef(null);
+  const selectedDayRef = useRef(null);
+  const slotsRequestRef = useRef(0);
 
   useEffect(() => {
     function handle(e) {
@@ -96,10 +98,27 @@ export default function BookingCalendar({
     if (!parsedToday) return;
     setViewYear(parsedToday.year);
     setViewMonth(parsedToday.month);
+
+    if (selectedDayRef.current && isoLt(selectedDayRef.current, todayISO)) {
+      selectedDayRef.current = null;
+      slotsRequestRef.current += 1;
+      setSelectedDay(null);
+      setSelectedSlot(null);
+      setHorariosHot([]);
+      setHorariosAll([]);
+      setShowAll(false);
+      setSlotsError(null);
+      setConfirmError(null);
+      setSlotsLoading(false);
+    }
   }, [todayISO]);
 
   const fetchSlots = useCallback(async (dayISO) => {
     if (!profissional?.id || !entrega?.duracao_minutos || !dayISO) return;
+
+    const requestId = slotsRequestRef.current + 1;
+    slotsRequestRef.current = requestId;
+    const canApply = () => slotsRequestRef.current === requestId && selectedDayRef.current === dayISO;
 
     setSlotsLoading(true);
     setSlotsError(null);
@@ -120,6 +139,7 @@ export default function BookingCalendar({
         p_modo:            'todos',
       });
       if (error) throw error;
+      if (!canApply()) return;
 
       const list = (data || []).map(s => ({
         hora:           String(s.label || '').slice(0, 5),
@@ -146,13 +166,15 @@ export default function BookingCalendar({
 
       setTimeout(() => slotsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
     } catch (e) {
+      if (!canApply()) return;
       setSlotsError('Erro ao buscar horários. Tente outro dia.');
     } finally {
-      setSlotsLoading(false);
+      if (canApply()) setSlotsLoading(false);
     }
   }, [profissional?.id, entrega?.duracao_minutos]);
 
   const handleSelectDay = iso => {
+    selectedDayRef.current = iso;
     setSelectedDay(iso);
     fetchSlots(iso);
   };
