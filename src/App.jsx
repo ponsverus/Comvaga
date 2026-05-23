@@ -409,7 +409,7 @@ export default function App() {
             <Route path="/cadastro/parceiro" element={
               isLoggedIn && userType
                 ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
-                : <CadastroParceiro suppressAuthRef={suppressAuthRef} />
+                : <CadastroParceiro onLogin={handleLogin} suppressAuthRef={suppressAuthRef} />
             } />
 
             <Route path="/login/parceiro" element={
