@@ -240,6 +240,11 @@ export const ptBR = {
           body: 'Ocorreu uma falha ao atualizar este serv. Tente novamente.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
         },
+        entrega_duplicate_name: {
+          title: 'Nome repetido',
+          body: 'Este profissional já possui um serv. com este nome.',
+          variant: 'warning', screen: 'dark', buttonText: 'OK',
+        },
         entrega_delete_confirm: {
           title: 'Excluir serv?',
           body: 'Tem certeza que deseja excluir este serv?',
@@ -284,6 +289,11 @@ export const ptBR = {
           body: 'Ocorreu uma falha ao atualizar esta consulta. Tente novamente.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
         },
+        entrega_duplicate_name: {
+          title: 'Nome repetido',
+          body: 'Este profissional já possui uma consulta com este nome.',
+          variant: 'warning', screen: 'dark', buttonText: 'OK',
+        },
         entrega_delete_confirm: {
           title: 'Excluir consulta?',
           body: 'Tem certeza que deseja excluir esta consulta?',
@@ -327,6 +337,11 @@ export const ptBR = {
           title: 'Erro ao salvar',
           body: 'Ocorreu uma falha ao atualizar esta aula. Tente novamente.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        entrega_duplicate_name: {
+          title: 'Nome repetido',
+          body: 'Este profissional já possui uma aula com este nome.',
+          variant: 'warning', screen: 'dark', buttonText: 'OK',
         },
         entrega_delete_confirm: {
           title: 'Excluir aula?',
