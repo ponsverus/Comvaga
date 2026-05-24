@@ -325,9 +325,9 @@ export default function Home({ user, userType, onLogout }) {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div className="grid grid-cols-2 gap-px bg-gray-800 border-y border-gray-800 max-w-2xl mx-auto">
             {['100%', '0%'].map((stat, i) => (
-              <div key={i} className="bg-dark-100/50 backdrop-blur-md border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all">
+              <div key={i} className="bg-black/50 backdrop-blur-md p-6 hover:bg-black/80 transition-all flex flex-col justify-center items-center text-center">
                 <div className="text-4xl font-normal text-primary mb-2">{stat}</div>
                 <div className="text-sm text-gray-500 uppercase">
                   {['Aproveitamento de Tempo', 'Conflito de Horários'][i]}
@@ -347,32 +347,30 @@ export default function Home({ user, userType, onLogout }) {
             <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-10 md:gap-14">
+          <div className="grid md:grid-cols-3 gap-px bg-gray-800 border-y border-gray-800">
             {[
               { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
               { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
               { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
             ].map(({ num, title, text }) => (
-              <div key={num} className="relative">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 md:-top-10 md:-left-4 w-16 h-16 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 z-10">
+              <div key={num} className="bg-dark-100 p-8 md:p-12 flex flex-col">
+                <div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 mb-6 shrink-0">
                   {num}
                 </div>
-                <div className="bg-dark-200 border border-gray-800 rounded-custom p-8 pt-14 md:pt-10">
-                  <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{text}</p>
-                </div>
+                <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
+                <p className="text-gray-400 leading-relaxed">{text}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-16 space-y-6">
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-full flex items-center justify-center flex-shrink-0">
+          <div className="mt-16 flex flex-col gap-px bg-gray-800 border-y border-gray-800">
+            <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors">
+              <div className="flex flex-col md:flex-row items-start gap-6">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
                   <ZapIcon className="w-8 h-8 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
+                  <h3 className="text-2xl font-normal mb-3 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
                   <p className="text-gray-300 leading-relaxed">
                     <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
                   </p>
@@ -380,13 +378,13 @@ export default function Home({ user, userType, onLogout }) {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors">
+              <div className="flex flex-col md:flex-row items-start gap-6">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
                   <ZapIcon className="w-8 h-8 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
+                  <h3 className="text-2xl font-normal mb-3 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
                   <p className="text-gray-300 leading-relaxed">
                     <span className="text-primary">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
                   </p>
@@ -394,13 +392,13 @@ export default function Home({ user, userType, onLogout }) {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors">
+              <div className="flex flex-col md:flex-row items-start gap-6">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
                   <ZapIcon className="w-8 h-8 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-normal mb-2 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
+                  <h3 className="text-2xl font-normal mb-3 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
                   <p className="text-gray-300 leading-relaxed">
                     <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
                   </p>
@@ -413,13 +411,13 @@ export default function Home({ user, userType, onLogout }) {
 
       <section className="py-24 px-4 bg-black overflow-hidden border-t border-white/5">
         <div className="max-w-7xl mx-auto">
-          <div className="relative bg-dark-200 rounded-custom border border-gray-800 overflow-hidden">
+          <div className="relative bg-dark-200 border-y border-gray-800 overflow-hidden">
             <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
             <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
 
-            <div className="grid lg:grid-cols-2 gap-12 items-center p-6 sm:p-16">
-              <div className="relative z-10 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6">
+            <div className="grid lg:grid-cols-2 gap-px bg-gray-800 items-stretch">
+              <div className="relative z-10 text-center lg:text-left bg-dark-200 p-8 sm:p-16 flex flex-col justify-center">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6 self-center lg:self-start">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -436,12 +434,12 @@ export default function Home({ user, userType, onLogout }) {
                   Seu negócio merece mais do que um link de WhatsApp. Permita que seus clientes enxerguem seus trabalhos, depoimentos, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12 lg:mb-0">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                   <a
                     href="https://comvaga.com.br/v/vikings"
                     target="_blank"
                     rel="noreferrer"
-                    className="px-8 py-4 bg-primary text-black font-black rounded-button hover:shadow-[0_0_30px_rgba(255,209,26,0.3)] transition-all hover:scale-105 flex items-center justify-center gap-3 group"
+                    className="px-8 py-4 bg-primary text-black font-black rounded-button hover:shadow-[0_0_30px_rgba(255,209,26,0.3)] transition-all flex items-center justify-center gap-3 group"
                   >
                     VER VITRINE EXEMPLO 
                     <ZapIcon className="w-5 h-5 group-hover:animate-bounce" />
@@ -449,8 +447,8 @@ export default function Home({ user, userType, onLogout }) {
                 </div>
               </div>
 
-              <div className="relative z-10 w-full max-w-[380px] mx-auto lg:max-w-none">
-                <div className="relative bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
+              <div className="relative z-10 w-full flex items-center justify-center bg-dark-200 p-8 sm:p-16">
+                <div className="relative w-full max-w-[380px] bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
                   <div className="h-16 sm:h-20 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
                     <div className="absolute -bottom-10 left-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
                        <div className="w-full h-full bg-gray-800 flex items-center justify-center font-black text-primary text-2xl">V</div>
@@ -540,7 +538,7 @@ export default function Home({ user, userType, onLogout }) {
             <p className="text-xl text-gray-400">Por que Profissionais e Clientes preferem Comvaga</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-800 border-y border-gray-800">
             {[
               { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
               { icon: ZapIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
@@ -551,9 +549,9 @@ export default function Home({ user, userType, onLogout }) {
             ].map(({ icon: Icon, title, text }, i) => (
               <div
                 key={i}
-                className="bg-gradient-to-br from-primary/10 to-yellow-600/10 border border-primary/20 rounded-custom p-8 hover:border-primary/50 transition-all hover:scale-105"
+                className="bg-dark-200 p-8 sm:p-10 hover:bg-dark-100 transition-colors flex flex-col"
               >
-                <div className="w-16 h-16 bg-primary/20 rounded-custom flex items-center justify-center mb-6">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
                   <Icon className="w-8 h-8 text-primary" />
                 </div>
                 <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
@@ -575,17 +573,15 @@ export default function Home({ user, userType, onLogout }) {
           </div>
          
           <div className="
-            flex items-start gap-5 overflow-x-auto scroll-snap-type-x-mandatory
-            sm:grid sm:grid-cols-3 sm:items-start sm:overflow-visible
+            flex sm:grid sm:grid-cols-3 gap-px bg-gray-800 border-y border-gray-800
+            overflow-x-auto sm:overflow-visible
             pb-4 sm:pb-0
             [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
           ">
 
             <div className="
-              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
-              sm:w-auto sm:max-w-none
-              bg-dark-200 border border-gray-800 rounded-[3px]
-              p-7 flex flex-col
+              shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
+              bg-dark-100 p-8 sm:p-10 flex flex-col
             ">
               <div className="mb-5">
                 <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
@@ -599,7 +595,7 @@ export default function Home({ user, userType, onLogout }) {
                 </p>
               </div>
 
-              <div className="pt-5 flex flex-col gap-3">
+              <div className="pt-5 flex flex-col gap-3 flex-grow">
                 {[
                   'Reabertura automática de horários cancelados na agenda',
                   'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
@@ -626,17 +622,15 @@ export default function Home({ user, userType, onLogout }) {
                 href={WHATSAPP_ESSENCIAL_HREF}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
+                className="mt-8 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
               >
                 Tenho interesse
               </a>
             </div>
 
             <div className="
-              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
-              sm:w-auto sm:max-w-none
-              bg-dark-200 border border-primary/60 rounded-[3px]
-              p-7 relative flex flex-col
+              shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
+              bg-primary/5 p-8 sm:p-10 relative flex flex-col
             ">
               <div className="mb-5">
                 <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
@@ -650,7 +644,7 @@ export default function Home({ user, userType, onLogout }) {
                 </p>
               </div>
 
-              <div className="pt-5 flex flex-col gap-3">
+              <div className="pt-5 flex flex-col gap-3 flex-grow">
                 {[
                   'Tudo do plano ESSENCIAL',
                   'Painel admin: controle de múltiplos profissionais',
@@ -670,7 +664,7 @@ export default function Home({ user, userType, onLogout }) {
                 ))}
               </div>
 
-              <div className="mt-5 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
+              <div className="mt-8 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
                 <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
                 <span className="text-xs font-normal text-primary uppercase tracking-wide">
                   MESMO <strong className="font-bold">VALOR</strong> E BENEFÍCIOS DO ESSENCIAL
@@ -679,17 +673,15 @@ export default function Home({ user, userType, onLogout }) {
 
               <Link
                 to="/cadastro"
-                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02] transition-all"
+                className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
               >
                 ASSINAR AGORA <ZapIcon className="w-3.5 h-3.5" />
               </Link>
             </div>
 
             <div className="
-              shrink-0 w-max max-w-[85vw] [scroll-snap-align:center]
-              sm:w-auto sm:max-w-none
-              bg-dark-200 border border-gray-800 rounded-[3px]
-              p-7 flex flex-col
+              shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
+              bg-dark-100 p-8 sm:p-10 flex flex-col
             ">
               <div className="mb-5">
                 <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
@@ -703,7 +695,7 @@ export default function Home({ user, userType, onLogout }) {
                 </p>
               </div>
 
-              <div className="pt-5 flex flex-col gap-3">
+              <div className="pt-5 flex flex-col gap-3 flex-grow">
                 {[
                   'Tudo do plano PROFISSIONAL',
                   'Profissionais ilimitados e sem custo extra por parceiro',                 
@@ -723,7 +715,7 @@ export default function Home({ user, userType, onLogout }) {
                 href={WHATSAPP_PREMIUM_HREF}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
+                className="mt-8 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
               >
                 Tenho interesse
               </a>
@@ -738,7 +730,7 @@ export default function Home({ user, userType, onLogout }) {
           <p className="text-2xl text-black/80 mb-8">Uma vitrine para vender, um painel para operar e uma agenda que pensa antes de confirmar.</p>
           <Link
             to="/cadastro"
-            className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all hover:scale-105"
+            className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all"
           >
             ACESSAR AGORA SEM CUSTO <ZapIcon className="w-6 h-6" />
           </Link>
@@ -856,4 +848,5 @@ export default function Home({ user, userType, onLogout }) {
       </footer>
     </div>
   );
+  
 }
