@@ -368,7 +368,7 @@ export default function Home({ user, userType, onLogout }) {
           <div className="mt-16 space-y-6">
             <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 bg-primary/30 rounded-full flex items-center justify-center flex-shrink-0">
                   <ZapIcon className="w-8 h-8 text-primary" />
                 </div>
                 <div>
@@ -382,7 +382,7 @@ export default function Home({ user, userType, onLogout }) {
 
             <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 bg-primary/30 rounded-full flex items-center justify-center flex-shrink-0">
                   <ZapIcon className="w-8 h-8 text-primary" />
                 </div>
                 <div>
@@ -396,7 +396,7 @@ export default function Home({ user, userType, onLogout }) {
 
             <div className="bg-gradient-to-br from-primary/20 to-yellow-600/20 border border-primary/30 rounded-custom p-8">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-primary/30 rounded-custom flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 bg-primary/30 rounded-full flex items-center justify-center flex-shrink-0">
                   <ZapIcon className="w-8 h-8 text-primary" />
                 </div>
                 <div>
