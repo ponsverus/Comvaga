@@ -611,7 +611,7 @@ export default function Home({ user, userType, onLogout }) {
                 </p>
               </div>
 
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
+              <div className="pt-5 flex flex-col gap-3">
                 {[
                   'Reabertura automática de horários cancelados na agenda',
                   'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
@@ -662,7 +662,7 @@ export default function Home({ user, userType, onLogout }) {
                 </p>
               </div>
 
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
+              <div className="pt-5 flex flex-col gap-3">
                 {[
                   'Tudo do plano ESSENCIAL',
                   'Painel admin: controle de múltiplos profissionais',
@@ -715,7 +715,7 @@ export default function Home({ user, userType, onLogout }) {
                 </p>
               </div>
 
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
+              <div className="pt-5 flex flex-col gap-3">
                 {[
                   'Tudo do plano PROFISSIONAL',
                   'Profissionais ilimitados e sem custo extra por parceiro',                 
