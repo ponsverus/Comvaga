@@ -284,7 +284,7 @@ export default function Home({ user, userType, onLogout }) {
               />
               <h1 className="text-2xl sm:text-3xl font-black">COMVAGA</h1>
             </Link>
-            <div className="absolute right-0 top-0 sm:top-1">
+            <div className="absolute right-0 top-[-4px] sm:top-[-2px]">
               <SearchBox
                 searchOpen={searchOpen}
                 setSearchOpen={setSearchOpen}
