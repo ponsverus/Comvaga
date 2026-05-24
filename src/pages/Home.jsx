@@ -274,8 +274,20 @@ export default function Home({ user, userType, onLogout }) {
       </div>
 
       <header className="absolute top-20 left-0 w-full z-40 bg-transparent border-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex items-center justify-center h-16 sm:h-20">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="absolute right-4 top-[-10px] z-20 sm:right-6 sm:top-[-6px] lg:right-8">
+            <SearchBox
+              searchOpen={searchOpen}
+              setSearchOpen={setSearchOpen}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              resultadosBusca={resultadosBusca}
+              setResultadosBusca={setResultadosBusca}
+              buscando={buscando}
+            />
+          </div>
+
+          <div className="flex items-center justify-center h-16 sm:h-20">
             <Link to="/" className="flex flex-col items-center justify-center gap-1">
               <img
                 src="/Comvaga Logo.png"
@@ -284,17 +296,6 @@ export default function Home({ user, userType, onLogout }) {
               />
               <h1 className="text-2xl sm:text-3xl font-black">COMVAGA</h1>
             </Link>
-            <div className="absolute right-0 top-[-4px] sm:top-[-2px]">
-              <SearchBox
-                searchOpen={searchOpen}
-                setSearchOpen={setSearchOpen}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                resultadosBusca={resultadosBusca}
-                setResultadosBusca={setResultadosBusca}
-                buscando={buscando}
-              />
-            </div>
           </div>
         </div>
       </header>
@@ -462,7 +463,7 @@ export default function Home({ user, userType, onLogout }) {
 
               <div className="relative z-10 w-full max-w-[380px] mx-auto lg:max-w-none">
                 <div className="relative bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
-                  <div className="h-20 sm:h-24 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
+                  <div className="h-16 sm:h-20 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
                     <div className="absolute -bottom-10 left-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
                        <div className="w-full h-full bg-gray-800 flex items-center justify-center font-black text-primary text-2xl">V</div>
                     </div>
@@ -610,7 +611,6 @@ export default function Home({ user, userType, onLogout }) {
                 </p>
               </div>
 
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
                   'Reabertura automática de horários cancelados na agenda',
                   'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
@@ -654,14 +654,13 @@ export default function Home({ user, userType, onLogout }) {
                   Profissional
                 </span>
                 <p className="text-2xl font-normal text-white mb-1">
-                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês o que dá R$ 1,33 por dia</span>
+                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
                 </p>
                 <p className="text-sm text-gray-400 leading-relaxed">
                   Para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.
                 </p>
               </div>
 
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
                   'Tudo do plano ESSENCIAL',
                   'Painel admin: controle de múltiplos profissionais',
@@ -714,7 +713,6 @@ export default function Home({ user, userType, onLogout }) {
                 </p>
               </div>
 
-              <div className="border-t border-gray-800 pt-5 flex flex-col gap-3">
                 {[
                   'Tudo do plano PROFISSIONAL',
                   'Profissionais ilimitados e sem custo extra por parceiro',                 
