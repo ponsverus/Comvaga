@@ -160,7 +160,6 @@ export default function Home({ user, userType, onLogout }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [resultadosBusca, setResultadosBusca] = useState([]);
   const [buscando, setBuscando] = useState(false);
-  const plansRef = useRef(null);
 
   const { showMessage } = useFeedback();
   const isLogged = !!user && !!userType;
@@ -208,16 +207,6 @@ export default function Home({ user, userType, onLogout }) {
       setBuscando(false);
     };
   }, [searchTerm, showMessage]);
-
-  useEffect(() => {
-    const wrap = plansRef.current;
-    if (!wrap || !window.matchMedia('(max-width: 639px)').matches) return;
-
-    const profissionalCard = wrap.children?.[1];
-    if (!profissionalCard) return;
-
-    wrap.scrollLeft = profissionalCard.offsetLeft - ((wrap.clientWidth - profissionalCard.clientWidth) / 2);
-  }, []);
 
   const handleLogoutClick = () => onLogout?.();
 
@@ -274,20 +263,8 @@ export default function Home({ user, userType, onLogout }) {
       </div>
 
       <header className="absolute top-20 left-0 w-full z-40 bg-transparent border-none">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="absolute right-4 top-[-10px] z-20 sm:right-6 sm:top-[-6px] lg:right-8">
-            <SearchBox
-              searchOpen={searchOpen}
-              setSearchOpen={setSearchOpen}
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              resultadosBusca={resultadosBusca}
-              setResultadosBusca={setResultadosBusca}
-              buscando={buscando}
-            />
-          </div>
-
-          <div className="flex items-center justify-center h-16 sm:h-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative flex items-center justify-center h-16 sm:h-20">
             <Link to="/" className="flex flex-col items-center justify-center gap-1">
               <img
                 src="/Comvaga Logo.png"
@@ -296,6 +273,17 @@ export default function Home({ user, userType, onLogout }) {
               />
               <h1 className="text-2xl sm:text-3xl font-black">COMVAGA</h1>
             </Link>
+            <div className="absolute right-0 top-[40%] -translate-y-1/2">
+              <SearchBox
+                searchOpen={searchOpen}
+                setSearchOpen={setSearchOpen}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                resultadosBusca={resultadosBusca}
+                setResultadosBusca={setResultadosBusca}
+                buscando={buscando}
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -463,7 +451,7 @@ export default function Home({ user, userType, onLogout }) {
 
               <div className="relative z-10 w-full max-w-[380px] mx-auto lg:max-w-none">
                 <div className="relative bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
-                  <div className="h-16 sm:h-20 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
+                  <div className="h-24 sm:h-32 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
                     <div className="absolute -bottom-10 left-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
                        <div className="w-full h-full bg-gray-800 flex items-center justify-center font-black text-primary text-2xl">V</div>
                     </div>
@@ -586,7 +574,7 @@ export default function Home({ user, userType, onLogout }) {
             <p className="text-xl text-gray-400">Acesso liberado sem necessidade de dados bancários. Simples assim :)</p>
           </div>
          
-          <div ref={plansRef} className="
+          <div className="
             flex items-start gap-5 overflow-x-auto scroll-snap-type-x-mandatory
             sm:grid sm:grid-cols-3 sm:items-start sm:overflow-visible
             pb-4 sm:pb-0
@@ -655,7 +643,7 @@ export default function Home({ user, userType, onLogout }) {
                   Profissional
                 </span>
                 <p className="text-2xl font-normal text-white mb-1">
-                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês o que dá R$ 1,33 por dia</span>
+                  R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
                 </p>
                 <p className="text-sm text-gray-400 leading-relaxed">
                   Para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.
