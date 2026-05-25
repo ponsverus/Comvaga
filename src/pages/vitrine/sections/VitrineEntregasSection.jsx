@@ -20,13 +20,18 @@ export default function VitrineEntregasSection({
           <p className="text-vmuted font-normal">{emptyListMsg}</p>
         </div>
       ) : (
-        <div className="w-full bg-vborder border-t border-vborder grid grid-cols-1 md:grid-cols-2 gap-px items-start">
+        <div className="w-full bg-vborder border-t border-vborder columns-1 md:columns-2 gap-px p-0">
           {cards.map((card) => {
             return (
-              <div key={card.id} className="bg-vcard p-6 hover:border-vprimary/50 transition-all h-full">
+              <div 
+                key={card.id} 
+                className="bg-vcard p-6 hover:border-vprimary/50 transition-all mb-px break-inside-avoid inline-block w-full"
+              >
                 <div className="flex items-center justify-between mb-4">
                   <div className="font-normal text-lg uppercase">{card.nome}</div>
-                  <div className="text-xs text-vmuted font-normal">{card.lista.length} {card.lista.length === 1 ? counterSingular : counterPlural}</div>
+                  <div className="text-xs text-vmuted font-normal">
+                    {card.lista.length} {card.lista.length === 1 ? counterSingular : counterPlural}
+                  </div>
                 </div>
                 <EntregasCarousel
                   lista={card.lista}
