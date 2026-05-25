@@ -247,7 +247,7 @@ export default function InfoNegocioSection({
           value={visiblePrivateFields.instagram ? formInfo.instagram : maskedPrivateValue}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, instagram: e.target.value }))}
           readOnly={!visiblePrivateFields.instagram}
-          className={inputClass}
+          className={`${inputClass} uppercase`}
           placeholder="@BARBEARIATORRES"
         />
       </InfoRow>
@@ -258,7 +258,7 @@ export default function InfoNegocioSection({
           value={visiblePrivateFields.facebook ? formInfo.facebook : maskedPrivateValue}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, facebook: e.target.value }))}
           readOnly={!visiblePrivateFields.facebook}
-          className={inputClass}
+          className={`${inputClass} uppercase`}
           placeholder="EX: BARBEARIA-TORRES"
         />
       </InfoRow>
