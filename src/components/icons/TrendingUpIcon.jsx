@@ -1,26 +1,32 @@
 import React from 'react';
 
-export default function TrendingUpIcon({
-  className = '',
-  title,
-  style = {},
-  ...props
-}) {
+export default function TrendingUpIcon({ className = '', title, style = {}, ...props }) {
   return (
     <svg
-      viewBox="0 0 16 16"
-      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
       className={className}
       style={{ display: 'inline-block', ...style }}
-      aria-hidden={!title}
-      role={title ? 'img' : undefined}
+      aria-hidden={title ? undefined : 'true'}
+      role={title ? 'img' : 'presentation'}
       {...props}
     >
-      {title ? <title>{title}</title> : null}
-
-      <path d="M16 2h-4l1.29 1.29-4.29 4.3-3-3-6 6v2.82l6-6 3 3 5.71-5.7 1.28 1.29 0.010-4z" />
-      
-      <circle cx="0" cy="13.41" r="1.2" fill="currentColor" />
+      {title && <title>{title}</title>}
+      <path
+        d="M23 6l-9.5 9.5-5-5L1 18"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M17 6h6v6"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
