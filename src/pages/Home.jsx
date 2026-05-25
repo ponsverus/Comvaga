@@ -495,7 +495,7 @@ export default function Home({ user, userType, onLogout }) {
                         </div>
                         <div className="flex items-center gap-1 mb-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
-                          <span className="text-[9px] text-gray-500 uppercase">Disponível</span>
+                          <span className="text-[9px] text-gray-500 uppercase">Aberto</span>
                         </div>
                         <div className="flex items-center gap-1 mb-1">
                           <StarGlyph sizeClass="h-2.5 w-2.5 text-[10px]" />
@@ -507,7 +507,7 @@ export default function Home({ user, userType, onLogout }) {
                             <TimeIcon className="w-2.5 h-2.5 shrink-0" />
                             08:00 - 18:00
                           </span>
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-orange-500 font-normal">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-vsub-500 font-normal">
                             PAUSA 11:00 - 12:00
                           </span>
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-500 font-normal">
