@@ -46,20 +46,19 @@ export default function VitrineProfessionalsSection({
   };
 
   return (
-    /* Seção com largura total, cortada pela linha superior e inferior (border-y) de ponta a ponta */
-    <section className="py-12 bg-vcard2 w-full border-y border-vborder">
+    /* Mantida apenas a linha superior (border-t) para iniciar a seção */
+    <section className="py-12 bg-vcard2 w-full border-t border-vborder">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
         <h2 className="text-2xl sm:text-3xl font-normal text-left">Profissionais</h2>
       </div>
 
-      {/* Espaço dividido de acordo com o número de blocos usando a malha de gap-px e a cor da linha no fundo */}
+      {/* Grid com apenas border-t (linha superior), sem a border-b que duplicava a divisão */}
       <div 
-        className="w-full bg-vborder border-y border-vborder grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px items-start" 
+        className="w-full bg-vborder border-t border-vborder grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px items-start" 
         onTouchStart={handleTouchStart} 
         onTouchEnd={handleTouchEnd}
       >
         {itens.map((prof) => (
-          /* Bloco com o fundo original e preenchimento interno ajustado para as extremidades */
           <div key={prof.id} className="bg-vcard p-6 hover:border-vprimary/50 transition-all self-start h-full">
             <div className="flex items-start gap-4 mb-4">
               {prof.avatarUrl ? (
