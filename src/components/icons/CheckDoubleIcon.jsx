@@ -30,14 +30,14 @@ export default function CheckDoubleIcon({
         d="M 50 510 L 310 770 L 720 360"
         stroke="currentColor"
         strokeWidth="110"
-        strokeLinecap="butt"
+        strokeLinecap="round"
         strokeLinejoin="miter"
       />
       <path
         d="M 250 510 L 510 770 L 920 360"
         stroke="currentColor"
         strokeWidth="110"
-        strokeLinecap="butt"
+        strokeLinecap="round"
         strokeLinejoin="miter"
       />
     </svg>
