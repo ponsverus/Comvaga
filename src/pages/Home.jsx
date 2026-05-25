@@ -128,6 +128,28 @@ function StarGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
   );
 }
 
+function MoneyGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
+  return (
+    <span
+      style={{ fontFamily: 'Roboto Condensed, sans-serif' }}
+      className={`inline-flex items-center justify-center font-normal leading-none text-primary ${sizeClass} ${className}`}
+    >
+      $
+    </span>
+  );
+}
+
+function SmileGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
+  return (
+    <span
+      style={{ fontFamily: 'Roboto Condensed, sans-serif' }}
+      className={`inline-flex items-center justify-center font-normal leading-none text-primary ${sizeClass} ${className}`}
+    >
+      :)
+    </span>
+  );
+}
+
 function PreviewHeartIcon({ className = '' }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
@@ -153,6 +175,7 @@ function PreviewFacebookIcon({ className = '' }) {
     </svg>
   );
 }
+
 
 export default function Home({ user, userType, onLogout }) {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -270,7 +293,7 @@ export default function Home({ user, userType, onLogout }) {
                 alt="Comvaga"
                 className="h-15 w-auto object-contain sm:h-17"
               />
-              <h1 className="text-2xl sm:text-3xl font-black">COMVAGA</h1>
+              <span className="text-2xl sm:text-3xl font-black">COMVAGA</span>
             </Link>
             <div className="absolute right-0 top-[40%] -translate-y-1/2">
               <SearchBox
@@ -308,26 +331,7 @@ export default function Home({ user, userType, onLogout }) {
             Comvaga organizes agenda, vitrine, equipe e cliente em uma experiência só. O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
           </p>
 
-          {/* INDICADORES INTELEGENTES DE PERFORMANCE (Sem caixas, soltos e sofisticados) */}
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs tracking-widest text-gray-500 font-medium uppercase mb-12">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span>Aproveitamento de Tempo: <strong className="text-white font-bold ml-1 text-sm tracking-normal">100%</strong></span>
-            </div>
-            <span className="text-gray-800 hidden sm:inline">|</span>
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              <span>Conflito de Horários: <strong className="text-white font-bold ml-1 text-sm tracking-normal">0%</strong></span>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Link
               to="/cadastro"
               className="px-10 py-5 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-black text-lg hover:shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105 flex items-center justify-center gap-3"
@@ -341,6 +345,17 @@ export default function Home({ user, userType, onLogout }) {
             >
               ENTENDER A LÓGICA
             </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-px bg-gray-800 border-y border-gray-800 max-w-2xl mx-auto">
+            {['100%', '0%'].map((stat, i) => (
+              <div key={i} className="bg-black/50 backdrop-blur-md p-6 hover:bg-black/80 transition-all flex flex-col justify-center items-center text-center">
+                <div className="text-4xl font-normal text-primary mb-2">{stat}</div>
+                <div className="text-sm text-gray-500 uppercase">
+                  {['Aproveitamento de Tempo', 'Conflito de Horários'][i]}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -543,10 +558,10 @@ export default function Home({ user, userType, onLogout }) {
         <div className="w-full bg-gray-800 border-y border-gray-800 grid sm:grid-cols-2 lg:grid-cols-3 gap-px">
           {[
             { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
-            { icon: ZapIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considers os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
-            { icon: TimeIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
-            { icon: CheckDoubleIcon, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
-            { icon: CheckDoubleIcon, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
+            { icon: ZapIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
+            { icon: ZapIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
+            { icon: MoneyGlyph, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
+            { icon: SmileGlyph, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
             { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
           ].map(({ icon: Icon, title, text }, i) => (
             <div
