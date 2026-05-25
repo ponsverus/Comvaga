@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { TimeIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon } from '../components/icons';
+import { CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon } from '../components/icons';
 
 const SUPORTE_PHONE_E164 = '5533999037979';
 const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
@@ -375,13 +375,13 @@ export default function Home({ user, userType, onLogout }) {
           <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
         </div>
 
-        <div className="w-full bg-gray-800 border-y border-gray-800 grid md:grid-cols-3 gap-px">
+        <div className="w-full bg-gray-800 border-y border-gray-800 grid md:grid-cols-3 items-start gap-px">
           {[
             { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
             { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada mudança: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
             { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
           ].map(({ num, title, text }) => (
-            <div key={num} className="bg-dark-100 p-8 md:p-12 flex flex-col px-4 sm:px-8 md:px-16 lg:px-24">
+            <div key={num} className="bg-dark-100 p-8 md:p-12 flex flex-col self-start px-4 sm:px-8 md:px-16 lg:px-24">
               <div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 mb-6 shrink-0">
                 {num}
               </div>
@@ -441,8 +441,8 @@ export default function Home({ user, userType, onLogout }) {
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
 
-          <div className="grid lg:grid-cols-2 gap-px bg-gray-800 items-stretch w-full">
-            <div className="relative z-10 text-center lg:text-left bg-dark-200 p-8 sm:p-16 flex flex-col justify-center px-4 sm:px-8 md:px-16 lg:px-24">
+          <div className="grid lg:grid-cols-2 gap-px bg-gray-800 items-start w-full">
+            <div className="relative z-10 text-center lg:text-left bg-dark-100 p-8 sm:p-16 flex flex-col justify-center self-start px-4 sm:px-8 md:px-16 lg:px-24">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6 self-center lg:self-start">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -473,7 +473,7 @@ export default function Home({ user, userType, onLogout }) {
               </div>
             </div>
 
-            <div className="relative z-10 w-full flex items-center justify-center bg-dark-200 p-8 sm:p-16 px-4 sm:px-8 md:px-16 lg:px-24">
+            <div className="relative z-10 w-full flex items-center justify-center bg-dark-100 p-8 sm:p-16 self-start px-4 sm:px-8 md:px-16 lg:px-24">
               <div className="relative w-full max-w-[380px] bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
                 <div className="h-16 sm:h-20 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
                   <div className="absolute -bottom-10 left-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
@@ -554,7 +554,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-dark-200 w-full">
+      <section className="py-24 bg-dark-100 w-full">
         <div className="max-w-7xl mx-auto px-4 text-center mb-16">
           <h2 className="text-5xl font-black mb-4">
             VANTAGEM <span className="text-primary">MÚTUA</span>
@@ -562,7 +562,7 @@ export default function Home({ user, userType, onLogout }) {
           <p className="text-xl text-gray-400">Por que Profissionais e Clientes preferem Comvaga</p>
         </div>
 
-        <div className="w-full bg-gray-800 border-y border-gray-800 grid sm:grid-cols-2 lg:grid-cols-3 gap-px">
+        <div className="w-full bg-gray-800 border-y border-gray-800 grid sm:grid-cols-2 lg:grid-cols-3 items-start gap-px">
           {[
             { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
             { icon: ZapIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
@@ -573,7 +573,7 @@ export default function Home({ user, userType, onLogout }) {
           ].map(({ icon: Icon, title, text }, i) => (
             <div
               key={i}
-              className="bg-dark-200 p-8 sm:p-10 hover:bg-dark-100 transition-colors flex flex-col px-4 sm:px-8 md:px-16 lg:px-24"
+              className="bg-dark-100 p-8 sm:p-10 hover:bg-dark-200/50 transition-colors flex flex-col self-start px-4 sm:px-8 md:px-16 lg:px-24"
             >
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
                 <Icon className="w-8 h-8 text-primary" />
@@ -585,7 +585,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-dark-100 w-full">
+      <section className="py-24 bg-black w-full">
         <div className="max-w-7xl mx-auto px-4 text-center mb-16">
           <h2 className="text-5xl font-normal mb-4">
             SEM <span className="text-primary">BUROCRACIA</span>
@@ -595,7 +595,7 @@ export default function Home({ user, userType, onLogout }) {
        
         <div className="
           w-full bg-gray-800 border-y border-gray-800
-          flex sm:grid sm:grid-cols-3 gap-px
+          flex sm:grid sm:grid-cols-3 sm:items-start gap-px
           overflow-x-auto sm:overflow-visible
           pb-4 sm:pb-0
           [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
@@ -603,7 +603,7 @@ export default function Home({ user, userType, onLogout }) {
 
           <div className="
             shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
-            bg-dark-100 p-8 sm:p-10 flex flex-col px-4 sm:px-8 md:px-12
+            bg-dark-100 p-8 sm:p-10 flex flex-col self-start px-4 sm:px-8 md:px-12
           ">
             <div className="mb-5">
               <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
@@ -652,7 +652,7 @@ export default function Home({ user, userType, onLogout }) {
 
           <div className="
             shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
-            bg-primary/5 p-8 sm:p-10 relative flex flex-col px-4 sm:px-8 md:px-12
+            bg-primary/5 p-8 sm:p-10 relative flex flex-col self-start px-4 sm:px-8 md:px-12
           ">
             <div className="mb-5">
               <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
@@ -703,7 +703,7 @@ export default function Home({ user, userType, onLogout }) {
 
           <div className="
             shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
-            bg-dark-100 p-8 sm:p-10 flex flex-col px-4 sm:px-8 md:px-12
+            bg-dark-100 p-8 sm:p-10 flex flex-col self-start px-4 sm:px-8 md:px-12
           ">
             <div className="mb-5">
               <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
@@ -745,17 +745,17 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
+      <section className="py-24 px-4 bg-dark-100">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-black text-black mb-6">ELEVE SEU NÍVEL PROFISSIONAL</h2>
-          <p className="text-2xl text-black/80 mb-8">Uma vitrine para vender, um painel para operar e uma agenda que pensa antes de confirmar.</p>
+          <h2 className="text-5xl font-black text-white mb-6">ELEVE SEU NÍVEL PROFISSIONAL</h2>
+          <p className="text-2xl text-gray-400 mb-8">Uma vitrine para vender, um painel para operar e uma agenda que pensa antes de confirmar.</p>
           <Link
             to="/cadastro"
-            className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all"
+            className="inline-flex items-center gap-3 px-12 py-6 bg-primary text-black rounded-button font-black text-xl hover:shadow-2xl transition-all"
           >
             ACESSAR AGORA SEM CUSTO <ZapIcon className="w-6 h-6" />
           </Link>
-          <p className="text-black/60 text-sm mt-6">Eficiência comprovada em barbearias, estúdios e clínicas.</p>
+          <p className="text-gray-500 text-sm mt-6">Eficiência comprovada em barbearias, estúdios e clínicas.</p>
         </div>
       </section>
 
