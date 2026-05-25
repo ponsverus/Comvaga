@@ -20,12 +20,12 @@ export default function VitrineEntregasSection({
           <p className="text-vmuted font-normal">{emptyListMsg}</p>
         </div>
       ) : (
-        <div className="w-full border-t border-vborder columns-1 md:columns-2 gap-4 p-4 md:p-6 bg-transparent">
+        <div className="w-full border-t border-vborder columns-1 md:columns-2 gap-0 p-0 bg-transparent">
           {cards.map((card) => {
             return (
               <div 
                 key={card.id} 
-                className="bg-vcard p-6 border border-vborder hover:border-vprimary/50 transition-all mb-4 break-inside-avoid inline-block w-full"
+                className="bg-vcard p-6 border-b border-vborder md:border-r last:border-r-0 break-inside-avoid inline-block w-full"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="font-normal text-lg uppercase">{card.nome}</div>
