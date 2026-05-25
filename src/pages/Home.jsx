@@ -327,7 +327,7 @@ export default function Home({ user, userType, onLogout }) {
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-400 mb-6 max-w-3xl mx-auto drop-shadow-md">
+          <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
             Comvaga organizes agenda, vitrine, equipe e cliente em uma experiência só. O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
           </p>
 
@@ -347,15 +347,22 @@ export default function Home({ user, userType, onLogout }) {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-px bg-gray-800 border-y border-gray-800 max-w-2xl mx-auto">
-            {['100%', '0%'].map((stat, i) => (
-              <div key={i} className="bg-black/50 backdrop-blur-md p-6 hover:bg-black/80 transition-all flex flex-col justify-center items-center text-center">
-                <div className="text-4xl font-normal text-primary mb-2">{stat}</div>
-                <div className="text-sm text-gray-500 uppercase">
-                  {['Aproveitamento de Tempo', 'Conflito de Horários'][i]}
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs tracking-widest text-gray-500 font-medium uppercase mb-12">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span>Aproveitamento de Tempo: <strong className="text-white font-normal ml-1 text-sm tracking-normal">100%</strong></span>
+            </div>
+            <span className="text-gray-800 hidden sm:inline">|</span>
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              <span>Conflito de Horários: <strong className="text-white font-normal ml-1 text-sm tracking-normal">0%</strong></span>
+            </div>
           </div>
         </div>
       </section>
