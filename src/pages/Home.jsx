@@ -310,7 +310,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </header>
 
-      <section className="relative pt-32 pb-0 sm:pt-40 sm:pb-0 lg:pt-48 lg:pb-0 px-4 overflow-hidden">
+      <section className="relative pt-32 pb-12 sm:pt-40 sm:pb-16 lg:pt-48 lg:pb-20 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-yellow-600/10"></div>
         <div className="absolute top-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
 
@@ -410,7 +410,7 @@ export default function Home({ user, userType, onLogout }) {
               <div>
                 <h3 className="text-2xl font-normal mb-3 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
+                  <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido in uma única reserva.
                 </p>
               </div>
             </div>
@@ -418,7 +418,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-0 bg-black overflow-hidden">
+      <section className="py-0 bg-black overflow-hidden border-b border-gray-800">
         <div className="w-full bg-dark-200 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
@@ -576,7 +576,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
        
         <div className="
-          w-full bg-gray-800 border-y border-gray-800
+          w-full bg-gray-800 border-t border-gray-800
           flex sm:grid sm:grid-cols-3 gap-px
           overflow-x-auto sm:overflow-visible
           pb-4 sm:pb-0
