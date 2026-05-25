@@ -310,7 +310,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </header>
 
-      <section className="relative pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pt-48 lg:pb-32 px-4 overflow-hidden">
+      <section className="relative pt-32 pb-0 sm:pt-40 sm:pb-0 lg:pt-48 lg:pb-0 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-yellow-600/10"></div>
         <div className="absolute top-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
 
@@ -328,10 +328,10 @@ export default function Home({ user, userType, onLogout }) {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
-            Comvaga organizes agenda, vitrine, equipe e cliente em uma experiência só. O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
+            Comvaga organizes agenda, vitrine, equipe e cliente em uma experience só. O sistema <span className="text-primary font-bold">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-0">
             <Link
               to="/cadastro"
               className="px-10 py-5 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-black text-lg hover:shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105 flex items-center justify-center gap-3"
@@ -346,29 +346,11 @@ export default function Home({ user, userType, onLogout }) {
               ENTENDER A LÓGICA
             </button>
           </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs tracking-widest text-gray-500 font-medium uppercase mb-12">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span>Aproveitamento de Tempo: <strong className="text-white font-normal ml-1 text-sm tracking-normal">100%</strong></span>
-            </div>
-            <span className="text-gray-800 hidden sm:inline">|</span>
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              <span>Conflito de Horários: <strong className="text-white font-normal ml-1 text-sm tracking-normal">0%</strong></span>
-            </div>
-          </div>
         </div>
       </section>
 
-      <section id="como-funciona" className="py-24 bg-dark-100 w-full">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16">
+      <section id="como-funciona" className="py-0 bg-dark-100 w-full">
+        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
           <h2 className="text-5xl font-black mb-4">
             A CIÊNCIA <span className="text-primary">POR TRÁS</span>
           </h2>
@@ -436,7 +418,7 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-black overflow-hidden">
+      <section className="py-0 bg-black overflow-hidden">
         <div className="w-full bg-dark-200 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
@@ -554,8 +536,8 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-dark-200 w-full">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16">
+      <section className="py-0 bg-dark-200 w-full">
+        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
           <h2 className="text-5xl font-black mb-4">
             VANTAGEM <span className="text-primary">MÚTUA</span>
           </h2>
@@ -585,8 +567,8 @@ export default function Home({ user, userType, onLogout }) {
         </div>
       </section>
 
-      <section className="py-24 bg-dark-100 w-full">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16">
+      <section className="py-0 bg-dark-100 w-full">
+        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
           <h2 className="text-5xl font-normal mb-4">
             SEM <span className="text-primary">BUROCRACIA</span>
           </h2>
