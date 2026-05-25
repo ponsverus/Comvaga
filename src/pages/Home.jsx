@@ -485,13 +485,13 @@ export default function Home({ user, userType, onLogout }) {
                   <div className="mb-4 px-2">
                     <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Profissionais</div>
                     <div className="bg-white/5 border border-white/10 rounded-[3px] p-3 flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-[3px] bg-primary flex items-center justify-center font-black text-black text-base shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-normal text-black text-base shrink-0">
                         R
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-1 mb-0.5">
                           <span className="text-xs font-normal text-white uppercase leading-tight">RAFAEL COSTA</span>
-                          <span className="text-[9px] font-normal uppercase border border-white/15 text-gray-400 rounded-[2px] px-1.5 py-0.5 shrink-0">BARBEIRO</span>
+                          <span className="text-[9px] font-normal uppercase border border-white/15 text-gray-400 rounded-full px-2.5 py-0.5 shrink-0">BARBEIRO</span>
                         </div>
                         <div className="flex items-center gap-1 mb-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
@@ -507,8 +507,11 @@ export default function Home({ user, userType, onLogout }) {
                             <TimeIcon className="w-2.5 h-2.5 shrink-0" />
                             08:00 - 18:00
                           </span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-orange-500 font-normal">
+                            PAUSA 11:00 - 12:00
+                          </span>
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-500 font-normal">
-                            6 serviços
+                            7 SERVS
                           </span>
                         </div>
                       </div>
