@@ -10,33 +10,20 @@ export default function VitrineEntregasSection({
   booking,
 }) {
   return (
-    <section className="py-12 bg-vcard2 w-full">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-        <h2 className="text-2xl sm:text-3xl font-normal text-left">{sectionTitle}</h2>
-      </div>
-
-      {cards.length === 0 ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-12 px-4 sm:px-6 lg:px-8 bg-vcard2">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-normal mb-6">{sectionTitle}</h2>
+        {cards.length === 0 ? (
           <p className="text-vmuted font-normal">{emptyListMsg}</p>
-        </div>
-      ) : (
-        <div className="w-full bg-transparent space-y-8">
-          {cards.map((card) => {
-            return (
-              <div 
-                key={card.id} 
-                className="w-full flex flex-col"
-              >
-                <div className="w-full bg-vcard py-6 border-t border-b border-vborder">
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        ) : (
+          <div className="space-y-4">
+            {cards.map((card) => {
+              return (
+                <div key={card.id} className="bg-vcard border border-vborder rounded-custom p-6 hover:border-vprimary/50 transition-all">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="font-normal text-lg uppercase">{card.nome}</div>
-                    <div className="text-xs text-vmuted font-normal">
-                      {card.lista.length} {card.lista.length === 1 ? counterSingular : counterPlural}
-                    </div>
+                    <div className="text-xs text-vmuted font-normal">{card.lista.length} {card.lista.length === 1 ? counterSingular : counterPlural}</div>
                   </div>
-                </div>
-
-                <div className="w-full bg-vcard">
                   <EntregasCarousel
                     lista={card.lista}
                     profissional={card.profissional}
@@ -49,11 +36,11 @@ export default function VitrineEntregasSection({
                     isLight={booking.isLight}
                   />
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
