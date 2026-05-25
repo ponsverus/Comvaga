@@ -10,7 +10,7 @@ export default function VitrineEntregasSection({
   booking,
 }) {
   return (
-    <section className="py-12 bg-vcard2 w-full border-t border-vborder">
+    <section className="py-12 bg-vcard2 w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
         <h2 className="text-2xl sm:text-3xl font-normal text-left">{sectionTitle}</h2>
       </div>
@@ -20,12 +20,12 @@ export default function VitrineEntregasSection({
           <p className="text-vmuted font-normal">{emptyListMsg}</p>
         </div>
       ) : (
-        <div className="w-full bg-vborder border-t border-vborder columns-1 md:columns-2 gap-px p-0">
+        <div className="w-full border-t border-vborder columns-1 md:columns-2 gap-4 p-4 md:p-6 bg-transparent">
           {cards.map((card) => {
             return (
               <div 
                 key={card.id} 
-                className="bg-vcard p-6 hover:border-vprimary/50 transition-all mb-px break-inside-avoid inline-block w-full"
+                className="bg-vcard p-6 border border-vborder hover:border-vprimary/50 transition-all mb-4 break-inside-avoid inline-block w-full"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="font-normal text-lg uppercase">{card.nome}</div>
