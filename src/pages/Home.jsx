@@ -482,7 +482,40 @@ export default function Home({ user, userType, onLogout }) {
                     </div>
                   </div>
 
-                  <div className="space-y-4 mb-6 px-2">
+                  <div className="mb-4 px-2">
+                    <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Profissionais</div>
+                    <div className="bg-white/5 border border-white/10 rounded-[3px] p-3 flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-[3px] bg-primary flex items-center justify-center font-black text-black text-base shrink-0">
+                        R
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-1 mb-0.5">
+                          <span className="text-xs font-normal text-white uppercase leading-tight">RAFAEL COSTA</span>
+                          <span className="text-[9px] font-normal uppercase border border-white/15 text-gray-400 rounded-[2px] px-1.5 py-0.5 shrink-0">BARBEIRO</span>
+                        </div>
+                        <div className="flex items-center gap-1 mb-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
+                          <span className="text-[9px] text-gray-500 uppercase">Disponível</span>
+                        </div>
+                        <div className="flex items-center gap-1 mb-1">
+                          <StarGlyph sizeClass="h-2.5 w-2.5 text-[10px]" />
+                          <span className="text-xs font-normal text-primary">4.8</span>
+                          <span className="text-[9px] text-gray-600">(12)</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-500 font-normal">
+                            <TimeIcon className="w-2.5 h-2.5 shrink-0" />
+                            08:00 - 18:00
+                          </span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-500 font-normal">
+                            6 serviços
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 mb-0 px-2">
                     <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs Disponíveis</div>
                     
                     {[
@@ -513,15 +546,6 @@ export default function Home({ user, userType, onLogout }) {
                         </div>
                       </div>
                     ))}
-                  </div>
-
-                  <div className="h-24 bg-gray-800/40 rounded-[3px] border border-dashed border-white/10 flex items-center justify-center relative group overflow-hidden mx-2">
-                     <div className="text-white/20 font-normal text-xs uppercase tracking-widest group-hover:text-primary/40 transition-colors">GALERIA DE TRABALHOS</div>
-                     <div className="absolute bottom-2 right-2 flex gap-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
-                        <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
-                        <div className="w-1.5 h-1.5 rounded-full bg-white/10"></div>
-                     </div>
                   </div>
                 </div>
                 
