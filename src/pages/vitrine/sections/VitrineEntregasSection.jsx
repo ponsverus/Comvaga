@@ -10,50 +10,37 @@ export default function VitrineEntregasSection({
   booking,
 }) {
   return (
-    <section className="py-16 bg-black text-white w-full border-t border-gray-900">
-      {/* Título da Seção alinhado ao Grid Master */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-        <h2 className="text-2xl sm:text-3xl font-black tracking-tight uppercase text-left">
-          {sectionTitle}
-        </h2>
+    <section className="py-12 bg-vcard2 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+        <h2 className="text-2xl sm:text-3xl font-normal text-left">{sectionTitle}</h2>
       </div>
 
       {cards.length === 0 ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-gray-500 font-normal uppercase tracking-wider text-sm">
-            {emptyListMsg}
-          </p>
+          <p className="text-vmuted font-normal">{emptyListMsg}</p>
         </div>
       ) : (
-        /* Lista de blocos individuais espaçados entre si */
-        <div className="w-full space-y-14">
+        /* Estrutura linear com espaçamento vertical sutil (space-y-6) para separar cada bloco individual */
+        <div className="w-full bg-transparent space-y-6">
           {cards.map((card) => {
             return (
               <div 
                 key={card.id} 
                 className="w-full flex flex-col"
               >
-                {/* 1. CARD DO PROFISSIONAL: Linhas cortam a tela de ponta a ponta horizontais */}
-                <div className="w-full border-t border-b border-gray-800 bg-dark-100/20 backdrop-blur-sm">
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
-                    <div>
-                      <span className="text-xs text-primary font-bold tracking-widest uppercase block mb-1">
-                        PROFISSIONAL AUTORIZADO
-                      </span>
-                      <div className="font-black text-xl tracking-wide uppercase text-white">
-                        {card.nome}
-                      </div>
-                    </div>
-                    
-                    <div className="text-xs font-bold tracking-widest text-gray-400 bg-gray-900/50 border border-gray-800 px-3 py-1.5 uppercase shrink-0">
+                {/* O card do profissional: mantendo bg-vcard, p-6 e as bordas originais, esticando de ponta a ponta */}
+                <div className="w-full bg-vcard p-6 border-t border-b border-vborder">
+                  <div className="max-w-7xl mx-auto flex items-center justify-between">
+                    <div className="font-normal text-lg uppercase">{card.nome}</div>
+                    <div className="text-xs text-vmuted font-normal">
                       {card.lista.length} {card.lista.length === 1 ? counterSingular : counterPlural}
                     </div>
                   </div>
                 </div>
 
-                {/* 2. CAROUSEL DE ENTREGAS: Colado imediatamente abaixo do card do profissional */}
-                <div className="w-full bg-black border-b border-gray-900/50">
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                {/* As entregas dele coladas logo abaixo: compartilhando a mesma cor de fundo e borda inferior */}
+                <div className="w-full bg-vcard p-6 border-b border-vborder">
+                  <div className="max-w-7xl mx-auto">
                     <EntregasCarousel
                       lista={card.lista}
                       profissional={card.profissional}
@@ -67,7 +54,6 @@ export default function VitrineEntregasSection({
                     />
                   </div>
                 </div>
-                
               </div>
             );
           })}
