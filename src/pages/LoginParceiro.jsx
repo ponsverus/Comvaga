@@ -38,7 +38,8 @@ function saveLastPartnerNegocio(userId, negocioId) {
   if (!userId || !negocioId) return;
   try {
     window.localStorage?.setItem(`comvaga:last-partner-negocio:${userId}`, negocioId);
-  } catch {
+  } catch (error) {
+    console.warn('Falha ao salvar negocio parceiro recente.', error);
   }
 }
 
@@ -229,7 +230,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="MINIMO 6 CARACTERES"
+                  placeholder="MÍNIMO 6 CARACTERES"
                   className={fieldInputClass}
                   required
                 />
