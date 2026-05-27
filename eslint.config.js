@@ -33,7 +33,7 @@ export default [
         { allowConstantExport: true },
       ],
       'no-unused-vars': 'off',
-      'no-empty': 'off',
+      'no-empty': 'warn',
       'react-hooks/exhaustive-deps': 'warn',
     },
   },
