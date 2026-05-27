@@ -58,7 +58,7 @@ export function useDashboardHistorico({
       await fetchHistoricoPage({ profIds: historicoProfIds, date: historicoData, page: nextPage, append: true });
       setHistoricoPage(nextPage);
     } catch (error) {
-      console.warn('Falha ao carregar mais historico.', error);
+      console.warn('Falha ao carregar mais histórico.', error);
     } finally {
       setHistoricoLoadingMore(false);
     }
