@@ -289,7 +289,9 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
             setAgendamentos(ags);
             await syncAvaliacoesConcluidas(ags);
             setAgendamentosHasMore(ags.length === limit);
-          } catch { }
+          } catch (error) {
+            console.warn('Falha ao atualizar agendamentos em tempo real.', error);
+          }
         }
       )
       .subscribe();
@@ -334,7 +336,9 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       const { error: updErr } = await supabase.from('users').update({ nome }).eq('id', user.id);
       if (updErr) throw updErr;
       const { error: metaErr } = await supabase.auth.updateUser({ data: { nome } });
-      if (metaErr) { }
+      if (metaErr) {
+        console.warn('Falha ao atualizar metadados do usuário.', metaErr);
+      }
       uiAlert('clientArea.profile_name_updated', 'success');
     } catch {
       uiAlert('clientArea.profile_name_update_error', 'error');
