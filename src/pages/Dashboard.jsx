@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { CalendarIcon, CrownIcon, TrendingUpIcon, UsersIcon } from '../components/icons';
 import AppFooter from '../components/AppFooter';
-import { X, Eye, LogOut, AlertCircle, } from 'lucide-react';
+import { Eye, LogOut, AlertCircle } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { getBusinessGroup } from '../businessTerms';
-import ProfissionalSelect from '../components/ProfissionalSelect';
 import EntregaModal from './dashboard/components/EntregaModal';
 import ProfissionalModal from './dashboard/components/ProfissionalModal';
 import VisaoGeralSection from './dashboard/sections/VisaoGeralSection';
@@ -27,8 +26,6 @@ import {
   getAgDate,
   getAgInicio,
   getBizLabel,
-  getValorAgendamento,
-  getValorEntrega,
   isCancelStatus,
   normalizeStatus,
   sameDay,
@@ -149,15 +146,12 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
   const [activeTab, setActiveTab] = useState('agendamentos');
   const {
     parceiroProfissional,
-    setParceiroProfissional,
     negocio,
     setNegocio,
     profissionais,
-    setProfissionais,
     entregas,
     setEntregas,
     agendamentos,
-    setAgendamentos,
     agendamentosHasMore,
     agendamentosLoadingMore,
     galeriaItems,
@@ -199,8 +193,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     return false;
   }, [acessoDashboardAutorizado, parceiroProfissional, uiAlert]);
 
-  const agProfIds = useMemo(() => profissionais.map(p => p.id), [profissionais]);
-
   const [faturamentoData, setFaturamentoData]             = useState('');
   const [faturamentoPeriodo, setFaturamentoPeriodo]       = useState('7d');
   const {
@@ -210,7 +202,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     metricsPeriodoData,
     metricsUtilizacao,
     metricsFutureBookings,
-    metricsHojeLoading,
     metricsTopCardsLoading,
     metricsDiaLoading,
     metricsPeriodoLoading,
@@ -218,8 +209,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     metricsFutureBookingsLoading,
     loadHoje,
     loadTopCards,
-    loadDia,
-    loadPeriodo,
     loadUtilizacao,
     loadFutureBookings,
   } = useDashboardMetrics({
