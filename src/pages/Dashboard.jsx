@@ -312,7 +312,9 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
       const { error: updErr } = await supabase.from('users').update({ nome }).eq('id', user.id);
       if (updErr) throw updErr;
       const { error: metaErr } = await supabase.auth.updateUser({ data: { nome } });
-      if (metaErr) { }
+      if (metaErr) {
+        console.warn('Falha ao atualizar metadados do usuário.', metaErr);
+      }
       setNomePerfil(nome);
       await uiAlert('clientArea.profile_name_updated', 'success');
     } catch {
