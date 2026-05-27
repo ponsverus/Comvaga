@@ -113,7 +113,9 @@ export default function SignupProfessional({ onLogin }) {
     } catch (err) {
       console.error('SignupProfessional error:', err);
       showMessage('alerts.action_failed_support');
-      try { await supabase.auth.signOut(); } catch {}
+      try { await supabase.auth.signOut(); } catch (signOutError) {
+        console.warn('Falha ao finalizar sessao apos erro de cadastro.', signOutError);
+      }
     } finally {
       setLoading(false);
     }
