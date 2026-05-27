@@ -19,7 +19,8 @@ try {
   if (url.pathname === '/reset-password' || type === 'recovery') {
     window.sessionStorage?.setItem(PASSWORD_RECOVERY_STORAGE_KEY, '1');
   }
-} catch {
+} catch (error) {
+  console.warn('Falha ao marcar recuperacao de senha.', error);
 }
 
 export const supabase = createClient(
