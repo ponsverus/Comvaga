@@ -94,7 +94,7 @@ export default function SignupProfessional({ onLogin }) {
         }
         throw authError;
       }
-      if (!authData?.user?.id) throw new Error('Usuario nao retornado pelo Supabase.');
+      if (!authData?.user?.id) throw new Error('Inexistência de usuário no retorno do Supabase.');
 
       if (!authData.session) {
         showMessage('signupProfessional.confirm_email_needed');
@@ -114,7 +114,7 @@ export default function SignupProfessional({ onLogin }) {
       console.error('SignupProfessional error:', err);
       showMessage('alerts.action_failed_support');
       try { await supabase.auth.signOut(); } catch (signOutError) {
-        console.warn('Falha ao finalizar sessao apos erro de cadastro.', signOutError);
+        console.warn('Falha ao deslogar após erro de cadastro.', signOutError);
       }
     } finally {
       setLoading(false);
