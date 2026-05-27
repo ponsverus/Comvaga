@@ -73,7 +73,7 @@ export default function SignupClient({ onLogin }) {
         }
         throw authError;
       }
-      if (!authData?.user?.id) throw new Error('Usuário não retornado pelo Supabase.');
+      if (!authData?.user?.id) throw new Error('Inexistência de usuário no retorno do Supabase.');
 
       if (!authData.session) {
         showMessage('signupClient.created_confirm_email');
@@ -87,7 +87,9 @@ export default function SignupClient({ onLogin }) {
       onLogin(authData.user, dbType);
       navigate('/minha-area');
     } catch (err) {
-      try { await supabase.auth.signOut(); } catch {}
+      try { await supabase.auth.signOut(); } catch (signOutError) {
+        console.warn('Falha ao deslogar após erro de cadastro.', signOutError);
+      }
       showMessage('alerts.action_failed_support');
       console.error('SignupClient error:', err);
     } finally {
