@@ -222,7 +222,9 @@ export default function App() {
         try {
           await supabase.auth.signOut({ scope: 'local' });
         } catch {
-          try { await supabase.auth.signOut(); } catch { }
+          try { await supabase.auth.signOut(); } catch (signOutError) {
+            console.warn('Falha ao finalizar sessao local.', signOutError);
+          }
         }
         safeSet(() => {
           setUser(null);
