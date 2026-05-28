@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { UsersIcon, CheckIcon } from '../../../components/icons';
 import { formatDateBRFromISO } from '../utils';
