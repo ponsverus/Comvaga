@@ -1,4 +1,3 @@
-import React from 'react';
 import { compareAgendamentoDateTimeDesc, formatDateBRFromISO, getAgDate, getAgInicio, getValorAgendamento } from '../utils';
 
 export default function CanceladosSection({ hojeCancelados }) {
