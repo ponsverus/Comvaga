@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import FullScreenMessage from './ui/FullScreenMessage';
 import { getFeedbackState, subscribeFeedback } from './feedbackStore';
