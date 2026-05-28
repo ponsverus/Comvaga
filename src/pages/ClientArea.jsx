@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, X } from 'lucide-react';
 import { CalendarIcon, TimePastIcon } from '../components/icons';
@@ -337,7 +337,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       if (updErr) throw updErr;
       const { error: metaErr } = await supabase.auth.updateUser({ data: { nome } });
       if (metaErr) {
-        console.warn('Falha ao atualizar metadados do usuário.', metaErr);
+        console.warn('Falha ao atualizar metadados do usuario.', metaErr);
       }
       uiAlert('clientArea.profile_name_updated', 'success');
     } catch {
@@ -690,7 +690,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                       >
                         {depoimentoLoading
                           ? 'ENVIANDO...'
-                          : `ENVIAR${nomeProfissionalDepoimento ? ` PARA ${nomeProfissionalDepoimento}` : ''}`}
+                          : `ENVIAR DEPOIMENTO${nomeProfissionalDepoimento ? ` PARA ${nomeProfissionalDepoimento}` : ''}`}
                       </button>
                     </div>
                   </div>
