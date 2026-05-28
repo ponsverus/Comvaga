@@ -1,4 +1,3 @@
-import React from 'react';
 
 function formatCurrency(value) {
   return `R$ ${Number(value || 0).toFixed(2)}`;
