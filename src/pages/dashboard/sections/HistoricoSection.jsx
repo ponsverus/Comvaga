@@ -1,4 +1,3 @@
-import React from 'react';
 import DatePicker from '../../../components/DatePicker';
 import {
   computeStatusFromDb,
