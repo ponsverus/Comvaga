@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { UsersIcon, CheckIcon } from '../../../components/icons';
 import { formatDateBRFromISO } from '../utils';
@@ -201,7 +201,7 @@ export default function ClientesSection({
       ) : (
         <div className="text-center py-12">
           <UsersIcon className="w-16 h-16 mx-auto mb-4 text-gray-500 opacity-40" />
-          <p className="text-gray-500 text-sm font-medium">:(</p>
+          <p className="text-gray-500 text-sm font-medium">NENHUM CLIENTE ENCONTRADO</p>
         </div>
       )}
     </div>
