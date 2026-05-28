@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { supabase } from './supabase';
 import { isPasswordRecoveryUrl } from './utils/auth';
@@ -204,7 +204,7 @@ export default function App() {
           setOnboardingStatus(null);
           setAccessState('active');
           loadedUserRef.current = null;
-          setFatalError('Perfil não encontrado. Por favor, conclua seu cadastro.');
+          setFatalError('Perfil inexistente. Crie ou conclua seu cadastro para prosseguir.');
         });
         return null;
       }
