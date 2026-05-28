@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function TimeIcon({ className = '', title, style = {}, ...props }) {
   return (
     <svg
