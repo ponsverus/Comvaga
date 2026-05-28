@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const SUPPORT_PHONE_E164 = '5533999037979';
@@ -67,7 +66,7 @@ export default function AppFooter({
           </div>
 
           <div>
-            <h4 className="text-white font-normal mb-4">PARA VOCE</h4>
+            <h4 className="text-white font-normal mb-4">PARA VOCÊ</h4>
             <ul className="space-y-2">
               {isProfessional ? (
                 <>
@@ -85,7 +84,7 @@ export default function AppFooter({
               ) : (
                 <>
                   <li><FooterLink to="/login">ENTRAR</FooterLink></li>
-                  <li><FooterLink to="/cadastro">CADASTRAR GRATIS</FooterLink></li>
+                  <li><FooterLink to="/cadastro">CADASTRAR GRÁTIS</FooterLink></li>
                   <li><FooterLink to="/login/parceiro">LOGIN PARCEIRO</FooterLink></li>
                   <li><FooterLink to="/cadastro/parceiro">CADASTRO PARCEIRO</FooterLink></li>
                   <li><FooterLink href={supportHref}>SUPORTE</FooterLink></li>
