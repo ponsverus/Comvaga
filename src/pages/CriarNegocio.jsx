@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '../supabase';
@@ -59,7 +59,7 @@ export default function CriarNegocio({ user }) {
     estado: '',
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     let active = true;
 
     async function loadOwnerBusinessCount() {
