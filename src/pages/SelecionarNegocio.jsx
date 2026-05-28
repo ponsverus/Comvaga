@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Award, LogOut, Plus } from 'lucide-react';
 import { supabase } from '../supabase';
