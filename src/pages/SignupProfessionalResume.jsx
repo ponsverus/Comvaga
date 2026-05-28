@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '../supabase';
@@ -69,7 +69,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
     nomeNegocio: '',
     urlNegocio: '',
     tipoNegocio: '',
-    anosExperiencia: '',
     telefone: '',
     rua: '',
     numero: '',
@@ -87,36 +86,20 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         const [
           { data: userData, error: userErr },
           { data: negocioRows, error: negocioErr },
-          { data: profissionalRows, error: profissionalErr },
         ] = await Promise.all([
           supabase.from('users').select('nome').eq('id', user.id).maybeSingle(),
           supabase.from('negocios')
             .select('id, nome, slug, tipo_negocio, telefone, endereco, created_at')
             .eq('owner_id', user.id)
             .order('created_at', { ascending: true }),
-          supabase.from('profissionais')
-            .select('id, negocio_id, anos_experiencia, created_at')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: true }),
         ]);
 
         if (userErr) throw userErr;
         if (negocioErr) throw negocioErr;
-        if (profissionalErr) throw profissionalErr;
         if (!active) return;
 
-        const profissionaisPorNegocio = new Map();
-        for (const profissional of profissionalRows || []) {
-          if (!profissional?.negocio_id || profissionaisPorNegocio.has(profissional.negocio_id)) continue;
-          profissionaisPorNegocio.set(profissional.negocio_id, profissional);
-        }
-
         const contexts = (negocioRows || [])
-          .map((negocio) => ({
-            negocio,
-            profissional: profissionaisPorNegocio.get(negocio.id) || null,
-          }))
-          .filter((item) => item.profissional);
+          .map((negocio) => ({ negocio }));
 
         const initialContext = contexts[0] || null;
         const endereco = parseEndereco(initialContext?.negocio?.endereco);
@@ -128,7 +111,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           nomeNegocio: onlyTrim(initialContext?.negocio?.nome),
           urlNegocio: onlyTrim(initialContext?.negocio?.slug),
           tipoNegocio: onlyTrim(initialContext?.negocio?.tipo_negocio),
-          anosExperiencia: initialContext?.profissional?.anos_experiencia != null ? String(initialContext.profissional.anos_experiencia) : '',
           telefone: onlyTrim(initialContext?.negocio?.telefone),
           rua: endereco.rua,
           numero: endereco.numero,
@@ -156,7 +138,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       nomeNegocio: onlyTrim(selectedContext.negocio?.nome),
       urlNegocio: onlyTrim(selectedContext.negocio?.slug),
       tipoNegocio: onlyTrim(selectedContext.negocio?.tipo_negocio),
-      anosExperiencia: selectedContext.profissional?.anos_experiencia != null ? String(selectedContext.profissional.anos_experiencia) : '',
       telefone: onlyTrim(selectedContext.negocio?.telefone),
       rua: endereco.rua,
       numero: endereco.numero,
@@ -204,7 +185,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       const slug = onlyTrim(formData.urlNegocio);
       const tipoNegocio = onlyTrim(formData.tipoNegocio);
       const telefone = onlyTrim(formData.telefone);
-      const anosExperiencia = parseInt(String(formData.anosExperiencia || ''), 10) || 0;
       const isWaitingRoom = !resumeContexts.length;
 
       if (!nome) { showMessage('signupProfessional.name_required'); return; }
@@ -212,7 +192,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       if (!nomeNegocio) { showMessage('signupProfessional.business_name_required'); return; }
       if (!slug || slug.length < 3) { showMessage('signupProfessional.business_slug_invalid'); return; }
       if (!tipoNegocio) { showMessage('signupProfessional.business_type_required'); return; }
-      if (anosExperiencia < 0) { showMessage('signupProfessional.experience_invalid'); return; }
 
       const enderecoKey = validarEnderecoCompleto();
       if (enderecoKey) { showMessage(enderecoKey); return; }
@@ -224,74 +203,14 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         estado: formData.estado,
       });
 
-      if (isWaitingRoom) {
-        const { data: existingNegocio, error: slugError } = await supabase
-          .rpc('get_negocio_vitrine_by_slug', { p_slug: slug });
-
-        if (slugError) throw slugError;
-        if (existingNegocio?.[0]) { showMessage('signupProfessional.business_slug_taken'); return; }
-
-        const { data: fnData, error: fnError } = await supabase.functions.invoke('signup-professional', {
-          body: {
-            source: 'waiting_room',
-            preserve_auth_user: true,
-            nome_usuario: nome,
-            nome_negocio: nomeNegocio,
-            slug,
-            telefone,
-            endereco: enderecoUnico,
-            tipo_negocio: tipoNegocio,
-            nome_prof: nome,
-            profissao: tipoNegocio,
-            anos_experiencia: anosExperiencia,
-          },
-        });
-
-        if (fnError) {
-          const payload = await fnError.context?.json?.().catch(() => null);
-          const code = payload?.error || '';
-
-          if (code === 'slug_indisponivel') {
-            showMessage('signupProfessional.business_slug_taken');
-            return;
-          }
-          if (code === 'slug_invalido') {
-            showMessage('signupProfessional.business_slug_invalid');
-            return;
-          }
-          if (code === 'usuario_nao_encontrado') {
-            showMessage('signupProfessional.profile_not_created');
-            return;
-          }
-          console.error('signup-professional waiting room error:', fnError, payload);
-          showMessage('signupProfessional.business_create_error');
-          return;
-        }
-
-        if (!fnData?.negocio_id || !fnData?.profissional_id) {
-          console.error('signup-professional waiting room incomplete payload:', fnData);
-          showMessage('signupProfessional.business_create_error');
-          return;
-        }
-
-        onLogin(user, 'professional', 'completed');
-        navigate('/dashboard');
-        return;
-      }
-
-      if (!negocioId) { showMessage('signupProfessional.profile_not_created'); return; }
-
-      const { data, error } = await supabase.rpc('resume_professional_onboarding', {
-        p_negocio_id: negocioId,
+      const { data, error } = await supabase.rpc('complete_owner_business_onboarding', {
+        p_negocio_id: isWaitingRoom ? null : negocioId,
         p_nome_usuario: nome,
         p_nome_negocio: nomeNegocio,
         p_slug: slug,
         p_telefone: telefone,
         p_endereco: enderecoUnico,
         p_tipo_negocio: tipoNegocio,
-        p_nome_prof: nome,
-        p_profissao: tipoNegocio,
-        p_anos_experiencia: anosExperiencia,
       });
 
       if (error) {
@@ -301,7 +220,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           showMessage('signupProfessional.business_slug_taken');
           return;
         }
-        if (code === 'usuario_nao_encontrado' || code === 'negocio_nao_encontrado' || code === 'negocio_nao_informado' || code === 'profissional_nao_encontrado') {
+        if (code === 'usuario_nao_encontrado' || code === 'negocio_nao_encontrado') {
           showMessage('signupProfessional.profile_not_created');
           return;
         }
@@ -309,19 +228,19 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           showMessage('signupProfessional.business_slug_invalid');
           return;
         }
-        console.error('resume_professional_onboarding error:', error);
+        console.error('complete_owner_business_onboarding error:', error);
         showMessage('signupProfessional.business_create_error');
         return;
       }
 
-      if (!data?.profissional_id) {
-        console.error('resume_professional_onboarding incomplete payload:', data);
+      if (!data?.negocio_id) {
+        console.error('complete_owner_business_onboarding incomplete payload:', data);
         showMessage('signupProfessional.business_create_error');
         return;
       }
 
       onLogin(user, 'professional', 'completed');
-      navigate('/dashboard');
+      navigate('/dashboard', { state: { negocioId: data.negocio_id } });
     } catch (err) {
       console.error('SignupProfessionalResume error:', err);
       showMessage('signupProfessional.resume_error');
@@ -377,7 +296,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         <form onSubmit={handleSubmit} className="space-y-5">
           {hasMultipleContexts && (
             <div>
-              <label className={labelClass}>QUAL NEGOCIO DESEJA RETOMAR?</label>
+              <label className={labelClass}>QUAL NEGÓCIO DESEJA RETOMAR?</label>
               <select
                 value={selectedNegocioId}
                 onChange={(e) => setSelectedNegocioId(e.target.value)}
@@ -402,19 +321,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 className={`${fieldInputClass} uppercase`}
                 placeholder="NOME COMPLETO"
                 required
-              />
-            </ResumeFieldRow>
-
-            <ResumeFieldRow label="EXPERIÊNCIA">
-              <input
-                type="number"
-                value={formData.anosExperiencia}
-                onChange={(e) => setFormData((prev) => ({ ...prev, anosExperiencia: e.target.value }))}
-                min="0"
-                max="50"
-                className={fieldInputClass}
-                required
-                placeholder="ANOS"
               />
             </ResumeFieldRow>
 
@@ -504,7 +410,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                   onChange={(e) => setFormData((prev) => ({ ...prev, estado: e.target.value }))}
                   className={fieldInputClass}
                   required
-                  placeholder="EXEMPLO: MG"
                 />
               </ResumeSplitField>
             </ResumeSplitRow>
