@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Plus } from 'lucide-react';
 import TemaToggle from '../components/TemaToggle';
 import { ptBR } from '../../../feedback/messages/ptBR';
@@ -247,7 +247,7 @@ export default function InfoNegocioSection({
           value={visiblePrivateFields.instagram ? formInfo.instagram : maskedPrivateValue}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, instagram: e.target.value }))}
           readOnly={!visiblePrivateFields.instagram}
-          className={`${inputClass} uppercase`}
+          className={inputClass}
           placeholder="@BARBEARIATORRES"
         />
       </InfoRow>
@@ -258,7 +258,7 @@ export default function InfoNegocioSection({
           value={visiblePrivateFields.facebook ? formInfo.facebook : maskedPrivateValue}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, facebook: e.target.value }))}
           readOnly={!visiblePrivateFields.facebook}
-          className={`${inputClass} uppercase`}
+          className={inputClass}
           placeholder="EX: BARBEARIA-TORRES"
         />
       </InfoRow>
@@ -270,7 +270,7 @@ export default function InfoNegocioSection({
             <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => uploadGaleria(e.target.files)} disabled={galleryUploading} />
             <span className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-[12px] uppercase ${galleryUploading ? 'border-gray-800 text-gray-600' : 'border-primary/30 text-primary'}`}>
               <Plus className="h-3.5 w-3.5" />
-              {galleryUploading ? 'ENVIANDO' : 'ADICIONAR IMG'}
+              {galleryUploading ? 'ENVIANDO' : 'ADICIONAR'}
             </span>
           </label>
         </div>
