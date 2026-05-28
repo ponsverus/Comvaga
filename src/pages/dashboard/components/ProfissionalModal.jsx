@@ -1,4 +1,3 @@
-import React from 'react';
 import { X } from 'lucide-react';
 import TimePicker from '../../../components/TimePicker';
 import { DEFAULT_PROFISSIONAL_HORARIOS, toUpperClean } from '../utils';
