@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, X, Loader2 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { CheckIcon } from './icons';
@@ -41,8 +41,8 @@ function isRateLimitError(error) {
   return raw.includes('rate_limit_exceeded') || raw.includes('muitas tentativas') || raw.includes('too many requests');
 }
 
-const MONTH_NAMES   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const WEEKDAY_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MONTH_NAMES   = ['Janeiro','Fevereiro','MarÃ§o','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const WEEKDAY_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','SÃ¡b'];
 
 export default function BookingCalendar({
   profissional,
@@ -167,7 +167,7 @@ export default function BookingCalendar({
       setTimeout(() => slotsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
     } catch (e) {
       if (!canApply()) return;
-      setSlotsError('Erro ao buscar horários. Tente outro dia.');
+      setSlotsError('Erro ao buscar horÃ¡rios. Tente outro dia.');
     } finally {
       if (canApply()) setSlotsLoading(false);
     }
@@ -238,10 +238,10 @@ export default function BookingCalendar({
       if (limited) {
         setConfirmError('Muitas tentativas de agendamento. Aguarde um minuto e tente novamente.');
       } else if (expired) {
-        setConfirmError('Esse horário expirou. Escolha outro.');
+        setConfirmError('Esse horÃ¡rio expirou. Escolha outro.');
         fetchSlots(selectedDay);
       } else if (overlap) {
-        setConfirmError('Alguém acabou de reservar esse horário. Escolha outro.');
+        setConfirmError('AlguÃ©m acabou de reservar esse horÃ¡rio. Escolha outro.');
         fetchSlots(selectedDay);
       } else {
         setConfirmError('Erro ao confirmar. Tente novamente mais tarde.');
@@ -299,8 +299,8 @@ export default function BookingCalendar({
             <div className={`font-normal truncate ${titleColor}`}>{entrega?.nome}</div>
             <div className={`text-xs mt-0.5 ${subtitleColor}`}>
               {profissional?.nome}
-              {entrega?.duracao_minutos && <span className={`ml-2 ${subMutedColor}`}>• {entrega.duracao_minutos} MIN</span>}
-              <span className="ml-2" style={{ color: 'var(--vpromo-text)' }}>• R$ {valorExibido}</span>
+              {entrega?.duracao_minutos && <span className={`ml-2 ${subMutedColor}`}>â€¢ {entrega.duracao_minutos} MIN</span>}
+              <span className="ml-2" style={{ color: 'var(--vpromo-text)' }}>â€¢ R$ {valorExibido}</span>
             </div>
           </div>
           <button
@@ -315,7 +315,7 @@ export default function BookingCalendar({
         <div className="px-6 py-5 space-y-6">
           {!todayISO && (
             <div className={`flex items-center justify-center border rounded-button p-3 text-sm font-normal text-center ${slotsErrorClass}`}>
-              Sincronizando horário oficial...
+              Sincronizando horÃ¡rio oficial...
             </div>
           )}
 
@@ -388,7 +388,7 @@ export default function BookingCalendar({
               {slotsLoading && (
                 <div className={`flex items-center justify-center py-8 ${loadingColor}`}>
                   <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  <span className="text-sm">BUSCANDO HORÁRIOS...</span>
+                  <span className="text-sm">BUSCANDO HORÃRIOS...</span>
                 </div>
               )}
 
@@ -415,7 +415,7 @@ export default function BookingCalendar({
                           onClick={() => setShowAll(v => !v)}
                           className={`w-full py-2.5 rounded-full border text-sm font-normal uppercase transition-colors ${showMoreBtn}`}
                         >
-                          {showAll ? 'OCULTAR HORÁRIOS' : 'VER MAIS HORÁRIOS'}
+                          {showAll ? 'OCULTAR HORÃRIOS' : 'VER MAIS HORÃRIOS'}
                         </button>
                         {showAll && horariosExtra.length > 0 && (
                           <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-3">
@@ -454,7 +454,7 @@ export default function BookingCalendar({
                   <span className={resumeValue}>{formatBR(selectedDay)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={resumeLabel}>HORÁRIO</span>
+                  <span className={resumeLabel}>HORÃRIO</span>
                   <span className="text-vprimary font-normal">{selectedSlot.hora}</span>
                 </div>
                 <div className="flex justify-between">
