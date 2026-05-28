@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function UsersIcon({ className = '', title, style = {}, ...props }) {
   return (
     <svg
