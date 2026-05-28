@@ -1,6 +1,4 @@
-import React from 'react';
-
-  export default function CheckedIcon({
+export default function CheckedIcon({
     className = '',
     title,
     style = {},
