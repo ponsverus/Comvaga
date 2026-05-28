@@ -1,880 +1,535 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { supabase } from '../supabase';
-import { useFeedback } from '../feedback/useFeedback';
-import { TimeIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon } from '../components/icons';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { supabase } from './supabase';
+import { isPasswordRecoveryUrl } from './utils/auth';
+import { fetchUserAccessProfile, isValidType, normalizeOnboardingStatus } from './utils/profileAccess';
 
-const SUPORTE_PHONE_E164 = '5533999037979';
-const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
-const SUPORTE_HREF =
-  `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent(SUPORTE_MSG)}`;
+import FeedbackProvider from './feedback/FeedbackProvider';
 
-const WHATSAPP_ESSENCIAL_HREF =
-  `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent('Olá! Sou um profissional e tenho interesse em assinar o plano Essencial por R$ 29,99/mês. Pode me orientar?')}`;
+import Home                   from './pages/Home';
+import Login                  from './pages/Login';
+import SignupChoice           from './pages/SignupChoice';
+import SignupClient           from './pages/SignupClient';
+import SignupProfessional     from './pages/SignupProfessional';
+import CadastroParceiro       from './pages/CadastroParceiro';
+import LoginParceiro          from './pages/LoginParceiro';
+import PartnerPendingApproval from './pages/PartnerPendingApproval';
+import ResetPassword          from './pages/ResetPassword';
+import NotFound               from './pages/NotFound';
 
-const WHATSAPP_PREMIUM_HREF =
-  `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent('Olá! Sou um profissional e tenho interesse em assinar o plano Premium Real por R$ 87,39/mês. Pode me orientar?')}`;
+const Dashboard                 = lazy(() => import('./pages/Dashboard'));
+const Vitrine                   = lazy(() => import('./pages/Vitrine'));
+const ClientArea                = lazy(() => import('./pages/ClientArea'));
+const CriarNegocio              = lazy(() => import('./pages/CriarNegocio'));
+const SelecionarNegocio         = lazy(() => import('./pages/SelecionarNegocio'));
+const SignupProfessionalResume  = lazy(() => import('./pages/SignupProfessionalResume'));
+const SignupProfessionalParceiroResume = lazy(() => import('./pages/SignupProfessionalParceiroResume'));
 
-function SearchBox({
-  searchOpen,
-  setSearchOpen,
-  searchTerm,
-  setSearchTerm,
-  resultadosBusca,
-  setResultadosBusca,
-  buscando,
-}) {
-  const wrapRef = useRef(null);
-  const inputRef = useRef(null);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  useEffect(() => {
-    if (!searchOpen) return;
-    inputRef.current?.focus();
-  }, [searchOpen]);
+function isAuthJwtError(error) {
+  const text = `${error?.message || ''} ${error?.details || ''} ${error?.hint || ''} ${error?.code || ''}`.toLowerCase();
+  return Number(error?.status) === 401
+    || text.includes('jwt')
+    || text.includes('invalid token')
+    || text.includes('not authenticated');
+}
 
-  useEffect(() => {
-    if (!searchOpen) return;
-    const handlePointerDown = (event) => {
-      if (!wrapRef.current?.contains(event.target)) {
-        setSearchOpen(false);
-        setSearchTerm('');
-        setResultadosBusca([]);
-      }
-    };
-    document.addEventListener('mousedown', handlePointerDown);
-    return () => document.removeEventListener('mousedown', handlePointerDown);
-  }, [searchOpen, setResultadosBusca, setSearchOpen, setSearchTerm]);
-
+function FullScreenLoading({ text = 'CARREGANDO...' }) {
   return (
-    <div ref={wrapRef} className="relative">
-      <div
-        className={[
-          'relative flex items-center overflow-hidden rounded-full bg-black/40 backdrop-blur-md transition-all duration-300 ease-out',
-          searchOpen
-            ? 'w-[min(24rem,calc(100vw-2rem))] border border-white/10 shadow-[0_0_0_1px_rgba(255,209,26,0.18)]'
-            : 'w-11 border border-transparent bg-transparent backdrop-blur-0',
-        ].join(' ')}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            if (searchOpen && !searchTerm) {
-              setSearchOpen(false);
-              return;
-            }
-            setSearchOpen(true);
-          }}
-          className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-300 transition-colors hover:text-primary"
-          aria-label="Pesquisar"
-        >
-          <SearchIcon strokeWidth={1.6} className="h-[18px] w-[18px]" />
-        </button>
-
-        <input
-          ref={inputRef}
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="BUSQUE UM PROFISSIONAL OU NEGÓCIO :)"
-          className={[
-            'bg-transparent pr-4 text-sm text-white uppercase placeholder:text-gray-500 focus:outline-none transition-all duration-300',
-            searchOpen ? 'w-full opacity-100' : 'w-0 opacity-0',
-          ].join(' ')}
-        />
-
-        {buscando && searchTerm.trim().length >= 3 && (
-          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
-            <div className="h-4 w-4 rounded-full border border-primary border-t-transparent animate-spin" />
-          </div>
-        )}
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <div className="text-primary text-xl">{text}</div>
       </div>
-
-      {searchOpen && resultadosBusca.length > 0 && (
-        <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl">
-          {resultadosBusca.map((r, i) => (
-            <Link
-              key={`${r.tipo}-${r.id}-${i}`}
-              to={`/v/${r.slug}`}
-              onClick={() => {
-                setSearchOpen(false);
-                setSearchTerm('');
-                setResultadosBusca([]);
-              }}
-              className="block border-b border-white/5 px-5 py-4 transition-colors hover:bg-dark-200/90 last:border-b-0"
-            >
-              <div className="font-normal text-white uppercase">{r.nome}</div>
-              {r.subtitulo && (
-                <div className="mt-1 text-sm text-gray-400">{r.subtitulo}</div>
-              )}
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {searchOpen && !buscando && searchTerm.trim().length >= 3 && resultadosBusca.length === 0 && (
-        <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[3px] border border-white/10 bg-dark-100/95 px-5 py-4 text-sm text-gray-400 shadow-2xl backdrop-blur-xl">
-          :(
-        </div>
-      )}
     </div>
   );
 }
 
-function StarGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
+function FullScreenError({ message, onRetry }) {
   return (
-    <span className={`inline-flex items-center justify-center font-normal leading-none text-primary ${sizeClass} ${className}`}>
-      {'\u2606'}
-    </span>
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-dark-100 border border-red-500/40 rounded-custom p-8 text-center">
+        <h1 className="text-2xl font-normal text-white mb-2">Algo deu errado</h1>
+        <p className="text-gray-400 mb-6 whitespace-pre-wrap">{message}</p>
+        <button onClick={onRetry} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button">
+          TENTAR NOVAMENTE
+        </button>
+      </div>
+    </div>
   );
 }
 
-function MoneyGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
-  return (
-    <span
-      style={{ fontFamily: 'Roboto Condensed, sans-serif' }}
-      className={`inline-flex items-center justify-center font-normal leading-none text-primary ${sizeClass} ${className}`}
-    >
-      $
-    </span>
-  );
+async function getUserProfileRobust(authUser) {
+  if (!authUser?.id) return null;
+
+  const delays = [100, 250, 500];
+  let lastErr = null;
+
+  for (let i = 0; i < delays.length; i++) {
+    try {
+      const profile = await fetchUserAccessProfile(authUser.id);
+      if (profile) return profile;
+      if (i < delays.length - 1) await sleep(delays[i]);
+    } catch (e) {
+      lastErr = e;
+      if (i < delays.length - 1) await sleep(delays[i]);
+    }
+  }
+
+  if (lastErr) throw lastErr;
+  return null;
 }
 
-function SmileGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
-  return (
-    <span
-      style={{ fontFamily: 'Roboto Condensed, sans-serif' }}
-      className={`inline-flex items-center justify-center font-normal leading-none text-primary ${sizeClass} ${className}`}
-    >
-      :)
-    </span>
-  );
+function ScrollToTopOnRouteChange() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
 }
 
-function PreviewHeartIcon({ className = '' }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    </svg>
-  );
+function RecoveryWatcher({ onChange }) {
+  const loc = useLocation();
+  useEffect(() => {
+    onChange(isPasswordRecoveryUrl());
+  }, [loc.pathname, loc.search, loc.hash, onChange]);
+  return null;
 }
 
-function PreviewInstagramIcon({ className = '' }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
-      <path d="M16.5 7.5h.01" />
-      <circle cx="12" cy="12" r="4" />
-    </svg>
-  );
-}
-
-function PreviewFacebookIcon({ className = '' }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-    </svg>
-  );
-}
-
-
-export default function Home({ user, userType, onLogout }) {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [resultadosBusca, setResultadosBusca] = useState([]);
-  const [buscando, setBuscando] = useState(false);
-
-  const { showMessage } = useFeedback();
-  const isLogged = !!user && !!userType;
+function LogoutRedirectResetter({ redirectPath, onClear }) {
+  const loc = useLocation();
 
   useEffect(() => {
-    let cancelled = false;
+    if (!redirectPath) return;
+    if (loc.pathname === redirectPath) onClear();
+  }, [loc.pathname, redirectPath, onClear]);
 
-    const buscar = async () => {
-      const term = String(searchTerm || '').trim();
+  return null;
+}
 
-      if (term.length < 3) {
-        if (!cancelled) {
-          setResultadosBusca([]);
-          setBuscando(false);
+function SelecionarNegocioRouteGuard({ user, onLogout }) {
+  const [loading, setLoading] = useState(true);
+  const [ownerBusinessCount, setOwnerBusinessCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!user?.id) {
+      setOwnerBusinessCount(0);
+      setLoading(false);
+      return () => { active = false; };
+    }
+
+    supabase
+      .from('negocios')
+      .select('id', { count: 'exact', head: true })
+      .eq('owner_id', user.id)
+      .then(({ count, error }) => {
+        if (!active) return;
+        if (error) {
+          setOwnerBusinessCount(0);
+          setLoading(false);
+          return;
         }
+        setOwnerBusinessCount(Number(count || 0));
+        setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user?.id]);
+
+  if (loading) return <FullScreenLoading text="CARREGANDO..." />;
+  if (ownerBusinessCount > 1) return <SelecionarNegocio user={user} onLogout={onLogout} />;
+  return <Navigate to="/dashboard" replace />;
+}
+
+export default function App() {
+  const [user,             setUser]             = useState(null);
+  const [userType,         setUserType]         = useState(null);
+  const [onboardingStatus, setOnboardingStatus] = useState(null);
+  const [accessState,      setAccessState]      = useState('active');
+  const [booting,          setBooting]          = useState(true);
+  const [typeLoading,      setTypeLoading]      = useState(false);
+  const [fatalError,       setFatalError]       = useState(null);
+  const [inRecovery,       setInRecovery]       = useState(() => isPasswordRecoveryUrl());
+  const [postLogoutRedirect, setPostLogoutRedirect] = useState(null);
+
+  const aliveRef        = useRef(true);
+  const loadedUserRef   = useRef(null);
+  const suppressAuthRef = useRef(false);
+  const inRecoveryRef   = useRef(inRecovery);
+
+  const isLoggedIn = !!user;
+  const isPartnerSignup = user?.user_metadata?.partner_signup === true
+    || String(user?.user_metadata?.partner_signup || '').toLowerCase() === 'true';
+
+  const safeSet = useCallback((fn) => {
+    if (aliveRef.current) fn();
+  }, []);
+
+  const setRecoveryMode = useCallback((next) => {
+    inRecoveryRef.current = !!next;
+    setInRecovery(!!next);
+  }, []);
+
+  const getPostLoginPath = useCallback((type, currentAccessState, status) => {
+    if (type !== 'professional') return '/minha-area';
+    if (currentAccessState === 'partner_pending') return '/parceiro/aguardando';
+    if (isPartnerSignup && currentAccessState === 'owner_resume') return '/cadastro/profissional-parceiro/retomada';
+    if (currentAccessState === 'owner_resume' || normalizeOnboardingStatus(type, status) === 'pending') {
+      return '/cadastro/profissional/retomada';
+    }
+    return '/dashboard';
+  }, [isPartnerSignup]);
+
+  const loadProfile = useCallback(async (sessionUser) => {
+    if (!sessionUser?.id) return null;
+
+    safeSet(() => {
+      setTypeLoading(true);
+      setUserType(null);
+      setOnboardingStatus(null);
+      setAccessState('active');
+    });
+
+    try {
+      const profile = await getUserProfileRobust(sessionUser);
+
+      if (!profile) {
+        await supabase.auth.signOut();
+        safeSet(() => {
+          setUser(null);
+          setUserType(null);
+          setOnboardingStatus(null);
+          setAccessState('active');
+          loadedUserRef.current = null;
+          setFatalError('Perfil inexistente. Crie ou conclua seu cadastro para prosseguir.');
+        });
+        return null;
+      }
+
+      loadedUserRef.current = sessionUser.id;
+      safeSet(() => {
+        setUserType(profile.type);
+        setOnboardingStatus(profile.onboardingStatus);
+        setAccessState(profile.accessState || 'active');
+        setFatalError(null);
+      });
+      return profile;
+    } catch (e) {
+      if (isAuthJwtError(e)) {
+        try {
+          await supabase.auth.signOut({ scope: 'local' });
+        } catch {
+          try { await supabase.auth.signOut(); } catch (signOutError) {
+            console.warn('Erro ao sair da conta.', signOutError);
+          }
+        }
+        safeSet(() => {
+          setUser(null);
+          setUserType(null);
+          setOnboardingStatus(null);
+          setAccessState('active');
+          setFatalError(null);
+          setPostLogoutRedirect('/login');
+          loadedUserRef.current = null;
+        });
+        return null;
+      }
+      safeSet(() => {
+        setUserType(null);
+        setOnboardingStatus(null);
+        setAccessState('active');
+        setFatalError(e?.message || 'Falha ao carregar perfil.');
+      });
+      return null;
+    } finally {
+      safeSet(() => setTypeLoading(false));
+    }
+  }, [safeSet]);
+
+  useEffect(() => {
+    aliveRef.current = true;
+
+    const { data: { subscription } } =
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        if (!aliveRef.current) return;
+        if (suppressAuthRef.current) return;
+
+        if (event === 'PASSWORD_RECOVERY') {
+          safeSet(() => { setRecoveryMode(true); setBooting(false); });
+          return;
+        }
+
+        if (event === 'INITIAL_SESSION') {
+          const sessionUser = session?.user || null;
+          if (isPasswordRecoveryUrl() || inRecoveryRef.current) {
+            safeSet(() => {
+              setRecoveryMode(true);
+              setUser(sessionUser);
+              setUserType(null);
+              setOnboardingStatus(null);
+              setAccessState('active');
+              setFatalError(null);
+              setTypeLoading(false);
+              setBooting(false);
+            });
+            return;
+          }
+
+          if (!sessionUser) {
+            safeSet(() => {
+              setUser(null);
+              setUserType(null);
+              setOnboardingStatus(null);
+              setAccessState('active');
+              setBooting(false);
+            });
+            return;
+          }
+
+          setUser(sessionUser);
+          if (loadedUserRef.current !== sessionUser.id) await loadProfile(sessionUser);
+          safeSet(() => setBooting(false));
+          return;
+        }
+
+        if (inRecoveryRef.current) {
+          safeSet(() => {
+            setUser(session?.user || null);
+            setUserType(null);
+            setOnboardingStatus(null);
+            setAccessState('active');
+            setFatalError(null);
+            setTypeLoading(false);
+            setBooting(false);
+          });
+          return;
+        }
+
+        const sessionUser = session?.user || null;
+        if (!sessionUser) {
+          loadedUserRef.current = null;
+          setUser(null);
+          setUserType(null);
+          setOnboardingStatus(null);
+          setAccessState('active');
+          setFatalError(null);
+          return;
+        }
+
+        setUser(sessionUser);
+        if (loadedUserRef.current !== sessionUser.id) await loadProfile(sessionUser);
+      });
+
+    return () => { aliveRef.current = false; subscription?.unsubscribe(); };
+  }, [loadProfile, safeSet, setRecoveryMode]);
+
+  const handleLogin = useCallback((userData, type, nextOnboardingStatus = 'completed', nextAccessState = 'active') => {
+    loadedUserRef.current = userData?.id || null;
+    setUser(userData || null);
+    setUserType(isValidType(type) ? type : null);
+    setOnboardingStatus(
+      isValidType(type)
+        ? normalizeOnboardingStatus(type, nextOnboardingStatus)
+        : null
+    );
+    setAccessState(nextAccessState);
+    setFatalError(null);
+    setPostLogoutRedirect(null);
+  }, []);
+
+  const handleLogout = useCallback(async (redirectTo = '/login') => {
+    loadedUserRef.current = null;
+    setPostLogoutRedirect(redirectTo);
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      setRecoveryMode(false);
+      setUser(null);
+      setUserType(null);
+      setOnboardingStatus(null);
+      setAccessState('active');
+      setFatalError(null);
+      setTypeLoading(false);
+    }
+  }, [setRecoveryMode]);
+
+  const handleRetry = useCallback(async () => {
+    safeSet(() => { setFatalError(null); setBooting(true); });
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        safeSet(() => {
+          setUser(null);
+          setUserType(null);
+          setOnboardingStatus(null);
+          setAccessState('active');
+          setBooting(false);
+        });
         return;
       }
 
-      if (!cancelled) setBuscando(true);
+      safeSet(() => setUser(session.user));
+      await loadProfile(session.user);
+      safeSet(() => setBooting(false));
+    } catch {
+      safeSet(() => {
+        setUser(null);
+        setUserType(null);
+        setOnboardingStatus(null);
+        setAccessState('active');
+        setBooting(false);
+      });
+    }
+  }, [safeSet, loadProfile]);
 
-      try {
-        const { data, error } = await supabase.rpc('search_home', {
-          p_term: term,
-          p_limit: 10,
-        });
-
-        if (error) throw error;
-        if (cancelled) return;
-
-        setResultadosBusca((data || []).filter((item) => item.slug));
-      } catch (error) {
-        if (cancelled) return;
-        console.error('Erro na busca:', error);
-        showMessage('home.search_failed_support');
-        setResultadosBusca([]);
-      } finally {
-        if (!cancelled) setBuscando(false);
-      }
-    };
-
-    const timer = setTimeout(buscar, 300);
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-      setBuscando(false);
-    };
-  }, [searchTerm, showMessage]);
-
-  const handleLogoutClick = () => onLogout?.();
+  if (booting) return <FullScreenLoading />;
+  if (fatalError && !inRecovery) return <FullScreenError message={fatalError} onRetry={handleRetry} />;
+  if (isLoggedIn && !userType && !inRecovery) return <FullScreenLoading text="CARREGANDO PERFIL..." />;
 
   return (
-    <div className="min-h-screen bg-black text-white relative">
-      <div className="relative z-50 w-full bg-yellow-400 border-b border-yellow-300/50 overflow-hidden h-10 flex items-center">
-        <div className="announcement-bar-wrapper flex">
-          {[1, 2].map((i) => (
-            <div
-              key={i}
-              className="announcement-bar-track flex items-center shrink-0 whitespace-nowrap"
-              aria-hidden={i === 2}
-            >
-              {[...Array(14)].map((_, index) => (
-                <div key={index} className="flex items-center">
-                  <span className="text-black font-bold text-sm uppercase mx-4">CLIQUE PARA IR</span>
-                  <span className="text-black mx-4">●</span>
-                  <a
-                    href={SUPORTE_HREF}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-black font-normal text-sm uppercase hover:underline underline-offset-4 transition-all mx-4"
-                  >
-                    SUPORTE
-                  </a>
-                  <span className="text-black mx-4">●</span>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+    <Router>
+      <FeedbackProvider>
+        <RecoveryWatcher onChange={setRecoveryMode} />
+        <LogoutRedirectResetter redirectPath={postLogoutRedirect} onClear={() => setPostLogoutRedirect(null)} />
+        <ScrollToTopOnRouteChange />
 
-        <style>{`
-          @keyframes announcement-scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          .announcement-bar-wrapper {
-            display: flex;
-            width: max-content;
-            animation: announcement-scroll 50s linear infinite;
-          }
-          .announcement-bar-wrapper:hover { animation-play-state: paused; }
-          .announcement-bar-track a {
-            position: relative;
-            z-index: 10;
-            cursor: pointer;
-            display: inline-block;
-          }
-          @media (prefers-reduced-motion: reduce) {
-            .announcement-bar-wrapper { animation: none; }
-          }
-        `}</style>
-      </div>
+        <Suspense fallback={<FullScreenLoading />}>
+          <Routes>
+            <Route path="/" element={<Home user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} onLogout={handleLogout} />} />
 
-      <header className="absolute top-20 left-0 w-full z-40 bg-transparent border-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex items-center justify-center h-16 sm:h-20">
-            <Link to="/" className="flex flex-col items-center justify-center gap-1">
-              <img
-                src="/Comvaga Logo.png"
-                alt="Comvaga"
-                className="h-15 w-auto object-contain sm:h-17"
-              />
-              <span className="text-2xl sm:text-3xl font-black">COMVAGA</span>
-            </Link>
-            <div className="absolute right-0 top-[40%] -translate-y-1/2">
-              <SearchBox
-                searchOpen={searchOpen}
-                setSearchOpen={setSearchOpen}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                resultadosBusca={resultadosBusca}
-                setResultadosBusca={setResultadosBusca}
-                buscando={buscando}
-              />
-            </div>
-          </div>
-        </div>
-      </header>
+            <Route path="/reset-password" element={<ResetPassword />} />
 
-      <section className="relative pt-32 pb-12 sm:pt-40 sm:pb-16 lg:pt-48 lg:pb-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-yellow-600/10"></div>
-        <div className="absolute top-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+            <Route path="/login" element={
+              inRecovery ? <Login onLogin={handleLogin} inRecovery={true} />
+              : isLoggedIn && userType ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+              : <Login onLogin={handleLogin} inRecovery={false} />
+            } />
 
-        <div className="relative z-10 max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 border border-primary/30 rounded-button mb-8 backdrop-blur-sm">
-            <ZapIcon className="w-4 h-4 text-primary" />
-            <span className="text-primary font-bold text-sm">O FIM DA AGENDA ESBURACADA</span>
-          </div>
+            <Route path="/cadastro/parceiro" element={
+              isLoggedIn && userType
+                ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                : <CadastroParceiro onLogin={handleLogin} suppressAuthRef={suppressAuthRef} />
+            } />
 
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-tight drop-shadow-lg">
-            SUA AGENDA,<br />
-            <span className="bg-gradient-to-r from-primary to-yellow-600 bg-clip-text text-transparent">
-              MATEMATICAMENTE PERFEITA
-            </span>
-          </h1>
+            <Route path="/login/parceiro" element={
+              inRecovery
+                ? <LoginParceiro onLogin={handleLogin} suppressAuthRef={suppressAuthRef} inRecovery={true} />
+                : isLoggedIn && userType
+                  ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                  : <LoginParceiro onLogin={handleLogin} suppressAuthRef={suppressAuthRef} />
+            } />
 
-          <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
-            A Comvaga organiza agenda, vitrine, equipe e clientes em uma experiência só. O sistema ANTECIPA CONFLITOS, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
-          </p>
+            <Route path="/parceiro/aguardando" element={
+              isLoggedIn ? (
+                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'professional' && accessState === 'partner_pending'
+                  ? <PartnerPendingApproval onLogout={handleLogout} />
+                  : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+              ) : <Navigate to={postLogoutRedirect || "/login"} />
+            } />
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-0">
-            <Link
-              to="/cadastro"
-              className="px-10 py-5 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-black text-lg hover:shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105 flex items-center justify-center gap-3"
-            >
-              MAXIMIZAR MEUS GANHOS <ZapIcon className="w-5 h-5" />
-            </Link>
-            <button
-              type="button"
-              onClick={() => document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-10 py-5 bg-white/10 border border-white/20 text-white rounded-button font-bold text-lg hover:bg-white/20 backdrop-blur-sm"
-            >
-              ENTENDER A LÓGICA
-            </button>
-          </div>
-        </div>
-      </section>
+            <Route path="/cadastro" element={
+              isLoggedIn && userType
+                ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                : <SignupChoice />
+            } />
 
-      <section id="como-funciona" className="py-0 bg-dark-100 w-full">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
-          <h2 className="text-5xl font-black mb-4">
-            A CIÊNCIA <span className="text-primary">POR TRÁS</span>
-          </h2>
-          <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
-        </div>
+            <Route path="/cadastro/cliente" element={
+              isLoggedIn && userType ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+              : <SignupClient onLogin={handleLogin} />
+            } />
 
-        <div className="w-full bg-gray-800 border-y border-gray-800 grid md:grid-cols-3 gap-px">
-          {[
-            { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
-            { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada evento: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
-            { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
-          ].map(({ num, title, text }) => (
-            <div key={num} className="bg-dark-100 p-8 md:p-12 flex flex-col px-4 sm:px-8 md:px-16 lg:px-24">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 mb-6 shrink-0">
-                {num}
-              </div>
-              <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-              <p className="text-gray-400 leading-relaxed">{text}</p>
-            </div>
-          ))}
-        </div>
+            <Route path="/cadastro/profissional" element={
+              isLoggedIn && userType ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+              : <SignupProfessional onLogin={handleLogin} />
+            } />
 
-        <div className="w-full bg-gray-800 border-b border-gray-800 flex flex-col gap-px">
-          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
-                </p>
-              </div>
-            </div>
-          </div>
+            <Route path="/cadastro/profissional/retomada" element={
+              isLoggedIn ? (
+                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'professional'
+                  ? isPartnerSignup && accessState === 'owner_resume'
+                    ? <Navigate to="/cadastro/profissional-parceiro/retomada" />
+                    : accessState === 'owner_resume'
+                    ? <SignupProfessionalResume user={user} onLogin={handleLogin} />
+                    : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                  : userType ? <Navigate to="/minha-area" />
+                  : <Navigate to="/login" />
+              ) : <Navigate to="/login" />
+            } />
 
-          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
-                </p>
-              </div>
-            </div>
-          </div>
+            <Route path="/cadastro/profissional-parceiro/retomada" element={
+              isLoggedIn ? (
+                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'professional'
+                  ? isPartnerSignup && accessState === 'owner_resume'
+                    ? <SignupProfessionalParceiroResume user={user} onLogin={handleLogin} />
+                    : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                  : userType ? <Navigate to="/minha-area" />
+                  : <Navigate to="/login/parceiro" />
+              ) : <Navigate to="/login/parceiro" />
+            } />
 
-          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            <Route path="/dashboard" element={
+              isLoggedIn ? (
+                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'professional'
+                  ? accessState === 'owner_resume'
+                    ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                    : accessState === 'partner_pending'
+                      ? <Navigate to="/parceiro/aguardando" />
+                    : <Dashboard user={user} onLogout={handleLogout} userType={userType} />
+                : userType ? <Navigate to="/minha-area" />
+                : <Navigate to={postLogoutRedirect || "/login"} />
+              ) : <Navigate to={postLogoutRedirect || "/login"} />
+            } />
 
-      <section className="py-0 bg-black overflow-hidden border-b border-gray-800">
-        <div className="w-full bg-dark-200 overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
+            <Route path="/minha-area" element={
+              isLoggedIn ? (
+                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'client' ? <ClientArea user={user} onLogout={handleLogout} userType={userType} />
+                : userType ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                : <Navigate to="/login" />
+              ) : <Navigate to="/login" />
+            } />
 
-          <div className="grid lg:grid-cols-2 gap-px bg-gray-800 items-stretch w-full">
-            <div className="relative z-10 text-center lg:text-left bg-dark-200 p-8 sm:p-16 flex flex-col justify-center px-4 sm:px-8 md:px-16 lg:px-24">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6 self-center lg:self-start">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                </span>
-                <span className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">VEJA AO VIVO</span>
-              </div>
-              
-              <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 leading-tight">
-                NÃO APENAS UMA AGENDA, <br/>
-                <span className="text-primary">UMA VITRINE PROFISSIONAL.</span>
-              </h2>
-              
-              <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                Seu negócio merece mais do que um link de WhatsApp. Permita que seus clientes enxerguem seus trabalhos, depoimentos, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
-              </p>
+            <Route path="/v/:slug" element={<Vitrine user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} onLogout={handleLogout} />} />
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <a
-                  href="https://comvaga.com.br/v/vikings"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-8 py-4 bg-primary text-black font-black rounded-button hover:shadow-[0_0_30px_rgba(255,209,26,0.3)] transition-all flex items-center justify-center gap-3 group"
-                >
-                  VER VITRINE EXEMPLO 
-                  <ZapIcon className="w-5 h-5 group-hover:animate-bounce" />
-                </a>
-              </div>
-            </div>
+            <Route path="/criar-negocio" element={
+              isLoggedIn ? (
+                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'professional'
+                  ? accessState === 'owner_resume'
+                    ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                    : accessState === 'partner_pending'
+                      ? <Navigate to="/parceiro/aguardando" />
+                      : <CriarNegocio user={user} />
+                : userType ? <Navigate to="/minha-area" />
+                : <Navigate to={postLogoutRedirect || "/login"} />
+              ) : <Navigate to={postLogoutRedirect || "/login"} />
+            } />
 
-            <div className="relative z-10 w-full flex items-center justify-center bg-dark-200 p-8 sm:p-16 px-4 sm:px-8 md:px-16 lg:px-24">
-              <div className="relative w-full max-w-[380px] bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
-                <div className="h-16 sm:h-20 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
-                  <div className="absolute -bottom-10 left-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
-                     <div className="w-full h-full bg-gray-800 flex items-center justify-center font-black text-primary text-2xl">V</div>
-                  </div>
-                </div>
+            <Route path="/selecionar-negocio" element={
+              isLoggedIn ? (
+                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'professional'
+                  ? accessState === 'owner_resume'
+                    ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                    : accessState === 'partner_pending'
+                      ? <Navigate to="/parceiro/aguardando" />
+                      : <SelecionarNegocioRouteGuard user={user} onLogout={handleLogout} />
+                : userType ? <Navigate to="/minha-area" />
+                : <Navigate to={postLogoutRedirect || "/login"} />
+              ) : <Navigate to={postLogoutRedirect || "/login"} />
+            } />
 
-                <div className="pt-12 pb-6 px-4 sm:px-6">
-                  <div className="mb-6 px-2">
-                    <div className="flex items-center gap-1">
-                      <div className="text-lg font-normal text-white uppercase tracking-tight">VIKINGS</div>
-                      <CheckedIcon className="w-[13px] h-[13px] text-primary shrink-0" />
-                    </div>
-                    <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                      <StarGlyph sizeClass="h-3 w-3 text-[12px]" /> 4.9
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      <div className="w-[22px] h-[22px] rounded-full border border-white/15 flex items-center justify-center text-gray-400">
-                        <PreviewInstagramIcon />
-                      </div>
-                      <div className="w-[22px] h-[22px] rounded-full border border-white/15 flex items-center justify-center text-gray-400">
-                        <PreviewFacebookIcon />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mb-4 px-2">
-                    <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Profissionais</div>
-                    <div className="bg-white/5 border border-white/10 rounded-[3px] p-3 flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-normal text-black text-base shrink-0">
-                        R
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-1 mb-0.5">
-                          <span className="text-xs font-normal text-white uppercase leading-tight">RAFAEL COSTA</span>
-                          <span className="text-[9px] font-normal uppercase border border-white/15 text-white-400 rounded-full px-2.5 py-0.5 shrink-0">BARBEIRO</span>
-                        </div>
-                        <div className="flex items-center gap-1 mb-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
-                          <span className="text-[9px] text-gray-500 uppercase">Aberto</span>
-                        </div>
-                        <div className="flex items-center gap-1 mb-1">
-                          <StarGlyph sizeClass="h-2.5 w-2.5 text-[10px]" />
-                          <span className="text-xs font-normal text-primary">4.8</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-500 font-normal">
-                            <TimeIcon className="w-2.5 h-2.5 shrink-0" />
-                            08:00 - 18:00
-                          </span>
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-orange-500 font-normal">
-                            PAUSA 11:00 - 12:00
-                          </span>
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-500 font-normal">
-                            7 SERVS
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 mb-0 px-2">
-                    <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs Disponíveis</div>
-                    
-                    {[
-                      { n: 'CORTE', p: 'R$ 45,00', d: '30 min' },
-                      { n: 'BARBA TERAPIA', p: 'R$ 35,00', d: '20 min' }
-                    ].map((s, idx) => (
-                      <div key={idx} className="bg-white/5 border border-white/10 rounded-[3px] p-4 flex flex-col gap-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="text-sm font-normal text-white uppercase">{s.n}</div>
-                            <div className="flex items-center gap-1.5 mt-1">
-                              <TimeIcon className="w-3 h-3 text-gray-500" />
-                              <span className="text-[10px] text-gray-500 font-normal uppercase">{s.d}</span>
-                            </div>
-                          </div>
-                          <div className="text-primary font-normal text-sm">{s.p}</div>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <div className="flex-1 h-8 rounded-full border border-white/15 flex items-center justify-center gap-2 px-3 hover:bg-white/5 transition-colors cursor-pointer">
-                            <CalendarIcon className="w-3.5 h-3.5 text-white/40" />
-                            <span className="text-[10px] font-normal text-white/70 uppercase">Agendar</span>
-                          </div>
-                          <div className="flex-1 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center gap-2 px-3 hover:bg-primary/20 transition-colors cursor-pointer">
-                            <SelectIcon className="w-3.5 h-3.5 text-white/40" />
-                            <span className="text-[10px] font-normal text-primary uppercase">Selecionar</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="absolute top-4 right-4 flex gap-2">
-                   <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-primary"><StarGlyph sizeClass="h-4 w-4 text-[16px]" /></div>
-                   <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white/40"><PreviewHeartIcon /></div>
-                </div>
-              </div>
-              <div className="absolute -inset-10 bg-primary/10 blur-[80px] -z-10 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-0 bg-dark-200 w-full">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
-          <h2 className="text-5xl font-black mb-4">
-            VANTAGEM <span className="text-primary">MÚTUA</span>
-          </h2>
-          <p className="text-xl text-gray-400">Por que Profissionais e Clientes preferem Comvaga</p>
-        </div>
-
-        <div className="w-full bg-gray-800 border-y border-gray-800 grid sm:grid-cols-2 lg:grid-cols-3 gap-px">
-          {[
-            { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
-            { icon: ZapIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
-            { icon: ZapIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
-            { icon: MoneyGlyph, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
-            { icon: SmileGlyph, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
-            { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
-          ].map(({ icon: Icon, title, text }, i) => (
-            <div
-              key={i}
-              className="bg-dark-200 p-8 sm:p-10 hover:bg-dark-100 transition-colors flex flex-col px-4 sm:px-8 md:px-16 lg:px-24"
-            >
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                <Icon className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-              <p className="text-gray-400 leading-relaxed">{text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-0 bg-dark-100 w-full">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
-          <h2 className="text-5xl font-normal mb-4">
-            SEM <span className="text-primary">BUROCRACIA</span>
-          </h2>
-          <p className="text-xl text-gray-400">Acesso liberado sem necessidade de dados bancários. Simples assim :)</p>
-        </div>
-       
-        <div className="
-          w-full bg-gray-800 border-t border-gray-800
-          flex sm:grid sm:grid-cols-3 gap-px
-          overflow-x-auto sm:overflow-visible
-          pb-4 sm:pb-0
-          [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-        ">
-
-          <div className="
-            shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
-            bg-dark-100 p-8 sm:p-10 flex flex-col px-4 sm:px-8 md:px-12
-          ">
-            <div className="mb-5">
-              <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-                Essencial
-              </span>
-              <p className="text-2xl font-normal text-white mb-1">
-                R$ 39<span className="text-base font-normal text-gray-500">,99/mês</span>
-              </p>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Para autônomos que buscam organizar sua agenda.
-              </p>
-            </div>
-
-            <div className="pt-5 flex flex-col gap-3 flex-grow">
-              {[
-                'Reabertura automática de horários cancelados na agenda',
-                'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
-                'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
-                'Controle individual para um único profissional com indicadores básicos de agendamentos e receita',
-                'Agendamento assistido pelo profissional',
-                'Vitrine profissional',
-                'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
-                'Reagendamento inteligente em um clique pela área exclusiva do cliente',
-                'Alertas por e-mail em tempo real',
-                'Lembrete automático 30 min antes',
-                'Sincronia total com o Google Agenda.',
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-2.5">
-                  <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span className="text-sm text-gray-400 leading-snug">{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <a
-              href={WHATSAPP_ESSENCIAL_HREF}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-8 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
-            >
-              Tenho interesse
-            </a>
-          </div>
-
-          <div className="
-            shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
-            bg-primary/5 p-8 sm:p-10 relative flex flex-col px-4 sm:px-8 md:px-12
-          ">
-            <div className="mb-5">
-              <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
-                Profissional
-              </span>
-              <p className="text-2xl font-normal text-white mb-1">
-                R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
-              </p>
-              <p className="text-sm text-gray-400 leading-relaxed">
-                Para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.
-              </p>
-            </div>
-
-            <div className="pt-5 flex flex-col gap-3 flex-grow">
-              {[
-                'Tudo do plano ESSENCIAL',
-                'Painel admin: controle de múltiplos profissionais',
-                'Painel individual para cada profissional parceiro',
-                'Até 5 profissionais parceiros sem taxas ou custos adicionais',
-                'Métricas em tempo real com contraste de desempenho diário',
-                'Análise evolutiva de faturamento com filtros temporais estratégicos',
-                'Relatório de faturamento volumétrico agrupado por período selecionado',
-                'Montagem de ofertas nos trabalhos oferecidos',                  
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-2.5">
-                  <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span className="text-sm text-gray-300 leading-snug">{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
-              <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
-              <span className="text-xs font-normal text-primary uppercase tracking-wide">
-                MESMO <strong className="font-bold">VALOR</strong> E BENEFÍCIOS DO ESSENCIAL
-              </span>
-            </div>
-
-            <Link
-              to="/cadastro"
-              className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
-            >
-              ASSINAR AGORA <ZapIcon className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <div className="
-            shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
-            bg-dark-100 p-8 sm:p-10 flex flex-col px-4 sm:px-8 md:px-12
-          ">
-            <div className="mb-5">
-              <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-                Premium Real
-              </span>
-              <p className="text-2xl font-normal text-white mb-1">
-                R$ 69<span className="text-base font-normal text-gray-500">,99/mês</span>
-              </p>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Experiência completa com acesso ilimitado a todos os recursos.
-              </p>
-            </div>
-
-            <div className="pt-5 flex flex-col gap-3 flex-grow">
-              {[
-                'Tudo do plano PROFISSIONAL',
-                'Profissionais ilimitados e sem custo extra por parceiro',                 
-                'Comprometimento da agenda e receita futura projetada',
-                'Acesso antecipado a novos recursos',
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-2.5">
-                  <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span className="text-sm text-gray-400 leading-snug">{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <a
-              href={WHATSAPP_PREMIUM_HREF}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-8 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
-            >
-              Tenho interesse
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-black text-black mb-6">ELEVE SEU NÍVEL PROFISSIONAL</h2>
-          <p className="text-2xl text-black/80 mb-8">Uma vitrine para vender, um painel para operar e uma agenda que pensa antes de confirmar.</p>
-          <Link
-            to="/cadastro"
-            className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all"
-          >
-            ACESSAR AGORA SEM CUSTO <ZapIcon className="w-6 h-6" />
-          </Link>
-          <p className="text-black/60 text-sm mt-6">Eficiência comprovada em barbearias, estúdios e clínicas.</p>
-        </div>
-      </section>
-
-      <footer className="bg-black py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div className="flex flex-col justify-start">
-              <Link to="/" className="inline-block hover:opacity-75 transition-opacity">
-                <img
-                  src="/Comvaga Logo.png"
-                  alt="Comvaga"
-                  className="h-16 w-auto object-contain"
-                />
-              </Link>
-              <p className="text-gray-600 text-xs mt-3 uppercase leading-relaxed">
-                Sua agenda,<br />matematicamente perfeita.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="text-white font-normal mb-4">PARA VOCÊ</h4>
-              <ul className="space-y-2">
-                {isLogged ? (
-                  <>
-                    <li>
-                      <Link
-                        to={userType === 'professional' ? '/dashboard' : '/minha-area'}
-                        className="text-gray-500 hover:text-primary transition-colors text-sm"
-                      >
-                        {userType === 'professional' ? 'DASHBOARD' : 'MINHA ÁREA'}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        LOGIN PARCEIRO
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        CADASTRO PARCEIRO
-                      </Link>
-                    </li>
-                    <li>
-                      <button
-                        type="button"
-                        onClick={handleLogoutClick}
-                        className="text-gray-500 hover:text-primary transition-colors text-sm"
-                      >
-                        SAIR
-                      </button>
-                    </li>
-                  </>
-                ) : (
-                  <>
-                    <li>
-                      <Link to="/login" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        ENTRAR
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        CADASTRAR GRÁTIS
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        LOGIN PARCEIRO
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        CADASTRO PARCEIRO
-                      </Link>
-                    </li>
-                  </>
-                )}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-normal mb-4">EMPRESA</h4>
-              <ul className="space-y-2">
-                {['SOBRE', 'BLOG'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-primary transition-colors text-sm">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-normal mb-4">LEGAL</h4>
-              <ul className="space-y-2">
-                {['PRIVACIDADE', 'TERMOS'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-6">
-            <p className="text-gray-600 text-sm">© 2026 COMVAGA. Todos os direitos reservados.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </FeedbackProvider>
+    </Router>
   );
 }
