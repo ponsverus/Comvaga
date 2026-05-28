@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
@@ -114,7 +114,7 @@ export default function SignupProfessional({ onLogin }) {
       console.error('SignupProfessional error:', err);
       showMessage('alerts.action_failed_support');
       try { await supabase.auth.signOut(); } catch (signOutError) {
-        console.warn('Falha ao deslogar após erro de cadastro.', signOutError);
+        console.warn('Houve um problema no cadastro, mas seu acesso continua ativo. Por favor, atualize a página.', signOutError);
       }
     } finally {
       setLoading(false);
