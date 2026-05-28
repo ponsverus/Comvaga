@@ -223,7 +223,7 @@ export default function App() {
           await supabase.auth.signOut({ scope: 'local' });
         } catch {
           try { await supabase.auth.signOut(); } catch (signOutError) {
-            console.warn('Falha ao finalizar sessao local.', signOutError);
+            console.warn('Erro ao sair da conta.', signOutError);
           }
         }
         safeSet(() => {
