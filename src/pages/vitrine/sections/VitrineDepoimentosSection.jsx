@@ -1,4 +1,3 @@
-import React from 'react';
 import DepoimentosPaginados from '../components/DepoimentosPaginados';
 
 function ReviewStar({ active, onClick, label, disabled }) {
