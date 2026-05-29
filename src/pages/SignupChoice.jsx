@@ -10,7 +10,7 @@ export default function SignupChoice() {
   const go = (path) => {
     try {
       navigate(path);
-    } catch (e) {
+    } catch {
       showMessage('signupChoice.navigate_error');
     }
   };
