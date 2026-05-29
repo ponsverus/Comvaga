@@ -28,7 +28,6 @@ export default function VitrineDepoimentosSection({
   reviewState,
   reviewActions,
 }) {
-  const lineClass = isLight ? 'border-vborder' : 'border-gray-800';
   const labelClass = isLight ? 'text-vmuted' : 'text-gray-500';
   const inputClass = isLight
     ? 'text-vtext placeholder:text-vmuted focus:text-vtext'
