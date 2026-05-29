@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 
 const PROFISSIONAIS_POR_PAGINA = 3;
@@ -54,7 +54,7 @@ export default function VitrineProfessionalsSection({
             <div key={prof.id} className="bg-vcard border border-vborder rounded-custom p-6 hover:border-vprimary/50 transition-all self-start">
               <div className="flex items-start gap-4 mb-4">
                 {prof.avatarUrl ? (
-                  <div className="w-14 h-14 rounded-full overflow-hidden border border-vborder bg-vcard2 shrink-0">
+                  <div className="w-14 h-14 rounded-custom overflow-hidden border border-vborder bg-vcard2 shrink-0">
                     <img src={prof.avatarUrl} alt={prof.nome} className="w-full h-full object-cover" />
                   </div>
                 ) : (
