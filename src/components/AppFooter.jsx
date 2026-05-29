@@ -42,7 +42,6 @@ function FooterLink({ to, href, children, onClick }) {
 export default function AppFooter({
   userType = null,
   onLogout,
-  vitrinePath = '/',
 }) {
   const isClient = userType === 'client';
   const isProfessional = userType === 'professional';
