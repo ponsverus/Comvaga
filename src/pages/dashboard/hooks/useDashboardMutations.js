@@ -61,6 +61,13 @@ export function useDashboardMutations({
     actionLocksRef.current.delete(key);
   };
 
+  const isEntregaDuplicateNameError = (error) => {
+    const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
+    return raw.includes('23505')
+      || raw.includes('ux_entregas_ativas_profissional_nome_normalizado')
+      || raw.includes('duplicate key');
+  };
+
   const ensureOwnerAction = async () => {
     if (!negocio?.id) {
       await uiAlert('alerts.business_not_loaded', 'error');
@@ -305,7 +312,8 @@ export function useDashboardMutations({
       await reloadEntregas();
     } catch (e2) {
       const msg = String(e2?.message || '');
-      if (msg.includes('oferta')) await uiAlert('dashboard.entrega_promo_invalid', 'error');
+      if (isEntregaDuplicateNameError(e2)) await uiAlert(`dashboard.business.${businessGroup}.entrega_duplicate_name`, 'warning');
+      else if (msg.includes('oferta')) await uiAlert('dashboard.entrega_promo_invalid', 'error');
       else if (msg.includes('invalido')) await uiAlert('dashboard.entrega_price_invalid', 'error');
       else if (msg.includes('Duracao')) await uiAlert('dashboard.entrega_duration_invalid', 'error');
       else if (msg.includes('Selecione')) await uiAlert(`dashboard.business.${businessGroup}.entrega_prof_required`, 'error');
@@ -356,7 +364,8 @@ export function useDashboardMutations({
       await reloadEntregas();
     } catch (e2) {
       const msg = String(e2?.message || '');
-      if (msg.includes('oferta')) await uiAlert('dashboard.entrega_promo_invalid', 'error');
+      if (isEntregaDuplicateNameError(e2)) await uiAlert(`dashboard.business.${businessGroup}.entrega_duplicate_name`, 'warning');
+      else if (msg.includes('oferta')) await uiAlert('dashboard.entrega_promo_invalid', 'error');
       else if (msg.includes('invalido')) await uiAlert('dashboard.entrega_price_invalid', 'error');
       else if (msg.includes('Duracao')) await uiAlert('dashboard.entrega_duration_invalid', 'error');
       else if (msg.includes('Selecione')) await uiAlert(`dashboard.business.${businessGroup}.entrega_prof_required`, 'error');
