@@ -1,4 +1,3 @@
-import React from 'react';
 import EntregasCarousel from '../components/EntregasCarousel';
 
 export default function VitrineEntregasSection({
