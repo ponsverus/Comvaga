@@ -87,7 +87,7 @@ export default function VitrineTopSection({ header, business, actions }) {
                 <img src={business.logoUrl} alt="Logo" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-vprimary rounded-custom flex items-center justify-center text-4xl sm:text-5xl font-normal text-vprimary-text">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-vprimary rounded-full flex items-center justify-center text-4xl sm:text-5xl font-normal text-vprimary-text">
                 {business.negocio.nome?.[0] || 'N'}
               </div>
             )}
