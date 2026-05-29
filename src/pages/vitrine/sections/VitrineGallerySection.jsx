@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function VitrineGallerySection({ items, hasMore = false, loadingMore = false, onLoadMore }) {
   const sentinelRef = useRef(null);
