@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowLeft, Phone } from 'lucide-react';
 import { CheckedIcon, LocationIcon } from '../../../components/icons';
 
