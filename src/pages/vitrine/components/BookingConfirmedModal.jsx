@@ -1,4 +1,3 @@
-import React from 'react';
 import { CalendarIcon } from '../../../components/icons';
 
 export default function BookingConfirmedModal({
