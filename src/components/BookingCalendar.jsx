@@ -165,7 +165,7 @@ export default function BookingCalendar({
       if (!final.length) setSlotsError('SEM VAGAS PRA HOJE :(');
 
       setTimeout(() => slotsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
-    } catch (e) {
+    } catch {
       if (!canApply()) return;
       setSlotsError('Erro ao buscar horários. Tente outro dia.');
     } finally {
