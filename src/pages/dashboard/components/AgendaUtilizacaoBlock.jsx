@@ -171,7 +171,6 @@ export default function AgendaUtilizacaoBlock({
                 {(() => {
                   const validos = Number(item?.agendamentos_validos || 0);
                   const cancelados = Number(item?.cancelados || 0);
-                  const totalAgendamentos = Math.max(validos + cancelados, 1);
                   const minutosDisponiveis = Number(item?.minutos_disponiveis || 0);
                   const minutosOcupados = Number(item?.minutos_ocupados || 0);
                   const minutosOciosos = Number(item?.minutos_ociosos || 0);
