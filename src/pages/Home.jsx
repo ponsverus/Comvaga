@@ -3,11 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { TimeIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon } from '../components/icons';
-import { SUPPORT_PHONE_E164 as SUPORTE_PHONE_E164 } from '../support';
-
-const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
-const SUPORTE_HREF =
-  `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent(SUPORTE_MSG)}`;
+import { SUPPORT_PHONE_E164 as SUPORTE_PHONE_E164, getSupportHref } from '../support';
 
 const WHATSAPP_ESSENCIAL_HREF =
   `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent('Olá! Sou um profissional e tenho interesse em assinar o plano Essencial por R$ 29,99/mês. Pode me orientar?')}`;
@@ -185,6 +181,7 @@ export default function Home({ user, userType, onLogout }) {
 
   const { showMessage } = useFeedback();
   const isLogged = !!user && !!userType;
+  const supportHref = getSupportHref(userType);
 
   useEffect(() => {
     let cancelled = false;
@@ -244,16 +241,9 @@ export default function Home({ user, userType, onLogout }) {
             >
               {[...Array(14)].map((_, index) => (
                 <div key={index} className="flex items-center">
-                  <span className="text-black font-bold text-sm uppercase mx-4">CLIQUE PARA IR</span>
+                  <span className="text-black font-bold text-sm uppercase mx-4">COMVAGA</span>
                   <span className="text-black mx-4">●</span>
-                  <a
-                    href={SUPORTE_HREF}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-black font-normal text-sm uppercase hover:underline underline-offset-4 transition-all mx-4"
-                  >
-                    SUPORTE
-                  </a>
+                  <span className="text-black font-normal text-sm uppercase mx-4">DESCONTO</span>
                   <span className="text-black mx-4">●</span>
                 </div>
               ))}
@@ -272,12 +262,6 @@ export default function Home({ user, userType, onLogout }) {
             animation: announcement-scroll 50s linear infinite;
           }
           .announcement-bar-wrapper:hover { animation-play-state: paused; }
-          .announcement-bar-track a {
-            position: relative;
-            z-index: 10;
-            cursor: pointer;
-            display: inline-block;
-          }
           @media (prefers-reduced-motion: reduce) {
             .announcement-bar-wrapper { animation: none; }
           }
@@ -522,7 +506,7 @@ export default function Home({ user, userType, onLogout }) {
                     
                     {[
                       { n: 'CORTE', p: 'R$ 45,00', d: '30 min' },
-                      { n: 'BARBA', p: 'R$ 25,00', d: '20 min' }
+                      { n: 'BARBA', p: 'R$ 30,00', d: '20 min' }
                     ].map((s, idx) => (
                       <div key={idx} className="bg-white/5 border border-white/10 rounded-[3px] p-4 flex flex-col gap-4">
                         <div className="flex justify-between items-start">
@@ -840,6 +824,16 @@ export default function Home({ user, userType, onLogout }) {
                     </li>
                   </>
                 )}
+                <li>
+                  <a
+                    href={supportHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-gray-500 hover:text-primary transition-colors text-sm"
+                  >
+                    SUPORTE
+                  </a>
+                </li>
               </ul>
             </div>
 
