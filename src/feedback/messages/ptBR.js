@@ -5,7 +5,7 @@ export const ptBR = {
       body:
         'Houve um erro inesperado durante o processamento.\n' +
         'Isso pode ser uma instabilidade temporária.\n' +
-        'Se o problema persistir, clique em SUPORTE na faixa amarela para falar com a gente.',
+        'Se o problema persistir, acesse SUPORTE no rodapé da página para falar com a gente.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -747,8 +747,8 @@ export const ptBR = {
       buttonText: 'EXCLUIR CONTA',
     },
     account_deleted: {
-      title: 'Conta excluida',
-      body: 'Sua conta de cliente foi excluida com sucesso.',
+      title: 'Conta excluída',
+      body: 'Sua conta de cliente foi excluída com sucesso.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
@@ -819,7 +819,7 @@ export const ptBR = {
       body:
         'Parece que ocorreu uma instabilidade temporária.\n' +
         'Tente novamente em alguns segundos.\n' +
-        'Persistindo a dificuldade, utilize o SUPORTE na faixa amarela para falar com a gente.',
+        'Persistindo a dificuldade, utilize o SUPORTE no rodapé da página para falar com a gente.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -832,7 +832,7 @@ export const ptBR = {
       body:
         '{msg}\n' +
         'Confira seu email, sua senha e o tipo selecionado.\n' +
-        'Se o problema persistir, clique em SUPORTE na faixa amarela para falar com a gente.',
+        'Se o problema persistir, acesse SUPORTE no rodapé da página para falar com a gente.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -841,7 +841,7 @@ export const ptBR = {
       title: 'Informe seu email',
       body:
         'Digite seu email para receber o link de resgate.\n' +
-        'Se precisar, clique em SUPORTE na faixa amarela.',
+        'Se precisar, acesse SUPORTE no rodapé da página.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'OK',
@@ -860,7 +860,7 @@ export const ptBR = {
       body:
         '{msg}\n' +
         'Tente novamente em instantes.\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela.',
+        'Se persistir, acesse SUPORTE no rodapé da página.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -893,7 +893,7 @@ export const ptBR = {
       body:
         '{msg}\n' +
         'Tente novamente.\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela.',
+        'Se persistir, acesse SUPORTE no rodapé da página.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -906,7 +906,7 @@ export const ptBR = {
       body:
         'Ocorreu uma falha ao abrir esta fase.\n' +
         'Tente novamente em alguns instantes.\n' +
-        'Persistindo o erro, use o SUPORTE na faixa amarela para falar com a gente.',
+        'Persistindo o erro, use o SUPORTE no rodapé da página para falar com a gente.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -959,7 +959,7 @@ export const ptBR = {
       body:
         'Seu perfil está ausente no sistema.\n' +
         'Aguarde alguns segundos e tente fazer login.\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela.',
+        'Se persistir, acesse SUPORTE no rodapé da página.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -1082,7 +1082,7 @@ export const ptBR = {
       body:
         'Seu perfil está ausente no sistema.\n' +
         'Aguarde alguns segundos e tente fazer login.\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela.',
+        'Se persistir, acesse SUPORTE no rodapé da página.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -1091,7 +1091,7 @@ export const ptBR = {
       title: 'Cadastro inconsistente',
       body:
         'Seu perfil foi criado com tipo incorreto.\n' +
-        'Clique em SUPORTE na faixa amarela para resolver.',
+        'Acesse SUPORTE no rodapé da página para resolver.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -1101,7 +1101,7 @@ export const ptBR = {
       body:
         'Erro ao criar o negócio agora. ' +
         'Tente novamente em alguns instantes.\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela.',
+        'Se persistir, acesse SUPORTE no rodapé da página.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -1111,7 +1111,7 @@ export const ptBR = {
       body:
         'Erro ao concluir o cadastro do profissional. ' +
         'Tente novamente.\n' +
-        'Se persistir, clique em SUPORTE na faixa amarela.',
+        'Se persistir, acesse SUPORTE no rodapé da página.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'ENTENDI',
