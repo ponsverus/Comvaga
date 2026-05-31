@@ -1,11 +1,12 @@
 import { ptBR } from '../../feedback/messages/ptBR.js';
 import { PROFISSIONAL_STATUS_DOT_CLASS } from '../../utils/profissionalStatus.js';
+import { SUPPORT_PHONE_E164, getSupportHref } from '../../support.js';
 
 export const STATUS_COLOR_CLASS = PROFISSIONAL_STATUS_DOT_CLASS;
 
-export const SUPORTE_PHONE_E164 = '5533999037979';
+export const SUPORTE_PHONE_E164 = SUPPORT_PHONE_E164;
 export const SUPORTE_MSG = 'Olá, sou cadastrado como Profissional e gostaria de uma ajuda especializada para o meu perfil. Pode me orientar?';
-export const SUPORTE_HREF = `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent(SUPORTE_MSG)}`;
+export const SUPORTE_HREF = getSupportHref('professional');
 
 export const AG_PAGE_SIZE = 15;
 export const IMAGE_EXT_BY_MIME = {
