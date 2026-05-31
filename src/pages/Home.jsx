@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { TimeIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon } from '../components/icons';
+import { SUPPORT_PHONE_E164 as SUPORTE_PHONE_E164 } from '../support';
 
-const SUPORTE_PHONE_E164 = '5533999037979';
 const SUPORTE_MSG = 'Olá, preciso de ajuda. Pode me orientar?';
 const SUPORTE_HREF =
   `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent(SUPORTE_MSG)}`;
@@ -522,7 +522,7 @@ export default function Home({ user, userType, onLogout }) {
                     
                     {[
                       { n: 'CORTE', p: 'R$ 45,00', d: '30 min' },
-                      { n: 'BARBA', p: 'R$ 30,00', d: '20 min' }
+                      { n: 'BARBA', p: 'R$ 25,00', d: '20 min' }
                     ].map((s, idx) => (
                       <div key={idx} className="bg-white/5 border border-white/10 rounded-[3px] p-4 flex flex-col gap-4">
                         <div className="flex justify-between items-start">
