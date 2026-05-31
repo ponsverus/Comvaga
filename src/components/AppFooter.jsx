@@ -1,17 +1,5 @@
 import { Link } from 'react-router-dom';
-
-const SUPPORT_PHONE_E164 = '5533999037979';
-
-const SUPPORT_MESSAGES = {
-  client: 'Olá, eu sou cliente e estou com um problema. Pode me ajudar?',
-  professional: 'Olá, sou profissional e preciso de ajuda.',
-  public: 'Olá, preciso de ajuda. Pode me orientar?',
-};
-
-function buildSupportHref(userType) {
-  const message = SUPPORT_MESSAGES[userType] || SUPPORT_MESSAGES.public;
-  return `https://wa.me/${SUPPORT_PHONE_E164}?text=${encodeURIComponent(message)}`;
-}
+import { getSupportHref } from '../support';
 
 function FooterLink({ to, href, children, onClick }) {
   const className = 'text-gray-500 hover:text-primary transition-colors text-sm uppercase';
@@ -45,7 +33,7 @@ export default function AppFooter({
 }) {
   const isClient = userType === 'client';
   const isProfessional = userType === 'professional';
-  const supportHref = buildSupportHref(userType);
+  const supportHref = getSupportHref(userType);
 
   return (
     <footer className="bg-black py-12 px-4 border-t border-gray-900">
