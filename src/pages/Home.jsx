@@ -518,11 +518,11 @@ export default function Home({ user, userType, onLogout }) {
                   </div>
 
                   <div className="space-y-4 mb-0 px-2">
-                    <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs Disponíveis</div>
+                    <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs</div>
                     
                     {[
                       { n: 'CORTE', p: 'R$ 45,00', d: '30 min' },
-                      { n: 'BARBA TERAPIA', p: 'R$ 35,00', d: '20 min' }
+                      { n: 'BARBA', p: 'R$ 30,00', d: '20 min' }
                     ].map((s, idx) => (
                       <div key={idx} className="bg-white/5 border border-white/10 rounded-[3px] p-4 flex flex-col gap-4">
                         <div className="flex justify-between items-start">
