@@ -139,7 +139,8 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
           signInData.user,
           'professional',
           accessProfile.onboardingStatus,
-          'partner_pending'
+          'partner_pending',
+          'partner'
         );
         navigate('/parceiro/aguardando', { replace: true });
         return;
@@ -155,7 +156,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
 
       if (suppressAuthRef) suppressAuthRef.current = false;
       saveLastPartnerNegocio(uid, negocio.id);
-      onLogin(signInData.user, 'professional');
+      onLogin(signInData.user, 'professional', 'completed', 'active');
       navigate('/dashboard', { state: { negocioId: negocio.id } });
     } catch (e2) {
       setAlerta({ body: e2?.message || msgs.unexpected_error.body, variant: 'erro' });
