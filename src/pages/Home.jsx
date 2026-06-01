@@ -241,9 +241,9 @@ export default function Home({ user, userType, onLogout }) {
             >
               {[...Array(14)].map((_, index) => (
                 <div key={index} className="flex items-center">
-                  <span className="text-black font-bold text-sm uppercase mx-4">COMVAGA</span>
+                  <span className="text-black font-normal text-sm uppercase mx-4">TESTE 30 DIAS GRÁTIS</span>
                   <span className="text-black mx-4">●</span>
-                  <span className="text-black font-normal text-sm uppercase mx-4">DESCONTO</span>
+                  <span className="text-black font-normal text-sm uppercase mx-4">TESTE 30 DIAS GRÁTIS</span>
                   <span className="text-black mx-4">●</span>
                 </div>
               ))}
