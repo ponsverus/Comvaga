@@ -4,6 +4,7 @@ const PROFILE_TABLE = 'users';
 
 export const isValidType = (t) => t === 'client' || t === 'professional';
 export const isValidOnboardingStatus = (s) => s === 'pending' || s === 'completed';
+export const isValidProfessionalOnboardingFlow = (s) => s === 'owner' || s === 'partner';
 
 export function normalizeOnboardingStatus(type, onboardingStatus) {
   if (type !== 'professional') return 'completed';
@@ -29,6 +30,9 @@ export async function fetchUserAccessProfile(userId) {
       return {
         type: data.type,
         onboardingStatus: normalizeOnboardingStatus(data.type, onboardingStatus),
+        onboardingFlow: isValidProfessionalOnboardingFlow(data.onboardingFlow ?? data.onboarding_flow)
+          ? (data.onboardingFlow ?? data.onboarding_flow)
+          : null,
         accessState: data.accessState || 'active',
       };
     }
@@ -38,7 +42,7 @@ export async function fetchUserAccessProfile(userId) {
 
   const { data: userData, error: userError } = await supabase
     .from(PROFILE_TABLE)
-    .select('type, onboarding_status')
+    .select('type, onboarding_status, professional_onboarding_flow')
     .eq('id', userId)
     .maybeSingle();
 
@@ -51,6 +55,7 @@ export async function fetchUserAccessProfile(userId) {
     return {
       type,
       onboardingStatus: 'completed',
+      onboardingFlow: null,
       accessState: 'active',
     };
   }
@@ -68,6 +73,9 @@ export async function fetchUserAccessProfile(userId) {
   return {
     type,
     onboardingStatus,
+    onboardingFlow: isValidProfessionalOnboardingFlow(userData?.professional_onboarding_flow)
+      ? userData.professional_onboarding_flow
+      : null,
     accessState: getProfessionalAccessState(statuses, onboardingStatus),
   };
 }
