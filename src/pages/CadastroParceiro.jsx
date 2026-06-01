@@ -83,7 +83,7 @@ export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
       }
 
       if (suppressAuthRef) suppressAuthRef.current = false;
-      onLogin?.(signUpData.user, 'professional', 'pending', 'owner_resume');
+      onLogin?.(signUpData.user, 'professional', 'pending', 'owner_resume', 'partner');
       navigate('/cadastro/profissional-parceiro/retomada', { replace: true });
     } catch (e) {
       setAlerta({ body: e?.message || msgs.unexpected_error.body, variant: 'erro' });
