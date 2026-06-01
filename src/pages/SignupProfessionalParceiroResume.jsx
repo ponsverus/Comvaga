@@ -96,7 +96,7 @@ export default function SignupProfessionalParceiroResume({ user, onLogin }) {
         return;
       }
 
-      onLogin?.(user, 'professional', 'pending', 'partner_pending');
+      onLogin?.(user, 'professional', 'pending', 'partner_pending', 'partner');
       navigate('/parceiro/aguardando', { replace: true });
     } catch (err) {
       setAlerta({ body: err?.message || msgs.unexpected_error.body, variant: 'erro' });
