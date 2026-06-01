@@ -148,6 +148,7 @@ export default function App() {
   const [user,             setUser]             = useState(null);
   const [userType,         setUserType]         = useState(null);
   const [onboardingStatus, setOnboardingStatus] = useState(null);
+  const [onboardingFlow,   setOnboardingFlow]   = useState(null);
   const [accessState,      setAccessState]      = useState('active');
   const [booting,          setBooting]          = useState(true);
   const [typeLoading,      setTypeLoading]      = useState(false);
@@ -161,8 +162,9 @@ export default function App() {
   const inRecoveryRef   = useRef(inRecovery);
 
   const isLoggedIn = !!user;
-  const isPartnerSignup = user?.user_metadata?.partner_signup === true
+  const metadataPartnerSignup = user?.user_metadata?.partner_signup === true
     || String(user?.user_metadata?.partner_signup || '').toLowerCase() === 'true';
+  const isPartnerSignup = onboardingFlow === 'partner' || metadataPartnerSignup;
 
   const safeSet = useCallback((fn) => {
     if (aliveRef.current) fn();
@@ -173,15 +175,15 @@ export default function App() {
     setInRecovery(!!next);
   }, []);
 
-  const getPostLoginPath = useCallback((type, currentAccessState, status) => {
+  const getPostLoginPath = useCallback((type, currentAccessState, status, flow = onboardingFlow) => {
     if (type !== 'professional') return '/minha-area';
     if (currentAccessState === 'partner_pending') return '/parceiro/aguardando';
-    if (isPartnerSignup && currentAccessState === 'owner_resume') return '/cadastro/profissional-parceiro/retomada';
+    if (flow === 'partner' && currentAccessState === 'owner_resume') return '/cadastro/profissional-parceiro/retomada';
     if (currentAccessState === 'owner_resume' || normalizeOnboardingStatus(type, status) === 'pending') {
       return '/cadastro/profissional/retomada';
     }
     return '/dashboard';
-  }, [isPartnerSignup]);
+  }, [onboardingFlow]);
 
   const loadProfile = useCallback(async (sessionUser) => {
     if (!sessionUser?.id) return null;
@@ -190,6 +192,7 @@ export default function App() {
       setTypeLoading(true);
       setUserType(null);
       setOnboardingStatus(null);
+      setOnboardingFlow(null);
       setAccessState('active');
     });
 
@@ -202,6 +205,7 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
+          setOnboardingFlow(null);
           setAccessState('active');
           loadedUserRef.current = null;
           setFatalError('Perfil inexistente. Crie ou conclua seu cadastro para prosseguir.');
@@ -213,6 +217,7 @@ export default function App() {
       safeSet(() => {
         setUserType(profile.type);
         setOnboardingStatus(profile.onboardingStatus);
+        setOnboardingFlow(profile.onboardingFlow || null);
         setAccessState(profile.accessState || 'active');
         setFatalError(null);
       });
@@ -230,6 +235,7 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
+          setOnboardingFlow(null);
           setAccessState('active');
           setFatalError(null);
           setPostLogoutRedirect('/login');
@@ -240,6 +246,7 @@ export default function App() {
       safeSet(() => {
         setUserType(null);
         setOnboardingStatus(null);
+        setOnboardingFlow(null);
         setAccessState('active');
         setFatalError(e?.message || 'Falha ao carregar perfil.');
       });
@@ -270,6 +277,7 @@ export default function App() {
               setUser(sessionUser);
               setUserType(null);
               setOnboardingStatus(null);
+              setOnboardingFlow(null);
               setAccessState('active');
               setFatalError(null);
               setTypeLoading(false);
@@ -283,6 +291,7 @@ export default function App() {
               setUser(null);
               setUserType(null);
               setOnboardingStatus(null);
+              setOnboardingFlow(null);
               setAccessState('active');
               setBooting(false);
             });
@@ -300,6 +309,7 @@ export default function App() {
             setUser(session?.user || null);
             setUserType(null);
             setOnboardingStatus(null);
+            setOnboardingFlow(null);
             setAccessState('active');
             setFatalError(null);
             setTypeLoading(false);
@@ -314,6 +324,7 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
+          setOnboardingFlow(null);
           setAccessState('active');
           setFatalError(null);
           return;
@@ -326,7 +337,7 @@ export default function App() {
     return () => { aliveRef.current = false; subscription?.unsubscribe(); };
   }, [loadProfile, safeSet, setRecoveryMode]);
 
-  const handleLogin = useCallback((userData, type, nextOnboardingStatus = 'completed', nextAccessState = 'active') => {
+  const handleLogin = useCallback((userData, type, nextOnboardingStatus = 'completed', nextAccessState = 'active', nextOnboardingFlow = null) => {
     loadedUserRef.current = userData?.id || null;
     setUser(userData || null);
     setUserType(isValidType(type) ? type : null);
@@ -335,6 +346,7 @@ export default function App() {
         ? normalizeOnboardingStatus(type, nextOnboardingStatus)
         : null
     );
+    setOnboardingFlow(nextOnboardingFlow === 'partner' || nextOnboardingFlow === 'owner' ? nextOnboardingFlow : null);
     setAccessState(nextAccessState);
     setFatalError(null);
     setPostLogoutRedirect(null);
@@ -350,6 +362,7 @@ export default function App() {
       setUser(null);
       setUserType(null);
       setOnboardingStatus(null);
+      setOnboardingFlow(null);
       setAccessState('active');
       setFatalError(null);
       setTypeLoading(false);
@@ -365,6 +378,7 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
+          setOnboardingFlow(null);
           setAccessState('active');
           setBooting(false);
         });
@@ -379,6 +393,7 @@ export default function App() {
         setUser(null);
         setUserType(null);
         setOnboardingStatus(null);
+        setOnboardingFlow(null);
         setAccessState('active');
         setBooting(false);
       });
