@@ -86,7 +86,8 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
           authUser,
           profile.type,
           profile.onboardingStatus,
-          profile.accessState
+          profile.accessState,
+          profile.onboardingFlow
         );
         navigate('/parceiro/aguardando', { replace: true });
         return;
@@ -96,7 +97,8 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
         authUser,
         profile.type,
         profile.onboardingStatus,
-        profile.accessState
+        profile.accessState,
+        profile.onboardingFlow
       );
 
     } catch (err) {
