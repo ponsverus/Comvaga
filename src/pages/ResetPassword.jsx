@@ -19,7 +19,7 @@ export default function ResetPassword() {
     try {
       setLoading(true);
 
-      if (newPassword.length < 6) {
+      if (newPassword.length < 7) {
         showMessage('login.recovery_password_too_short');
         return;
       }
