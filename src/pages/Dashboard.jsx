@@ -330,6 +330,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     historicoAgendamentos,
     historicoHasMore,
     historicoLoadingMore,
+    historicoError,
     historicoData,
     setHistoricoData,
     loadMoreHistorico,
@@ -727,6 +728,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
                 historicoHasMore={historicoHasMore}
                 loadMoreHistorico={loadMoreHistorico}
                 historicoLoadingMore={historicoLoadingMore}
+                historicoError={historicoError}
               />
             )}
 
