@@ -582,7 +582,7 @@ export default function Home({ user, userType, onLogout }) {
           <h2 className="text-5xl font-normal mb-4">
             SEM <span className="text-primary">BUROCRACIA</span>
           </h2>
-          <p className="text-xl text-gray-400">Acesso liberado sem necessidade de dados bancários. Simples assim :)</p>
+          <p className="text-xl text-gray-400">Teste grátis por 30 dias com acesso total e imediato. Sem compromisso e sem burocracia ;)</p>
         </div>
        
         <div className="
