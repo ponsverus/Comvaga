@@ -518,7 +518,7 @@ export const ptBR = {
     },
     account_password_too_short: {
       title: 'Senha fraca',
-      body: 'A senha deve ter no mínimo 6 caracteres.',
+      body: 'A senha deve ter no mínimo 7 caracteres.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -585,7 +585,7 @@ export const ptBR = {
 
   parceiroLogin: {
     email_invalid:                  { body: 'Informe um email válido para continuar.', variant: 'erro' },
-    senha_too_short:                { body: 'A senha deve ter pelo menos 6 caracteres.', variant: 'erro' },
+    senha_too_short:                { body: 'A senha deve ter pelo menos 7 caracteres.', variant: 'erro' },
     slug_required:                  { body: 'Informe o slug do negócio para continuar.', variant: 'erro' },
     negocio_not_found:              { body: 'Negócio ausente. Verifique o slug informado e tente novamente.', variant: 'erro' },
     credentials_invalid:            { body: 'Email ou senha incorretos.', variant: 'erro' },
@@ -596,7 +596,7 @@ export const ptBR = {
     reset_email_required:           { body: 'Digite seu email antes de solicitar o resgate de senha.', variant: 'aviso' },
     reset_sent:                     { body: 'Link enviado. Confira sua caixa de entrada para redefinir a senha.', variant: 'sucesso' },
     reset_error:                    { body: 'Erro ao enviar o link agora. Tente novamente.', variant: 'erro' },
-    recovery_password_too_short:    { body: 'A nova senha deve ter pelo menos 6 caracteres.', variant: 'erro' },
+    recovery_password_too_short:    { body: 'A nova senha deve ter pelo menos 7 caracteres.', variant: 'erro' },
     recovery_password_mismatch:     { body: 'As senhas divergem. Revise e tente novamente.', variant: 'erro' },
     recovery_password_updated:      { body: 'Senha atualizada com sucesso. Faça login com a nova senha.', variant: 'sucesso' },
     recovery_password_update_error: { body: 'Erro ao atualizar a senha agora. Tente novamente.', variant: 'erro' },
@@ -711,7 +711,7 @@ export const ptBR = {
     },
     account_password_too_short: {
       title: 'Senha muito curta',
-      body: 'A senha precisa ter pelo menos 6 caracteres.',
+      body: 'A senha precisa ter pelo menos 7 caracteres.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -867,7 +867,7 @@ export const ptBR = {
     },
     recovery_password_too_short: {
       title: 'Senha muito curta',
-      body: 'A nova senha precisa ter pelo menos 6 caracteres.',
+      body: 'A nova senha precisa ter pelo menos 7 caracteres.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
