@@ -142,7 +142,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
     setRecoveryLoading(true);
 
     try {
-      if (newPassword.length < 6) {
+      if (newPassword.length < 7) {
         showMessage('login.recovery_password_too_short');
         return;
       }
