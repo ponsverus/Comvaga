@@ -1,4 +1,5 @@
 import DatePicker from '../../../components/DatePicker';
+import { ptBR } from '../../../feedback/messages/ptBR.js';
 import {
   computeStatusFromDb,
   formatDateBRFromISO,
@@ -17,13 +18,21 @@ export default function HistoricoSection({
   historicoHasMore,
   loadMoreHistorico,
   historicoLoadingMore,
+  historicoError,
 }) {
+  const historicoErrorMsg = historicoError ? ptBR.dashboard?.history_load_error : null;
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <h2 className="text-2xl font-normal">HISTÓRICO</h2>
         <DatePicker value={historicoData} onChange={(iso) => setHistoricoData(iso)} todayISO={hoje} />
       </div>
+      {historicoErrorMsg && (
+        <div className="mb-4 border border-yellow-500/30 bg-yellow-500/10 text-yellow-300 rounded-custom p-4 text-sm">
+          {historicoErrorMsg.body}
+        </div>
+      )}
       {historicoAgendamentos.length > 0 ? (
         <div className="space-y-3">
           {historicoAgendamentos.map(a => {
@@ -50,7 +59,7 @@ export default function HistoricoSection({
             );
           })}
         </div>
-      ) : <div className="text-gray-500 text-center py-12">...</div>}
+      ) : !historicoErrorMsg ? <div className="text-gray-500 text-center py-12">...</div> : null}
       {historicoHasMore && (
         <button onClick={loadMoreHistorico} disabled={historicoLoadingMore} className="mt-12 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed">
           {historicoLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
