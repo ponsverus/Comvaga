@@ -370,7 +370,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const salvarSenha = async () => {
     const pass = String(novaSenha || '');
     const conf = String(confirmarSenha || '');
-    if (pass.length < 6) { uiAlert('clientArea.account_password_too_short', 'error'); return; }
+    if (pass.length < 7) { uiAlert('clientArea.account_password_too_short', 'error'); return; }
     if (pass !== conf)   { uiAlert('clientArea.account_password_mismatch',  'error'); return; }
     try {
       setSavingDados(true);
