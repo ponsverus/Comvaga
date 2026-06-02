@@ -595,7 +595,7 @@ export function useDashboardMutations({
   const salvarSenha = async (novaSenha, confirmarSenha) => {
     const pass = String(novaSenha || '');
     const conf = String(confirmarSenha || '');
-    if (pass.length < 6) {
+    if (pass.length < 7) {
       await uiAlert('dashboard.account_password_too_short', 'error');
       return;
     }
