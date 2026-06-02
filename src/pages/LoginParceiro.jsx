@@ -83,7 +83,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
     const slugClean = slug.trim().toLowerCase();
 
     if (!emailClean || !emailClean.includes('@')) return setAlerta(msgs.email_invalid);
-    if (senha.length < 6) return setAlerta(msgs.senha_too_short);
+    if (senha.length < 7) return setAlerta(msgs.senha_too_short);
     if (!slugClean) return setAlerta(msgs.slug_required);
 
     setLoading(true);
@@ -194,7 +194,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
     if (recoveryLoading) return;
     setRecoveryAlerta(null);
 
-    if (newPassword.length < 6) return setRecoveryAlerta(msgs.recovery_password_too_short);
+    if (newPassword.length < 7) return setRecoveryAlerta(msgs.recovery_password_too_short);
     if (newPassword !== newPassword2) return setRecoveryAlerta(msgs.recovery_password_mismatch);
 
     setRecoveryLoading(true);
