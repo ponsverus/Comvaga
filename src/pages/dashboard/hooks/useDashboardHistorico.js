@@ -12,6 +12,7 @@ export function useDashboardHistorico({
   const [historicoHasMore, setHistoricoHasMore] = useState(false);
   const [historicoLoadingMore, setHistoricoLoadingMore] = useState(false);
   const [historicoData, setHistoricoData] = useState('');
+  const [historicoError, setHistoricoError] = useState('');
 
   useEffect(() => {
     setHistoricoData((prev) => (prev ? prev : hoje));
@@ -40,6 +41,7 @@ export function useDashboardHistorico({
         .sort(compareAgendamentoDateTimeDesc);
     });
     setHistoricoHasMore(rows.length === AG_PAGE_SIZE);
+    setHistoricoError('');
   }, [negocioId]);
 
   useEffect(() => {
@@ -47,7 +49,13 @@ export function useDashboardHistorico({
     setHistoricoPage(0);
     setHistoricoHasMore(false);
     setHistoricoAgendamentos([]);
-    fetchHistoricoPage({ profIds: historicoProfIds, date: historicoData, page: 0, append: false });
+    setHistoricoError('');
+    fetchHistoricoPage({ profIds: historicoProfIds, date: historicoData, page: 0, append: false })
+      .catch(() => {
+        setHistoricoAgendamentos([]);
+        setHistoricoHasMore(false);
+        setHistoricoError('dashboard.history_load_error');
+      });
   }, [fetchHistoricoPage, historicoData, historicoProfIds, negocioId]);
 
   const loadMoreHistorico = useCallback(async () => {
@@ -59,6 +67,7 @@ export function useDashboardHistorico({
       setHistoricoPage(nextPage);
     } catch (error) {
       console.warn('Falha ao carregar mais histórico.', error);
+      setHistoricoError('dashboard.history_load_error');
     } finally {
       setHistoricoLoadingMore(false);
     }
@@ -76,6 +85,7 @@ export function useDashboardHistorico({
     historicoAgendamentos,
     historicoHasMore,
     historicoLoadingMore,
+    historicoError,
     historicoData,
     setHistoricoData,
     loadMoreHistorico,
