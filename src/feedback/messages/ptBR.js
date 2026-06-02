@@ -130,6 +130,13 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
+    history_load_error: {
+      title: 'Histórico indisponível',
+      body: 'Histórico indisponível no momento. Tente novamente em instantes.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
     gallery_remove_confirm: {
       title: 'Remover imagem?',
       body: 'Tem certeza que deseja remover esta imagem da galeria?',
