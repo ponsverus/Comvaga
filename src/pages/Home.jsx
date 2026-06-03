@@ -660,9 +660,7 @@ export default function Home({ user, userType, onLogout }) {
                 'Painel admin: controle de múltiplos profissionais',
                 'Painel individual para cada profissional parceiro',
                 'Até 5 profissionais parceiros sem taxas ou custos adicionais',
-                'Métricas em tempo real com contraste de desempenho diário',
-                'Análise evolutiva de faturamento com filtros temporais estratégicos',
-                'Relatório de faturamento volumétrico agrupado por período selecionado',
+                'Métricas de Faturamento e Desempenho Operacional por Data ou Período',
                 'Montagem de ofertas nos trabalhos oferecidos',                  
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2.5">
