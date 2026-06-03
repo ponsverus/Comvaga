@@ -312,7 +312,7 @@ export default function Home({ user, userType, onLogout }) {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
-            A Comvaga organiza agenda, vitrine, equipe e clientes em uma experiência só. O sistema ANTECIPA CONFLITOS, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
+            A Comvaga organiza agenda, vitrine, equipe e clientes em uma experiência só. O sistema <span className="text-primary">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-0">
@@ -474,7 +474,7 @@ export default function Home({ user, userType, onLogout }) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-1 mb-0.5">
-                          <span className="text-xs font-normal text-white uppercase leading-tight">RAFAEL COSTA</span>
+                          <span className="text-xs font-normal text-white uppercase leading-tight">EVERTON RAMOS</span>
                           <span className="text-[9px] font-normal uppercase border border-white/15 text-white-400 rounded-full px-2.5 py-0.5 shrink-0">BARBEIRO</span>
                         </div>
                         <div className="flex items-center gap-1 mb-1">
@@ -505,8 +505,8 @@ export default function Home({ user, userType, onLogout }) {
                     <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs</div>
                     
                     {[
-                      { n: 'CORTE', p: 'R$ 45,00', d: '30 min' },
-                      { n: 'BARBA', p: 'R$ 30,00', d: '20 min' }
+                      { n: 'CORTE', p: 'R$ 35,00', d: '30 min' },
+                      { n: 'BARBA', p: 'R$ 20,00', d: '20 min' }
                     ].map((s, idx) => (
                       <div key={idx} className="bg-white/5 border border-white/10 rounded-[3px] p-4 flex flex-col gap-4">
                         <div className="flex justify-between items-start">
