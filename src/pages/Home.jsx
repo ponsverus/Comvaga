@@ -483,7 +483,7 @@ export default function Home({ user, userType, onLogout }) {
                         </div>
                         <div className="flex items-center gap-1 mb-1">
                           <StarGlyph sizeClass="h-2.5 w-2.5 text-[10px]" />
-                          <span className="text-xs font-normal text-primary">4.8</span>
+                          <span className="text-xs font-normal text-primary">5.0</span>
                         </div>
                         <div className="flex flex-wrap gap-1 mt-1">
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-500 font-normal">
@@ -491,7 +491,7 @@ export default function Home({ user, userType, onLogout }) {
                             08:00 - 18:00
                           </span>
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-orange-500 font-normal">
-                            PAUSA 11:00 - 12:00
+                            PAUSA 12:00 - 13:00
                           </span>
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-500 font-normal">
                             7 SERVS
@@ -505,8 +505,8 @@ export default function Home({ user, userType, onLogout }) {
                     <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs</div>
                     
                     {[
-                      { n: 'CORTE', p: 'R$ 35,00', d: '30 min' },
-                      { n: 'BARBA', p: 'R$ 20,00', d: '20 min' }
+                      { n: 'CORTE', p: 'R$ 40,00', d: '30 min' },
+                      { n: 'BARBA', p: 'R$ 20,00', d: '15 min' }
                     ].map((s, idx) => (
                       <div key={idx} className="bg-white/5 border border-white/10 rounded-[3px] p-4 flex flex-col gap-4">
                         <div className="flex justify-between items-start">
