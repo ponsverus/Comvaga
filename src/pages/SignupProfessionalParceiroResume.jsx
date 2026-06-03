@@ -64,6 +64,7 @@ export default function SignupProfessionalParceiroResume({ user, onLogin }) {
 
       if (signupStatusErr) throw signupStatusErr;
       if (signupStatus?.status === 'negocio_not_found') return setAlerta(msgs.negocio_not_found);
+      if (signupStatus?.status === 'plan_not_supported') return setAlerta(msgs.partner_plan_unavailable);
       if (signupStatus?.status !== 'available' || !signupStatus?.negocio_id) {
         throw new Error(msgs.unexpected_error.body);
       }
@@ -76,6 +77,7 @@ export default function SignupProfessionalParceiroResume({ user, onLogin }) {
       if (accessErr) {
         const code = String(accessErr.message || '').split(':')[0].trim();
         if (code === 'access_inactive') return setAlerta(msgs.access_inactive);
+        if (code === 'partner_plan_unavailable') return setAlerta(msgs.partner_plan_unavailable);
         if (code === 'usuario_nao_encontrado') return setAlerta(msgs.account_create_error);
         if (code === 'negocio_nao_encontrado' || code === 'negocio_nao_informado') return setAlerta(msgs.negocio_not_found);
         if (accessErr.code === '23505') return setAlerta(msgs.access_unavailable);
