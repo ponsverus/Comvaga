@@ -42,6 +42,7 @@ export default function EntregaModal({
   parceiroProfissional,
   profissionais,
   submittingEntrega,
+  allowOffers = true,
   onClose,
   onSubmit,
 }) {
@@ -109,16 +110,18 @@ export default function EntregaModal({
             </ServiceSplitField>
           </ServiceSplitRow>
 
-          <ServiceFieldRow label="OFERTA">
-            <input
-              type="number"
-              step="0.01"
-              value={formEntrega.preco_promocional}
-              onChange={(e) => setFormEntrega({ ...formEntrega, preco_promocional: e.target.value })}
-              className={serviceInputClass}
-              placeholder="OPCIONAL"
-            />
-          </ServiceFieldRow>
+          {allowOffers && (
+            <ServiceFieldRow label="OFERTA">
+              <input
+                type="number"
+                step="0.01"
+                value={formEntrega.preco_promocional}
+                onChange={(e) => setFormEntrega({ ...formEntrega, preco_promocional: e.target.value })}
+                className={serviceInputClass}
+                placeholder="OPCIONAL"
+              />
+            </ServiceFieldRow>
+          )}
 
           <div className="flex items-center gap-3 border-t border-gray-800 px-8 py-6">
             <button
