@@ -3,13 +3,10 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { TimeIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon } from '../components/icons';
-import { SUPPORT_PHONE_E164 as SUPORTE_PHONE_E164, getSupportHref } from '../support';
+import { getSupportHref } from '../support';
+import { saveSelectedPlanIntent } from '../utils/plans';
 
-const WHATSAPP_ESSENCIAL_HREF =
-  `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent('Olá! Sou um profissional e tenho interesse em assinar o plano Essencial por R$ 29,99/mês. Pode me orientar?')}`;
-
-const WHATSAPP_PREMIUM_HREF =
-  `https://wa.me/${SUPORTE_PHONE_E164}?text=${encodeURIComponent('Olá! Sou um profissional e tenho interesse em assinar o plano Premium Real por R$ 87,39/mês. Pode me orientar?')}`;
+const planSignupTo = (planCode) => `/cadastro/profissional?plano=${planCode}`;
 
 function SearchBox({
   searchOpen,
@@ -632,14 +629,13 @@ export default function Home({ user, userType, onLogout }) {
               ))}
             </div>
 
-            <a
-              href={WHATSAPP_ESSENCIAL_HREF}
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              to={planSignupTo('essencial')}
+              onClick={() => saveSelectedPlanIntent('essencial')}
               className="mt-8 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
             >
-              Tenho interesse
-            </a>
+              Testar Essencial
+            </Link>
           </div>
 
           <div className="
@@ -686,10 +682,11 @@ export default function Home({ user, userType, onLogout }) {
             </div>
 
             <Link
-              to="/cadastro"
+              to={planSignupTo('profissional')}
+              onClick={() => saveSelectedPlanIntent('profissional')}
               className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
             >
-              ASSINAR AGORA <ZapIcon className="w-3.5 h-3.5" />
+              TESTAR AGORA <ZapIcon className="w-3.5 h-3.5" />
             </Link>
           </div>
 
@@ -725,14 +722,13 @@ export default function Home({ user, userType, onLogout }) {
               ))}
             </div>
 
-            <a
-              href={WHATSAPP_PREMIUM_HREF}
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              to={planSignupTo('premium')}
+              onClick={() => saveSelectedPlanIntent('premium')}
               className="mt-8 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
             >
-              Tenho interesse
-            </a>
+              Testar Premium
+            </Link>
           </div>
         </div>
       </section>
