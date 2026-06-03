@@ -16,6 +16,7 @@ import ClientesSection from './dashboard/sections/ClientesSection';
 import EntregasSection from './dashboard/sections/EntregasSection';
 import ProfissionaisSection from './dashboard/sections/ProfissionaisSection';
 import InfoNegocioSection from './dashboard/sections/InfoNegocioSection';
+import PlanosSection from './dashboard/sections/PlanosSection';
 import AccountDataSection from './dashboard/sections/AccountDataSection';
 import {
   NOW_RPC_SEQUENCE,
@@ -494,11 +495,11 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     parceiroProfissional
       ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais', 'dados']
       : souDono
-        ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais', 'info-negocio']
+        ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais', 'info-negocio', 'planos']
         : ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais']
   ), [parceiroProfissional, souDono]);
 
-  const TAB_LABELS = { 'visao-geral': 'GERAL', 'agendamentos': 'AGENDAMENTOS', 'cancelados': 'CANCELADOS', 'historico': 'HISTÓRICO', 'clientes': 'CLIENTES', 'entregas': tabEntregasLabel, 'profissionais': 'PROFISSIONAIS', 'dados': 'DADOS', 'info-negocio': 'INFO DO NEGÓCIO' };
+  const TAB_LABELS = { 'visao-geral': 'GERAL', 'agendamentos': 'AGENDAMENTOS', 'cancelados': 'CANCELADOS', 'historico': 'HISTÓRICO', 'clientes': 'CLIENTES', 'entregas': tabEntregasLabel, 'profissionais': 'PROFISSIONAIS', 'dados': 'DADOS', 'info-negocio': 'INFO DO NEGÓCIO', 'planos': 'PLANOS' };
   useEffect(() => {
     const requestedTab = location?.state?.activeTab;
     if (requestedTab && tabs.includes(requestedTab)) setActiveTab(requestedTab);
@@ -835,6 +836,10 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
                   excluirNegocio={excluirNegocio}
                   navigate={navigate}
                 />
+            )}
+
+            {activeTab === 'planos' && souDono && (
+              <PlanosSection negocioId={negocio.id} />
             )}
 
           </div>
