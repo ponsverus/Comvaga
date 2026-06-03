@@ -100,6 +100,34 @@ export async function fetchOwnerNegocio(ownerId) {
   return data || null;
 }
 
+export async function fetchBillingPlans() {
+  const { data, error } = await supabase
+    .from('billing_plans')
+    .select('code, name, price_cents, currency, max_profissionais, trial_days, grace_days, features, sort_order')
+    .eq('active', true)
+    .order('sort_order', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function fetchBusinessBillingStatus(negocioId) {
+  const { data, error } = await supabase.rpc('get_business_billing_status', {
+    p_negocio_id: negocioId,
+  });
+  if (error) throw error;
+  return data || null;
+}
+
+export async function setBusinessPlan(negocioId, planCode) {
+  const { data, error } = await supabase.rpc('set_business_plan', {
+    p_negocio_id: negocioId,
+    p_plan_code: planCode,
+  });
+  if (error) throw error;
+  return data || null;
+}
+
 export async function fetchPartnerNegocioIds(userId) {
   const { data, error } = await supabase
     .from('profissionais')
