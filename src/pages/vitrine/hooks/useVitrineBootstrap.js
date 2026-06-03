@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  fetchBusinessBillingStatus,
   fetchOfficialDate,
   fetchVitrineDepoimentos,
   fetchVitrineEntregas,
@@ -11,7 +12,7 @@ import {
 const EMPTY_NOW = { ts: null, dow: 0, date: '', source: 'db', minutes: 0 };
 const GALERIA_PAGE_SIZE = 12;
 
-export function useVitrineBootstrap({ slug, rpcSequence, getMsg }) {
+export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = null }) {
   const [negocio, setNegocio] = useState(null);
   const [profissionais, setProfissionais] = useState([]);
   const [entregas, setEntregas] = useState([]);
@@ -19,6 +20,7 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg }) {
   const [galeriaItems, setGaleriaItems] = useState([]);
   const [galeriaHasMore, setGaleriaHasMore] = useState(false);
   const [galeriaLoadingMore, setGaleriaLoadingMore] = useState(false);
+  const [billingStatus, setBillingStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [serverNow, setServerNow] = useState(EMPTY_NOW);
@@ -92,10 +94,22 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg }) {
         setGaleriaItems([]);
         setGaleriaHasMore(false);
         setGaleriaLoadingMore(false);
+        setBillingStatus(null);
         return;
       }
 
       setNegocio(negocioData);
+      if (authUserId) {
+        fetchBusinessBillingStatus(negocioData.id)
+          .then((status) => {
+            if (loadRunRef.current === runId) setBillingStatus(status);
+          })
+          .catch(() => {
+            if (loadRunRef.current === runId) setBillingStatus(null);
+          });
+      } else {
+        setBillingStatus(null);
+      }
 
       const profs = await fetchVitrineProfissionais(negocioData.id);
       if (loadRunRef.current !== runId) return;
@@ -122,13 +136,14 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg }) {
       setGaleriaItems([]);
       setGaleriaHasMore(false);
       setGaleriaLoadingMore(false);
+      setBillingStatus(null);
     } finally {
       clearTimeout(watchdog);
       if (loadRunRef.current === runId) {
         setLoading(false);
       }
     }
-  }, [applyGaleriaPage, fetchNowFromDb, getMsg, slug]);
+  }, [applyGaleriaPage, authUserId, fetchNowFromDb, getMsg, slug]);
 
   useEffect(() => {
     loadVitrine();
@@ -149,6 +164,7 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg }) {
     galeriaItems,
     galeriaHasMore,
     galeriaLoadingMore,
+    billingStatus,
     loading,
     error,
     serverNow,
