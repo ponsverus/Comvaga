@@ -19,6 +19,7 @@ export function useVitrineBooking({
   gerarLinkGoogle,
   gerarArquivoICS,
   calendarPlatformMode,
+  billingStatus,
 }) {
   const [calendarExport, setCalendarExport] = useState({ googleUrl: '', icsUrl: '', icsFilename: '' });
   const [flow, setFlow] = useState({ step: 'idle', profissional: null, servicosSelecionados: [], lastSlot: null });
@@ -27,6 +28,7 @@ export function useVitrineBooking({
   const rebookAppliedRef = useRef('');
   const assistedBooking = location.state?.assistedBooking || null;
   const isAssistedBooking = !!(user && userType === 'professional' && assistedBooking?.clienteId);
+  const bookingAllowed = billingStatus?.booking_allowed !== false;
 
   const revokeCurrentIcs = useCallback(() => {
     setCalendarExport((prev) => {
@@ -43,7 +45,7 @@ export function useVitrineBooking({
 
   useEffect(() => {
     const rebook = location.state?.rebook;
-    if (!rebook || loading || !negocio?.id) return;
+    if (!rebook || loading || !negocio?.id || !bookingAllowed) return;
     const rebookKey = `${location.key || location.pathname}:${rebook.profissionalId || ''}:${rebook.entregaId || ''}`;
     if (rebookAppliedRef.current === rebookKey) return;
     const profissional = profissionais.find((item) => item.id === rebook.profissionalId);
@@ -59,9 +61,18 @@ export function useVitrineBooking({
     revokeCurrentIcs();
     setFlow({ step: 'booking', profissional, servicosSelecionados: [servico], lastSlot: null });
     navigate(location.pathname, { replace: true, state: {} });
-  }, [entregas, loading, location.key, location.pathname, location.state, navigate, negocio?.id, profissionais, revokeCurrentIcs]);
+  }, [bookingAllowed, entregas, loading, location.key, location.pathname, location.state, navigate, negocio?.id, profissionais, revokeCurrentIcs]);
 
   const requireLogin = useCallback(async () => {
+    if (!bookingAllowed) {
+      alertKey(
+        'schedule_billing_required',
+        'Agenda indisponível',
+        'Este negócio precisa ativar um plano para receber novos agendamentos.',
+        'ENTENDI'
+      );
+      return false;
+    }
     if (!user) {
       const ok = await confirmKey(
         'schedule_need_login_confirm',
@@ -96,7 +107,7 @@ export function useVitrineBooking({
       }
     }
     return true;
-  }, [alertKey, confirmKey, fetchNowFromDb, isAssistedBooking, navigate, todayISO, user, userType]);
+  }, [alertKey, bookingAllowed, confirmKey, fetchNowFromDb, isAssistedBooking, navigate, todayISO, user, userType]);
 
   const handleAgendarAgora = useCallback(async (profissional, servicos) => {
     if (!(await requireLogin())) return;
