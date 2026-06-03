@@ -14,6 +14,7 @@ function ProfissionalEntregasBlock({
   setEditingEntregaId,
   setFormEntrega,
   setShowNovaEntrega,
+  allowOffers = true,
 }) {
   const [page, setPage] = useState(0);
   const pageCount = Math.max(1, Math.ceil(lista.length / ENTREGAS_PER_PAGE));
@@ -65,7 +66,7 @@ function ProfissionalEntregasBlock({
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
               {visibleEntregas.map(s => {
                 const preco = Number(s.preco ?? 0);
-                const promo = s.preco_promocional == null ? null : Number(s.preco_promocional);
+                const promo = !allowOffers || s.preco_promocional == null ? null : Number(s.preco_promocional);
                 return (
                   <div key={s.id} className="bg-dark-100 border border-gray-800 rounded-custom p-5">
                     <div className="flex justify-between items-start mb-3">
@@ -78,7 +79,7 @@ function ProfissionalEntregasBlock({
                       <button onClick={async () => {
                         if (!await checarPermissao(s.profissional_id)) return;
                         setEditingEntregaId(s.id);
-                        setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: String(s.preco_promocional ?? ''), profissional_id: s.profissional_id || '' });
+                        setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: allowOffers ? String(s.preco_promocional ?? '') : '', profissional_id: s.profissional_id || '' });
                         setShowNovaEntrega(true);
                       }} className="flex-1 py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
                       <button onClick={() => deleteEntrega(s)} className="flex-1 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
@@ -142,6 +143,7 @@ export default function EntregasSection({
   emptyListMsg,
   checarPermissao,
   deleteEntrega,
+  allowOffers = true,
 }) {
   return (
     <div>
@@ -170,6 +172,7 @@ export default function EntregasSection({
                 setEditingEntregaId={setEditingEntregaId}
                 setFormEntrega={setFormEntrega}
                 setShowNovaEntrega={setShowNovaEntrega}
+                allowOffers={allowOffers}
               />
             );
           })}
