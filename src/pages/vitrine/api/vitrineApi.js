@@ -69,6 +69,16 @@ export async function fetchVitrineProfissionais(negocioId) {
   return data || [];
 }
 
+export async function fetchBusinessBillingStatus(negocioId) {
+  const { data, error } = await withTimeout(
+    supabase.rpc('get_business_billing_status', { p_negocio_id: negocioId }),
+    7000,
+    'billing'
+  );
+  if (error) throw error;
+  return data || null;
+}
+
 export async function fetchVitrineEntregas(profissionalIds) {
   if (!profissionalIds.length) return [];
   const { data, error } = await withTimeout(
