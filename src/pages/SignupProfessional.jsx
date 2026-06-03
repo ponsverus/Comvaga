@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { CrownIcon } from '../components/icons';
+import { DEFAULT_PLAN_CODE, getPlanFromSearch, getSelectedPlanIntent, saveSelectedPlanIntent } from '../utils/plans';
 
 const PROFILE_TABLE = 'users';
 const isValidType = (t) => t === 'client' || t === 'professional';
@@ -52,6 +53,7 @@ function SignupFieldRow({ label, children, last = false }) {
 const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white';
 
 export default function SignupProfessional({ onLogin }) {
+  const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -62,6 +64,14 @@ export default function SignupProfessional({ onLogin }) {
 
   const navigate = useNavigate();
   const { showMessage } = useFeedback();
+  const selectedPlanCode = useMemo(
+    () => getPlanFromSearch(searchParams) || getSelectedPlanIntent() || DEFAULT_PLAN_CODE,
+    [searchParams]
+  );
+
+  useEffect(() => {
+    saveSelectedPlanIntent(selectedPlanCode);
+  }, [selectedPlanCode]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -73,6 +83,7 @@ export default function SignupProfessional({ onLogin }) {
       const nome = onlyTrim(formData.nome);
       const email = onlyTrim(formData.email).toLowerCase();
       const password = String(formData.password || '');
+      saveSelectedPlanIntent(selectedPlanCode);
 
       if (!nome) { showMessage('signupProfessional.name_required'); return; }
       if (!email || !email.includes('@')) { showMessage('signupProfessional.email_invalid'); return; }
@@ -82,7 +93,7 @@ export default function SignupProfessional({ onLogin }) {
         email,
         password,
         options: {
-          data: { type: 'professional', nome },
+          data: { type: 'professional', nome, selected_plan: selectedPlanCode },
           emailRedirectTo: `${window.location.origin}/cadastro/profissional/retomada`,
         },
       });
