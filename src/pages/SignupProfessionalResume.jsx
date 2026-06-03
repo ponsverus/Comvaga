@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { CrownIcon } from '../components/icons';
+import { DEFAULT_PLAN_CODE, clearSelectedPlanIntent, getSelectedPlanIntent, normalizePlanCode } from '../utils/plans';
 
 function onlyTrim(v) {
   return String(v || '').trim();
@@ -237,6 +238,19 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         console.error('complete_owner_business_onboarding incomplete payload:', data);
         showMessage('signupProfessional.business_create_error');
         return;
+      }
+
+      const selectedPlanCode = normalizePlanCode(user?.user_metadata?.selected_plan)
+        || getSelectedPlanIntent()
+        || DEFAULT_PLAN_CODE;
+      const { error: planError } = await supabase.rpc('set_business_plan', {
+        p_negocio_id: data.negocio_id,
+        p_plan_code: selectedPlanCode,
+      });
+      if (planError) {
+        console.warn('set_business_plan error:', planError);
+      } else {
+        clearSelectedPlanIntent();
       }
 
       onLogin(user, 'professional', 'completed');
