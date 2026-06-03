@@ -280,6 +280,7 @@ export default function Vitrine({ user, userType, onLogout }) {
     galeriaItems,
     galeriaHasMore,
     galeriaLoadingMore,
+    billingStatus,
     loading,
     error,
     serverNow,
@@ -291,6 +292,7 @@ export default function Vitrine({ user, userType, onLogout }) {
     slug,
     rpcSequence: NOW_RPC_SEQUENCE,
     getMsg,
+    authUserId: user?.id || null,
   });
 
   const businessGroup = useMemo(() => getBusinessGroup(negocio?.tipo_negocio), [negocio?.tipo_negocio]);
@@ -494,6 +496,7 @@ export default function Vitrine({ user, userType, onLogout }) {
     gerarLinkGoogle,
     gerarArquivoICS,
     calendarPlatformMode,
+    billingStatus,
   });
 
   const {
