@@ -32,7 +32,7 @@ import {
   sameDay,
   timeToMinutes,
 } from './dashboard/utils';
-import { getPublicUrl } from './dashboard/api/dashboardApi';
+import { fetchBusinessBillingStatus, getPublicUrl } from './dashboard/api/dashboardApi';
 import { useDashboardBootstrap } from './dashboard/hooks/useDashboardBootstrap';
 import { useDashboardClientes } from './dashboard/hooks/useDashboardClientes';
 import { useDashboardHistorico } from './dashboard/hooks/useDashboardHistorico';
@@ -145,6 +145,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
   const uiPrompt  = useCallback(async (key, opts = {}) => { if (feedback?.prompt) return await feedback.prompt(key, opts); return null; }, [feedback]);
 
   const [activeTab, setActiveTab] = useState('agendamentos');
+  const [billingStatus, setBillingStatus] = useState(null);
   const {
     parceiroProfissional,
     negocio,
@@ -182,6 +183,26 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
   const souDono = negocio?.owner_id === user?.id;
   const parceiroProfissionalId = parceiroProfissional?.id ?? null;
   const acessoDashboardAutorizado = souDono || !!parceiroProfissional;
+  const billingFeatures = billingStatus?.features || {};
+  const allowAdvancedMetrics = billingFeatures.advanced_metrics !== false;
+  const allowFutureRevenue = billingFeatures.future_revenue === true;
+  const allowOffers = billingFeatures.offers === true;
+
+  useEffect(() => {
+    let active = true;
+    if (!negocio?.id || !acessoDashboardAutorizado) {
+      setBillingStatus(null);
+      return () => { active = false; };
+    }
+    fetchBusinessBillingStatus(negocio.id)
+      .then((status) => {
+        if (active) setBillingStatus(status);
+      })
+      .catch(() => {
+        if (active) setBillingStatus(null);
+      });
+    return () => { active = false; };
+  }, [acessoDashboardAutorizado, negocio?.id]);
 
   const checarPermissao = useCallback(async (profissionalId) => {
     if (!acessoDashboardAutorizado) {
@@ -385,6 +406,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     negocio,
     businessGroup,
     parceiroProfissional,
+    allowOffers,
     reloadNegocio,
     reloadProfissionais,
       reloadEntregas,
@@ -701,6 +723,8 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
                 metricsFutureBookings={metricsFutureBookings}
                 metricsFutureBookingsLoading={metricsFutureBookingsLoading}
                 counterSingular={counterSingular}
+                allowAdvancedMetrics={allowAdvancedMetrics}
+                allowFutureRevenue={allowFutureRevenue}
               />
             )}
 
@@ -761,6 +785,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
                 emptyListMsg={emptyListMsg}
                 checarPermissao={checarPermissao}
                 deleteEntrega={deleteEntrega}
+                allowOffers={allowOffers}
               />
             )}
 
@@ -856,6 +881,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
         parceiroProfissional={parceiroProfissional}
         profissionais={profissionais}
         submittingEntrega={submittingEntrega}
+        allowOffers={allowOffers}
         onClose={() => {
           setShowNovaEntrega(false);
           setEditingEntregaId(null);
