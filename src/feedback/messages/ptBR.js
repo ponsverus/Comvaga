@@ -1181,6 +1181,11 @@ export const ptBR = {
       body: 'Você está logado como PROFISSIONAL.\nPara agendar, entre com uma conta CLIENTE.',
       buttonText: 'ENTENDI',
     },
+    schedule_billing_required: {
+      title: 'Agenda indisponivel',
+      body: 'Este negocio precisa ativar um plano para receber novos agendamentos.',
+      buttonText: 'ENTENDI',
+    },
     schedule_time_unavailable: {
       title: 'Horário oficial indisponível',
       body: 'Ainda estamos sincronizando o horário oficial. Tente novamente em instantes.',
