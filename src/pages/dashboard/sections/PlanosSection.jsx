@@ -287,7 +287,7 @@ export default function PlanosSection({ negocioId }) {
                 type="button"
                 disabled={active || !!savingPlan}
                 onClick={() => handleSelectPlan(plan.code)}
-                className={`mt-8 flex items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active ? 'cursor-default rounded-full bg-green-400/10 text-green-300 border border-green-400/30 text-xs font-normal uppercase tracking-wider' : content.buttonClass}`}
+                className={`mt-4 flex items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active ? 'cursor-default rounded-full bg-green-400/10 text-green-300 border border-green-400/30 text-xs font-normal uppercase tracking-wider' : content.buttonClass}`}
               >
                 {active ? 'Plano ativo' : saving ? 'Salvando...' : content.buttonText}
               </button>
