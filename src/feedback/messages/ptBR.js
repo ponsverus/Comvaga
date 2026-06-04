@@ -573,6 +573,27 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    partner_plan_unavailable: {
+      title: 'Parceria indisponivel',
+      body: 'Parcerias desabilitadas neste negócio.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
+    plan_professional_limit_reached: {
+      title: 'Limite do plano',
+      body: 'Limite de profissionais atingido para a capacidade atual. Reduza os profissionais ativos ou pendentes antes de continuar.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
+    plan_feature_offers_unavailable: {
+      title: 'Oferta indisponivel',
+      body: 'Recurso de ofertas restrito. Remova o valor promocional antes de continuar.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
   },
 
   parceiroCadastro: {
@@ -581,6 +602,7 @@ export const ptBR = {
     senha_too_short:      { body: 'A senha deve ter pelo menos 7 caracteres.', variant: 'erro' },
     slug_required:        { body: 'Informe o slug do negócio para continuar.', variant: 'erro' },
     negocio_not_found:    { body: 'Negócio ausente. Verifique o slug informado e tente novamente.', variant: 'erro' },
+    partner_plan_unavailable: { body: 'Parcerias desabilitadas neste negócio.', variant: 'erro' },
     email_already_exists: { body: 'Este email já possui uma conta. Use a página de login de parceiro.', variant: 'erro' },
     access_unavailable:   { body: 'Erro ao solicitar acesso com este email. Faça login como parceiro ou fale com o responsável pelo negócio.', variant: 'erro' },
     account_create_error: { body: 'Erro ao criar sua conta agora. Tente novamente.', variant: 'erro' },
