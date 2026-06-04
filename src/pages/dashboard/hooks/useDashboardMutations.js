@@ -69,6 +69,14 @@ export function useDashboardMutations({
       || raw.includes('duplicate key');
   };
 
+  const getBillingErrorKey = (error) => {
+    const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
+    if (raw.includes('feature_unavailable') && raw.includes('offers')) return 'dashboard.plan_feature_offers_unavailable';
+    if (raw.includes('plan_professional_limit_reached')) return 'dashboard.plan_professional_limit_reached';
+    if (raw.includes('partner_plan_unavailable')) return 'dashboard.partner_plan_unavailable';
+    return null;
+  };
+
   const ensureOwnerAction = async () => {
     if (!negocio?.id) {
       await uiAlert('alerts.business_not_loaded', 'error');
@@ -101,8 +109,10 @@ export function useDashboardMutations({
       if (insErr) throw insErr;
       await uiAlert('dashboard.professional_updated', 'success');
       await reloadProfissionais();
-    } catch {
-      await uiAlert('dashboard.professional_update_error', 'error');
+    } catch (err) {
+      const billingKey = getBillingErrorKey(err);
+      if (billingKey) await uiAlert(billingKey, 'warning');
+      else await uiAlert('dashboard.professional_update_error', 'error');
     } finally {
       setSubmittingAdminProf(false);
     }
@@ -312,8 +322,10 @@ export function useDashboardMutations({
       resetEntregaForm();
       await reloadEntregas();
     } catch (e2) {
+      const billingKey = getBillingErrorKey(e2);
       const msg = String(e2?.message || '');
-      if (isEntregaDuplicateNameError(e2)) await uiAlert(`dashboard.business.${businessGroup}.entrega_duplicate_name`, 'warning');
+      if (billingKey) await uiAlert(billingKey, 'warning');
+      else if (isEntregaDuplicateNameError(e2)) await uiAlert(`dashboard.business.${businessGroup}.entrega_duplicate_name`, 'warning');
       else if (msg.includes('oferta')) await uiAlert('dashboard.entrega_promo_invalid', 'error');
       else if (msg.includes('invalido')) await uiAlert('dashboard.entrega_price_invalid', 'error');
       else if (msg.includes('Duracao')) await uiAlert('dashboard.entrega_duration_invalid', 'error');
@@ -364,8 +376,10 @@ export function useDashboardMutations({
       resetEntregaForm();
       await reloadEntregas();
     } catch (e2) {
+      const billingKey = getBillingErrorKey(e2);
       const msg = String(e2?.message || '');
-      if (isEntregaDuplicateNameError(e2)) await uiAlert(`dashboard.business.${businessGroup}.entrega_duplicate_name`, 'warning');
+      if (billingKey) await uiAlert(billingKey, 'warning');
+      else if (isEntregaDuplicateNameError(e2)) await uiAlert(`dashboard.business.${businessGroup}.entrega_duplicate_name`, 'warning');
       else if (msg.includes('oferta')) await uiAlert('dashboard.entrega_promo_invalid', 'error');
       else if (msg.includes('invalido')) await uiAlert('dashboard.entrega_price_invalid', 'error');
       else if (msg.includes('Duracao')) await uiAlert('dashboard.entrega_duration_invalid', 'error');
@@ -523,8 +537,10 @@ export function useDashboardMutations({
       await aprovarParceiroProfissional(prof.id, negocio.id);
       await uiAlert('dashboard.professional_approved', 'success');
       await reloadProfissionais();
-    } catch {
-      await uiAlert('dashboard.partner_approve_error', 'error');
+    } catch (err) {
+      const billingKey = getBillingErrorKey(err);
+      if (billingKey) await uiAlert(billingKey, 'warning');
+      else await uiAlert('dashboard.partner_approve_error', 'error');
     } finally {
       unlockAction(lockKey);
     }
