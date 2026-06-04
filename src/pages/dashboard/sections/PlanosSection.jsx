@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, CreditCard, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import {
   fetchBillingPlans,
   fetchBusinessBillingStatus,
@@ -8,13 +8,6 @@ import {
 
 function formatCurrencyFromCents(value) {
   return `R$ ${(Number(value || 0) / 100).toFixed(2).replace('.', ',')}`;
-}
-
-function formatDateBR(value) {
-  if (!value) return '--';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '--';
-  return date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 }
 
 function planLimitText(plan) {
@@ -33,6 +26,17 @@ function statusText(status) {
   if (current === 'payment_required') return 'Pagamento necessário';
   if (current === 'canceled') return 'Cancelado';
   return 'Em configuração';
+}
+
+function getPlanChangeErrorMessage(error) {
+  const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
+  if (raw.includes('plan_professional_limit_reached')) {
+    return 'Este plano não comporta a quantidade atual de profissionais. Reduza os profissionais ativos/pendentes antes de trocar.';
+  }
+  if (raw.includes('feature_unavailable') && raw.includes('offers')) {
+    return 'Este plano não permite ofertas. Remova as ofertas ativas antes de trocar.';
+  }
+  return 'Não foi possível trocar o plano agora.';
 }
 
 export default function PlanosSection({ negocioId }) {
@@ -66,7 +70,6 @@ export default function PlanosSection({ negocioId }) {
   }, [loadBilling]);
 
   const currentPlanCode = billingStatus?.plan_code || '';
-  const bookingAllowed = billingStatus?.booking_allowed !== false;
   const selectedPlan = useMemo(
     () => plans.find((plan) => plan.code === currentPlanCode) || null,
     [currentPlanCode, plans]
@@ -81,7 +84,7 @@ export default function PlanosSection({ negocioId }) {
       setBillingStatus(updated);
     } catch (err) {
       console.error('setBusinessPlan error:', err);
-      setError('Não foi possível trocar o plano agora.');
+      setError(getPlanChangeErrorMessage(err));
     } finally {
       setSavingPlan('');
     }
@@ -91,33 +94,18 @@ export default function PlanosSection({ negocioId }) {
     return (
       <div className="flex items-center justify-center py-14 text-gray-500">
         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        Carregando planos...
+        CARREGANDO PLANOS...
       </div>
     );
   }
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <h2 className="text-2xl font-normal text-white">Planos</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Plano atual: <span className="text-primary">{selectedPlan?.name || statusText(billingStatus)}</span>
-          </p>
-        </div>
-
-        <div className={`rounded-custom border px-5 py-4 ${bookingAllowed ? 'border-primary/30 bg-primary/10' : 'border-red-500/40 bg-red-500/10'}`}>
-          <div className="flex items-center gap-2 text-sm uppercase tracking-wide text-white">
-            <CreditCard className="h-4 w-4 text-primary" />
-            {statusText(billingStatus)}
-          </div>
-          <div className="mt-2 grid gap-1 text-xs text-gray-400 sm:grid-cols-2">
-            <span>Fim do teste: {formatDateBR(billingStatus?.trial_ends_at)}</span>
-            <span>Bloqueio da agenda: {formatDateBR(billingStatus?.billing_blocked_at)}</span>
-            <span>Pagamento: {billingStatus?.payment_method_status === 'valid' ? 'Validado' : 'Pendente'}</span>
-            <span>Agenda: {bookingAllowed ? 'Liberada' : 'Bloqueada'}</span>
-          </div>
-        </div>
+      <div>
+        <h2 className="text-2xl font-normal text-white">PLANOS</h2>
+        <p className="mt-1 text-sm text-gray-500">
+          PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || statusText(billingStatus)}</span>
+        </p>
       </div>
 
       {error && (
@@ -126,18 +114,23 @@ export default function PlanosSection({ negocioId }) {
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-100">
+        <div className="grid lg:grid-cols-3 divide-y divide-gray-800 lg:divide-y-0 lg:divide-x">
         {plans.map((plan) => {
           const active = plan.code === currentPlanCode;
           const saving = savingPlan === plan.code;
           return (
-            <article key={plan.code} className={`flex flex-col rounded-custom border p-5 ${active ? 'border-primary bg-primary/10' : 'border-gray-800 bg-dark-100'}`}>
+            <article key={plan.code} className={`flex min-h-[360px] flex-col p-6 sm:p-8 ${active ? 'bg-primary/5' : ''}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="text-xl font-normal text-white">{plan.name}</h3>
                   <p className="mt-1 text-sm text-gray-500">{planLimitText(plan)}</p>
                 </div>
-                {active && <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />}
+                {active && (
+                  <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-normal uppercase tracking-wide text-primary">
+                    Ativo
+                  </span>
+                )}
               </div>
 
               <div className="mt-5">
@@ -145,28 +138,18 @@ export default function PlanosSection({ negocioId }) {
                 <span className="ml-1 text-sm text-gray-500">/mês</span>
               </div>
 
-              <div className="mt-5 space-y-2 text-sm text-gray-400">
-                <p>{plan.trial_days || 30} dias grátis</p>
-                <p>{plan.grace_days || 2} dias de tolerância</p>
-                <p>{planLimitText(plan)}</p>
-              </div>
-
               <button
                 type="button"
                 disabled={active || !!savingPlan}
                 onClick={() => handleSelectPlan(plan.code)}
-                className={`mt-6 rounded-button px-4 py-2.5 text-sm font-normal uppercase transition-all ${active ? 'cursor-default bg-primary/20 text-primary' : 'border border-primary/40 text-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40'}`}
+                className={`mt-auto rounded-button px-4 py-2.5 text-sm font-normal uppercase transition-all ${active ? 'cursor-default bg-primary/15 text-primary' : 'border border-primary/40 text-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40'}`}
               >
                 {active ? 'Selecionado' : saving ? 'Salvando...' : 'Selecionar plano'}
               </button>
             </article>
           );
         })}
-      </div>
-
-      <div className="rounded-custom border border-gray-800 bg-dark-100 px-5 py-4 text-sm text-gray-400">
-        Gateway pendente: quando o provedor de pagamento for conectado, o webhook deve atualizar esta assinatura com
-        método de pagamento válido, status ativo ou pendência de cobrança.
+        </div>
       </div>
     </section>
   );
