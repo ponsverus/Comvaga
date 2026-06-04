@@ -98,6 +98,54 @@ function InfoPill({ label, value, tone = 'text-gray-300', border = 'border-gray-
   );
 }
 
+function getBillingAnnouncement(status) {
+  if (!status) return null;
+  const current = String(status.status || '').toLowerCase();
+  const daysUntilTrialEnd = Number(status.days_until_trial_end);
+  const daysUntilBlock = Number(status.days_until_block);
+
+  if (current === 'blocked' || current === 'billing_required') {
+    return {
+      tone: 'danger',
+      text: 'Agenda bloqueada para novos agendamentos. Ative um plano com pagamento valido para liberar.',
+    };
+  }
+
+  if (current === 'payment_required' || current === 'past_due') {
+    const suffix = Number.isFinite(daysUntilBlock) && daysUntilBlock > 0
+      ? ` Bloqueio em ${daysUntilBlock} dia${daysUntilBlock === 1 ? '' : 's'}.`
+      : '';
+    return {
+      tone: 'warning',
+      text: `Teste gratuito encerrado. Adicione um metodo de pagamento para manter a agenda ativa.${suffix}`,
+    };
+  }
+
+  if (current === 'trialing' && Number.isFinite(daysUntilTrialEnd) && daysUntilTrialEnd <= 2) {
+    return {
+      tone: 'warning',
+      text: `Seu teste gratuito termina em ${daysUntilTrialEnd} dia${daysUntilTrialEnd === 1 ? '' : 's'}. Escolha um plano e adicione o pagamento para evitar bloqueio da agenda.`,
+    };
+  }
+
+  return null;
+}
+
+function BillingAnnouncementBar({ announcement }) {
+  if (!announcement) return null;
+  const toneClass = announcement.tone === 'danger'
+    ? 'border-red-500/30 bg-red-500/15 text-red-100'
+    : 'border-primary/25 bg-primary/15 text-primary';
+
+  return (
+    <div className={`border-b ${toneClass}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-center text-xs sm:text-sm font-normal">
+        {announcement.text}
+      </div>
+    </div>
+  );
+}
+
 function DashboardTopCard({ icon, label, value, children, highlight = false }) {
   const baseClass = highlight
     ? 'bg-gradient-to-br from-green-500/20 to-emerald-600/20 border-green-500/30'
@@ -572,47 +620,53 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     </div>
   );
 
+  const billingAnnouncement = getBillingAnnouncement(billingStatus);
+
   return (
     <div className="min-h-screen bg-black text-white">
 
-      <header className="bg-dark-100 border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-800 bg-dark-200 flex items-center justify-center shrink-0">
-                {negocio.logo_path
-                  ? <img src={getPublicUrl('logos', negocio.logo_path)} alt="Logo" className="w-full h-full object-cover" />
-                  : <div className="w-12 h-12 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center"><CrownIcon className="w-7 h-7 text-black" /></div>}
+      <div className="sticky top-0 z-50">
+        <BillingAnnouncementBar announcement={billingAnnouncement} />
+
+        <header className="bg-dark-100 border-b border-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-20">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-800 bg-dark-200 flex items-center justify-center shrink-0">
+                  {negocio.logo_path
+                    ? <img src={getPublicUrl('logos', negocio.logo_path)} alt="Logo" className="w-full h-full object-cover" />
+                    : <div className="w-12 h-12 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center"><CrownIcon className="w-7 h-7 text-black" /></div>}
+                </div>
+                <div>
+                  <h1 className="text-xl font-normal">{negocio.nome}</h1>
+                  {souDono
+                    ? ownerBusinessCount > 1
+                      ? <button type="button" onClick={() => navigate('/selecionar-negocio')} className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block">TROCAR NEGÓCIO</button>
+                      : <span className="text-xs text-gray-500 -mt-0.5 block">DASHBOARD</span>
+                    : <span className="text-xs text-primary -mt-0.5 block uppercase">{parceiroProfissional?.nome || 'PARCEIRO'}</span>}
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-normal">{negocio.nome}</h1>
-                {souDono
-                  ? ownerBusinessCount > 1
-                    ? <button type="button" onClick={() => navigate('/selecionar-negocio')} className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block">TROCAR NEGÓCIO</button>
-                    : <span className="text-xs text-gray-500 -mt-0.5 block">DASHBOARD</span>
-                  : <span className="text-xs text-primary -mt-0.5 block uppercase">{parceiroProfissional?.nome || 'PARCEIRO'}</span>}
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Link to={`/v/${negocio.slug}`} target="_blank" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-dark-200 border border-gray-800 hover:border-primary rounded-button text-sm font-normal uppercase">
+                  <Eye className="w-4 h-4" />VER VITRINE
+                </Link>
+                {souDono && (
+                  <label className="inline-block">
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadLogoNegocio(e.target.files?.[0])} disabled={logoUploading} />
+                    <span className={`inline-flex items-center justify-center text-center rounded-button font-normal border transition-all uppercase focus:outline-none ${logoUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/10 hover:bg-primary/20 border-primary/30 text-primary cursor-pointer'}  px-4 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-sm`}>
+                      <span className="sm:hidden">{logoUploading ? 'ENVIANDO...' : 'LOGO'}</span>
+                      <span className="hidden sm:inline">{logoUploading ? 'ENVIANDO...' : 'ALTERAR LOGO'}</span>
+                    </span>
+                  </label>
+                )}
+                <button onClick={handleDashboardLogout} className="flex items-center gap-2 px-4 py-1.5 sm:py-2 bg-red-600 hover:bg-red-700 rounded-button text-sm font-normal uppercase">
+                  <LogOut className="w-4 h-4" /><span className="hidden sm:inline">SAIR</span>
+                </button>
               </div>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Link to={`/v/${negocio.slug}`} target="_blank" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-dark-200 border border-gray-800 hover:border-primary rounded-button text-sm font-normal uppercase">
-                <Eye className="w-4 h-4" />VER VITRINE
-              </Link>
-              {souDono && (
-                <label className="inline-block">
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => uploadLogoNegocio(e.target.files?.[0])} disabled={logoUploading} />
-                  <span className={`inline-flex items-center justify-center text-center rounded-button font-normal border transition-all uppercase focus:outline-none ${logoUploading ? 'bg-gray-900 border-gray-800 text-gray-600 cursor-not-allowed' : 'bg-primary/10 hover:bg-primary/20 border-primary/30 text-primary cursor-pointer'}  px-4 py-1.5 text-[11px] sm:px-4 sm:py-2 sm:text-sm`}>
-                    <span className="sm:hidden">{logoUploading ? 'ENVIANDO...' : 'LOGO'}</span>
-                    <span className="hidden sm:inline">{logoUploading ? 'ENVIANDO...' : 'ALTERAR LOGO'}</span>
-                  </span>
-                </label>
-              )}
-              <button onClick={handleDashboardLogout} className="flex items-center gap-2 px-4 py-1.5 sm:py-2 bg-red-600 hover:bg-red-700 rounded-button text-sm font-normal uppercase">
-                <LogOut className="w-4 h-4" /><span className="hidden sm:inline">SAIR</span>
-              </button>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 items-start">
