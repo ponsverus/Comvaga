@@ -19,7 +19,7 @@ function statusText(status) {
   if (current === 'billing_required') return 'Pagamento necessário';
   if (current === 'payment_required') return 'Pagamento necessário';
   if (current === 'canceled') return 'Cancelado';
-  return 'Em configuração';
+  return 'Config.';
 }
 
 function getPlanChangeErrorMessage(error) {
@@ -217,7 +217,7 @@ export default function PlanosSection({ negocioId }) {
 
       <div
         ref={planScrollerRef}
-        className="-mx-6 bg-gray-800 border-t border-gray-800 flex sm:grid sm:grid-cols-3 gap-px overflow-x-auto sm:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-6 -mb-6 bg-gray-800 border-t border-gray-800 flex sm:grid sm:grid-cols-3 gap-px overflow-x-auto sm:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {plans.map((plan) => {
           const active = plan.code === currentPlanCode;
