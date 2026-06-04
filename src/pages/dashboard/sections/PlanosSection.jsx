@@ -114,6 +114,14 @@ function CheckMark({ className }) {
   );
 }
 
+function StarGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
+  return (
+    <span className={`inline-flex items-center justify-center font-normal leading-none text-primary ${sizeClass} ${className}`}>
+      {'\u2606'}
+    </span>
+  );
+}
+
 export default function PlanosSection({ negocioId }) {
   const [plans, setPlans] = useState([]);
   const [billingStatus, setBillingStatus] = useState(null);
@@ -209,7 +217,7 @@ export default function PlanosSection({ negocioId }) {
 
       <div
         ref={planScrollerRef}
-        className="-mx-6 bg-gray-800 border-t border-gray-800 flex sm:grid sm:grid-cols-3 gap-px overflow-x-auto sm:overflow-visible pb-4 sm:pb-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-6 bg-gray-800 border-t border-gray-800 flex sm:grid sm:grid-cols-3 gap-px overflow-x-auto sm:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {plans.map((plan) => {
           const active = plan.code === currentPlanCode;
@@ -240,7 +248,7 @@ export default function PlanosSection({ negocioId }) {
               }}
               className={`relative shrink-0 w-[calc(100vw-3rem)] sm:w-auto snap-center p-8 sm:p-10 flex flex-col px-4 sm:px-8 md:px-12 ${plan.code === 'profissional' ? 'bg-primary/5' : 'bg-dark-100'}`}
             >
-              <div className="mb-5 pr-20">
+              <div className="mb-5">
                 <span className={`inline-block text-[10px] font-normal uppercase tracking-widest rounded-full px-3 py-1 mb-4 ${content.badgeClass}`}>
                   {content.label}
                 </span>
@@ -268,9 +276,9 @@ export default function PlanosSection({ negocioId }) {
 
               {content.highlight && (
                 <div className="mt-8 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
-                  <span className="shrink-0 text-primary text-[18px] leading-none">✦</span>
+                  <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
                   <span className="text-xs font-normal text-primary uppercase tracking-wide">
-                    {content.highlight}
+                    MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL COM MAIS BENEFÍCIOS
                   </span>
                 </div>
               )}
