@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import {
   fetchBillingPlans,
@@ -28,7 +28,7 @@ function getPlanChangeErrorMessage(error) {
     return 'Este plano não comporta a quantidade atual de profissionais. Reduza os profissionais ativos/pendentes antes de trocar.';
   }
   if (raw.includes('feature_unavailable') && raw.includes('offers')) {
-    return 'Recurso de ofertas restrito. Remova o valor promocional antes de continuar.';
+    return 'Este plano não permite ofertas. Remova as ofertas ativas antes de trocar.';
   }
   return 'Não foi possível trocar o plano agora.';
 }
@@ -120,6 +120,8 @@ export default function PlanosSection({ negocioId }) {
   const [loading, setLoading] = useState(true);
   const [savingPlan, setSavingPlan] = useState('');
   const [error, setError] = useState('');
+  const planScrollerRef = useRef(null);
+  const planCardRefs = useRef({});
 
   const loadBilling = useCallback(async () => {
     if (!negocioId) return;
@@ -149,6 +151,22 @@ export default function PlanosSection({ negocioId }) {
     () => plans.find((plan) => plan.code === currentPlanCode) || null,
     [currentPlanCode, plans]
   );
+
+  useEffect(() => {
+    const scroller = planScrollerRef.current;
+    const activeCard = planCardRefs.current[currentPlanCode];
+    if (!scroller || !activeCard) return;
+
+    window.requestAnimationFrame(() => {
+      const scrollerRect = scroller.getBoundingClientRect();
+      const cardRect = activeCard.getBoundingClientRect();
+      const nextLeft = scroller.scrollLeft
+        + (cardRect.left - scrollerRect.left)
+        - ((scrollerRect.width - cardRect.width) / 2);
+
+      scroller.scrollTo({ left: Math.max(0, nextLeft), behavior: 'auto' });
+    });
+  }, [currentPlanCode, plans]);
 
   const handleSelectPlan = async (planCode) => {
     if (!negocioId || savingPlan || planCode === currentPlanCode) return;
@@ -189,7 +207,10 @@ export default function PlanosSection({ negocioId }) {
         </div>
       )}
 
-      <div className="w-full bg-gray-800 border-t border-gray-800 flex sm:grid sm:grid-cols-3 gap-px overflow-x-auto sm:overflow-visible pb-4 sm:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div
+        ref={planScrollerRef}
+        className="-mx-6 bg-gray-800 border-t border-gray-800 flex sm:grid sm:grid-cols-3 gap-px overflow-x-auto sm:overflow-visible pb-4 sm:pb-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
         {plans.map((plan) => {
           const active = plan.code === currentPlanCode;
           const saving = savingPlan === plan.code;
@@ -213,7 +234,11 @@ export default function PlanosSection({ negocioId }) {
           return (
             <article
               key={plan.code}
-              className={`relative shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center] p-8 sm:p-10 flex flex-col px-4 sm:px-8 md:px-12 ${plan.code === 'profissional' ? 'bg-primary/5' : 'bg-dark-100'}`}
+              ref={(node) => {
+                if (node) planCardRefs.current[plan.code] = node;
+                else delete planCardRefs.current[plan.code];
+              }}
+              className={`relative shrink-0 w-[calc(100vw-3rem)] sm:w-auto snap-center p-8 sm:p-10 flex flex-col px-4 sm:px-8 md:px-12 ${plan.code === 'profissional' ? 'bg-primary/5' : 'bg-dark-100'}`}
             >
               <div className="mb-5 pr-20">
                 <span className={`inline-block text-[10px] font-normal uppercase tracking-widest rounded-full px-3 py-1 mb-4 ${content.badgeClass}`}>
