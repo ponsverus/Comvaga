@@ -25,12 +25,12 @@ function statusText(status) {
 function getPlanChangeErrorMessage(error) {
   const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
   if (raw.includes('plan_professional_limit_reached')) {
-    return 'Este plano não comporta a quantidade atual de profissionais. Reduza os profissionais ativos/pendentes antes de trocar.';
+    return 'Este plano possui um limite menor de profissionais. Reduza os profissionais ativos ou pendentes antes de trocar.';
   }
   if (raw.includes('feature_unavailable') && raw.includes('offers')) {
-    return 'Este plano não permite ofertas. Remova as ofertas ativas antes de trocar.';
+    return 'Este plano é incompatível com ofertas. Remova as ofertas ativas antes de trocar.';
   }
-  return 'Não foi possível trocar o plano agora.';
+  return 'Houve uma falha durante a troca de plano.';
 }
 
 const PLAN_CONTENT = {
@@ -144,7 +144,7 @@ export default function PlanosSection({ negocioId }) {
       setBillingStatus(statusData);
     } catch (err) {
       console.error('PlanosSection load error:', err);
-      setError('Não foi possível carregar os planos agora.');
+      setError('Erro ao carregar os planos agora.');
     } finally {
       setLoading(false);
     }
@@ -195,7 +195,7 @@ export default function PlanosSection({ negocioId }) {
     return (
       <div className="flex items-center justify-center py-14 text-gray-500">
         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        Carregando planos...
+        CARREGANDO PLANOS...
       </div>
     );
   }
@@ -204,8 +204,8 @@ export default function PlanosSection({ negocioId }) {
     <section className="space-y-6">
       <div>
         <h2 className="text-2xl font-normal text-white">Planos</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Plano atual: <span className="text-primary">{selectedPlan?.name || statusText(billingStatus)}</span>
+        <p className="mt-1 text-sm text-gray-500 uppercase">
+          PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || statusText(billingStatus)}</span>
         </p>
       </div>
 
