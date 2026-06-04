@@ -586,7 +586,7 @@ export default function Home({ user, userType, onLogout }) {
           w-full bg-gray-800 border-t border-gray-800
           flex sm:grid sm:grid-cols-3 gap-px
           overflow-x-auto sm:overflow-visible
-          pb-4 sm:pb-0
+          pb-0 sm:pb-0
           [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
         ">
 
