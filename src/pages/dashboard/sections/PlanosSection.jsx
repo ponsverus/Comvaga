@@ -10,12 +10,6 @@ function formatCurrencyFromCents(value) {
   return `R$ ${(Number(value || 0) / 100).toFixed(2).replace('.', ',')}`;
 }
 
-function planLimitText(plan) {
-  if (plan?.max_profissionais == null) return 'Profissionais ilimitados';
-  if (Number(plan.max_profissionais) === 1) return '1 profissional';
-  return `Até ${plan.max_profissionais} profissionais`;
-}
-
 function statusText(status) {
   const current = String(status?.status || '').toLowerCase();
   if (current === 'active') return 'Ativo';
@@ -34,9 +28,90 @@ function getPlanChangeErrorMessage(error) {
     return 'Este plano não comporta a quantidade atual de profissionais. Reduza os profissionais ativos/pendentes antes de trocar.';
   }
   if (raw.includes('feature_unavailable') && raw.includes('offers')) {
-    return 'Este plano não permite ofertas. Remova as ofertas ativas antes de trocar.';
+    return 'Recurso de ofertas restrito. Remova o valor promocional antes de continuar.';
   }
   return 'Não foi possível trocar o plano agora.';
+}
+
+const PLAN_CONTENT = {
+  essencial: {
+    label: 'Essencial',
+    description: 'Para autônomos que buscam organizar sua agenda.',
+    badgeClass: 'text-gray-400 bg-gray-800',
+    price: (
+      <>
+        R$ 39<span className="text-base font-normal text-gray-500">,99/mês</span>
+      </>
+    ),
+    items: [
+      'Reabertura automática de horários cancelados na agenda',
+      'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
+      'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
+      'Controle individual para um único profissional com indicadores básicos de agendamentos e receita',
+      'Agendamento assistido pelo profissional',
+      'Vitrine profissional',
+      'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
+      'Reagendamento inteligente em um clique pela área exclusiva do cliente',
+      'Alertas por e-mail em tempo real',
+      'Lembrete automático 30 min antes',
+      'Sincronia total com o Google Agenda.',
+    ],
+    checkClass: 'text-gray-600',
+    textClass: 'text-gray-400',
+    buttonText: 'Selecionar Essencial',
+    buttonClass: 'bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10',
+  },
+  profissional: {
+    label: 'Profissional',
+    description: 'Para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.',
+    badgeClass: 'text-primary bg-primary/15',
+    price: (
+      <>
+        R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
+      </>
+    ),
+    items: [
+      'Tudo do plano ESSENCIAL',
+      'Painel admin: controle de múltiplos profissionais',
+      'Painel individual para cada profissional parceiro',
+      'Até 5 profissionais parceiros sem taxas ou custos adicionais',
+      'Métricas de Faturamento e Desempenho Operacional por Data ou Período',
+      'Montagem de ofertas nos trabalhos oferecidos',
+    ],
+    checkClass: 'text-primary',
+    textClass: 'text-gray-300',
+    highlight: 'MESMO VALOR DO ESSENCIAL COM MAIS BENEFÍCIOS',
+    buttonText: 'Selecionar plano',
+    buttonClass: 'bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30',
+  },
+  premium: {
+    label: 'Premium Real',
+    description: 'Experiência completa com acesso ilimitado a todos os recursos.',
+    badgeClass: 'text-gray-400 bg-gray-800',
+    price: (
+      <>
+        R$ 69<span className="text-base font-normal text-gray-500">,99/mês</span>
+      </>
+    ),
+    items: [
+      'Tudo do plano PROFISSIONAL',
+      'Profissionais ilimitados e sem custo extra por parceiro',
+      'Comprometimento da agenda e receita futura projetada',
+      'Acesso antecipado a novos recursos',
+    ],
+    checkClass: 'text-gray-600',
+    textClass: 'text-gray-400',
+    buttonText: 'Selecionar Premium',
+    buttonClass: 'bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10',
+  },
+};
+
+function CheckMark({ className }) {
+  return (
+    <svg className={`h-4 w-4 shrink-0 mt-0.5 ${className}`} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }
 
 export default function PlanosSection({ negocioId }) {
@@ -94,7 +169,7 @@ export default function PlanosSection({ negocioId }) {
     return (
       <div className="flex items-center justify-center py-14 text-gray-500">
         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        CARREGANDO PLANOS...
+        Carregando planos...
       </div>
     );
   }
@@ -102,9 +177,9 @@ export default function PlanosSection({ negocioId }) {
   return (
     <section className="space-y-6">
       <div>
-        <h2 className="text-2xl font-normal text-white">PLANOS</h2>
+        <h2 className="text-2xl font-normal text-white">Planos</h2>
         <p className="mt-1 text-sm text-gray-500">
-          PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || statusText(billingStatus)}</span>
+          Plano atual: <span className="text-primary">{selectedPlan?.name || statusText(billingStatus)}</span>
         </p>
       </div>
 
@@ -114,42 +189,78 @@ export default function PlanosSection({ negocioId }) {
         </div>
       )}
 
-      <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-100">
-        <div className="grid lg:grid-cols-3 divide-y divide-gray-800 lg:divide-y-0 lg:divide-x">
+      <div className="w-full bg-gray-800 border-t border-gray-800 flex sm:grid sm:grid-cols-3 gap-px overflow-x-auto sm:overflow-visible pb-4 sm:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {plans.map((plan) => {
           const active = plan.code === currentPlanCode;
           const saving = savingPlan === plan.code;
+          const content = PLAN_CONTENT[plan.code] || {
+            label: plan.name,
+            description: '',
+            badgeClass: 'text-gray-400 bg-gray-800',
+            price: (
+              <>
+                {formatCurrencyFromCents(plan.price_cents)}
+                <span className="text-base font-normal text-gray-500">/mês</span>
+              </>
+            ),
+            items: [],
+            checkClass: 'text-gray-600',
+            textClass: 'text-gray-400',
+            buttonText: 'Selecionar plano',
+            buttonClass: 'bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10',
+          };
+
           return (
-            <article key={plan.code} className={`flex min-h-[360px] flex-col p-6 sm:p-8 ${active ? 'bg-primary/5' : ''}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="text-xl font-normal text-white">{plan.name}</h3>
-                  <p className="mt-1 text-sm text-gray-500">{planLimitText(plan)}</p>
-                </div>
+            <article
+              key={plan.code}
+              className={`relative shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center] p-8 sm:p-10 flex flex-col px-4 sm:px-8 md:px-12 ${plan.code === 'profissional' ? 'bg-primary/5' : 'bg-dark-100'}`}
+            >
+              <div className="mb-5 pr-20">
+                <span className={`inline-block text-[10px] font-normal uppercase tracking-widest rounded-full px-3 py-1 mb-4 ${content.badgeClass}`}>
+                  {content.label}
+                </span>
                 {active && (
-                  <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-normal uppercase tracking-wide text-primary">
+                  <span className="absolute right-4 top-8 sm:right-8 sm:top-10 rounded-full border border-green-400/30 bg-green-400/10 px-3 py-1 text-[10px] font-normal uppercase tracking-wide text-green-300">
                     Ativo
                   </span>
                 )}
+                <p className="text-2xl font-normal text-white mb-1">
+                  {content.price}
+                </p>
+                <p className={`text-sm leading-relaxed ${plan.code === 'profissional' ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {content.description}
+                </p>
               </div>
 
-              <div className="mt-5">
-                <span className="text-3xl font-normal text-white">{formatCurrencyFromCents(plan.price_cents)}</span>
-                <span className="ml-1 text-sm text-gray-500">/mês</span>
+              <div className="pt-5 flex flex-col gap-3 flex-grow">
+                {content.items.map((item) => (
+                  <div key={item} className="flex items-start gap-2.5">
+                    <CheckMark className={content.checkClass} />
+                    <span className={`text-sm leading-snug ${content.textClass}`}>{item}</span>
+                  </div>
+                ))}
               </div>
+
+              {content.highlight && (
+                <div className="mt-8 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
+                  <span className="shrink-0 text-primary text-[18px] leading-none">✦</span>
+                  <span className="text-xs font-normal text-primary uppercase tracking-wide">
+                    {content.highlight}
+                  </span>
+                </div>
+              )}
 
               <button
                 type="button"
                 disabled={active || !!savingPlan}
                 onClick={() => handleSelectPlan(plan.code)}
-                className={`mt-auto rounded-button px-4 py-2.5 text-sm font-normal uppercase transition-all ${active ? 'cursor-default bg-primary/15 text-primary' : 'border border-primary/40 text-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40'}`}
+                className={`mt-8 flex items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active ? 'cursor-default rounded-full bg-green-400/10 text-green-300 border border-green-400/30 text-xs font-normal uppercase tracking-wider' : content.buttonClass}`}
               >
-                {active ? 'Selecionado' : saving ? 'Salvando...' : 'Selecionar plano'}
+                {active ? 'Plano ativo' : saving ? 'Salvando...' : content.buttonText}
               </button>
             </article>
           );
         })}
-        </div>
       </div>
     </section>
   );
