@@ -5,7 +5,6 @@ import AppFooter from '../components/AppFooter';
 import { Eye, LogOut, AlertCircle } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { getBusinessGroup } from '../businessTerms';
 import EntregaModal from './dashboard/components/EntregaModal';
 import ProfissionalModal from './dashboard/components/ProfissionalModal';
 import VisaoGeralSection from './dashboard/sections/VisaoGeralSection';
@@ -345,17 +344,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     });
   }, [negocio]);
 
-  const businessGroup    = useMemo(() => getBusinessGroup(negocio?.tipo_negocio), [negocio?.tipo_negocio]);
-
-  const tabEntregasLabel = useMemo(() => getBizLabel(businessGroup, 'tab_title').toUpperCase(), [businessGroup]);
-  const sectionTitle     = useMemo(() => getBizLabel(businessGroup, 'tab_title'), [businessGroup]);
-  const btnAddLabel      = useMemo(() => getBizLabel(businessGroup, 'button_add'), [businessGroup]);
-  const modalNewLabel    = useMemo(() => getBizLabel(businessGroup, 'modal_new'), [businessGroup]);
-  const modalEditLabel   = useMemo(() => getBizLabel(businessGroup, 'modal_edit'), [businessGroup]);
-  const counterSingular  = useMemo(() => getBizLabel(businessGroup, 'counter_singular'), [businessGroup]);
-  const counterPlural    = useMemo(() => getBizLabel(businessGroup, 'counter_plural'), [businessGroup]);
-  const emptyListMsg     = useMemo(() => getBizLabel(businessGroup, 'empty_list'), [businessGroup]);
-
   const adminJaEhProfissional = useMemo(() =>
     profissionais.some(p => p.user_id === user?.id),
   [profissionais, user?.id]);
@@ -452,7 +440,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     userId: user?.id,
     userEmail: user?.email,
     negocio,
-    businessGroup,
     parceiroProfissional,
     allowOffers,
     reloadNegocio,
