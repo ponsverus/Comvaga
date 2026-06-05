@@ -5,7 +5,6 @@ import BookingCalendar from '../components/BookingCalendar';
 import { CalendarIcon } from '../components/icons';
 import AppFooter from '../components/AppFooter';
 import { ptBR } from '../feedback/messages/ptBR';
-import { getBusinessGroup } from '../businessTerms';
 import { getPublicUrl } from './vitrine/api/vitrineApi';
 import { useVitrineBootstrap } from './vitrine/hooks/useVitrineBootstrap';
 import { useVitrineBooking } from './vitrine/hooks/useVitrineBooking';
@@ -295,7 +294,6 @@ export default function Vitrine({ user, userType, onLogout }) {
     authUserId: user?.id || null,
   });
 
-  const businessGroup = useMemo(() => getBusinessGroup(negocio?.tipo_negocio), [negocio?.tipo_negocio]);
   const bizV = vitrineMsgs?.business || {};
   const sectionTitle = bizV?.section_title?.[businessGroup] ?? 'Serviços';
   const counterSingular = ptBR?.vitrine?.business?.counter_singular?.[businessGroup] ?? 'serviço';
