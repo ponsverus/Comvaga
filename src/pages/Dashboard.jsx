@@ -5,7 +5,6 @@ import AppFooter from '../components/AppFooter';
 import { Eye, LogOut, AlertCircle } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { getBusinessGroup } from '../businessTerms';
 import EntregaModal from './dashboard/components/EntregaModal';
 import ProfissionalModal from './dashboard/components/ProfissionalModal';
 import VisaoGeralSection from './dashboard/sections/VisaoGeralSection';
@@ -344,8 +343,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
       tema: negocio.tema || 'dark',
     });
   }, [negocio]);
-
-  const businessGroup    = useMemo(() => getBusinessGroup(negocio?.tipo_negocio), [negocio?.tipo_negocio]);
 
   const tabEntregasLabel = useMemo(() => getBizLabel(businessGroup, 'tab_title').toUpperCase(), [businessGroup]);
   const sectionTitle     = useMemo(() => getBizLabel(businessGroup, 'tab_title'), [businessGroup]);
