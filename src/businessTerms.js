@@ -1,48 +1,39 @@
-function _norm(s) {
-  return String(s || '')
-    .toLowerCase()
-    .trim()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+import { useEffect, useState } from 'react';
+import { supabase } from './supabase';
+
+const DEFAULT_BUSINESS_GROUP = 'servicos';
+const VALID_BUSINESS_GROUPS = new Set(['servicos', 'consultas', 'aulas']);
+
+function sanitizeBusinessGroup(value) {
+  return VALID_BUSINESS_GROUPS.has(value) ? value : DEFAULT_BUSINESS_GROUP;
 }
 
-const TIPO_PARA_GRUPO = {
-  'barbearia':      'servicos',
-  's. de beleza':   'servicos',
-  'cabeleireiro':   'servicos',
-  'm. e pedicure':  'servicos',
-  'e. tatuagem':    'servicos',
-  'estetica':       'servicos',
-  'spa':            'servicos',
-  'c. medica':      'servicos',
-  'dentista':       'servicos',
-  'nutricao':       'servicos',
-  'c. veterinaria': 'servicos',
-  'fisioterapia':   'servicos',
-  'fonoaudiologia': 'servicos',
-  'terapia':        'servicos',
-  'dermatologia':   'servicos',
+export function useBusinessGroup(tipoNegocio) {
+  const [businessGroup, setBusinessGroup] = useState(DEFAULT_BUSINESS_GROUP);
 
-  'psicologia':     'consultas',
+  useEffect(() => {
+    let active = true;
+    const pTipo = typeof tipoNegocio === 'string' ? tipoNegocio : null;
 
-  'p. trainer':     'aulas',
-  'academia':       'aulas',
-  'pilates':        'aulas',
-  'yoga':           'aulas',
-  'danca':          'aulas',
-  'musica':         'aulas',
-  'idiomas':        'aulas',
-  'natacao':        'aulas',
-  'crossfit':       'aulas',
-  'ginastica':      'aulas',
-};
+    if (!pTipo?.trim()) {
+      setBusinessGroup(DEFAULT_BUSINESS_GROUP);
+      return () => { active = false; };
+    }
 
-export function getBusinessGroup(tipoNegocio) {
-  const key = _norm(tipoNegocio);
-  if (!key) return 'servicos';
-  if (TIPO_PARA_GRUPO[key]) return TIPO_PARA_GRUPO[key];
-  const match = Object.keys(TIPO_PARA_GRUPO).find(
-    k => key.includes(k) || k.includes(key)
-  );
-  return match ? TIPO_PARA_GRUPO[match] : 'servicos';
+    supabase
+      .rpc('tipo_negocio_grupo', { p_tipo: pTipo })
+      .then(({ data, error }) => {
+        if (!active) return;
+        if (error) throw error;
+        setBusinessGroup(sanitizeBusinessGroup(data));
+      })
+      .catch((error) => {
+        console.warn('Falha ao resolver tipo_negocio_grupo.', error);
+        if (active) setBusinessGroup(DEFAULT_BUSINESS_GROUP);
+      });
+
+    return () => { active = false; };
+  }, [tipoNegocio]);
+
+  return businessGroup;
 }
