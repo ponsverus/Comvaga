@@ -5,7 +5,6 @@ import AppFooter from '../components/AppFooter';
 import { Eye, LogOut, AlertCircle } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { getBusinessGroup } from '../businessTerms';
 import EntregaModal from './dashboard/components/EntregaModal';
 import ProfissionalModal from './dashboard/components/ProfissionalModal';
 import VisaoGeralSection from './dashboard/sections/VisaoGeralSection';
