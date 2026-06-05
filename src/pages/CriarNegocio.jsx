@@ -127,26 +127,32 @@ export default function CriarNegocio({ user }) {
     setLoading(true);
 
     try {
-      const { data: slugExiste, error: slugErr } = await supabase
-        .rpc('get_negocio_vitrine_by_slug', { p_slug: slug });
+      const { data, error } = await supabase.rpc('create_owner_business', {
+        p_nome_negocio: nomeNegocio,
+        p_slug: slug,
+        p_telefone: telefone,
+        p_endereco: endereco,
+        p_tipo_negocio: tipoNegocio,
+      });
 
-      if (slugErr) throw slugErr;
-      if (slugExiste?.[0]) {
-        showMessage('signupProfessional.business_slug_taken');
-        setLoading(false);
-        return;
+      if (error) {
+        const code = String(error.message || '').split(':')[0].trim();
+        if (code === 'slug_indisponivel') {
+          showMessage('signupProfessional.business_slug_taken');
+          return;
+        }
+        if (code === 'slug_invalido') {
+          showMessage('signupProfessional.business_slug_invalid');
+          return;
+        }
+        if (code === 'usuario_sem_permissao' || code === 'nao_autenticado') {
+          showMessage('signupProfessional.profile_not_created');
+          return;
+        }
+        throw error;
       }
 
-      const { error: insErr } = await supabase.from('negocios').insert([{
-        owner_id: user.id,
-        nome: nomeNegocio,
-        slug,
-        tipo_negocio: tipoNegocio,
-        telefone,
-        endereco,
-      }]);
-
-      if (insErr) throw insErr;
+      if (!data?.negocio_id) throw new Error('create_owner_business payload incompleto');
 
       await sleep(300);
       navigate('/selecionar-negocio');
