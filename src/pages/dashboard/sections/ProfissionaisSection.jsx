@@ -39,7 +39,7 @@ export default function ProfissionaisSection({
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-normal">Profissionais</h2>
+        <h2 className="text-2xl font-normal">PROFISSIONAIS</h2>
         {souDono && !adminJaEhProfissional && (
           <button
             onClick={cadastrarAdminComoProfissional}
