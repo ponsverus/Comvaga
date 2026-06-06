@@ -66,7 +66,8 @@ export default function ProfissionaisSection({
           const horarioHoje = getHorarioPorDia(horarios, todayDow);
           const almocoInicio = horarioHoje?.almoco_inicio ? String(horarioHoje.almoco_inicio).slice(0, 5) : null;
           const almocoFim = horarioHoje?.almoco_fim ? String(horarioHoje.almoco_fim).slice(0, 5) : null;
-          const almocoTexto = almocoInicio && almocoFim ? `${almocoInicio} - ${almocoFim}` : 'SE PAUSA';
+          const almocoTexto = almocoInicio && almocoFim ? `${almocoInicio} - ${almocoFim}` : 'SEM PAUSA';
+          const pausaTexto = almocoInicio && almocoFim ? `PAUSA ${almocoTexto}` : almocoTexto;
           const openEditor = () => {
             setEditingProfissionalId(p.id);
             setFormProfissional(buildProfissionalForm(p));
@@ -101,7 +102,7 @@ export default function ProfissionaisSection({
                 <>
                   <div className="text-sm text-gray-400 mb-3">{entregas.filter((s) => s.profissional_id === p.id).length} {counterPlural}</div>
                   <div className="text-xs text-gray-500 mb-3">
-                    <Clock className="w-4 h-4 inline mr-1" />PAUSA {almocoTexto}
+                    <Clock className="w-4 h-4 inline mr-1" />{pausaTexto}
                   </div>
                   <div className="text-xs text-gray-500 mb-1">
                     {getSemanaResumo(horarios, todayDow).map((dia, idx, arr) => {
