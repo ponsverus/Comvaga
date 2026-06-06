@@ -75,7 +75,7 @@ const PLAN_CONTENT = {
       'Painel admin: controle de múltiplos profissionais',
       'Painel individual para cada profissional parceiro',
       'Até 5 profissionais parceiros sem taxas ou custos adicionais',
-      'Métricas de Faturamento e Desempenho Operacional por Data ou Período',
+      'Métricas de faturamento e desempenho operacional por data ou período',
       'Montagem de ofertas nos trabalhos oferecidos',
     ],
     checkClass: 'text-primary',
@@ -203,7 +203,7 @@ export default function PlanosSection({ negocioId }) {
   return (
     <section className="space-y-6">
       <div>
-        <h2 className="text-2xl font-normal text-white">Planos</h2>
+        <h2 className="text-2xl font-normal text-white">PLANOS</h2>
         <p className="mt-1 text-sm text-gray-500 uppercase">
           PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || statusText(billingStatus)}</span>
         </p>
