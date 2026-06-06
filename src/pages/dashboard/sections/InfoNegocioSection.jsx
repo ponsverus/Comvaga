@@ -248,7 +248,7 @@ export default function InfoNegocioSection({
           onChange={(e) => setFormInfo((prev) => ({ ...prev, instagram: e.target.value }))}
           readOnly={!visiblePrivateFields.instagram}
           className={`${inputClass} uppercase`}
-          placeholder="@BARBEARIATORRES"
+          placeholder="EX: @BARBEARIATORRES"
         />
       </InfoRow>
 
