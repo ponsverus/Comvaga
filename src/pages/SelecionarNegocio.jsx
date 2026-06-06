@@ -99,11 +99,11 @@ export default function SelecionarNegocio({ user, onLogout }) {
                 onClick={() => handleSelecionar(neg.id)}
                 className="w-full flex items-center gap-4 p-4 bg-dark-100 border border-gray-800 hover:border-primary/50 hover:bg-dark-100/80 rounded-custom transition-all text-left group"
               >
-                <div className="w-12 h-12 rounded-custom overflow-hidden border border-gray-700 bg-dark-200 shrink-0 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-700 bg-dark-200 shrink-0 flex items-center justify-center">
                   {logoUrl ? (
-                    <img src={logoUrl} alt={neg.nome} className="w-full h-full object-cover" />
+                    <img src={logoUrl} alt={neg.nome} className="w-full h-full rounded-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary to-yellow-600 flex items-center justify-center">
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-yellow-600 flex items-center justify-center">
                       <CrownIcon className="w-6 h-6 text-black" />
                     </div>
                   )}
