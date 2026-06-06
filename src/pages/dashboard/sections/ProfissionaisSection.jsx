@@ -66,7 +66,7 @@ export default function ProfissionaisSection({
           const horarioHoje = getHorarioPorDia(horarios, todayDow);
           const almocoInicio = horarioHoje?.almoco_inicio ? String(horarioHoje.almoco_inicio).slice(0, 5) : null;
           const almocoFim = horarioHoje?.almoco_fim ? String(horarioHoje.almoco_fim).slice(0, 5) : null;
-          const almocoTexto = almocoInicio && almocoFim ? `${almocoInicio} - ${almocoFim}` : 'SEM PAUSA';
+          const almocoTexto = almocoInicio && almocoFim ? `${almocoInicio} - ${almocoFim}` : 'SE PAUSA';
           const openEditor = () => {
             setEditingProfissionalId(p.id);
             setFormProfissional(buildProfissionalForm(p));
