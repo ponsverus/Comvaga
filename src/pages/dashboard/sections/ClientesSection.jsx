@@ -122,7 +122,7 @@ export default function ClientesSection({
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-normal">Clientes</h2>
+        <h2 className="text-2xl font-normal">CLIENTES</h2>
       </div>
 
       {clientesLoading ? (
