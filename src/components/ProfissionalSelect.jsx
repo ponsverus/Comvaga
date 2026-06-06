@@ -74,7 +74,7 @@ export default function ProfissionalSelect({
           className="absolute left-0 right-0 mt-1 z-50 bg-dark-100 border border-gray-800 rounded-custom shadow-2xl py-1 max-h-52 overflow-y-auto"
         >
           {lista.length === 0 ? (
-            <div className="px-4 py-3 text-sm text-gray-500">Nenhum profissional disponível.</div>
+            <div className="px-4 py-3 text-sm text-gray-500">:(</div>
           ) : (
             lista.map(p => {
               const isSelected = p.id === value;
