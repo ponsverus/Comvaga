@@ -155,7 +155,7 @@ export default function EntregasSection({
           <Plus className="w-5 h-5" />{btnAddLabel}
         </button>
       </div>
-      {profissionais.length === 0 ? <div className="text-gray-500">Nenhum profissional cadastrado.</div> : (
+      {profissionais.length === 0 ? <div className="text-gray-500">:(</div> : (
         <div className="space-y-4">
           {profissionais.map(p => {
             const lista = (entregasPorProf.get(p.id) || []).slice().sort((a, b) => Number(b.preco || 0) - Number(a.preco || 0));
