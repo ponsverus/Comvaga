@@ -55,8 +55,6 @@ export default function DepoimentosPaginados({ depoimentos, nomeNegocioLabel, is
     else goPrev();
   };
 
-  if (!depoimentos.length) return <p className="text-vmuted font-normal">Nenhum depoimento ainda</p>;
-
   return (
     <div>
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-4" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
