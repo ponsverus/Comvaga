@@ -58,37 +58,6 @@ function centsToReais(cents: number) {
   return Number((Number(cents || 0) / 100).toFixed(2));
 }
 
-function digits(value: unknown) {
-  return String(value || '').replace(/\D/g, '');
-}
-
-function trimText(value: unknown) {
-  return String(value || '').trim();
-}
-
-function requireBusinessBillingData(negocio: Record<string, unknown>, payerName: string) {
-  const missing = [];
-  const name = trimText(payerName);
-  const cpfCnpj = digits(negocio.cpf_cnpj);
-  const postalCode = digits(negocio.endereco_cep);
-  const address = trimText(negocio.endereco_rua);
-  const addressNumber = trimText(negocio.endereco_numero);
-  const province = trimText(negocio.endereco_bairro);
-
-  if (!name) missing.push('nome_pagador');
-  if (!cpfCnpj) missing.push('cpf_cnpj');
-  if (!postalCode) missing.push('endereco_cep');
-  if (!address) missing.push('endereco_rua');
-  if (!addressNumber) missing.push('endereco_numero');
-  if (!province) missing.push('endereco_bairro');
-
-  if (missing.length) {
-    throw new Error(`missing_business_billing_data: ${missing.join(', ')}`);
-  }
-
-  return { name, cpfCnpj, postalCode, address, addressNumber, province };
-}
-
 async function callAsaas(path: string, body: Record<string, unknown>) {
   const apiKey = requiredEnv('ASAAS_API_KEY');
   const baseUrl = (Deno.env.get('ASAAS_BASE_URL') || DEFAULT_ASAAS_BASE_URL).replace(/\/+$/, '');
@@ -152,7 +121,7 @@ Deno.serve(async (req) => {
 
     const [{ data: plan, error: planFetchError }, { data: negocio, error: negocioError }] = await Promise.all([
       admin.from('billing_plans').select('code, name, price_cents, trial_days').eq('code', planCode).eq('active', true).maybeSingle(),
-      admin.from('negocios').select('id, owner_id, nome, telefone, cpf_cnpj, endereco_cep, endereco_rua, endereco_numero, endereco_bairro').eq('id', negocioId).maybeSingle(),
+      admin.from('negocios').select('id, owner_id, nome').eq('id', negocioId).maybeSingle(),
     ]);
 
     if (planFetchError) throw planFetchError;
@@ -160,15 +129,7 @@ Deno.serve(async (req) => {
     if (!plan) return jsonResponse({ error: 'plan_not_found' }, 404);
     if (!negocio || negocio.owner_id !== authData.user.id) return jsonResponse({ error: 'acao_nao_permitida' }, 403);
 
-    const { data: ownerProfile } = await admin
-      .from('users')
-      .select('nome')
-      .eq('id', authData.user.id)
-      .maybeSingle();
-
     const selectedPlan = plan as BillingPlan;
-    const payerName = trimText(ownerProfile?.nome) || trimText(authData.user.user_metadata?.nome);
-    const billingData = requireBusinessBillingData(negocio, payerName);
     const siteUrl = publicSiteUrl(req);
     const externalReference = `comvaga:${negocioId}:${selectedPlan.code}`;
     const nextDueDate = asAsaasDateTime(addDays(new Date(), Number(selectedPlan.trial_days || 0)));
@@ -188,16 +149,6 @@ Deno.serve(async (req) => {
         quantity: 1,
         value: centsToReais(selectedPlan.price_cents),
       }],
-      customerData: {
-        name: billingData.name,
-        email: authData.user.email || undefined,
-        phone: digits(negocio.telefone) || undefined,
-        cpfCnpj: billingData.cpfCnpj,
-        postalCode: billingData.postalCode,
-        address: billingData.address,
-        addressNumber: billingData.addressNumber,
-        province: billingData.province,
-      },
       subscription: {
         cycle: 'MONTHLY',
         nextDueDate,

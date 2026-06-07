@@ -128,12 +128,11 @@ export async function setBusinessPlan(negocioId, planCode) {
   return data || null;
 }
 
-export async function createAsaasCheckout(negocioId, planCode, customerData = {}) {
+export async function createAsaasCheckout(negocioId, planCode) {
   const { data, error } = await supabase.functions.invoke('asaas-create-checkout', {
     body: {
       negocio_id: negocioId,
       plan_code: planCode,
-      customer_data: customerData,
     },
   });
 

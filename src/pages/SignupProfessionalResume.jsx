@@ -67,7 +67,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
     urlNegocio: '',
     tipoNegocio: '',
     telefone: '',
-    cpfCnpj: '',
     cep: '',
     rua: '',
     numero: '',
@@ -90,7 +89,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         ] = await Promise.all([
           supabase.from('users').select('nome').eq('id', user.id).maybeSingle(),
           supabase.from('negocios')
-            .select('id, nome, slug, tipo_negocio, telefone, cpf_cnpj, endereco_cep, endereco_rua, endereco_numero, endereco_complemento, endereco_bairro, endereco_cidade, endereco_estado, created_at')
+            .select('id, nome, slug, tipo_negocio, telefone, endereco_cep, endereco_rua, endereco_numero, endereco_complemento, endereco_bairro, endereco_cidade, endereco_estado, created_at')
             .eq('owner_id', user.id)
             .order('created_at', { ascending: true }),
         ]);
@@ -113,7 +112,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           urlNegocio: onlyTrim(initialContext?.negocio?.slug),
           tipoNegocio: onlyTrim(initialContext?.negocio?.tipo_negocio),
           telefone: onlyTrim(initialContext?.negocio?.telefone),
-          cpfCnpj: onlyTrim(initialContext?.negocio?.cpf_cnpj),
           cep: endereco.cep,
           rua: endereco.rua,
           numero: endereco.numero,
@@ -144,7 +142,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       urlNegocio: onlyTrim(selectedContext.negocio?.slug),
       tipoNegocio: onlyTrim(selectedContext.negocio?.tipo_negocio),
       telefone: onlyTrim(selectedContext.negocio?.telefone),
-      cpfCnpj: onlyTrim(selectedContext.negocio?.cpf_cnpj),
       cep: endereco.cep,
       rua: endereco.rua,
       numero: endereco.numero,
@@ -196,7 +193,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       const slug = onlyTrim(formData.urlNegocio);
       const tipoNegocio = onlyTrim(formData.tipoNegocio);
       const telefone = onlyTrim(formData.telefone);
-      const cpfCnpj = onlyTrim(formData.cpfCnpj).replace(/\D/g, '');
       const isWaitingRoom = !resumeContexts.length;
 
       if (!nome) { showMessage('signupProfessional.name_required'); return; }
@@ -204,7 +200,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       if (!nomeNegocio) { showMessage('signupProfessional.business_name_required'); return; }
       if (!slug || slug.length < 3) { showMessage('signupProfessional.business_slug_invalid'); return; }
       if (!tipoNegocio) { showMessage('signupProfessional.business_type_required'); return; }
-      if (!cpfCnpj) { showMessage('signupProfessional.address_format_invalid'); return; }
 
       const enderecoKey = validarEnderecoCompleto();
       if (enderecoKey) { showMessage(enderecoKey); return; }
@@ -216,7 +211,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         p_slug: slug,
         p_telefone: telefone,
         p_tipo_negocio: tipoNegocio,
-        p_cpf_cnpj: cpfCnpj,
         p_endereco_cep: formData.cep,
         p_endereco_rua: formData.rua,
         p_endereco_numero: formData.numero,
@@ -366,16 +360,6 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 type="tel"
                 value={formData.telefone}
                 onChange={(e) => setFormData((prev) => ({ ...prev, telefone: e.target.value }))}
-                className={fieldInputClass}
-                required
-              />
-            </ResumeFieldRow>
-
-            <ResumeFieldRow label="CPF/CNPJ">
-              <input
-                type="text"
-                value={formData.cpfCnpj}
-                onChange={(e) => setFormData((prev) => ({ ...prev, cpfCnpj: e.target.value }))}
                 className={fieldInputClass}
                 required
               />
