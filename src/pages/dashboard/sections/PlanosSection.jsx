@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import {
+  createAsaasCheckout,
   fetchBillingPlans,
   fetchBusinessBillingStatus,
-  setBusinessPlan,
 } from '../api/dashboardApi';
 
 function formatCurrencyFromCents(value) {
@@ -29,6 +29,9 @@ function getPlanChangeErrorMessage(error) {
   }
   if (raw.includes('feature_unavailable') && raw.includes('offers')) {
     return 'Este plano é incompatível com ofertas. Remova as ofertas ativas antes de trocar.';
+  }
+  if (raw.includes('asaas_checkout_failed')) {
+    return 'Nao foi possivel abrir o checkout do pagamento agora.';
   }
   return 'Houve uma falha durante a troca de plano.';
 }
@@ -177,14 +180,15 @@ export default function PlanosSection({ negocioId }) {
   }, [currentPlanCode, plans]);
 
   const handleSelectPlan = async (planCode) => {
-    if (!negocioId || savingPlan || planCode === currentPlanCode) return;
+    if (!negocioId || savingPlan) return;
     setSavingPlan(planCode);
     setError('');
     try {
-      const updated = await setBusinessPlan(negocioId, planCode);
-      setBillingStatus(updated);
+      const checkout = await createAsaasCheckout(negocioId, planCode);
+      if (checkout?.billing_status) setBillingStatus(checkout.billing_status);
+      window.location.assign(checkout.checkout_url);
     } catch (err) {
-      console.error('setBusinessPlan error:', err);
+      console.error('createAsaasCheckout error:', err);
       setError(getPlanChangeErrorMessage(err));
     } finally {
       setSavingPlan('');
@@ -222,6 +226,8 @@ export default function PlanosSection({ negocioId }) {
         {plans.map((plan) => {
           const active = plan.code === currentPlanCode;
           const saving = savingPlan === plan.code;
+          const needsPayment = active
+            && !['valid', 'none'].includes(String(billingStatus?.payment_method_status || '').toLowerCase());
           const content = PLAN_CONTENT[plan.code] || {
             label: plan.name,
             description: '',
@@ -285,11 +291,11 @@ export default function PlanosSection({ negocioId }) {
 
               <button
                 type="button"
-                disabled={active || !!savingPlan}
+                disabled={(active && !needsPayment) || !!savingPlan}
                 onClick={() => handleSelectPlan(plan.code)}
-                className={`mt-3 flex items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active ? 'cursor-default rounded-full bg-green-400/10 text-green-300 border border-green-400/30 text-xs font-normal uppercase tracking-wider' : content.buttonClass}`}
+                className={`mt-8 flex items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active && !needsPayment ? 'cursor-default rounded-full bg-green-400/10 text-green-300 border border-green-400/30 text-xs font-normal uppercase tracking-wider' : content.buttonClass}`}
               >
-                {active ? 'Plano ativo' : saving ? 'Salvando...' : content.buttonText}
+                {active && !needsPayment ? 'Plano ativo' : saving ? 'Abrindo checkout...' : needsPayment ? 'Adicionar pagamento' : content.buttonText}
               </button>
             </article>
           );
