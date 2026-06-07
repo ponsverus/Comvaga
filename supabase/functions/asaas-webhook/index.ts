@@ -18,13 +18,21 @@ function checkoutFromPayload(payload: Record<string, unknown>) {
   return (payload.checkout || {}) as Record<string, unknown>;
 }
 
+function scalarId(value: unknown) {
+  if (typeof value === 'string' || typeof value === 'number') {
+    const text = String(value).trim();
+    return text || null;
+  }
+  return null;
+}
+
 function providerSubscriptionId(payload: Record<string, unknown>, entity: Record<string, unknown>) {
-  const direct = entity.id && entity.object === 'subscription' ? entity.id : null;
-  return String(direct || entity.subscription || payload.subscriptionId || '') || null;
+  const direct = entity.object === 'subscription' ? scalarId(entity.id) : null;
+  return direct || scalarId(entity.subscription) || scalarId(payload.subscriptionId);
 }
 
 function providerCustomerId(entity: Record<string, unknown>) {
-  return String(entity.customer || entity.customerId || '') || null;
+  return scalarId(entity.customer) || scalarId(entity.customerId);
 }
 
 function providerStatus(entity: Record<string, unknown>) {
