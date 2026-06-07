@@ -49,7 +49,6 @@ export default function CriarNegocio({ user }) {
     urlNegocio: '',
     tipoNegocio: '',
     telefone: '',
-    cpfCnpj: '',
     cep: '',
     rua: '',
     numero: '',
@@ -62,44 +61,20 @@ export default function CriarNegocio({ user }) {
   useEffect(() => {
     let active = true;
 
-    async function loadOwnerBusinessContext() {
+    async function loadOwnerBusinessCount() {
       if (!user?.id) return;
 
-      const [
-        { count, error: countError },
-        { data: identityRows, error: identityError },
-      ] = await Promise.all([
-        supabase
-          .from('negocios')
-          .select('id', { count: 'exact', head: true })
-          .eq('owner_id', user.id),
-        supabase
-          .from('negocios')
-          .select('cpf_cnpj')
-          .eq('owner_id', user.id)
-          .not('cpf_cnpj', 'is', null)
-          .order('created_at', { ascending: true })
-          .limit(1),
-      ]);
+      const { count, error } = await supabase
+        .from('negocios')
+        .select('id', { count: 'exact', head: true })
+        .eq('owner_id', user.id);
 
-      if (!active) return;
-
-      if (!countError) {
+      if (!error && active) {
         setOwnerBusinessCount(Number(count || 0));
-      }
-
-      if (!identityError) {
-        const ownerCpfCnpj = onlyTrim(identityRows?.[0]?.cpf_cnpj);
-        if (ownerCpfCnpj) {
-          setFormData((prev) => ({
-            ...prev,
-            cpfCnpj: prev.cpfCnpj || ownerCpfCnpj,
-          }));
-        }
       }
     }
 
-    loadOwnerBusinessContext();
+    loadOwnerBusinessCount();
     return () => { active = false; };
   }, [user?.id]);
 
@@ -134,13 +109,11 @@ export default function CriarNegocio({ user }) {
     const slug = onlyTrim(formData.urlNegocio);
     const tipoNegocio = onlyTrim(formData.tipoNegocio);
     const telefone = onlyTrim(formData.telefone);
-    const cpfCnpj = onlyTrim(formData.cpfCnpj).replace(/\D/g, '');
 
     if (!nomeNegocio) { showMessage('signupProfessional.business_name_required'); return; }
     if (!slug || slug.length < 3) { showMessage('signupProfessional.business_slug_invalid'); return; }
     if (!tipoNegocio) { showMessage('signupProfessional.business_type_required'); return; }
     if (!telefone) { showMessage('signupProfessional.phone_required'); return; }
-    if (!cpfCnpj) { showMessage('signupProfessional.address_format_invalid'); return; }
 
     const enderecoKey = validarEndereco();
     if (enderecoKey) { showMessage(enderecoKey); return; }
@@ -153,7 +126,6 @@ export default function CriarNegocio({ user }) {
         p_slug: slug,
         p_telefone: telefone,
         p_tipo_negocio: tipoNegocio,
-        p_cpf_cnpj: cpfCnpj,
         p_endereco_cep: formData.cep,
         p_endereco_rua: formData.rua,
         p_endereco_numero: formData.numero,
@@ -245,16 +217,6 @@ export default function CriarNegocio({ user }) {
                 required
               />
             </FieldRow>           
-
-            <FieldRow label="CPF/CNPJ">
-              <input
-                type="text"
-                value={formData.cpfCnpj}
-                onChange={(e) => setFormData(prev => ({ ...prev, cpfCnpj: e.target.value }))}
-                className={fieldInputClass}
-                required
-              />
-            </FieldRow>
 
             <FieldRow label="TIPO">
               <input
