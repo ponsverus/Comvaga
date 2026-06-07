@@ -128,6 +128,19 @@ export async function setBusinessPlan(negocioId, planCode) {
   return data || null;
 }
 
+export async function createAsaasCheckout(negocioId, planCode) {
+  const { data, error } = await supabase.functions.invoke('asaas-create-checkout', {
+    body: {
+      negocio_id: negocioId,
+      plan_code: planCode,
+    },
+  });
+
+  if (error) throw error;
+  if (!data?.checkout_url) throw new Error('checkout_url_missing');
+  return data;
+}
+
 export async function fetchPartnerNegocioIds(userId) {
   const { data, error } = await supabase
     .from('profissionais')
