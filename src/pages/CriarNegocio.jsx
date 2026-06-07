@@ -10,16 +10,6 @@ function onlyTrim(v) {
   return String(v || '').trim();
 }
 
-function montarEnderecoUnico({ rua, numero, bairro, cidade, estado, cep, complemento }) {
-  return [
-    `${onlyTrim(rua)}, ${onlyTrim(numero)}`,
-    onlyTrim(complemento),
-    onlyTrim(bairro),
-    `${onlyTrim(cidade)}, ${onlyTrim(estado).toUpperCase()}`,
-    onlyTrim(cep) ? `CEP ${onlyTrim(cep)}` : '',
-  ].filter(Boolean).join(' - ');
-}
-
 function FieldRow({ label, children, last = false, alignStart = false }) {
   return (
     <div className={`flex ${alignStart ? 'items-start' : 'items-center'} gap-3 px-5 py-3 ${last ? '' : 'border-b border-gray-800'}`}>
@@ -72,20 +62,44 @@ export default function CriarNegocio({ user }) {
   useEffect(() => {
     let active = true;
 
-    async function loadOwnerBusinessCount() {
+    async function loadOwnerBusinessContext() {
       if (!user?.id) return;
 
-      const { count, error } = await supabase
-        .from('negocios')
-        .select('id', { count: 'exact', head: true })
-        .eq('owner_id', user.id);
+      const [
+        { count, error: countError },
+        { data: identityRows, error: identityError },
+      ] = await Promise.all([
+        supabase
+          .from('negocios')
+          .select('id', { count: 'exact', head: true })
+          .eq('owner_id', user.id),
+        supabase
+          .from('negocios')
+          .select('cpf_cnpj')
+          .eq('owner_id', user.id)
+          .not('cpf_cnpj', 'is', null)
+          .order('created_at', { ascending: true })
+          .limit(1),
+      ]);
 
-      if (!error && active) {
+      if (!active) return;
+
+      if (!countError) {
         setOwnerBusinessCount(Number(count || 0));
+      }
+
+      if (!identityError) {
+        const ownerCpfCnpj = onlyTrim(identityRows?.[0]?.cpf_cnpj);
+        if (ownerCpfCnpj) {
+          setFormData((prev) => ({
+            ...prev,
+            cpfCnpj: prev.cpfCnpj || ownerCpfCnpj,
+          }));
+        }
       }
     }
 
-    loadOwnerBusinessCount();
+    loadOwnerBusinessContext();
     return () => { active = false; };
   }, [user?.id]);
 
@@ -131,16 +145,6 @@ export default function CriarNegocio({ user }) {
     const enderecoKey = validarEndereco();
     if (enderecoKey) { showMessage(enderecoKey); return; }
 
-    const endereco = montarEnderecoUnico({
-      rua: formData.rua,
-      numero: formData.numero,
-      bairro: formData.bairro,
-      cidade: formData.cidade,
-      estado: formData.estado,
-      cep: formData.cep,
-      complemento: formData.complemento,
-    });
-
     setLoading(true);
 
     try {
@@ -148,7 +152,6 @@ export default function CriarNegocio({ user }) {
         p_nome_negocio: nomeNegocio,
         p_slug: slug,
         p_telefone: telefone,
-        p_endereco: endereco,
         p_tipo_negocio: tipoNegocio,
         p_cpf_cnpj: cpfCnpj,
         p_endereco_cep: formData.cep,
