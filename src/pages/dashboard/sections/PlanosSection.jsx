@@ -133,6 +133,7 @@ export default function PlanosSection({ negocioId }) {
   const [error, setError] = useState('');
   const [checkoutPlanCode, setCheckoutPlanCode] = useState('');
   const [payerData, setPayerData] = useState({
+    name: '',
     cpfCnpj: '',
     postalCode: '',
     address: '',
@@ -215,7 +216,7 @@ export default function PlanosSection({ negocioId }) {
 
   const handleSubmitPayerData = async (event) => {
     event.preventDefault();
-    const required = ['cpfCnpj', 'postalCode', 'address', 'addressNumber', 'province'];
+    const required = ['name', 'cpfCnpj', 'postalCode', 'address', 'addressNumber', 'province'];
     const missing = required.some((field) => !String(payerData[field] || '').trim());
     if (missing) {
       setError('Preencha os dados de cobranca para abrir o checkout.');
@@ -338,6 +339,15 @@ export default function PlanosSection({ negocioId }) {
           <form onSubmit={handleSubmitPayerData} className="w-full max-w-lg rounded-custom border border-gray-800 bg-dark-100 p-6 shadow-2xl">
             <h3 className="text-xl font-normal text-white">Dados de cobranca</h3>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <label className="block text-xs uppercase tracking-wide text-gray-500 sm:col-span-2">
+                Nome completo ou razao social
+                <input
+                  value={payerData.name}
+                  onChange={(event) => updatePayerField('name', event.target.value)}
+                  className="mt-2 w-full rounded-button border border-gray-800 bg-black px-3 py-2 text-sm text-white outline-none focus:border-primary"
+                  autoComplete="name"
+                />
+              </label>
               <label className="block text-xs uppercase tracking-wide text-gray-500">
                 CPF/CNPJ
                 <input
