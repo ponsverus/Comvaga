@@ -571,9 +571,10 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
 
   const TAB_LABELS = { 'visao-geral': 'GERAL', 'agendamentos': 'AGENDAMENTOS', 'cancelados': 'CANCELADOS', 'historico': 'HISTÓRICO', 'clientes': 'CLIENTES', 'entregas': tabEntregasLabel, 'profissionais': 'PROFISSIONAIS', 'dados': 'DADOS', 'info-negocio': 'INFO DO NEGÓCIO', 'planos': 'PLANOS' };
   useEffect(() => {
-    const requestedTab = location?.state?.activeTab;
+    const queryTab = new URLSearchParams(location?.search || '').get('tab');
+    const requestedTab = location?.state?.activeTab || queryTab;
     if (requestedTab && tabs.includes(requestedTab)) setActiveTab(requestedTab);
-  }, [location?.state?.activeTab, tabs]);
+  }, [location?.search, location?.state?.activeTab, tabs]);
 
   const agendarCliente = useCallback((cliente) => {
     if (!negocio?.slug || !cliente?.cliente_id) return;
