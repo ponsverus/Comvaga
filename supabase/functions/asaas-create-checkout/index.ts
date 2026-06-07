@@ -66,16 +66,16 @@ function trimText(value: unknown) {
   return String(value || '').trim();
 }
 
-function requireBusinessBillingData(negocio: Record<string, unknown>) {
+function requireBusinessBillingData(negocio: Record<string, unknown>, payerName: string) {
   const missing = [];
-  const name = trimText(negocio.nome);
+  const name = trimText(payerName);
   const cpfCnpj = digits(negocio.cpf_cnpj);
   const postalCode = digits(negocio.endereco_cep);
   const address = trimText(negocio.endereco_rua);
   const addressNumber = trimText(negocio.endereco_numero);
   const province = trimText(negocio.endereco_bairro);
 
-  if (!name) missing.push('nome');
+  if (!name) missing.push('nome_pagador');
   if (!cpfCnpj) missing.push('cpf_cnpj');
   if (!postalCode) missing.push('endereco_cep');
   if (!address) missing.push('endereco_rua');
@@ -160,8 +160,15 @@ Deno.serve(async (req) => {
     if (!plan) return jsonResponse({ error: 'plan_not_found' }, 404);
     if (!negocio || negocio.owner_id !== authData.user.id) return jsonResponse({ error: 'acao_nao_permitida' }, 403);
 
+    const { data: ownerProfile } = await admin
+      .from('users')
+      .select('nome')
+      .eq('id', authData.user.id)
+      .maybeSingle();
+
     const selectedPlan = plan as BillingPlan;
-    const billingData = requireBusinessBillingData(negocio);
+    const payerName = trimText(ownerProfile?.nome) || trimText(authData.user.user_metadata?.nome);
+    const billingData = requireBusinessBillingData(negocio, payerName);
     const siteUrl = publicSiteUrl(req);
     const externalReference = `comvaga:${negocioId}:${selectedPlan.code}`;
     const nextDueDate = asAsaasDateTime(addDays(new Date(), Number(selectedPlan.trial_days || 0)));
