@@ -190,8 +190,8 @@ export default function CriarNegocio({ user }) {
         <div className="text-center mb-10">
           <h1 className="text-4xl font-normal mb-3 tracking-wide">NOVO NEGÓCIO</h1>
           <p className="text-gray-500 text-base font-normal">
-            <span>AGORA, PREENCHA OS DADOS DO SEU</span>
-            <span className="block text-primary sm:inline"> SEGUNDO NEGÓCIO</span>
+            <span>AGORA, PREENCHA OS DADOS DO</span>
+            <span className="block text-primary sm:inline"> PRÓXIMOO NEGÓCIO</span>
           </p>
         </div>
 
@@ -223,7 +223,7 @@ export default function CriarNegocio({ user }) {
                 type="text"
                 value={formData.tipoNegocio}
                 onChange={(e) => setFormData(prev => ({ ...prev, tipoNegocio: e.target.value.toUpperCase() }))}
-                placeholder="EX: ESTÚDIO"
+                placeholder="ESTÚDIO"
                 className={`${fieldInputClass} uppercase`}
                 required
               />
