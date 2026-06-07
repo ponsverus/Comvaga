@@ -10,8 +10,14 @@ function onlyTrim(v) {
   return String(v || '').trim();
 }
 
-function montarEnderecoUnico({ rua, numero, cidade, estado }) {
-  return `${onlyTrim(rua)}, ${onlyTrim(numero)} - ${onlyTrim(cidade)}, ${onlyTrim(estado)}`;
+function montarEnderecoUnico({ rua, numero, bairro, cidade, estado, cep, complemento }) {
+  return [
+    `${onlyTrim(rua)}, ${onlyTrim(numero)}`,
+    onlyTrim(complemento),
+    onlyTrim(bairro),
+    `${onlyTrim(cidade)}, ${onlyTrim(estado).toUpperCase()}`,
+    onlyTrim(cep) ? `CEP ${onlyTrim(cep)}` : '',
+  ].filter(Boolean).join(' - ');
 }
 
 function parseEndereco(endereco) {
@@ -26,6 +32,22 @@ function parseEndereco(endereco) {
     numero: onlyTrim(match[2]),
     cidade: onlyTrim(match[3]),
     estado: onlyTrim(match[4]),
+  };
+}
+
+function negocioEnderecoFields(negocio) {
+  if (!negocio) {
+    return { rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '', complemento: '' };
+  }
+  const parsed = parseEndereco(negocio.endereco);
+  return {
+    rua: onlyTrim(negocio.endereco_rua) || parsed.rua,
+    numero: onlyTrim(negocio.endereco_numero) || parsed.numero,
+    bairro: onlyTrim(negocio.endereco_bairro),
+    cidade: onlyTrim(negocio.endereco_cidade) || parsed.cidade,
+    estado: onlyTrim(negocio.endereco_estado) || parsed.estado,
+    cep: onlyTrim(negocio.endereco_cep),
+    complemento: onlyTrim(negocio.endereco_complemento),
   };
 }
 
@@ -71,8 +93,12 @@ export default function SignupProfessionalResume({ user, onLogin }) {
     urlNegocio: '',
     tipoNegocio: '',
     telefone: '',
+    cpfCnpj: '',
+    cep: '',
     rua: '',
     numero: '',
+    complemento: '',
+    bairro: '',
     cidade: '',
     estado: '',
   });
@@ -90,7 +116,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         ] = await Promise.all([
           supabase.from('users').select('nome').eq('id', user.id).maybeSingle(),
           supabase.from('negocios')
-            .select('id, nome, slug, tipo_negocio, telefone, endereco, created_at')
+            .select('id, nome, slug, tipo_negocio, telefone, endereco, cpf_cnpj, endereco_cep, endereco_rua, endereco_numero, endereco_complemento, endereco_bairro, endereco_cidade, endereco_estado, created_at')
             .eq('owner_id', user.id)
             .order('created_at', { ascending: true }),
         ]);
@@ -103,7 +129,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           .map((negocio) => ({ negocio }));
 
         const initialContext = contexts[0] || null;
-        const endereco = parseEndereco(initialContext?.negocio?.endereco);
+        const endereco = negocioEnderecoFields(initialContext?.negocio);
 
         setProfileName(onlyTrim(userData?.nome || user?.user_metadata?.nome || ''));
         setResumeContexts(contexts);
@@ -113,8 +139,12 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           urlNegocio: onlyTrim(initialContext?.negocio?.slug),
           tipoNegocio: onlyTrim(initialContext?.negocio?.tipo_negocio),
           telefone: onlyTrim(initialContext?.negocio?.telefone),
+          cpfCnpj: onlyTrim(initialContext?.negocio?.cpf_cnpj),
+          cep: endereco.cep,
           rua: endereco.rua,
           numero: endereco.numero,
+          complemento: endereco.complemento,
+          bairro: endereco.bairro,
           cidade: endereco.cidade,
           estado: endereco.estado,
         });
@@ -134,14 +164,18 @@ export default function SignupProfessionalResume({ user, onLogin }) {
     if (!selectedNegocioId) return;
     const selectedContext = resumeContexts.find((item) => item.negocio.id === selectedNegocioId);
     if (!selectedContext) return;
-    const endereco = parseEndereco(selectedContext.negocio?.endereco);
+    const endereco = negocioEnderecoFields(selectedContext.negocio);
     setFormData({
       nomeNegocio: onlyTrim(selectedContext.negocio?.nome),
       urlNegocio: onlyTrim(selectedContext.negocio?.slug),
       tipoNegocio: onlyTrim(selectedContext.negocio?.tipo_negocio),
       telefone: onlyTrim(selectedContext.negocio?.telefone),
+      cpfCnpj: onlyTrim(selectedContext.negocio?.cpf_cnpj),
+      cep: endereco.cep,
       rua: endereco.rua,
       numero: endereco.numero,
+      complemento: endereco.complemento,
+      bairro: endereco.bairro,
       cidade: endereco.cidade,
       estado: endereco.estado,
     });
@@ -168,8 +202,10 @@ export default function SignupProfessionalResume({ user, onLogin }) {
   const validarEnderecoCompleto = () => {
     if (!onlyTrim(formData.rua)) return 'signupProfessional.address_street_required';
     if (!onlyTrim(formData.numero)) return 'signupProfessional.address_number_required';
+    if (!onlyTrim(formData.bairro)) return 'signupProfessional.address_format_invalid';
     if (!onlyTrim(formData.cidade)) return 'signupProfessional.address_city_required';
     if (!onlyTrim(formData.estado)) return 'signupProfessional.address_state_required';
+    if (!onlyTrim(formData.cep)) return 'signupProfessional.address_format_invalid';
     return null;
   };
 
@@ -186,6 +222,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       const slug = onlyTrim(formData.urlNegocio);
       const tipoNegocio = onlyTrim(formData.tipoNegocio);
       const telefone = onlyTrim(formData.telefone);
+      const cpfCnpj = onlyTrim(formData.cpfCnpj).replace(/\D/g, '');
       const isWaitingRoom = !resumeContexts.length;
 
       if (!nome) { showMessage('signupProfessional.name_required'); return; }
@@ -193,6 +230,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       if (!nomeNegocio) { showMessage('signupProfessional.business_name_required'); return; }
       if (!slug || slug.length < 3) { showMessage('signupProfessional.business_slug_invalid'); return; }
       if (!tipoNegocio) { showMessage('signupProfessional.business_type_required'); return; }
+      if (!cpfCnpj) { showMessage('signupProfessional.address_format_invalid'); return; }
 
       const enderecoKey = validarEnderecoCompleto();
       if (enderecoKey) { showMessage(enderecoKey); return; }
@@ -200,8 +238,11 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       const enderecoUnico = montarEnderecoUnico({
         rua: formData.rua,
         numero: formData.numero,
+        bairro: formData.bairro,
         cidade: formData.cidade,
         estado: formData.estado,
+        cep: formData.cep,
+        complemento: formData.complemento,
       });
 
       const { data, error } = await supabase.rpc('complete_owner_business_onboarding', {
@@ -212,6 +253,14 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         p_telefone: telefone,
         p_endereco: enderecoUnico,
         p_tipo_negocio: tipoNegocio,
+        p_cpf_cnpj: cpfCnpj,
+        p_endereco_cep: formData.cep,
+        p_endereco_rua: formData.rua,
+        p_endereco_numero: formData.numero,
+        p_endereco_complemento: formData.complemento,
+        p_endereco_bairro: formData.bairro,
+        p_endereco_cidade: formData.cidade,
+        p_endereco_estado: formData.estado,
       });
 
       if (error) {
@@ -359,6 +408,16 @@ export default function SignupProfessionalResume({ user, onLogin }) {
               />
             </ResumeFieldRow>
 
+            <ResumeFieldRow label="CPF/CNPJ">
+              <input
+                type="text"
+                value={formData.cpfCnpj}
+                onChange={(e) => setFormData((prev) => ({ ...prev, cpfCnpj: e.target.value }))}
+                className={fieldInputClass}
+                required
+              />
+            </ResumeFieldRow>
+
             <ResumeFieldRow label="TIPO">
               <input
                 type="text"
@@ -385,6 +444,28 @@ export default function SignupProfessionalResume({ user, onLogin }) {
             </ResumeFieldRow>
 
             <ResumeSplitRow>
+              <ResumeSplitField label="CEP" divider>
+                <input
+                  type="text"
+                  value={formData.cep}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, cep: e.target.value }))}
+                  className={fieldInputClass}
+                  required
+                />
+              </ResumeSplitField>
+
+              <ResumeSplitField label="BAIRRO">
+                <input
+                  type="text"
+                  value={formData.bairro}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, bairro: e.target.value }))}
+                  className={fieldInputClass}
+                  required
+                />
+              </ResumeSplitField>
+            </ResumeSplitRow>
+
+            <ResumeSplitRow>
               <ResumeSplitField label="RUA" divider>
                 <input
                   type="text"
@@ -405,6 +486,16 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 />
               </ResumeSplitField>
             </ResumeSplitRow>
+
+            <ResumeFieldRow label="COMPL.">
+              <input
+                type="text"
+                value={formData.complemento}
+                onChange={(e) => setFormData((prev) => ({ ...prev, complemento: e.target.value }))}
+                className={fieldInputClass}
+                placeholder="OPCIONAL"
+              />
+            </ResumeFieldRow>
 
             <ResumeSplitRow last>
               <ResumeSplitField label="CIDADE" divider>
