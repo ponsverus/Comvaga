@@ -10,42 +10,16 @@ function onlyTrim(v) {
   return String(v || '').trim();
 }
 
-function montarEnderecoUnico({ rua, numero, bairro, cidade, estado, cep, complemento }) {
-  return [
-    `${onlyTrim(rua)}, ${onlyTrim(numero)}`,
-    onlyTrim(complemento),
-    onlyTrim(bairro),
-    `${onlyTrim(cidade)}, ${onlyTrim(estado).toUpperCase()}`,
-    onlyTrim(cep) ? `CEP ${onlyTrim(cep)}` : '',
-  ].filter(Boolean).join(' - ');
-}
-
-function parseEndereco(endereco) {
-  const raw = onlyTrim(endereco);
-  const match = raw.match(/^(.*?),\s*(.*?)\s*-\s*(.*?),\s*(.*?)$/);
-  if (!match) {
-    return { rua: '', numero: '', cidade: '', estado: '' };
-  }
-
-  return {
-    rua: onlyTrim(match[1]),
-    numero: onlyTrim(match[2]),
-    cidade: onlyTrim(match[3]),
-    estado: onlyTrim(match[4]),
-  };
-}
-
 function negocioEnderecoFields(negocio) {
   if (!negocio) {
     return { rua: '', numero: '', bairro: '', cidade: '', estado: '', cep: '', complemento: '' };
   }
-  const parsed = parseEndereco(negocio.endereco);
   return {
-    rua: onlyTrim(negocio.endereco_rua) || parsed.rua,
-    numero: onlyTrim(negocio.endereco_numero) || parsed.numero,
+    rua: onlyTrim(negocio.endereco_rua),
+    numero: onlyTrim(negocio.endereco_numero),
     bairro: onlyTrim(negocio.endereco_bairro),
-    cidade: onlyTrim(negocio.endereco_cidade) || parsed.cidade,
-    estado: onlyTrim(negocio.endereco_estado) || parsed.estado,
+    cidade: onlyTrim(negocio.endereco_cidade),
+    estado: onlyTrim(negocio.endereco_estado),
     cep: onlyTrim(negocio.endereco_cep),
     complemento: onlyTrim(negocio.endereco_complemento),
   };
@@ -116,7 +90,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         ] = await Promise.all([
           supabase.from('users').select('nome').eq('id', user.id).maybeSingle(),
           supabase.from('negocios')
-            .select('id, nome, slug, tipo_negocio, telefone, endereco, cpf_cnpj, endereco_cep, endereco_rua, endereco_numero, endereco_complemento, endereco_bairro, endereco_cidade, endereco_estado, created_at')
+            .select('id, nome, slug, tipo_negocio, telefone, cpf_cnpj, endereco_cep, endereco_rua, endereco_numero, endereco_complemento, endereco_bairro, endereco_cidade, endereco_estado, created_at')
             .eq('owner_id', user.id)
             .order('created_at', { ascending: true }),
         ]);
@@ -235,23 +209,12 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       const enderecoKey = validarEnderecoCompleto();
       if (enderecoKey) { showMessage(enderecoKey); return; }
 
-      const enderecoUnico = montarEnderecoUnico({
-        rua: formData.rua,
-        numero: formData.numero,
-        bairro: formData.bairro,
-        cidade: formData.cidade,
-        estado: formData.estado,
-        cep: formData.cep,
-        complemento: formData.complemento,
-      });
-
       const { data, error } = await supabase.rpc('complete_owner_business_onboarding', {
         p_negocio_id: isWaitingRoom ? null : negocioId,
         p_nome_usuario: nome,
         p_nome_negocio: nomeNegocio,
         p_slug: slug,
         p_telefone: telefone,
-        p_endereco: enderecoUnico,
         p_tipo_negocio: tipoNegocio,
         p_cpf_cnpj: cpfCnpj,
         p_endereco_cep: formData.cep,
