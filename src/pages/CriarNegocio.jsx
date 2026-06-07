@@ -202,7 +202,7 @@ export default function CriarNegocio({ user }) {
                 type="text"
                 value={formData.nomeNegocio}
                 onChange={(e) => handleNomeChange(e.target.value)}
-                placeholder="EX: EQUINOX TATOO"
+                placeholder="EX: BLACKLINE"
                 className={`${fieldInputClass} uppercase`}
                 required
               />
@@ -236,7 +236,7 @@ export default function CriarNegocio({ user }) {
                   type="text"
                   value={formData.urlNegocio}
                   onChange={(e) => setFormData(prev => ({ ...prev, urlNegocio: generateSlug(e.target.value) }))}
-                  placeholder="EQUINOX-TATTOO"
+                  placeholder="BLACKLINE"
                   className={`${fieldInputClass} uppercase`}
                   required
                   pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
