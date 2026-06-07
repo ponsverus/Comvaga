@@ -193,10 +193,6 @@ export default function InfoNegocioSection({
         />
       </InfoRow>
 
-      <InfoRow label="CPF/CNPJ" action={businessSaveAction('cpf_cnpj')}>
-        {businessTextInput('cpf_cnpj', 'CPF OU CNPJ')}
-      </InfoRow>
-
       <InfoRow label="CEP" action={businessSaveAction('endereco_cep')}>
         {businessTextInput('endereco_cep', 'CEP')}
       </InfoRow>
