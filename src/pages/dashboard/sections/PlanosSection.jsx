@@ -33,9 +33,6 @@ function getPlanChangeErrorMessage(error) {
   if (raw.includes('asaas_checkout_failed')) {
     return 'Nao foi possivel abrir o checkout do pagamento agora.';
   }
-  if (raw.includes('missing_business_billing_data')) {
-    return 'Complete CPF/CNPJ, CEP, rua, numero e bairro em Info do Negocio antes de abrir o checkout.';
-  }
   return 'Houve uma falha durante a troca de plano.';
 }
 
@@ -296,7 +293,7 @@ export default function PlanosSection({ negocioId }) {
                 type="button"
                 disabled={(active && !needsPayment) || !!savingPlan}
                 onClick={() => handleSelectPlan(plan.code)}
-                className={`mt-8 flex items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active && !needsPayment ? 'cursor-default rounded-full bg-green-400/10 text-green-300 border border-green-400/30 text-xs font-normal uppercase tracking-wider' : content.buttonClass}`}
+                className={`mt-4 flex items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active && !needsPayment ? 'cursor-default rounded-full bg-green-400/10 text-green-300 border border-green-400/30 text-xs font-normal uppercase tracking-wider' : content.buttonClass}`}
               >
                 {active && !needsPayment ? 'Plano ativo' : saving ? 'Abrindo checkout...' : needsPayment ? 'Adicionar pagamento' : content.buttonText}
               </button>
