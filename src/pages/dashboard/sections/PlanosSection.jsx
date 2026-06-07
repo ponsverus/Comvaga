@@ -131,6 +131,14 @@ export default function PlanosSection({ negocioId }) {
   const [loading, setLoading] = useState(true);
   const [savingPlan, setSavingPlan] = useState('');
   const [error, setError] = useState('');
+  const [checkoutPlanCode, setCheckoutPlanCode] = useState('');
+  const [payerData, setPayerData] = useState({
+    cpfCnpj: '',
+    postalCode: '',
+    address: '',
+    addressNumber: '',
+    province: '',
+  });
   const planScrollerRef = useRef(null);
   const planCardRefs = useRef({});
 
@@ -179,12 +187,16 @@ export default function PlanosSection({ negocioId }) {
     });
   }, [currentPlanCode, plans]);
 
-  const handleSelectPlan = async (planCode) => {
+  const updatePayerField = (field, value) => {
+    setPayerData((current) => ({ ...current, [field]: value }));
+  };
+
+  const startCheckout = async (planCode, customerData = {}) => {
     if (!negocioId || savingPlan) return;
     setSavingPlan(planCode);
     setError('');
     try {
-      const checkout = await createAsaasCheckout(negocioId, planCode);
+      const checkout = await createAsaasCheckout(negocioId, planCode, customerData);
       if (checkout?.billing_status) setBillingStatus(checkout.billing_status);
       window.location.assign(checkout.checkout_url);
     } catch (err) {
@@ -193,6 +205,25 @@ export default function PlanosSection({ negocioId }) {
     } finally {
       setSavingPlan('');
     }
+  };
+
+  const handleSelectPlan = (planCode) => {
+    if (!negocioId || savingPlan) return;
+    setCheckoutPlanCode(planCode);
+    setError('');
+  };
+
+  const handleSubmitPayerData = async (event) => {
+    event.preventDefault();
+    const required = ['cpfCnpj', 'postalCode', 'address', 'addressNumber', 'province'];
+    const missing = required.some((field) => !String(payerData[field] || '').trim());
+    if (missing) {
+      setError('Preencha os dados de cobranca para abrir o checkout.');
+      return;
+    }
+    const planCode = checkoutPlanCode;
+    setCheckoutPlanCode('');
+    await startCheckout(planCode, payerData);
   };
 
   if (loading) {
@@ -301,6 +332,79 @@ export default function PlanosSection({ negocioId }) {
           );
         })}
       </div>
+
+      {checkoutPlanCode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+          <form onSubmit={handleSubmitPayerData} className="w-full max-w-lg rounded-custom border border-gray-800 bg-dark-100 p-6 shadow-2xl">
+            <h3 className="text-xl font-normal text-white">Dados de cobranca</h3>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <label className="block text-xs uppercase tracking-wide text-gray-500">
+                CPF/CNPJ
+                <input
+                  value={payerData.cpfCnpj}
+                  onChange={(event) => updatePayerField('cpfCnpj', event.target.value)}
+                  className="mt-2 w-full rounded-button border border-gray-800 bg-black px-3 py-2 text-sm text-white outline-none focus:border-primary"
+                  inputMode="numeric"
+                  autoComplete="off"
+                />
+              </label>
+              <label className="block text-xs uppercase tracking-wide text-gray-500">
+                CEP
+                <input
+                  value={payerData.postalCode}
+                  onChange={(event) => updatePayerField('postalCode', event.target.value)}
+                  className="mt-2 w-full rounded-button border border-gray-800 bg-black px-3 py-2 text-sm text-white outline-none focus:border-primary"
+                  inputMode="numeric"
+                  autoComplete="postal-code"
+                />
+              </label>
+              <label className="block text-xs uppercase tracking-wide text-gray-500 sm:col-span-2">
+                Endereco
+                <input
+                  value={payerData.address}
+                  onChange={(event) => updatePayerField('address', event.target.value)}
+                  className="mt-2 w-full rounded-button border border-gray-800 bg-black px-3 py-2 text-sm text-white outline-none focus:border-primary"
+                  autoComplete="street-address"
+                />
+              </label>
+              <label className="block text-xs uppercase tracking-wide text-gray-500">
+                Numero
+                <input
+                  value={payerData.addressNumber}
+                  onChange={(event) => updatePayerField('addressNumber', event.target.value)}
+                  className="mt-2 w-full rounded-button border border-gray-800 bg-black px-3 py-2 text-sm text-white outline-none focus:border-primary"
+                  autoComplete="off"
+                />
+              </label>
+              <label className="block text-xs uppercase tracking-wide text-gray-500">
+                Bairro
+                <input
+                  value={payerData.province}
+                  onChange={(event) => updatePayerField('province', event.target.value)}
+                  className="mt-2 w-full rounded-button border border-gray-800 bg-black px-3 py-2 text-sm text-white outline-none focus:border-primary"
+                  autoComplete="address-level3"
+                />
+              </label>
+            </div>
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setCheckoutPlanCode('')}
+                className="rounded-button border border-gray-700 px-5 py-2.5 text-sm uppercase text-gray-300 hover:border-gray-500"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={!!savingPlan}
+                className="rounded-button bg-primary px-5 py-2.5 text-sm uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {savingPlan ? 'Abrindo...' : 'Abrir checkout'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </section>
   );
 }
