@@ -15,6 +15,20 @@ function getPublicUrl(bucket, path) {
   }
 }
 
+function formatBusinessAddress(negocio) {
+  const rua = String(negocio?.endereco_rua || '').trim();
+  const numero = String(negocio?.endereco_numero || '').trim();
+  const bairro = String(negocio?.endereco_bairro || '').trim();
+  const cidade = String(negocio?.endereco_cidade || '').trim();
+  const estado = String(negocio?.endereco_estado || '').trim().toUpperCase();
+
+  return [
+    rua && numero ? `${rua}, ${numero}` : rua,
+    bairro,
+    estado || (!bairro ? cidade : ''),
+  ].filter(Boolean).join(' - ');
+}
+
 export default function SelecionarNegocio({ user, onLogout }) {
   const navigate = useNavigate();
   const [negocios, setNegocios] = useState([]);
@@ -30,7 +44,7 @@ export default function SelecionarNegocio({ user, onLogout }) {
 
     supabase
       .from('negocios')
-      .select('id, nome, slug, logo_path, tipo_negocio, endereco')
+      .select('id, nome, slug, logo_path, tipo_negocio, endereco_cep, endereco_rua, endereco_numero, endereco_complemento, endereco_bairro, endereco_cidade, endereco_estado')
       .eq('owner_id', user.id)
       .order('created_at', { ascending: true })
       .then(({ data, error }) => {
@@ -92,6 +106,7 @@ export default function SelecionarNegocio({ user, onLogout }) {
         <div className="space-y-3 mb-6">
           {negocios.map((neg) => {
             const logoUrl = getPublicUrl('logos', neg.logo_path);
+            const endereco = formatBusinessAddress(neg);
             return (
               <button
                 key={neg.id}
@@ -113,8 +128,8 @@ export default function SelecionarNegocio({ user, onLogout }) {
                   {neg.tipo_negocio && (
                     <div className="text-xs text-gray-500 uppercase mt-0.5">{neg.tipo_negocio}</div>
                   )}
-                  {neg.endereco && (
-                    <div className="text-xs text-gray-600 uppercase mt-0.5">{neg.endereco}</div>
+                  {endereco && (
+                    <div className="text-xs text-gray-600 uppercase mt-0.5">{endereco}</div>
                   )}
                 </div>
                 <div className="text-gray-600 group-hover:text-primary transition-colors shrink-0">
