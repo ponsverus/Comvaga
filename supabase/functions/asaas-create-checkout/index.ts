@@ -66,6 +66,29 @@ function trimText(value: unknown) {
   return String(value || '').trim();
 }
 
+function requireBusinessBillingData(negocio: Record<string, unknown>) {
+  const missing = [];
+  const name = trimText(negocio.nome);
+  const cpfCnpj = digits(negocio.cpf_cnpj);
+  const postalCode = digits(negocio.endereco_cep);
+  const address = trimText(negocio.endereco_rua);
+  const addressNumber = trimText(negocio.endereco_numero);
+  const province = trimText(negocio.endereco_bairro);
+
+  if (!name) missing.push('nome');
+  if (!cpfCnpj) missing.push('cpf_cnpj');
+  if (!postalCode) missing.push('endereco_cep');
+  if (!address) missing.push('endereco_rua');
+  if (!addressNumber) missing.push('endereco_numero');
+  if (!province) missing.push('endereco_bairro');
+
+  if (missing.length) {
+    throw new Error(`missing_business_billing_data: ${missing.join(', ')}`);
+  }
+
+  return { name, cpfCnpj, postalCode, address, addressNumber, province };
+}
+
 async function callAsaas(path: string, body: Record<string, unknown>) {
   const apiKey = requiredEnv('ASAAS_API_KEY');
   const baseUrl = (Deno.env.get('ASAAS_BASE_URL') || DEFAULT_ASAAS_BASE_URL).replace(/\/+$/, '');
@@ -117,7 +140,6 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const negocioId = String(body?.negocio_id || '').trim();
     const planCode = normalizePlanCode(body?.plan_code);
-    const customerData = (body?.customer_data || {}) as Record<string, unknown>;
     debugNegocioId = negocioId || null;
     debugPlanCode = planCode || null;
     if (!negocioId || !planCode) return jsonResponse({ error: 'missing_required_fields' }, 400);
@@ -130,7 +152,7 @@ Deno.serve(async (req) => {
 
     const [{ data: plan, error: planFetchError }, { data: negocio, error: negocioError }] = await Promise.all([
       admin.from('billing_plans').select('code, name, price_cents, trial_days').eq('code', planCode).eq('active', true).maybeSingle(),
-      admin.from('negocios').select('id, owner_id, nome, telefone').eq('id', negocioId).maybeSingle(),
+      admin.from('negocios').select('id, owner_id, nome, telefone, cpf_cnpj, endereco_cep, endereco_rua, endereco_numero, endereco_bairro').eq('id', negocioId).maybeSingle(),
     ]);
 
     if (planFetchError) throw planFetchError;
@@ -139,6 +161,7 @@ Deno.serve(async (req) => {
     if (!negocio || negocio.owner_id !== authData.user.id) return jsonResponse({ error: 'acao_nao_permitida' }, 403);
 
     const selectedPlan = plan as BillingPlan;
+    const billingData = requireBusinessBillingData(negocio);
     const siteUrl = publicSiteUrl(req);
     const externalReference = `comvaga:${negocioId}:${selectedPlan.code}`;
     const nextDueDate = asAsaasDateTime(addDays(new Date(), Number(selectedPlan.trial_days || 0)));
@@ -159,14 +182,14 @@ Deno.serve(async (req) => {
         value: centsToReais(selectedPlan.price_cents),
       }],
       customerData: {
-        name: negocio.nome || authData.user.email || 'Cliente ComVaga',
+        name: billingData.name,
         email: authData.user.email || undefined,
         phone: digits(negocio.telefone) || undefined,
-        cpfCnpj: digits(customerData.cpfCnpj),
-        postalCode: digits(customerData.postalCode),
-        address: trimText(customerData.address),
-        addressNumber: trimText(customerData.addressNumber),
-        province: trimText(customerData.province),
+        cpfCnpj: billingData.cpfCnpj,
+        postalCode: billingData.postalCode,
+        address: billingData.address,
+        addressNumber: billingData.addressNumber,
+        province: billingData.province,
       },
       subscription: {
         cycle: 'MONTHLY',
