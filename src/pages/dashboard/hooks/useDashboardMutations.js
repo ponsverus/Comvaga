@@ -62,6 +62,30 @@ export function useDashboardMutations({
     actionLocksRef.current.delete(key);
   };
 
+  const cleanText = (value) => String(value || '').trim();
+  const onlyDigits = (value) => cleanText(value).replace(/\D/g, '');
+  const buildEndereco = (info) => {
+    const rua = cleanText(info.endereco_rua);
+    const numero = cleanText(info.endereco_numero);
+    const complemento = cleanText(info.endereco_complemento);
+    const bairro = cleanText(info.endereco_bairro);
+    const cidade = cleanText(info.endereco_cidade);
+    const estado = cleanText(info.endereco_estado).toUpperCase();
+    const cep = onlyDigits(info.endereco_cep);
+
+    if (rua && numero && cidade && estado) {
+      return [
+        `${rua}, ${numero}`,
+        complemento,
+        bairro,
+        `${cidade}, ${estado}`,
+        cep ? `CEP ${cep}` : '',
+      ].filter(Boolean).join(' - ');
+    }
+
+    return cleanText(info.endereco);
+  };
+
   const isEntregaDuplicateNameError = (error) => {
     const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
     return raw.includes('23505')
@@ -149,13 +173,21 @@ export function useDashboardMutations({
     if (!(await ensureOwnerAction())) return;
     try {
       setInfoSaving(true);
-      const endereco = String(formInfo.endereco || '').trim();
+      const endereco = buildEndereco(formInfo);
       if (endereco && !isEnderecoPadrao(endereco)) throw new Error('Endereco fora do padrao.');
       const payload = {
         nome: toUpperClean(formInfo.nome),
         descricao: String(formInfo.descricao || '').trim(),
         telefone: String(formInfo.telefone || '').trim(),
+        cpf_cnpj: onlyDigits(formInfo.cpf_cnpj) || null,
         endereco,
+        endereco_cep: onlyDigits(formInfo.endereco_cep) || null,
+        endereco_rua: cleanText(formInfo.endereco_rua) || null,
+        endereco_numero: cleanText(formInfo.endereco_numero) || null,
+        endereco_complemento: cleanText(formInfo.endereco_complemento) || null,
+        endereco_bairro: cleanText(formInfo.endereco_bairro) || null,
+        endereco_cidade: cleanText(formInfo.endereco_cidade) || null,
+        endereco_estado: cleanText(formInfo.endereco_estado).toUpperCase() || null,
         instagram: String(formInfo.instagram || '').trim() || null,
         facebook: String(formInfo.facebook || '').trim() || null,
         tema: formInfo.tema || 'dark',
