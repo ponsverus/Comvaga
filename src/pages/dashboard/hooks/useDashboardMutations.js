@@ -155,7 +155,6 @@ export function useDashboardMutations({
         nome: toUpperClean(formInfo.nome),
         descricao: String(formInfo.descricao || '').trim(),
         telefone: String(formInfo.telefone || '').trim(),
-        cpf_cnpj: onlyDigits(formInfo.cpf_cnpj) || null,
         endereco_cep: onlyDigits(formInfo.endereco_cep) || null,
         endereco_rua: cleanText(formInfo.endereco_rua) || null,
         endereco_numero: cleanText(formInfo.endereco_numero) || null,
