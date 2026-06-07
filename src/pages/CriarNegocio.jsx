@@ -191,7 +191,7 @@ export default function CriarNegocio({ user }) {
           <h1 className="text-4xl font-normal mb-3 tracking-wide">NOVO NEGÓCIO</h1>
           <p className="text-gray-500 text-base font-normal">
             <span>AGORA, PREENCHA OS DADOS DO</span>
-            <span className="block text-primary sm:inline"> PRÓXIMOO NEGÓCIO</span>
+            <span className="block text-primary sm:inline"> PRÓXIMO NEGÓCIO</span>
           </p>
         </div>
 
