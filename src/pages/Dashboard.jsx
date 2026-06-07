@@ -294,7 +294,23 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
 
   const [formEntrega, setFormEntrega] = useState({ nome: '', duracao_minutos: '', preco: '', preco_promocional: '', profissional_id: '' });
 
-  const [formInfo, setFormInfo] = useState({ nome: '', descricao: '', telefone: '', endereco: '', instagram: '', facebook: '', tema: 'dark' });
+  const [formInfo, setFormInfo] = useState({
+    nome: '',
+    descricao: '',
+    telefone: '',
+    cpf_cnpj: '',
+    endereco: '',
+    endereco_cep: '',
+    endereco_rua: '',
+    endereco_numero: '',
+    endereco_complemento: '',
+    endereco_bairro: '',
+    endereco_cidade: '',
+    endereco_estado: '',
+    instagram: '',
+    facebook: '',
+    tema: 'dark',
+  });
 
   const [nomePerfil, setNomePerfil] = useState('');
   const [savingPerfil, setSavingPerfil] = useState(false);
@@ -338,7 +354,15 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
       nome: negocio.nome || '',
       descricao: negocio.descricao || '',
       telefone: negocio.telefone || '',
+      cpf_cnpj: negocio.cpf_cnpj || '',
       endereco: negocio.endereco || '',
+      endereco_cep: negocio.endereco_cep || '',
+      endereco_rua: negocio.endereco_rua || '',
+      endereco_numero: negocio.endereco_numero || '',
+      endereco_complemento: negocio.endereco_complemento || '',
+      endereco_bairro: negocio.endereco_bairro || '',
+      endereco_cidade: negocio.endereco_cidade || '',
+      endereco_estado: negocio.endereco_estado || '',
       instagram: negocio.instagram || '',
       facebook: negocio.facebook || '',
       tema: negocio.tema || 'dark',

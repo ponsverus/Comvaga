@@ -10,8 +10,14 @@ function onlyTrim(v) {
   return String(v || '').trim();
 }
 
-function montarEnderecoUnico({ rua, numero, cidade, estado }) {
-  return `${onlyTrim(rua)}, ${onlyTrim(numero)} - ${onlyTrim(cidade)}, ${onlyTrim(estado)}`;
+function montarEnderecoUnico({ rua, numero, bairro, cidade, estado, cep, complemento }) {
+  return [
+    `${onlyTrim(rua)}, ${onlyTrim(numero)}`,
+    onlyTrim(complemento),
+    onlyTrim(bairro),
+    `${onlyTrim(cidade)}, ${onlyTrim(estado).toUpperCase()}`,
+    onlyTrim(cep) ? `CEP ${onlyTrim(cep)}` : '',
+  ].filter(Boolean).join(' - ');
 }
 
 function FieldRow({ label, children, last = false, alignStart = false }) {
@@ -53,8 +59,12 @@ export default function CriarNegocio({ user }) {
     urlNegocio: '',
     tipoNegocio: '',
     telefone: '',
+    cpfCnpj: '',
+    cep: '',
     rua: '',
     numero: '',
+    complemento: '',
+    bairro: '',
     cidade: '',
     estado: '',
   });
@@ -95,8 +105,10 @@ export default function CriarNegocio({ user }) {
   const validarEndereco = () => {
     if (!onlyTrim(formData.rua)) return 'signupProfessional.address_street_required';
     if (!onlyTrim(formData.numero)) return 'signupProfessional.address_number_required';
+    if (!onlyTrim(formData.bairro)) return 'signupProfessional.address_format_invalid';
     if (!onlyTrim(formData.cidade)) return 'signupProfessional.address_city_required';
     if (!onlyTrim(formData.estado)) return 'signupProfessional.address_state_required';
+    if (!onlyTrim(formData.cep)) return 'signupProfessional.address_format_invalid';
     return null;
   };
 
@@ -108,11 +120,13 @@ export default function CriarNegocio({ user }) {
     const slug = onlyTrim(formData.urlNegocio);
     const tipoNegocio = onlyTrim(formData.tipoNegocio);
     const telefone = onlyTrim(formData.telefone);
+    const cpfCnpj = onlyTrim(formData.cpfCnpj).replace(/\D/g, '');
 
     if (!nomeNegocio) { showMessage('signupProfessional.business_name_required'); return; }
     if (!slug || slug.length < 3) { showMessage('signupProfessional.business_slug_invalid'); return; }
     if (!tipoNegocio) { showMessage('signupProfessional.business_type_required'); return; }
     if (!telefone) { showMessage('signupProfessional.phone_required'); return; }
+    if (!cpfCnpj) { showMessage('signupProfessional.address_format_invalid'); return; }
 
     const enderecoKey = validarEndereco();
     if (enderecoKey) { showMessage(enderecoKey); return; }
@@ -120,8 +134,11 @@ export default function CriarNegocio({ user }) {
     const endereco = montarEnderecoUnico({
       rua: formData.rua,
       numero: formData.numero,
+      bairro: formData.bairro,
       cidade: formData.cidade,
       estado: formData.estado,
+      cep: formData.cep,
+      complemento: formData.complemento,
     });
 
     setLoading(true);
@@ -133,6 +150,14 @@ export default function CriarNegocio({ user }) {
         p_telefone: telefone,
         p_endereco: endereco,
         p_tipo_negocio: tipoNegocio,
+        p_cpf_cnpj: cpfCnpj,
+        p_endereco_cep: formData.cep,
+        p_endereco_rua: formData.rua,
+        p_endereco_numero: formData.numero,
+        p_endereco_complemento: formData.complemento,
+        p_endereco_bairro: formData.bairro,
+        p_endereco_cidade: formData.cidade,
+        p_endereco_estado: formData.estado,
       });
 
       if (error) {
@@ -202,7 +227,7 @@ export default function CriarNegocio({ user }) {
                 type="text"
                 value={formData.nomeNegocio}
                 onChange={(e) => handleNomeChange(e.target.value)}
-                placeholder="EX: BLACKLINE"
+                placeholder="EX: EQUINOX TATOO"
                 className={`${fieldInputClass} uppercase`}
                 required
               />
@@ -217,6 +242,16 @@ export default function CriarNegocio({ user }) {
                 required
               />
             </FieldRow>           
+
+            <FieldRow label="CPF/CNPJ">
+              <input
+                type="text"
+                value={formData.cpfCnpj}
+                onChange={(e) => setFormData(prev => ({ ...prev, cpfCnpj: e.target.value }))}
+                className={fieldInputClass}
+                required
+              />
+            </FieldRow>
 
             <FieldRow label="TIPO">
               <input
@@ -236,13 +271,35 @@ export default function CriarNegocio({ user }) {
                   type="text"
                   value={formData.urlNegocio}
                   onChange={(e) => setFormData(prev => ({ ...prev, urlNegocio: generateSlug(e.target.value) }))}
-                  placeholder="BLLACKLINE"
+                  placeholder="EQUINOX-TATTOO"
                   className={`${fieldInputClass} uppercase`}
                   required
                   pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
                 />
               </div>
             </FieldRow>
+
+            <SplitRow>
+              <SplitField label="CEP" divider>
+                <input
+                  type="text"
+                  value={formData.cep}
+                  onChange={(e) => setFormData(prev => ({ ...prev, cep: e.target.value }))}
+                  className={fieldInputClass}
+                  required
+                />
+              </SplitField>
+
+              <SplitField label="BAIRRO">
+                <input
+                  type="text"
+                  value={formData.bairro}
+                  onChange={(e) => setFormData(prev => ({ ...prev, bairro: e.target.value }))}
+                  className={fieldInputClass}
+                  required
+                />
+              </SplitField>
+            </SplitRow>
 
             <SplitRow>
               <SplitField label="RUA" divider>
@@ -265,6 +322,16 @@ export default function CriarNegocio({ user }) {
                 />
               </SplitField>
             </SplitRow>
+
+            <FieldRow label="COMPL.">
+              <input
+                type="text"
+                value={formData.complemento}
+                onChange={(e) => setFormData(prev => ({ ...prev, complemento: e.target.value }))}
+                className={fieldInputClass}
+                placeholder="OPCIONAL"
+              />
+            </FieldRow>
 
             <SplitRow last>
               <SplitField label="CIDADE" divider>

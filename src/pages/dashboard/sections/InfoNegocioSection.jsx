@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Plus } from 'lucide-react';
 import TemaToggle from '../components/TemaToggle';
-import { ptBR } from '../../../feedback/messages/ptBR';
-import { isEnderecoPadrao } from '../utils';
 
 function InfoRow({ label, children, action, last = false }) {
   return (
@@ -17,7 +15,7 @@ function InfoRow({ label, children, action, last = false }) {
 const inputClass = 'w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white';
 const pillInputClass = 'w-full rounded-full border border-gray-800 bg-transparent px-4 py-2 text-center text-[14px] text-white placeholder-gray-600 outline-none focus:border-primary/50 focus:text-white';
 const saveButtonClass = 'shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] font-normal uppercase text-primary disabled:opacity-50';
-const maskedPrivateValue = '••••••••';
+const maskedPrivateValue = '********';
 
 export default function InfoNegocioSection({
   nomePerfil,
@@ -59,9 +57,7 @@ export default function InfoNegocioSection({
   });
   const [savingBusinessField, setSavingBusinessField] = useState(null);
   const [savingAccountField, setSavingAccountField] = useState(null);
-  const [fieldErrors, setFieldErrors] = useState({});
   const gallerySentinelRef = useRef(null);
-  const addressErrorMessage = ptBR?.dashboard?.address_format_invalid_inline?.body || 'Use o formato: RUA, NUMERO - CIDADE, ESTADO.';
 
   useEffect(() => {
     const node = gallerySentinelRef.current;
@@ -86,15 +82,6 @@ export default function InfoNegocioSection({
   const saveBusinessField = async (field) => {
     try {
       setSavingBusinessField(field);
-      if (field === 'endereco') {
-        const endereco = String(formInfo.endereco || '').trim();
-        if (endereco && !isEnderecoPadrao(endereco)) {
-          setFieldErrors((prev) => ({ ...prev, endereco: true }));
-          await Promise.resolve(salvarInfoNegocio());
-          return;
-        }
-        setFieldErrors((prev) => ({ ...prev, endereco: false }));
-      }
       await Promise.resolve(salvarInfoNegocio());
       if (field === 'instagram' || field === 'facebook') hidePrivateField(field);
     } finally {
@@ -151,6 +138,15 @@ export default function InfoNegocioSection({
     )
   );
 
+  const businessTextInput = (field, placeholder, extraClass = '') => (
+    <input
+      value={formInfo[field] || ''}
+      onChange={(e) => setFormInfo((prev) => ({ ...prev, [field]: e.target.value }))}
+      className={`${inputClass} max-w-[calc(100vw-13.75rem)] truncate pr-4 sm:max-w-none sm:pr-0 ${extraClass}`}
+      placeholder={placeholder}
+    />
+  );
+
   return (
     <div className="-m-6">
       <div className="flex items-center gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
@@ -179,12 +175,12 @@ export default function InfoNegocioSection({
         />
       </InfoRow>
 
-      <InfoRow label="NEGÓCIO" action={businessSaveAction('nome')}>
+      <InfoRow label="NEGOCIO" action={businessSaveAction('nome')}>
         <input
           value={formInfo.nome}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, nome: e.target.value }))}
           className={`${inputClass} uppercase truncate pr-10 sm:pr-0`}
-          placeholder="NOME DO NEGÓCIO"
+          placeholder="NOME DO NEGOCIO"
         />
       </InfoRow>
 
@@ -197,20 +193,42 @@ export default function InfoNegocioSection({
         />
       </InfoRow>
 
-      <InfoRow label="ENDERE." action={businessSaveAction('endereco')}>
-        {fieldErrors.endereco ? (
-          <p className="mb-1 text-xs leading-4 text-red-400">{addressErrorMessage}</p>
-        ) : null}
+      <InfoRow label="CPF/CNPJ" action={businessSaveAction('cpf_cnpj')}>
+        {businessTextInput('cpf_cnpj', 'CPF OU CNPJ')}
+      </InfoRow>
+
+      <InfoRow label="CEP" action={businessSaveAction('endereco_cep')}>
+        {businessTextInput('endereco_cep', 'CEP')}
+      </InfoRow>
+
+      <InfoRow label="RUA" action={businessSaveAction('endereco_rua')}>
+        {businessTextInput('endereco_rua', 'RUA')}
+      </InfoRow>
+
+      <InfoRow label="NUM." action={businessSaveAction('endereco_numero')}>
+        {businessTextInput('endereco_numero', 'NUMERO')}
+      </InfoRow>
+
+      <InfoRow label="BAIRRO" action={businessSaveAction('endereco_bairro')}>
+        {businessTextInput('endereco_bairro', 'BAIRRO')}
+      </InfoRow>
+
+      <InfoRow label="CIDADE" action={businessSaveAction('endereco_cidade')}>
+        {businessTextInput('endereco_cidade', 'CIDADE')}
+      </InfoRow>
+
+      <InfoRow label="ESTADO" action={businessSaveAction('endereco_estado')}>
         <input
-          value={formInfo.endereco}
-          onChange={(e) => {
-            setFieldErrors((prev) => ({ ...prev, endereco: false }));
-            setFormInfo((prev) => ({ ...prev, endereco: e.target.value }));
-          }}
-          className={`${inputClass} max-w-[calc(100vw-13.75rem)] truncate border-b pr-4 sm:max-w-none sm:pr-0 ${fieldErrors.endereco ? 'border-red-500 text-red-200 focus:border-red-400' : 'border-transparent'}`}
-          aria-invalid={fieldErrors.endereco ? 'true' : 'false'}
-          placeholder="RUA, NÚMERO - CIDADE, ESTADO"
+          value={formInfo.endereco_estado || ''}
+          onChange={(e) => setFormInfo((prev) => ({ ...prev, endereco_estado: e.target.value.toUpperCase() }))}
+          className={`${inputClass} max-w-[calc(100vw-13.75rem)] truncate pr-4 uppercase sm:max-w-none sm:pr-0`}
+          placeholder="UF"
+          maxLength={2}
         />
+      </InfoRow>
+
+      <InfoRow label="COMPL." action={businessSaveAction('endereco_complemento')}>
+        {businessTextInput('endereco_complemento', 'OPCIONAL')}
       </InfoRow>
 
       <div className="border-b border-gray-800 px-4 py-3 sm:px-6">
@@ -231,13 +249,13 @@ export default function InfoNegocioSection({
           )}
         </div>
         {sobreExpanded ? (
-        <textarea
-          value={formInfo.descricao}
-          onChange={(e) => setFormInfo((prev) => ({ ...prev, descricao: e.target.value }))}
-          rows={4}
-          className="max-h-32 w-full resize-none overflow-y-auto bg-transparent py-2 pl-0 pr-6 text-[14px] font-normal leading-5 text-white outline-none [scrollbar-width:none] placeholder-gray-600 focus:text-white sm:pr-0 [&::-webkit-scrollbar]:hidden"
-          placeholder="Conte sobre seu negócio, atendimento e diferenciais"
-        />
+          <textarea
+            value={formInfo.descricao}
+            onChange={(e) => setFormInfo((prev) => ({ ...prev, descricao: e.target.value }))}
+            rows={4}
+            className="max-h-32 w-full resize-none overflow-y-auto bg-transparent py-2 pl-0 pr-6 text-[14px] font-normal leading-5 text-white outline-none [scrollbar-width:none] placeholder-gray-600 focus:text-white sm:pr-0 [&::-webkit-scrollbar]:hidden"
+            placeholder="Conte sobre seu negocio, atendimento e diferenciais"
+          />
         ) : null}
       </div>
 
@@ -248,7 +266,7 @@ export default function InfoNegocioSection({
           onChange={(e) => setFormInfo((prev) => ({ ...prev, instagram: e.target.value }))}
           readOnly={!visiblePrivateFields.instagram}
           className={`${inputClass} uppercase`}
-          placeholder="EX: @BARBEARIATORRES"
+          placeholder="@BARBEARIATORRES"
         />
       </InfoRow>
 
@@ -297,10 +315,7 @@ export default function InfoNegocioSection({
         ) : null}
       </div>
 
-      <InfoRow
-        label="E-MAIL"
-        action={privateEmailAction}
-      >
+      <InfoRow label="E-MAIL" action={privateEmailAction}>
         <input
           type={visiblePrivateFields.email ? 'email' : 'text'}
           value={visiblePrivateFields.email ? novoEmail : maskedPrivateValue}
