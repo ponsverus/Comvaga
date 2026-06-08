@@ -12,6 +12,23 @@ function InfoRow({ label, children, action, last = false }) {
   );
 }
 
+function SplitRow({ children, last = false }) {
+  return (
+    <div className={`grid grid-cols-2 ${last ? '' : 'border-b border-gray-800'}`}>
+      {children}
+    </div>
+  );
+}
+
+function SplitField({ label, children, divider = false }) {
+  return (
+    <div className={`flex items-center gap-3 px-0 py-3 ${divider ? 'border-r border-gray-800 pr-3' : 'pl-3'}`}>
+      <label className="w-[62px] shrink-0 text-[14px] leading-5 text-gray-500">{label}</label>
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}
+
 const inputClass = 'w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white';
 const pillInputClass = 'w-full rounded-full border border-gray-800 bg-transparent px-4 py-2 text-center text-[14px] text-white placeholder-gray-600 outline-none focus:border-primary/50 focus:text-white';
 const saveButtonClass = 'shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] font-normal uppercase text-primary disabled:opacity-50';
@@ -138,11 +155,11 @@ export default function InfoNegocioSection({
     )
   );
 
-  const businessTextInput = (field, placeholder, extraClass = '') => (
+  const addressTextInput = (field, placeholder, extraClass = '') => (
     <input
       value={formInfo[field] || ''}
       onChange={(e) => setFormInfo((prev) => ({ ...prev, [field]: e.target.value }))}
-      className={`${inputClass} max-w-[calc(100vw-13.75rem)] truncate pr-4 sm:max-w-none sm:pr-0 ${extraClass}`}
+      className={`${inputClass} truncate ${extraClass}`}
       placeholder={placeholder}
     />
   );
@@ -175,12 +192,12 @@ export default function InfoNegocioSection({
         />
       </InfoRow>
 
-      <InfoRow label="NEGOCIO" action={businessSaveAction('nome')}>
+      <InfoRow label="NEGÓCIO" action={businessSaveAction('nome')}>
         <input
           value={formInfo.nome}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, nome: e.target.value }))}
           className={`${inputClass} uppercase truncate pr-10 sm:pr-0`}
-          placeholder="NOME DO NEGOCIO"
+          placeholder="NOME DO NEGÓCIO"
         />
       </InfoRow>
 
@@ -191,40 +208,6 @@ export default function InfoNegocioSection({
           className={inputClass}
           placeholder="CONTATO"
         />
-      </InfoRow>
-
-      <InfoRow label="CEP" action={businessSaveAction('endereco_cep')}>
-        {businessTextInput('endereco_cep', 'CEP')}
-      </InfoRow>
-
-      <InfoRow label="RUA" action={businessSaveAction('endereco_rua')}>
-        {businessTextInput('endereco_rua', 'RUA')}
-      </InfoRow>
-
-      <InfoRow label="NUM." action={businessSaveAction('endereco_numero')}>
-        {businessTextInput('endereco_numero', 'NUMERO')}
-      </InfoRow>
-
-      <InfoRow label="BAIRRO" action={businessSaveAction('endereco_bairro')}>
-        {businessTextInput('endereco_bairro', 'BAIRRO')}
-      </InfoRow>
-
-      <InfoRow label="CIDADE" action={businessSaveAction('endereco_cidade')}>
-        {businessTextInput('endereco_cidade', 'CIDADE')}
-      </InfoRow>
-
-      <InfoRow label="ESTADO" action={businessSaveAction('endereco_estado')}>
-        <input
-          value={formInfo.endereco_estado || ''}
-          onChange={(e) => setFormInfo((prev) => ({ ...prev, endereco_estado: e.target.value.toUpperCase() }))}
-          className={`${inputClass} max-w-[calc(100vw-13.75rem)] truncate pr-4 uppercase sm:max-w-none sm:pr-0`}
-          placeholder="UF"
-          maxLength={2}
-        />
-      </InfoRow>
-
-      <InfoRow label="COMPL." action={businessSaveAction('endereco_complemento')}>
-        {businessTextInput('endereco_complemento', 'OPCIONAL')}
       </InfoRow>
 
       <div className="border-b border-gray-800 px-4 py-3 sm:px-6">
@@ -245,13 +228,59 @@ export default function InfoNegocioSection({
           )}
         </div>
         {sobreExpanded ? (
-          <textarea
-            value={formInfo.descricao}
-            onChange={(e) => setFormInfo((prev) => ({ ...prev, descricao: e.target.value }))}
-            rows={4}
-            className="max-h-32 w-full resize-none overflow-y-auto bg-transparent py-2 pl-0 pr-6 text-[14px] font-normal leading-5 text-white outline-none [scrollbar-width:none] placeholder-gray-600 focus:text-white sm:pr-0 [&::-webkit-scrollbar]:hidden"
-            placeholder="Conte sobre seu negocio, atendimento e diferenciais"
-          />
+          <>
+            <textarea
+              value={formInfo.descricao}
+              onChange={(e) => setFormInfo((prev) => ({ ...prev, descricao: e.target.value }))}
+              rows={4}
+              className="max-h-32 w-full resize-none overflow-y-auto bg-transparent py-2 pl-0 pr-6 text-[14px] font-normal leading-5 text-white outline-none [scrollbar-width:none] placeholder-gray-600 focus:text-white sm:pr-0 [&::-webkit-scrollbar]:hidden"
+              placeholder="Conte sobre seu negocio, atendimento e diferenciais"
+            />
+
+            <div className="mt-3 border-t border-gray-800">
+              <SplitRow>
+                <SplitField label="CEP" divider>
+                  {addressTextInput('endereco_cep', 'CEP')}
+                </SplitField>
+                <SplitField label="BAIRRO">
+                  {addressTextInput('endereco_bairro', 'BAIRRO')}
+                </SplitField>
+              </SplitRow>
+
+              <SplitRow>
+                <SplitField label="RUA" divider>
+                  {addressTextInput('endereco_rua', 'RUA')}
+                </SplitField>
+                <SplitField label="NÚM.">
+                  {addressTextInput('endereco_numero', 'NUMERO')}
+                </SplitField>
+              </SplitRow>
+
+              <div className="border-b border-gray-800 py-3">
+                <div className="flex items-center gap-3">
+                  <label className="w-[62px] shrink-0 text-[14px] leading-5 text-gray-500">COMPL.</label>
+                  <div className="min-w-0 flex-1">
+                    {addressTextInput('endereco_complemento', 'OPCIONAL')}
+                  </div>
+                </div>
+              </div>
+
+              <SplitRow last>
+                <SplitField label="CIDADE" divider>
+                  {addressTextInput('endereco_cidade', 'CIDADE')}
+                </SplitField>
+                <SplitField label="ESTADO">
+                  <input
+                    value={formInfo.endereco_estado || ''}
+                    onChange={(e) => setFormInfo((prev) => ({ ...prev, endereco_estado: e.target.value.toUpperCase() }))}
+                    className={`${inputClass} truncate uppercase`}
+                    placeholder="UF"
+                    maxLength={2}
+                  />
+                </SplitField>
+              </SplitRow>
+            </div>
+          </>
         ) : null}
       </div>
 
