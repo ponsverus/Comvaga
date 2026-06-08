@@ -238,7 +238,7 @@ export default function InfoNegocioSection({
             />
 
             <div className="-mx-4 mt-3 border-t border-gray-800 sm:-mx-6">
-              <SplitRow>
+              <SplitRow last>
                 <SplitField label="CEP" divider>
                   {addressTextInput('endereco_cep')}
                 </SplitField>
@@ -251,7 +251,7 @@ export default function InfoNegocioSection({
                 <SplitField label="RUA" divider>
                   {addressTextInput('endereco_rua')}
                 </SplitField>
-                <SplitField label="NÚM.">
+                <SplitField label="NÚMERO.">
                   {addressTextInput('endereco_numero')}
                 </SplitField>
               </SplitRow>
@@ -301,7 +301,7 @@ export default function InfoNegocioSection({
           onChange={(e) => setFormInfo((prev) => ({ ...prev, facebook: e.target.value }))}
           readOnly={!visiblePrivateFields.facebook}
           className={`${inputClass} uppercase`}
-          placeholder="BARBEARIA-TORRES"
+          placeholder="EX: BARBEARIA-TORRES"
         />
       </InfoRow>
 
