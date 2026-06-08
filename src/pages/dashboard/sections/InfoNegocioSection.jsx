@@ -22,7 +22,7 @@ function SplitRow({ children, last = false }) {
 
 function SplitField({ label, children, divider = false }) {
   return (
-    <div className={`flex items-center gap-3 px-0 py-3 ${divider ? 'border-r border-gray-800 pr-3' : 'pl-3'}`}>
+    <div className={`flex items-center gap-3 px-4 py-3 sm:px-6 ${divider ? 'border-r border-gray-800' : ''}`}>
       <label className="w-[62px] shrink-0 text-[14px] leading-5 text-gray-500">{label}</label>
       <div className="min-w-0 flex-1">{children}</div>
     </div>
@@ -155,7 +155,7 @@ export default function InfoNegocioSection({
     )
   );
 
-  const addressTextInput = (field, placeholder, extraClass = '') => (
+  const addressTextInput = (field, placeholder = '', extraClass = '') => (
     <input
       value={formInfo[field] || ''}
       onChange={(e) => setFormInfo((prev) => ({ ...prev, [field]: e.target.value }))}
@@ -221,7 +221,7 @@ export default function InfoNegocioSection({
             <button
               type="button"
               onClick={() => setSobreExpanded(true)}
-              aria-label="Abrir sobre o negocio"
+              aria-label="Abrir sobre o negócio"
             >
               <ChevronDown className="h-4 w-4" />
             </button>
@@ -234,29 +234,29 @@ export default function InfoNegocioSection({
               onChange={(e) => setFormInfo((prev) => ({ ...prev, descricao: e.target.value }))}
               rows={4}
               className="max-h-32 w-full resize-none overflow-y-auto bg-transparent py-2 pl-0 pr-6 text-[14px] font-normal leading-5 text-white outline-none [scrollbar-width:none] placeholder-gray-600 focus:text-white sm:pr-0 [&::-webkit-scrollbar]:hidden"
-              placeholder="Conte sobre seu negocio, atendimento e diferenciais"
+              placeholder="Conte sobre seu negócio, atendimento e diferenciais"
             />
 
-            <div className="mt-3 border-t border-gray-800">
+            <div className="-mx-4 mt-3 border-t border-gray-800 sm:-mx-6">
               <SplitRow>
                 <SplitField label="CEP" divider>
-                  {addressTextInput('endereco_cep', 'CEP')}
+                  {addressTextInput('endereco_cep')}
                 </SplitField>
                 <SplitField label="BAIRRO">
-                  {addressTextInput('endereco_bairro', 'BAIRRO')}
+                  {addressTextInput('endereco_bairro')}
                 </SplitField>
               </SplitRow>
 
               <SplitRow>
                 <SplitField label="RUA" divider>
-                  {addressTextInput('endereco_rua', 'RUA')}
+                  {addressTextInput('endereco_rua')}
                 </SplitField>
-                <SplitField label="NÚM.">
-                  {addressTextInput('endereco_numero', 'NUMERO')}
+                <SplitField label="NUM.">
+                  {addressTextInput('endereco_numero')}
                 </SplitField>
               </SplitRow>
 
-              <div className="border-b border-gray-800 py-3">
+              <div className="border-b border-gray-800 px-4 py-3 sm:px-6">
                 <div className="flex items-center gap-3">
                   <label className="w-[62px] shrink-0 text-[14px] leading-5 text-gray-500">COMPL.</label>
                   <div className="min-w-0 flex-1">
@@ -267,14 +267,13 @@ export default function InfoNegocioSection({
 
               <SplitRow last>
                 <SplitField label="CIDADE" divider>
-                  {addressTextInput('endereco_cidade', 'CIDADE')}
+                  {addressTextInput('endereco_cidade')}
                 </SplitField>
                 <SplitField label="ESTADO">
                   <input
                     value={formInfo.endereco_estado || ''}
                     onChange={(e) => setFormInfo((prev) => ({ ...prev, endereco_estado: e.target.value.toUpperCase() }))}
                     className={`${inputClass} truncate uppercase`}
-                    placeholder="UF"
                     maxLength={2}
                   />
                 </SplitField>
