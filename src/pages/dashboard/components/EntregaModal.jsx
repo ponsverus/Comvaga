@@ -4,7 +4,7 @@ import ProfissionalSelect from '../../../components/ProfissionalSelect';
 function ServiceFieldRow({ label, children, hint, last = false }) {
   return (
     <div className={`flex items-start gap-3 px-8 py-3 ${last ? '' : 'border-b border-gray-800'}`}>
-      <span className="w-[86px] shrink-0 py-2 text-[13px] leading-5 text-gray-500">{label}</span>
+      <span className="w-[86px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">{label}</span>
       <div className="min-w-0 flex-1">
         {children}
         {hint ? <p className="mt-1 text-[11px] text-gray-500">{hint}</p> : null}
@@ -24,7 +24,7 @@ function ServiceSplitRow({ children, last = false }) {
 function ServiceSplitField({ label, children, divider = false }) {
   return (
     <div className={`flex items-start gap-3 px-8 py-3 ${divider ? 'border-r border-gray-800' : ''}`}>
-      <span className="w-[58px] shrink-0 py-2 text-[13px] leading-5 text-gray-500">{label}</span>
+      <span className="w-[58px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">{label}</span>
       <div className="min-w-0 flex-1">{children}</div>
     </div>
   );
