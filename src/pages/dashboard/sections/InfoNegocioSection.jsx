@@ -32,7 +32,7 @@ function SplitField({ label, children, divider = false }) {
 const inputClass = 'w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white';
 const pillInputClass = 'w-full rounded-full border border-gray-800 bg-transparent px-4 py-2 text-center text-[14px] text-white placeholder-gray-600 outline-none focus:border-primary/50 focus:text-white';
 const saveButtonClass = 'shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] font-normal uppercase text-primary disabled:opacity-50';
-const maskedPrivateValue = '********';
+const maskedPrivateValue = '••••••••';
 
 export default function InfoNegocioSection({
   nomePerfil,
@@ -251,7 +251,7 @@ export default function InfoNegocioSection({
                 <SplitField label="RUA" divider>
                   {addressTextInput('endereco_rua')}
                 </SplitField>
-                <SplitField label="NÚMERO.">
+                <SplitField label="NÚMERO">
                   {addressTextInput('endereco_numero')}
                 </SplitField>
               </SplitRow>
@@ -265,7 +265,7 @@ export default function InfoNegocioSection({
                 </div>
               </div>
 
-              <SplitRow>
+              <SplitRow last>
                 <SplitField label="CIDADE" divider>
                   {addressTextInput('endereco_cidade')}
                 </SplitField>
