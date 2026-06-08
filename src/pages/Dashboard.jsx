@@ -113,7 +113,7 @@ function getBillingAnnouncement(status) {
 
   if (current === 'payment_required' || current === 'past_due') {
     const suffix = Number.isFinite(daysUntilBlock) && daysUntilBlock > 0
-      ? ` Bloqueio em ${daysUntilBlock} dia${daysUntilBlock === 1 ? '' : 's'}.`
+      ? ` BLOQUEIO EM ${daysUntilBlock} DIA${daysUntilBlock === 1 ? '' : 'S'}.`
       : '';
     return {
       tone: 'warning',
