@@ -117,14 +117,14 @@ function getBillingAnnouncement(status) {
       : '';
     return {
       tone: 'warning',
-      text: `Teste gratuito encerrado. Adicione um metodo de pagamento para manter a agenda ativa.${suffix}`,
+      text: `TESTE ENCERRADO. ADD UM PAGAMENTO.${suffix}`,
     };
   }
 
   if (current === 'trialing' && Number.isFinite(daysUntilTrialEnd) && daysUntilTrialEnd <= 2) {
     return {
       tone: 'warning',
-      text: `Seu teste gratuito termina em ${daysUntilTrialEnd} dia${daysUntilTrialEnd === 1 ? '' : 's'}. Escolha um plano e adicione o pagamento para evitar bloqueio da agenda.`,
+      text: `MAIS ${daysUntilTrialEnd} dia${daysUntilTrialEnd === 1 ? '' : 's'} DE TESTES. CONFIGURE O PAGAMENTO.`,
     };
   }
 
@@ -134,8 +134,8 @@ function getBillingAnnouncement(status) {
 function BillingAnnouncementBar({ announcement }) {
   if (!announcement) return null;
   const toneClass = announcement.tone === 'danger'
-    ? 'border-red-500/30 bg-red-500/15 text-red-100'
-    : 'border-primary/25 bg-primary/15 text-primary';
+    ? 'border-red-500/30 bg-[#1a0b0b] text-red-100'
+    : 'border-primary/25 bg-[#151106] text-primary';
 
   return (
     <div className={`border-b ${toneClass}`}>
