@@ -265,7 +265,7 @@ export default function InfoNegocioSection({
                 </div>
               </div>
 
-              <SplitRow last>
+              <SplitRow>
                 <SplitField label="CIDADE" divider>
                   {addressTextInput('endereco_cidade')}
                 </SplitField>
