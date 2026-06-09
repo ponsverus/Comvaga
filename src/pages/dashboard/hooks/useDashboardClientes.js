@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchClientesDashboard } from '../api/dashboardApi';
+import { getRequestErrorKey } from '../../../utils/requestError';
 
 const CLIENTES_PAGE_SIZE = 50;
 
@@ -45,11 +46,18 @@ export function useDashboardClientes({ negocioId }) {
     setClientesPage(0);
     setClientesHasMore(false);
 
-    loadClientes({ page: 0, append: false })
+      loadClientes({ page: 0, append: false })
       .catch((error) => {
         if (!active) return;
         setClientes([]);
-        setClientesError(error?.message || 'Erro ao carregar clientes.');
+        const requestKey = getRequestErrorKey(error);
+        if (requestKey === 'alerts.request_timeout') {
+          setClientesError('O carregamento dos clientes demorou demais. Tente novamente em instantes.');
+        } else if (requestKey === 'alerts.rate_limit_exceeded') {
+          setClientesError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
+        } else {
+          setClientesError(error?.message || 'Erro ao carregar clientes.');
+        }
       })
       .finally(() => {
         if (active) setClientesLoading(false);
@@ -68,7 +76,14 @@ export function useDashboardClientes({ negocioId }) {
       await loadClientes({ page: nextPage, append: true });
       setClientesPage(nextPage);
     } catch (error) {
-      setClientesError(error?.message || 'Erro ao carregar mais clientes.');
+      const requestKey = getRequestErrorKey(error);
+      if (requestKey === 'alerts.request_timeout') {
+        setClientesError('O carregamento de mais clientes demorou demais. Tente novamente em instantes.');
+      } else if (requestKey === 'alerts.rate_limit_exceeded') {
+        setClientesError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
+      } else {
+        setClientesError(error?.message || 'Erro ao carregar mais clientes.');
+      }
     } finally {
       setClientesLoadingMore(false);
     }
