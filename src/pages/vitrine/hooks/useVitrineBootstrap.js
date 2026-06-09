@@ -8,6 +8,7 @@ import {
   fetchVitrineNegocioBySlug,
   fetchVitrineProfissionais,
 } from '../api/vitrineApi';
+import { getRequestErrorKey } from '../../../utils/requestError';
 
 const EMPTY_NOW = { ts: null, dow: 0, date: '', source: 'db', minutes: 0 };
 const GALERIA_PAGE_SIZE = 12;
@@ -128,7 +129,12 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
       setDepoimentos(deps);
     } catch (e) {
       if (loadRunRef.current !== runId) return;
-      setError(e?.message || getMsg('load_error', 'Erro ao carregar a vitrine.'));
+      const requestKey = getRequestErrorKey(e);
+      if (requestKey === 'alerts.request_timeout') {
+        setError(getMsg('load_timeout', 'Demorou demais para carregar. Tente novamente.'));
+      } else {
+        setError(e?.message || getMsg('load_error', 'Erro ao carregar a vitrine.'));
+      }
       setNegocio(null);
       setProfissionais([]);
       setEntregas([]);
