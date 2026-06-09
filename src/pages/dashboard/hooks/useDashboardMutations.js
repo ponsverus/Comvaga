@@ -1,8 +1,28 @@
 import { useRef, useState } from 'react';
 import { supabase } from '../../../supabase';
 import { getDiasTrabalhoFromHorarios, timeToMinutes, toNumberOrNull, toUpperClean } from '../utils';
-import { aprovarParceiroProfissional, removeEntregaSeguramente, removeNegocioSeguramente, removeProfissionalSeguramente } from '../api/dashboardApi';
+import {
+  aprovarParceiroProfissional,
+  cancelarAgendamentoProfissional,
+  concluirAgendamentoProfissional,
+  deleteGaleriaItem,
+  insertEntrega,
+  insertGaleriaItem,
+  insertProfissional,
+  removeEntregaSeguramente,
+  removeNegocioSeguramente,
+  removeProfissionalSeguramente,
+  updateEntregaById,
+  updateNegocioInfo,
+  updateNegocioLogo,
+  updateNegocioTema,
+  updateProfissionalComHorarios,
+  updateProfissionalStatus,
+  fetchUserNome,
+} from '../api/dashboardApi';
 import { convertImageToWebp, isImageFile } from '../../../utils/media';
+import { getRequestErrorKey } from '../../../utils/requestError';
+import { withTimeout } from '../../../utils/withTimeout';
 
 export function useDashboardMutations({
   userId,
@@ -64,6 +84,7 @@ export function useDashboardMutations({
 
   const cleanText = (value) => String(value || '').trim();
   const onlyDigits = (value) => cleanText(value).replace(/\D/g, '');
+
   const isEntregaDuplicateNameError = (error) => {
     const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
     return raw.includes('23505')
@@ -95,20 +116,14 @@ export function useDashboardMutations({
     if (!negocio?.id || !userId || submittingAdminProf) return;
     try {
       setSubmittingAdminProf(true);
-      const { data: userData, error: userErr } = await supabase
-        .from('users')
-        .select('nome')
-        .eq('id', userId)
-        .maybeSingle();
-      if (userErr) throw userErr;
+      const userData = await fetchUserNome(userId);
       const nome = String(userData?.nome || '').trim() || 'PROFISSIONAL';
-      const { error: insErr } = await supabase.from('profissionais').insert([{
+      await insertProfissional({
         negocio_id: negocio.id,
         user_id: userId,
         nome,
         status: 'ativo',
-      }]);
-      if (insErr) throw insErr;
+      });
       await uiAlert('dashboard.professional_updated', 'success');
       await reloadProfissionais();
     } catch (err) {
@@ -129,13 +144,20 @@ export function useDashboardMutations({
       const convertedFile = await convertImageToWebp(file);
       const oldPath = negocio?.logo_path || null;
       const filePath = `${negocio.id}/logo.webp`;
-      const { error: upErr } = await supabase.storage.from('logos').upload(filePath, convertedFile, { upsert: true, contentType: convertedFile.type });
+      const { error: upErr } = await withTimeout(
+        supabase.storage.from('logos').upload(filePath, convertedFile, { upsert: true, contentType: convertedFile.type }),
+        10000,
+        'logo-upload'
+      );
       if (upErr) throw upErr;
-      const { error: dbErr } = await supabase.from('negocios').update({ logo_path: filePath }).eq('id', negocio.id).eq('owner_id', userId);
-      if (dbErr) throw dbErr;
+      await updateNegocioLogo(negocio.id, userId, { logo_path: filePath });
       if (oldPath && String(oldPath).replace(/^logos\//, '') !== filePath) {
         const normalizedOldPath = String(oldPath).replace(/^logos\//, '');
-        await supabase.storage.from('logos').remove([normalizedOldPath]);
+        await withTimeout(
+          supabase.storage.from('logos').remove([normalizedOldPath]),
+          6000,
+          'logo-remove-old'
+        );
       }
       await uiAlert('dashboard.logo_updated', 'success');
       await reloadNegocio();
@@ -166,8 +188,7 @@ export function useDashboardMutations({
         facebook: String(formInfo.facebook || '').trim() || null,
         tema: formInfo.tema || 'dark',
       };
-      const { error: updErr } = await supabase.from('negocios').update(payload).eq('id', negocio.id).eq('owner_id', userId);
-      if (updErr) throw updErr;
+      await updateNegocioInfo(negocio.id, userId, payload);
       await uiAlert('dashboard.business_info_updated', 'success');
       await reloadNegocio();
     } catch {
@@ -183,8 +204,7 @@ export function useDashboardMutations({
     setFormInfo((prev) => ({ ...prev, tema: novoTema }));
     try {
       setTemaSaving(true);
-      const { error: updErr } = await supabase.from('negocios').update({ tema: novoTema }).eq('id', negocio.id).eq('owner_id', userId);
-      if (updErr) throw updErr;
+      await updateNegocioTema(negocio.id, userId, novoTema);
       setNegocio((prev) => (prev ? { ...prev, tema: novoTema } : prev));
     } catch {
       setFormInfo((prev) => ({ ...prev, tema: negocio?.tema || 'dark' }));
@@ -208,7 +228,11 @@ export function useDashboardMutations({
       const accountDeleted = !!result?.account_deleted;
 
       if (accountDeleted) {
-        await supabase.auth.signOut();
+        await withTimeout(
+          supabase.auth.signOut(),
+          6000,
+          'dashboard-sign-out'
+        );
         navigate('/', { replace: true });
         return;
       }
@@ -224,8 +248,10 @@ export function useDashboardMutations({
       }
 
       navigate('/criar-negocio', { replace: true });
-    } catch {
-      await uiAlert('dashboard.business_delete_error', 'error');
+    } catch (error) {
+      const requestKey = getRequestErrorKey(error);
+      if (requestKey) await uiAlert(requestKey, 'warning');
+      else await uiAlert('dashboard.business_delete_error', 'error');
     } finally {
       setDeletingBusiness(false);
     }
@@ -247,14 +273,23 @@ export function useDashboardMutations({
         }
         const convertedFile = await convertImageToWebp(file);
         const filePath = `${negocio.id}/${crypto.randomUUID()}.webp`;
-        const { error: upErr } = await supabase.storage.from('galerias').upload(filePath, convertedFile, { contentType: convertedFile.type });
+        const { error: upErr } = await withTimeout(
+          supabase.storage.from('galerias').upload(filePath, convertedFile, { contentType: convertedFile.type }),
+          10000,
+          'galeria-upload'
+        );
         if (upErr) {
           await uiAlert('dashboard.gallery_upload_error', 'error');
           continue;
         }
-        const { error: dbErr } = await supabase.from('galerias').insert({ negocio_id: negocio.id, path: filePath });
-        if (dbErr) {
-          await supabase.storage.from('galerias').remove([filePath]);
+        try {
+          await insertGaleriaItem(negocio.id, filePath);
+        } catch {
+          await withTimeout(
+            supabase.storage.from('galerias').remove([filePath]),
+            6000,
+            'galeria-remove-orphan'
+          );
           await uiAlert('dashboard.gallery_upload_error', 'error');
         }
       }
@@ -280,8 +315,7 @@ export function useDashboardMutations({
       return;
     }
     try {
-      const { error: dbErr } = await supabase.from('galerias').delete().eq('id', item.id);
-      if (dbErr) throw dbErr;
+      await deleteGaleriaItem(item.id);
       setGaleriaItems((prev) => prev.filter((x) => x.id !== item.id));
       await uiAlert('dashboard.gallery_image_removed', 'success');
     } catch {
@@ -321,8 +355,7 @@ export function useDashboardMutations({
       if (!payload.nome) throw new Error('Nome da entrega e obrigatorio.');
       if (!payload.profissional_id) throw new Error('Selecione um profissional.');
       if (!payload.duracao_minutos) throw new Error('Duracao invalida.');
-      const { error: insErr } = await supabase.from('entregas').insert([payload]);
-      if (insErr) throw insErr;
+      await insertEntrega(payload);
       await uiAlert(`dashboard.business.${businessGroup}.entrega_created`, 'success');
       resetEntregaForm();
       await reloadEntregas();
@@ -366,16 +399,10 @@ export function useDashboardMutations({
       const mudouProfissional = entregaAtual?.profissional_id && entregaAtual.profissional_id !== profId;
 
       if (mudouProfissional) {
-        const { error: insErr } = await supabase.from('entregas').insert([{
-          ...payload,
-          ativo: true,
-          negocio_id: negocio.id,
-        }]);
-        if (insErr) throw insErr;
+        await insertEntrega({ ...payload, ativo: true, negocio_id: negocio.id });
         await uiAlert(`dashboard.business.${businessGroup}.entrega_created`, 'success');
       } else {
-        const { error: updErr } = await supabase.from('entregas').update(payload).eq('id', editingEntregaId).eq('negocio_id', negocio.id);
-        if (updErr) throw updErr;
+        await updateEntregaById(editingEntregaId, negocio.id, payload);
         await uiAlert(`dashboard.business.${businessGroup}.entrega_updated`, 'success');
       }
       resetEntregaForm();
@@ -411,8 +438,10 @@ export function useDashboardMutations({
       await removeEntregaSeguramente(entrega.id);
       await uiAlert(`dashboard.business.${businessGroup}.entrega_deleted`, 'success');
       await reloadEntregas();
-    } catch {
-      await uiAlert(`dashboard.business.${businessGroup}.entrega_delete_error`, 'error');
+    } catch (error) {
+      const requestKey = getRequestErrorKey(error);
+      if (requestKey) await uiAlert(requestKey, 'warning');
+      else await uiAlert(`dashboard.business.${businessGroup}.entrega_delete_error`, 'error');
     } finally {
       unlockAction(lockKey);
     }
@@ -433,12 +462,12 @@ export function useDashboardMutations({
         if (r === null) return;
         motivo = r || null;
       }
-      const { error: upErr } = await supabase
-        .from('profissionais')
-        .update({ status: novoStatus, motivo_inativo: novoStatus === 'ativo' ? null : motivo })
-        .eq('id', p.id)
-        .eq('negocio_id', negocio.id);
-      if (upErr) throw upErr;
+      await updateProfissionalStatus(
+        p.id,
+        negocio.id,
+        novoStatus,
+        novoStatus === 'ativo' ? null : motivo
+      );
       await uiAlert(novoStatus === 'ativo' ? 'dashboard.professional_activated' : 'dashboard.professional_inactivated', 'success');
       await reloadProfissionais();
     } catch {
@@ -466,8 +495,10 @@ export function useDashboardMutations({
       const profs = await reloadProfissionais();
       if (profs?.length) await reloadEntregas(negocio.id, profs.map((item) => item.id));
       else setEntregas([]);
-    } catch {
-      await uiAlert('dashboard.professional_delete_error', 'error');
+    } catch (error) {
+      const requestKey = getRequestErrorKey(error);
+      if (requestKey) await uiAlert(requestKey, 'warning');
+      else await uiAlert('dashboard.professional_delete_error', 'error');
     } finally {
       unlockAction(lockKey);
     }
@@ -506,14 +537,7 @@ export function useDashboardMutations({
         })),
       };
       if (!payload.nome) throw new Error('Nome obrigatorio.');
-      const { error: updErr } = await supabase.rpc('update_profissional_com_horarios', {
-        p_profissional_id: editingProfissionalId,
-        p_nome: payload.nome,
-        p_profissao: payload.profissao,
-        p_anos_experiencia: payload.anos_experiencia,
-        p_horarios: payload.horarios,
-      });
-      if (updErr) throw updErr;
+      await updateProfissionalComHorarios(editingProfissionalId, payload);
       await uiAlert('dashboard.professional_updated', 'success');
       setShowEditProfissional(false);
       setEditingProfissionalId(null);
@@ -544,7 +568,9 @@ export function useDashboardMutations({
       await reloadProfissionais();
     } catch (err) {
       const billingKey = getBillingErrorKey(err);
+      const requestKey = getRequestErrorKey(err);
       if (billingKey) await uiAlert(billingKey, 'warning');
+      else if (requestKey) await uiAlert(requestKey, 'warning');
       else await uiAlert('dashboard.partner_approve_error', 'error');
     } finally {
       unlockAction(lockKey);
@@ -559,13 +585,14 @@ export function useDashboardMutations({
       return;
     }
     try {
-      const { error } = await supabase.rpc('concluir_agendamento_profissional', { p_agendamento_id: a.id });
-      if (error) throw error;
+      await concluirAgendamentoProfissional(a.id);
       await uiAlert('dashboard.booking_confirmed', 'success');
       await reloadAgendamentos();
       loadHoje(negocio.id, parceiroProfissional?.id ?? null);
-    } catch {
-      await uiAlert('dashboard.booking_confirm_error', 'error');
+    } catch (error) {
+      const requestKey = getRequestErrorKey(error);
+      if (requestKey) await uiAlert(requestKey, 'warning');
+      else await uiAlert('dashboard.booking_confirm_error', 'error');
     } finally {
       unlockAction(lockKey);
     }
@@ -584,13 +611,14 @@ export function useDashboardMutations({
       return;
     }
     try {
-      const { error } = await supabase.rpc('cancelar_agendamento_profissional', { p_agendamento_id: a.id });
-      if (error) throw error;
+      await cancelarAgendamentoProfissional(a.id);
       await uiAlert('dashboard.booking_canceled', 'error');
       await reloadAgendamentos();
       loadHoje(negocio.id, parceiroProfissional?.id ?? null);
-    } catch {
-      await uiAlert('dashboard.booking_cancel_error', 'error');
+    } catch (error) {
+      const requestKey = getRequestErrorKey(error);
+      if (requestKey) await uiAlert(requestKey, 'warning');
+      else await uiAlert('dashboard.booking_cancel_error', 'error');
     } finally {
       unlockAction(lockKey);
     }
@@ -604,7 +632,11 @@ export function useDashboardMutations({
     }
     try {
       setSavingDados(true);
-      const { error: updErr } = await supabase.auth.updateUser({ email });
+      const { error: updErr } = await withTimeout(
+        supabase.auth.updateUser({ email }),
+        6000,
+        'dashboard-email-update'
+      );
       if (updErr) throw updErr;
       await uiAlert('dashboard.account_email_update_sent', 'success');
     } catch {
@@ -627,7 +659,11 @@ export function useDashboardMutations({
     }
     try {
       setSavingDados(true);
-      const { error: updErr } = await supabase.auth.updateUser({ password: pass });
+      const { error: updErr } = await withTimeout(
+        supabase.auth.updateUser({ password: pass }),
+        6000,
+        'dashboard-password-update'
+      );
       if (updErr) throw updErr;
       setNovaSenha('');
       setConfirmarSenha('');
