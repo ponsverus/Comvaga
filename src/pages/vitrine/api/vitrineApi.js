@@ -1,12 +1,5 @@
 import { supabase } from '../../../supabase';
-
-export const withTimeout = (promise, ms, label = 'timeout') => {
-  let timeoutId;
-  const timeout = new Promise((_, reject) => {
-    timeoutId = setTimeout(() => reject(new Error(`Timeout (${label}) em ${ms}ms`)), ms);
-  });
-  return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
-};
+import { withTimeout } from '../../../utils/withTimeout';
 
 export function getPublicUrl(bucket, path) {
   if (!path) return null;
@@ -24,7 +17,11 @@ export async function fetchOfficialDate(rpcSequence) {
 
   for (const rpcName of rpcSequence) {
     for (let attempt = 0; attempt < 2; attempt += 1) {
-      const { data, error } = await supabase.rpc(rpcName);
+      const { data, error } = await withTimeout(
+        supabase.rpc(rpcName),
+        6000,
+        `data-oficial:${rpcName}`
+      );
       if (error) {
         lastErr = error;
         continue;
