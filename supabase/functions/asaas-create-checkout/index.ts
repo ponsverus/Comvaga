@@ -113,12 +113,6 @@ Deno.serve(async (req) => {
     debugPlanCode = planCode || null;
     if (!negocioId || !planCode) return jsonResponse({ error: 'missing_required_fields' }, 400);
 
-    const { data: statusData, error: planError } = await userClient.rpc('set_business_plan', {
-      p_negocio_id: negocioId,
-      p_plan_code: planCode,
-    });
-    if (planError) throw planError;
-
     const [{ data: plan, error: planFetchError }, { data: negocio, error: negocioError }] = await Promise.all([
       admin.from('billing_plans').select('code, name, price_cents, trial_days').eq('code', planCode).eq('active', true).maybeSingle(),
       admin.from('negocios').select('id, owner_id, nome').eq('id', negocioId).maybeSingle(),
@@ -128,6 +122,12 @@ Deno.serve(async (req) => {
     if (negocioError) throw negocioError;
     if (!plan) return jsonResponse({ error: 'plan_not_found' }, 404);
     if (!negocio || negocio.owner_id !== authData.user.id) return jsonResponse({ error: 'acao_nao_permitida' }, 403);
+
+    const { data: statusData, error: planError } = await userClient.rpc('set_business_plan', {
+      p_negocio_id: negocioId,
+      p_plan_code: planCode,
+    });
+    if (planError) throw planError;
 
     const selectedPlan = plan as BillingPlan;
     const siteUrl = publicSiteUrl(req);
