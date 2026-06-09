@@ -10,6 +10,7 @@ import {
   fetchPartnerNegocioIds,
   fetchProfissionaisComStatus,
 } from '../api/dashboardApi';
+import { getRequestErrorKey } from '../../../utils/requestError';
 
 const AGENDAMENTOS_PAGE_SIZE = 50;
 const GALERIA_PAGE_SIZE = 12;
@@ -308,7 +309,16 @@ export function useDashboardBootstrap({
       setBootstrapState('ready');
     } catch (e) {
       if (!isCurrentRun()) return;
-      setError(e?.message || 'Erro inesperado.');
+      const requestKey = getRequestErrorKey(e);
+      if (requestKey === 'alerts.request_timeout') {
+        setError('O carregamento do dashboard demorou demais. Tente novamente em instantes.');
+        uiAlert(requestKey, 'warning');
+      } else if (requestKey === 'alerts.rate_limit_exceeded') {
+        setError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
+        uiAlert(requestKey, 'warning');
+      } else {
+        setError(e?.message || 'Erro inesperado.');
+      }
       setBootstrapState('error');
     }
   }, [applyGaleriaPage, locationNegocioId, navigate, scopeProfissionais, uiAlert, userId]);
