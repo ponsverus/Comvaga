@@ -6,7 +6,19 @@ import AppFooter from '../components/AppFooter';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { convertImageToWebp, isImageFile } from '../utils/media';
-import { createBookingReview, fetchReviewedBookings } from './clientArea/api/clientAreaApi';
+import { getRequestErrorKey } from '../utils/requestError';
+import { withTimeout } from '../utils/withTimeout';
+import {
+  cancelarAgendamentoCliente,
+  createBookingReview,
+  fetchAgendamentosCliente,
+  fetchClientePerfil,
+  fetchCurrentClienteId,
+  fetchFavoritosCliente,
+  fetchReviewedBookings,
+  removerContaCliente,
+  removerFavoritoCliente,
+} from './clientArea/api/clientAreaApi';
 
 function formatDateBRFromISO(dateStr) {
   if (!dateStr) return '';
@@ -144,18 +156,15 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
 
   const fetchClienteId = useCallback(async () => {
-    const { data, error } = await supabase.rpc('get_current_cliente_id');
-    if (error) throw error;
-    return data || null;
+    return fetchCurrentClienteId();
   }, []);
 
   const fetchAgendamentos = useCallback(async ({ page = 0, limit = PAGE_SIZE, clienteId: clienteIdParam = clienteId } = {}) => {
-    const { data, error } = await supabase.rpc('get_agendamentos_cliente', {
-      p_cliente_id: clienteIdParam,
-      p_limit: limit,
-      p_offset: page * PAGE_SIZE,
+    const data = await fetchAgendamentosCliente({
+      clienteId: clienteIdParam,
+      limit,
+      offset: page * PAGE_SIZE,
     });
-    if (error) throw error;
     return (data || []).map(a => ({
       ...a,
       preco_final:  a.preco_final ?? null,
@@ -180,12 +189,11 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   }, [clienteId]);
 
   const fetchFavoritos = useCallback(async ({ page = 0, limit = PAGE_SIZE, clienteId: clienteIdParam = clienteId } = {}) => {
-    const { data, error } = await supabase.rpc('get_favoritos_cliente', {
-      p_cliente_id: clienteIdParam,
-      p_limit: limit,
-      p_offset: page * PAGE_SIZE,
+    const data = await fetchFavoritosCliente({
+      clienteId: clienteIdParam,
+      limit,
+      offset: page * PAGE_SIZE,
     });
-    if (error) throw error;
     return (data || []).map(f => ({
       ...f,
       negocios: f.tipo === 'negocio' && f.negocio_nome
@@ -218,13 +226,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   }, []);
 
   const loadPerfil = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('nome, avatar_path')
-      .eq('id', user.id)
-      .maybeSingle();
-    if (error) throw error;
-    return { nome: String(data?.nome || '').trim(), avatarPath: data?.avatar_path || null };
+    return fetchClientePerfil(user.id);
   }, [user.id]);
 
   const loadData = useCallback(async () => {
@@ -251,7 +253,17 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       setAgendamentosHasMore(agendamentosRows.length === PAGE_SIZE);
       setFavoritosHasMore(favoritosRows.length === PAGE_SIZE);
     } catch (error) {
-      setLoadError(error?.message || 'Erro ao carregar dados.');
+      const requestKey = getRequestErrorKey(error);
+      if (requestKey === 'alerts.request_timeout') {
+        setLoadError('A leitura da área do cliente demorou demais. Tente novamente em instantes.');
+        uiAlert(requestKey, 'warning');
+      } else if (requestKey === 'alerts.rate_limit_exceeded') {
+        setLoadError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
+        uiAlert(requestKey, 'warning');
+      } else {
+        setLoadError(error?.message || 'Erro ao carregar dados.');
+        uiAlert('clientArea.load_data_error', 'warning');
+      }
       setAgendamentos([]);
       setFavoritos([]);
       setAgendamentosPage(0);
@@ -259,7 +271,6 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       setAgendamentosHasMore(false);
       setFavoritosHasMore(false);
       setAvaliacoesPorAgendamento({});
-      uiAlert('clientArea.load_data_error', 'warning');
     } finally {
       setLoading(false);
     }
@@ -312,12 +323,24 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       const convertedFile = await convertImageToWebp(file);
       const oldPath = avatarPath || null;
       const path = `${user.id}/avatar.webp`;
-      const { error: upErr } = await supabase.storage.from('avatars').upload(path, convertedFile, { upsert: true, contentType: convertedFile.type });
+      const { error: upErr } = await withTimeout(
+        supabase.storage.from('avatars').upload(path, convertedFile, { upsert: true, contentType: convertedFile.type }),
+        10000,
+        'avatar-upload'
+      );
       if (upErr) throw upErr;
-      const { error: updErr } = await supabase.from('users').update({ avatar_path: path }).eq('id', user.id);
+      const { error: updErr } = await withTimeout(
+        supabase.from('users').update({ avatar_path: path }).eq('id', user.id),
+        6000,
+        'avatar-path-update'
+      );
       if (updErr) throw updErr;
       if (oldPath && oldPath !== path) {
-        await supabase.storage.from('avatars').remove([oldPath]);
+        await withTimeout(
+          supabase.storage.from('avatars').remove([oldPath]),
+          6000,
+          'avatar-remove-old'
+        );
       }
       setAvatarPath(path);
       uiAlert('clientArea.avatar_updated', 'success');
@@ -333,9 +356,17 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     if (!nome) { uiAlert('clientArea.profile_name_required', 'error'); return; }
     try {
       setSavingPerfil(true);
-      const { error: updErr } = await supabase.from('users').update({ nome }).eq('id', user.id);
+      const { error: updErr } = await withTimeout(
+        supabase.from('users').update({ nome }).eq('id', user.id),
+        6000,
+        'cliente-nome-update'
+      );
       if (updErr) throw updErr;
-      const { error: metaErr } = await supabase.auth.updateUser({ data: { nome } });
+      const { error: metaErr } = await withTimeout(
+        supabase.auth.updateUser({ data: { nome } }),
+        6000,
+        'cliente-auth-nome-update'
+      );
       if (metaErr) {
         console.warn('Falha ao atualizar metadados do usuário.', metaErr);
       }
@@ -352,7 +383,11 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     if (!email || !email.includes('@')) { uiAlert('clientArea.account_email_invalid', 'error'); return; }
     try {
       setSavingDados(true);
-      const { error } = await supabase.auth.updateUser({ email });
+      const { error } = await withTimeout(
+        supabase.auth.updateUser({ email }),
+        6000,
+        'cliente-email-update'
+      );
       if (error) throw error;
       uiAlert('clientArea.account_email_update_sent', 'success');
     } catch {
@@ -374,7 +409,11 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     if (pass !== conf)   { uiAlert('clientArea.account_password_mismatch',  'error'); return; }
     try {
       setSavingDados(true);
-      const { error } = await supabase.auth.updateUser({ password: pass });
+      const { error } = await withTimeout(
+        supabase.auth.updateUser({ password: pass }),
+        6000,
+        'cliente-password-update'
+      );
       if (error) throw error;
       setNovaSenha('');
       setConfirmarSenha('');
@@ -390,15 +429,19 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     const ok = await uiConfirm('clientArea.booking_cancel_confirm', 'warning');
     if (!ok) return;
     try {
-      const { error } = await supabase.rpc('cancelar_agendamento', { p_agendamento_id: agendamentoId });
-      if (error) throw error;
+      await cancelarAgendamentoCliente(agendamentoId);
       uiAlert('clientArea.booking_canceled', 'danger');
       const limit = (agendamentosPage + 1) * PAGE_SIZE;
       const ags = await fetchAgendamentos({ limit });
       setAgendamentos(ags);
       await syncAvaliacoesConcluidas(ags);
       setAgendamentosHasMore(ags.length === limit);
-    } catch {
+    } catch (error) {
+      const requestKey = getRequestErrorKey(error);
+      if (requestKey) {
+        await uiAlert(requestKey, 'warning');
+        return;
+      }
       uiAlert('clientArea.booking_cancel_error', 'error');
     }
   };
@@ -446,8 +489,13 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       setDepoimentoNota(5);
       feedback.showMessage('vitrine.depoimento_sent', { variant: 'success' });
     } catch (e) {
-      if (isRateLimitError(e)) {
+      const requestKey = getRequestErrorKey(e);
+      if (requestKey === 'alerts.rate_limit_exceeded' || isRateLimitError(e)) {
         feedback.showMessage('clientArea.depoimento_rate_limit', { variant: 'warning' });
+        return;
+      }
+      if (requestKey === 'alerts.request_timeout') {
+        feedback.showMessage('alerts.request_timeout', { variant: 'warning' });
         return;
       }
       feedback.showMessage('clientArea.depoimento_send_error', { msg: e?.message || '' });
@@ -461,8 +509,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     try {
       removingFavoritoRef.current = true;
       setRemovingFavoritoId(favoritoId);
-      const { error } = await supabase.from('favoritos').delete().eq('id', favoritoId).eq('cliente_id', clienteId);
-      if (error) throw error;
+      await removerFavoritoCliente({ favoritoId, clienteId });
       setFavoritos(prev => prev.filter(f => f.id !== favoritoId));
       uiAlert('clientArea.favorite_removed', 'success');
     } catch {
@@ -480,13 +527,17 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
 
     try {
       setDeletingAccount(true);
-      const { error } = await supabase.rpc('remove_cliente_seguro');
-      if (error) throw error;
+      await removerContaCliente();
       await uiAlert('clientArea.account_deleted', 'success');
       const logoutResult = onLogout?.('/');
       if (logoutResult?.catch) logoutResult.catch(() => {});
       navigate('/', { replace: true });
-    } catch {
+    } catch (error) {
+      const requestKey = getRequestErrorKey(error);
+      if (requestKey) {
+        await uiAlert(requestKey, 'warning');
+        return;
+      }
       uiAlert('clientArea.account_delete_error', 'error');
     } finally {
       setDeletingAccount(false);
