@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AG_PAGE_SIZE, compareAgendamentoDateTimeDesc } from '../utils';
 import { fetchAgendamentosNegocio } from '../api/dashboardApi';
+import { getRequestErrorKey } from '../../../utils/requestError';
 
 export function useDashboardHistorico({
   negocioId,
@@ -51,9 +52,14 @@ export function useDashboardHistorico({
     setHistoricoAgendamentos([]);
     setHistoricoError('');
     fetchHistoricoPage({ profIds: historicoProfIds, date: historicoData, page: 0, append: false })
-      .catch(() => {
+      .catch((error) => {
+        const requestKey = getRequestErrorKey(error);
         setHistoricoAgendamentos([]);
         setHistoricoHasMore(false);
+        if (requestKey === 'alerts.request_timeout' || requestKey === 'alerts.rate_limit_exceeded') {
+          setHistoricoError('dashboard.history_load_error');
+          return;
+        }
         setHistoricoError('dashboard.history_load_error');
       });
   }, [fetchHistoricoPage, historicoData, historicoProfIds, negocioId]);
