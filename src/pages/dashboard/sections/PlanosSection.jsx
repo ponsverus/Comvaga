@@ -5,6 +5,7 @@ import {
   fetchBillingPlans,
   fetchBusinessBillingStatus,
 } from '../api/dashboardApi';
+import { getRequestErrorKey } from '../../../utils/requestError';
 
 function formatCurrencyFromCents(value) {
   return `R$ ${(Number(value || 0) / 100).toFixed(2).replace('.', ',')}`;
@@ -147,7 +148,14 @@ export default function PlanosSection({ negocioId }) {
       setBillingStatus(statusData);
     } catch (err) {
       console.error('PlanosSection load error:', err);
-      setError('Erro ao carregar os planos agora.');
+      const requestKey = getRequestErrorKey(err);
+      if (requestKey === 'alerts.request_timeout') {
+        setError('O carregamento dos planos demorou demais. Tente novamente em instantes.');
+      } else if (requestKey === 'alerts.rate_limit_exceeded') {
+        setError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
+      } else {
+        setError('Erro ao carregar os planos agora.');
+      }
     } finally {
       setLoading(false);
     }
@@ -189,7 +197,14 @@ export default function PlanosSection({ negocioId }) {
       window.location.assign(checkout.checkout_url);
     } catch (err) {
       console.error('createAsaasCheckout error:', err);
-      setError(getPlanChangeErrorMessage(err));
+      const requestKey = getRequestErrorKey(err);
+      if (requestKey === 'alerts.request_timeout') {
+        setError('O checkout demorou demais para abrir. Tente novamente em instantes.');
+      } else if (requestKey === 'alerts.rate_limit_exceeded') {
+        setError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
+      } else {
+        setError(getPlanChangeErrorMessage(err));
+      }
     } finally {
       setSavingPlan('');
     }
