@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, X, Loader2 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { CheckIcon } from './icons';
 import { ZapIcon } from '../components/icons';
+import { withTimeout } from '../utils/withTimeout';
 
 function parseISO(iso) {
   if (!iso) return null;
@@ -131,13 +132,17 @@ export default function BookingCalendar({
     try {
       const dur = Number(entrega.duracao_minutos);
 
-      const { data, error } = await supabase.rpc('rpc_get_slots_v4', {
-        p_profissional_id: profissional.id,
-        p_dia:             dayISO,
-        p_entrega_min:     dur,
-        p_margem_min:      5,
-        p_modo:            'todos',
-      });
+      const { data, error } = await withTimeout(
+        supabase.rpc('rpc_get_slots_v4', {
+          p_profissional_id: profissional.id,
+          p_dia:             dayISO,
+          p_entrega_min:     dur,
+          p_margem_min:      5,
+          p_modo:            'todos',
+        }),
+        7000,
+        'booking-slots'
+      );
       if (error) throw error;
       if (!canApply()) return;
 
@@ -194,8 +199,8 @@ export default function BookingCalendar({
     setConfirmError(null);
     try {
       const isMultiplo = entregaIds.length > 1;
-      const { data, error } = isMultiplo
-        ? await supabase.rpc(assistedBooking ? 'rpc_criar_agendamentos_multiplos_assistido' : 'rpc_criar_agendamentos_multiplos', {
+      const bookingRequest = isMultiplo
+        ? supabase.rpc(assistedBooking ? 'rpc_criar_agendamentos_multiplos_assistido' : 'rpc_criar_agendamentos_multiplos', {
             ...(assistedBooking ? { p_cliente_id: clienteIdAssistido } : {}),
             p_negocio_id:      negocioId,
             p_profissional_id: profissional.id,
@@ -203,7 +208,7 @@ export default function BookingCalendar({
             p_data:            selectedDay,
             p_horario_inicio:  selectedSlot.hora,
           })
-        : await supabase.rpc(assistedBooking ? 'rpc_criar_agendamento_assistido' : 'rpc_criar_agendamento', {
+        : supabase.rpc(assistedBooking ? 'rpc_criar_agendamento_assistido' : 'rpc_criar_agendamento', {
             ...(assistedBooking ? { p_cliente_id: clienteIdAssistido } : {}),
             p_negocio_id:      negocioId,
             p_profissional_id: profissional.id,
@@ -211,6 +216,11 @@ export default function BookingCalendar({
             p_data:            selectedDay,
             p_horario_inicio:  selectedSlot.hora,
           });
+      const { data, error } = await withTimeout(
+        bookingRequest,
+        8000,
+        'booking-confirm'
+      );
 
       if (error) throw error;
 
