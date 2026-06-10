@@ -5,6 +5,7 @@ import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { CrownIcon } from '../components/icons';
 import { DEFAULT_PLAN_CODE, clearSelectedPlanIntent, getSelectedPlanIntent, normalizePlanCode } from '../utils/plans';
+import { withTimeout } from '../utils/withTimeout';
 
 function onlyTrim(v) {
   return String(v || '').trim();
@@ -87,11 +88,19 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           { data: userData, error: userErr },
           { data: negocioRows, error: negocioErr },
         ] = await Promise.all([
-          supabase.from('users').select('nome').eq('id', user.id).maybeSingle(),
-          supabase.from('negocios')
-            .select('id, nome, slug, tipo_negocio, telefone, endereco_cep, endereco_rua, endereco_numero, endereco_complemento, endereco_bairro, endereco_cidade, endereco_estado, created_at')
-            .eq('owner_id', user.id)
-            .order('created_at', { ascending: true }),
+          withTimeout(
+            supabase.from('users').select('nome').eq('id', user.id).maybeSingle(),
+            6000,
+            'resume-user-profile'
+          ),
+          withTimeout(
+            supabase.from('negocios')
+              .select('id, nome, slug, tipo_negocio, telefone, endereco_cep, endereco_rua, endereco_numero, endereco_complemento, endereco_bairro, endereco_cidade, endereco_estado, created_at')
+              .eq('owner_id', user.id)
+              .order('created_at', { ascending: true }),
+            6000,
+            'resume-businesses'
+          ),
         ]);
 
         if (userErr) throw userErr;
@@ -204,21 +213,25 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       const enderecoKey = validarEnderecoCompleto();
       if (enderecoKey) { showMessage(enderecoKey); return; }
 
-      const { data, error } = await supabase.rpc('complete_owner_business_onboarding', {
-        p_negocio_id: isWaitingRoom ? null : negocioId,
-        p_nome_usuario: nome,
-        p_nome_negocio: nomeNegocio,
-        p_slug: slug,
-        p_telefone: telefone,
-        p_tipo_negocio: tipoNegocio,
-        p_endereco_cep: formData.cep,
-        p_endereco_rua: formData.rua,
-        p_endereco_numero: formData.numero,
-        p_endereco_complemento: formData.complemento,
-        p_endereco_bairro: formData.bairro,
-        p_endereco_cidade: formData.cidade,
-        p_endereco_estado: formData.estado,
-      });
+      const { data, error } = await withTimeout(
+        supabase.rpc('complete_owner_business_onboarding', {
+          p_negocio_id: isWaitingRoom ? null : negocioId,
+          p_nome_usuario: nome,
+          p_nome_negocio: nomeNegocio,
+          p_slug: slug,
+          p_telefone: telefone,
+          p_tipo_negocio: tipoNegocio,
+          p_endereco_cep: formData.cep,
+          p_endereco_rua: formData.rua,
+          p_endereco_numero: formData.numero,
+          p_endereco_complemento: formData.complemento,
+          p_endereco_bairro: formData.bairro,
+          p_endereco_cidade: formData.cidade,
+          p_endereco_estado: formData.estado,
+        }),
+        8000,
+        'complete-owner-onboarding'
+      );
 
       if (error) {
         const code = String(error.message || '').split(':')[0].trim();
@@ -249,10 +262,14 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       const selectedPlanCode = normalizePlanCode(user?.user_metadata?.selected_plan)
         || getSelectedPlanIntent()
         || DEFAULT_PLAN_CODE;
-      const { error: planError } = await supabase.rpc('set_business_plan', {
-        p_negocio_id: data.negocio_id,
-        p_plan_code: selectedPlanCode,
-      });
+      const { error: planError } = await withTimeout(
+        supabase.rpc('set_business_plan', {
+          p_negocio_id: data.negocio_id,
+          p_plan_code: selectedPlanCode,
+        }),
+        6500,
+        'resume-set-plan'
+      );
       if (planError) {
         console.warn('set_business_plan error:', planError);
       } else {
