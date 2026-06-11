@@ -641,7 +641,7 @@ export default function Home({ user, userType, onLogout }) {
             shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
             bg-primary/5 p-8 sm:p-10 relative flex flex-col px-4 sm:px-8 md:px-12
           ">
-            <span className="absolute right-4 top-4 inline-flex rounded-full bg-green-500 px-3 py-1 text-[10px] font-normal uppercase tracking-widest text-white">
+            <span className="absolute right-4 top-4 inline-flex rounded-full bg-green-400 px-3 py-1 text-[10px] font-normal uppercase tracking-widest text-white">
               OFERTA
             </span>
             <div className="mb-5">
