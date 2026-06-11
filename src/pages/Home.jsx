@@ -579,7 +579,7 @@ export default function Home({ user, userType, onLogout }) {
           <h2 className="text-5xl font-normal mb-4">
             SEM <span className="text-primary">BUROCRACIA</span>
           </h2>
-          <p className="text-xl text-gray-400">Teste grátis por 30 dias com acesso total e imediato. Sem compromisso e sem burocracia ;)</p>
+          <p className="text-xl text-gray-400">Teste grátis por 30 dias o plano escolhido. Sem compromisso e sem burocracia ;)</p>
         </div>
        
         <div className="
@@ -616,8 +616,7 @@ export default function Home({ user, userType, onLogout }) {
                 'Vitrine profissional',
                 'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
                 'Reagendamento inteligente em um clique pela área exclusiva do cliente',
-                'Alertas por e-mail em tempo real',
-                'Lembrete automático 30 min antes',
+                'Alertas operacionais por e-mail e lembretes automáticos para clientes',
                 'Sincronia total com o Google Agenda.',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2.5">
@@ -642,6 +641,9 @@ export default function Home({ user, userType, onLogout }) {
             shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
             bg-primary/5 p-8 sm:p-10 relative flex flex-col px-4 sm:px-8 md:px-12
           ">
+            <span className="absolute right-4 top-4 inline-flex rounded-full bg-green-500 px-3 py-1 text-[10px] font-normal uppercase tracking-widest text-white">
+              OFERTA
+            </span>
             <div className="mb-5">
               <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
                 Profissional
