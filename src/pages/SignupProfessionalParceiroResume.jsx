@@ -78,6 +78,7 @@ export default function SignupProfessionalParceiroResume({ user, onLogin }) {
         const code = String(accessErr.message || '').split(':')[0].trim();
         if (code === 'access_inactive') return setAlerta(msgs.access_inactive);
         if (code === 'partner_plan_unavailable') return setAlerta(msgs.partner_plan_unavailable);
+        if (code === 'owner_cannot_request_partner_access') return setAlerta(msgs.owner_cannot_request_partner_access);
         if (code === 'usuario_nao_encontrado') return setAlerta(msgs.account_create_error);
         if (code === 'negocio_nao_encontrado' || code === 'negocio_nao_informado') return setAlerta(msgs.negocio_not_found);
         if (accessErr.code === '23505') return setAlerta(msgs.access_unavailable);
