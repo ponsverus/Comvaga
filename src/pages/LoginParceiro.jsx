@@ -118,6 +118,16 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
         return setAlerta(msgs.not_partner);
       }
 
+      const { data: isOwner, error: ownerErr } = await supabase.rpc('is_owner_of_negocio', {
+        p_negocio_id: negocio.id,
+      });
+
+      if (ownerErr) throw ownerErr;
+      if (isOwner === true) {
+        await supabase.auth.signOut();
+        return setAlerta(ptBR.parceiroCadastro.owner_cannot_request_partner_access);
+      }
+
       const { data: partnerRow, error: partnerErr } = await supabase
         .from('profissionais')
         .select('status')
