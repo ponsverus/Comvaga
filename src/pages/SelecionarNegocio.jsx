@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CrownIcon } from '../components/icons';
+import { PremiumBadgeIcon } from '../components/icons';
 import { LogOut, Plus } from 'lucide-react';
 import { supabase } from '../supabase';
 
@@ -119,7 +119,7 @@ export default function SelecionarNegocio({ user, onLogout }) {
                     <img src={logoUrl} alt={neg.nome} className="w-full h-full rounded-full object-cover" />
                   ) : (
                     <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-yellow-600 flex items-center justify-center">
-                      <CrownIcon className="w-6 h-6 text-black" />
+                      <PremiumBadgeIcon className="w-6 h-6 text-black" />
                     </div>
                   )}
                 </div>
