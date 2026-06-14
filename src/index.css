@@ -1,4 +1,3 @@
-/* Tailwind v4: design tokens and visual source of truth live here. */
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700;900&display=swap');
 @import "tailwindcss";
 
@@ -8,7 +7,7 @@
   --radius-custom: 3px;
   --radius-button: 9999px;
 
-  --color-primary: #FFD700;
+  --color-primary: #000000;
   --color-dark-100: #1a1a1a;
   --color-dark-200: #0d0d0d;
   --color-dark-300: #000000;
@@ -29,16 +28,16 @@
 }
 
 :root {
-  --vbg:           #000000;
-  --vcard:         #1a1a1a;
-  --vcard2:        #0d0d0d;
-  --vtext:         #ffffff;
-  --vsub:          #d4d4d8;
+  --vbg:           #ffffff;
+  --vcard:         #f4f4f5;
+  --vcard2:        #e4e4e7;
+  --vtext:         #000000;
+  --vsub:          #3f3f46;
   --vmuted:        #71717a;
-  --vborder:       #27272a;
-  --vborder2:      #18181b;
-  --vprimary:      #FFD700;
-  --vprimary-text: #000000;
+  --vborder:       #d4d4d8;
+  --vborder2:      #a1a1aa;
+  --vprimary:      #000000;
+  --vprimary-text: #ffffff;
   --voferta-bg:    rgba(74,222,128,0.15);
   --voferta-border:rgba(74,222,128,0.35);
   --voferta-text:  #4ade80;
@@ -84,8 +83,8 @@ html, body, #root {
 body {
   margin: 0;
   padding: 0;
-  background-color: #000;
-  color: #fff;
+  background-color: #ffffff;
+  color: #000000;
   font-family: 'Roboto Condensed', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -109,6 +108,6 @@ body {
 .animate-slide-up { animation: slideUp 0.6s ease-out; }
 
 ::-webkit-scrollbar       { width: 8px; }
-::-webkit-scrollbar-track { background: #111; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #555; }
+::-webkit-scrollbar-track { background: #f4f4f5; }
+::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
