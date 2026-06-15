@@ -1,4 +1,4 @@
-export default function PremiumIcon({
+export default function ProfessionalIcon({
   className = '',
   title,
   style = {},
