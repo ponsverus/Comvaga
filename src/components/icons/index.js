@@ -5,6 +5,7 @@ export { default as CheckedIcon } from './CheckedIcon';
 export { default as CrownIcon } from './CrownIcon';
 export { default as LocationIcon } from './LocationIcon';
 export { default as LogoutIcon } from './LogoutIcon';
+export { default as ProfessionalIcon } from './ProfessionalIcon';
 export { default as ProtectionIcon } from './ProtectionIcon';
 export { default as SearchIcon } from './SearchIcon';
 export { default as SelectIcon } from './SelectIcon';
