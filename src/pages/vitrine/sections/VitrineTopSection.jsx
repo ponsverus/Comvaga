@@ -1,5 +1,5 @@
 import { ArrowLeft, Phone } from 'lucide-react';
-import { CheckedIcon, CrownIcon, LocationIcon } from '../../../components/icons';
+import { CheckedIcon, ProfessionalIcon, LocationIcon } from '../../../components/icons';
 
 function FacebookIcon({ className = '', size = 16 }) {
   return (
@@ -88,7 +88,7 @@ export default function VitrineTopSection({ header, business, actions }) {
               </div>
             ) : (
               <div className="w-20 h-20 sm:w-24 sm:h-24 bg-vprimary rounded-full flex items-center justify-center text-vprimary-text">
-                <CrownIcon className="w-12 h-12 sm:w-14 sm:h-14" />
+                <ProfessionalIcon className="w-12 h-12 sm:w-14 sm:h-14" />
               </div>
             )}
             <div className="flex-1">

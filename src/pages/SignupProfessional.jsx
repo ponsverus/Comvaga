@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { CrownIcon } from '../components/icons';
+import { ProfessionalIcon } from '../components/icons';
 import { DEFAULT_PLAN_CODE, getPlanFromSearch, getSelectedPlanIntent, saveSelectedPlanIntent } from '../utils/plans';
 
 const PROFILE_TABLE = 'users';
@@ -157,7 +157,7 @@ export default function SignupProfessional({ onLogin }) {
         </div>
 
         <div className="text-center mb-10">
-          <CrownIcon className="mx-auto mb-4 text-primary w-12 h-12" />
+          <ProfessionalIcon className="mx-auto mb-4 text-primary w-12 h-12" />
           <h1 className="text-4xl font-normal mb-3 tracking-wide">CRIAR VITRINE</h1>
           <p className="text-gray-500 text-base font-normal">CADASTRO DE <span className="text-primary">PROFISSIONAL</span></p>
         </div>
