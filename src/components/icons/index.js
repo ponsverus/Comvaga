@@ -2,7 +2,6 @@ export { default as CalendarIcon } from './CalendarIcon';
 export { default as CheckDoubleIcon } from './CheckDoubleIcon';
 export { default as CheckIcon } from './CheckIcon';
 export { default as CheckedIcon } from './CheckedIcon';
-export { default as CrownIcon } from './CrownIcon';
 export { default as LocationIcon } from './LocationIcon';
 export { default as LogoutIcon } from './LogoutIcon';
 export { default as ProfessionalIcon } from './ProfessionalIcon';
