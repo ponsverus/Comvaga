@@ -146,7 +146,7 @@ export default function SignupProfessionalParceiroResume({ user, onLogin }) {
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase())}
                 placeholder="EX: BARBEARIA-TORRES"
-                className={fieldInputClass}
+                className={`${fieldInputClass} uppercase`}
                 required
               />
             </FieldRow>
