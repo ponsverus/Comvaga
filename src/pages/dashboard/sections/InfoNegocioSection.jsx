@@ -275,6 +275,7 @@ export default function InfoNegocioSection({
                     onChange={(e) => setFormInfo((prev) => ({ ...prev, endereco_estado: e.target.value.toUpperCase() }))}
                     className={`${inputClass} truncate uppercase`}
                     maxLength={2}
+                    placeholder="EX: MG"
                   />
                 </SplitField>
               </SplitRow>
