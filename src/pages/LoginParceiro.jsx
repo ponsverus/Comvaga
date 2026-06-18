@@ -331,9 +331,9 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
               <input
                 type="text"
                 value={slug}
-                onChange={(e) => setSlug(e.target.value.toUpperCase())}
+                onChange={(e) => setSlug(e.target.value)}
                 placeholder="SLUG DO NEGÓCIO"
-                className={fieldInputClass}
+                className={`${fieldInputClass} uppercase`}
                 required
               />
             </FieldRow>
