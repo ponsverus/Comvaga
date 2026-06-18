@@ -144,7 +144,7 @@ export default function SignupProfessionalParceiroResume({ user, onLogin }) {
               <input
                 type="text"
                 value={slug}
-                onChange={(e) => setSlug(e.target.value.toLowerCase())}
+                onChange={(e) => setSlug(e.target.value)}
                 placeholder="EX: BARBEARIA-TORRES"
                 className={`${fieldInputClass} uppercase`}
                 required
