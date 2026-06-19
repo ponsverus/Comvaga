@@ -517,22 +517,22 @@ export const ptBR = {
     },
 
     account_email_invalid: {
-      title: 'Email inválido',
-      body: 'Digite um email válido para continuar.',
+      title: 'E-mail inválido',
+      body: 'Digite um e-mail válido para continuar.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
     account_email_update_sent: {
       title: 'Acesso enviado',
-      body: 'Confira seu email para confirmar a troca.',
+      body: 'Confira seu e-mail para confirmar a troca.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
     },
     account_email_update_error: {
       title: 'Erro',
-      body: 'Erro ao solicitar a troca de email agora. Tente novamente.',
+      body: 'Erro ao solicitar a troca de e-mail agora. Tente novamente.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -612,40 +612,40 @@ export const ptBR = {
 
   parceiroCadastro: {
     nome_required:        { body: 'Informe seu nome para continuar.', variant: 'erro' },
-    email_invalid:        { body: 'Informe um email válido para continuar.', variant: 'erro' },
+    email_invalid:        { body: 'Informe um e-mail válido para continuar.', variant: 'erro' },
     senha_too_short:      { body: 'A senha deve ter pelo menos 7 caracteres.', variant: 'erro' },
     slug_required:        { body: 'Informe o slug do negócio para continuar.', variant: 'erro' },
     negocio_not_found:    { body: 'Negócio ausente. Verifique o slug informado e tente novamente.', variant: 'erro' },
     partner_plan_unavailable: { body: 'Parcerias desabilitadas neste negócio.', variant: 'erro' },
-    email_registered_client: { body: 'Este email já pertence a uma conta de cliente. Use outro email para solicitar acesso profissional.', variant: 'erro' },
-    email_registered_professional: { body: 'Este email já pertence a uma conta profissional. Faça login como parceiro para solicitar ou acompanhar acessos.', variant: 'erro' },
-    email_registered_unknown: { body: 'Este email já está vinculado a uma conta existente. Faça login ou use outro email.', variant: 'erro' },
+    email_registered_client: { body: 'Este e-mail já pertence a uma conta de cliente. Use outro e-mail para solicitar acesso profissional.', variant: 'erro' },
+    email_registered_professional: { body: 'Este e-mail já pertence a uma conta profissional. Acesse como parceiro para solicitar ou acompanhar acessos.', variant: 'erro' },
+    email_registered_unknown: { body: 'Este e-mail já está vinculado a uma conta existente. Acesse sua conta ou use outro e-mail.', variant: 'erro' },
     email_check_rate_limit: { body: 'Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.', variant: 'aviso' },
-    access_unavailable:   { body: 'Erro ao solicitar acesso com este email. Faça login como parceiro ou fale com o responsável pelo negócio.', variant: 'erro' },
+    access_unavailable:   { body: 'Erro ao solicitar acesso com este e-mail. Acesse sua conta de parceiro ou fale com o responsável pelo negócio.', variant: 'erro' },
     account_create_error: { body: 'Erro ao criar sua conta agora. Tente novamente.', variant: 'erro' },
     access_inactive:      { body: 'Seu acesso está inativo. Entre em contato com o responsável pelo negócio.', variant: 'erro' },
     owner_cannot_request_partner_access: { body: 'Esta conta já gerencia este negócio. Acesse pela área profissional.', variant: 'erro' },
     unexpected_error:     { body: 'Ocorreu um erro inesperado. Tente novamente.', variant: 'erro' },
-    success_title:        'Confirme seu email',
-    success_body:         'Enviamos um link para seu email.\nClique no link para concluir o seu cadastro de parceria.',
+    success_title:        'Confirme seu e-mail',
+    success_body:         'Enviamos um link para seu e-mail.\nClique no link para concluir o seu cadastro de parceria.',
   },
 
   parceiroLogin: {
-    email_invalid:                  { body: 'Informe um email válido para continuar.', variant: 'erro' },
+    email_invalid:                  { body: 'Informe um e-mail válido para continuar.', variant: 'erro' },
     senha_too_short:                { body: 'A senha deve ter pelo menos 7 caracteres.', variant: 'erro' },
     slug_required:                  { body: 'Informe o slug do negócio para continuar.', variant: 'erro' },
     negocio_not_found:              { body: 'Negócio ausente. Verifique o slug informado e tente novamente.', variant: 'erro' },
-    credentials_invalid:            { body: 'Email ou senha incorretos.', variant: 'erro' },
+    credentials_invalid:            { body: 'E-mail ou senha incorretos.', variant: 'erro' },
     auth_error:                     { body: 'Erro ao autenticar agora. Tente novamente.', variant: 'erro' },
     not_partner:                    { body: 'Este login pertence a outro tipo de conta para este negócio.', variant: 'erro' },
     access_inactive:                { body: 'Seu acesso está inativo. Entre em contato com o responsável pelo negócio.', variant: 'erro' },
     unexpected_error:               { body: 'Ocorreu um erro inesperado. Tente novamente.', variant: 'erro' },
-    reset_email_required:           { body: 'Digite seu email antes de solicitar o resgate de senha.', variant: 'aviso' },
+    reset_email_required:           { body: 'Digite seu e-mail antes de solicitar o resgate de senha.', variant: 'aviso' },
     reset_sent:                     { body: 'Link enviado. Confira sua caixa de entrada para redefinir a senha.', variant: 'sucesso' },
     reset_error:                    { body: 'Erro ao enviar o link agora. Tente novamente.', variant: 'erro' },
     recovery_password_too_short:    { body: 'A nova senha deve ter pelo menos 7 caracteres.', variant: 'erro' },
     recovery_password_mismatch:     { body: 'As senhas divergem. Revise e tente novamente.', variant: 'erro' },
-    recovery_password_updated:      { body: 'Senha atualizada com sucesso. Faça login com a nova senha.', variant: 'sucesso' },
+    recovery_password_updated:      { body: 'Senha atualizada com sucesso. Acesse sua conta com a nova senha.', variant: 'sucesso' },
     recovery_password_update_error: { body: 'Erro ao atualizar a senha agora. Tente novamente.', variant: 'erro' },
   },
 
@@ -736,22 +736,22 @@ export const ptBR = {
       buttonText: 'OK',
     },
     account_email_invalid: {
-      title: 'Email inválido',
-      body: 'Digite um email válido para continuar.',
+      title: 'E-mail inválido',
+      body: 'Digite um e-mail válido para continuar.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
     account_email_update_sent: {
       title: 'Código de acesso enviado',
-      body: 'Confira seu email para validar a troca.',
+      body: 'Confira seu e-mail para validar a troca.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
     },
     account_email_update_error: {
-      title: 'Erro ao alterar email',
-      body: 'Erro ao alterar seu email agora. Tente novamente.',
+      title: 'Erro ao alterar e-mail',
+      body: 'Erro ao alterar seu e-mail agora. Tente novamente.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -878,16 +878,16 @@ export const ptBR = {
       title: 'Acesso indisponível no momento.',
       body:
         '{msg}\n' +
-        'Confira seu email, sua senha e o tipo selecionado.\n' +
+        'Confira seu e-mail, sua senha e o tipo selecionado.\n' +
         'Se o problema persistir, acesse SUPORTE no rodapé da página para falar com a gente.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
     reset_email_required: {
-      title: 'Informe seu email',
+      title: 'Informe seu e-mail',
       body:
-        'Digite seu email para receber o link de resgate.\n' +
+        'Digite seu e-mail para receber o link de resgate.\n' +
         'Se precisar, acesse SUPORTE no rodapé da página.',
       variant: 'warning',
       screen: 'dark',
@@ -969,16 +969,16 @@ export const ptBR = {
       buttonText: 'OK',
     },
     email_invalid: {
-      title: 'Email inválido',
-      body: 'Informe um email válido para continuar.',
+      title: 'E-mail inválido',
+      body: 'Informe um e-mail válido para continuar.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
     email_already_exists: {
-      title: 'Email já cadastrado',
+      title: 'E-mail já cadastrado',
       body:
-        'Este email já possui uma conta.\n' +
+        'Este e-mail já possui uma conta.\n' +
         'Use a tela de login para entrar ou recupere o acesso, se necessário.',
       variant: 'warning',
       screen: 'dark',
@@ -994,9 +994,9 @@ export const ptBR = {
     created_confirm_email: {
       title: 'Conta criada :)',
       body:
-        'Agora confirme seu email para ativar o acesso.\n' +
+        'Agora confirme seu e-mail para ativar o acesso.\n' +
         'Verifique a caixa de entrada e o spam.\n' +
-        'Depois disso, faça login normalmente.',
+        'Depois disso, realize o login normalmente.',
       variant: 'success',
       screen: 'light',
       buttonText: 'ENTENDI',
@@ -1029,16 +1029,16 @@ export const ptBR = {
       buttonText: 'OK',
     },
     email_invalid: {
-      title: 'Email inválido',
-      body: 'Informe um email válido para continuar.',
+      title: 'E-mail inválido',
+      body: 'Informe um e-mail válido para continuar.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
     email_already_exists: {
-      title: 'Email já cadastrado',
+      title: 'E-mail já cadastrado',
       body:
-        'Este email já possui uma conta.\n' +
+        'Este e-mail já possui uma conta.\n' +
         'Use a tela de login do parceiro ou recupere o acesso, se necessário.',
       variant: 'warning',
       screen: 'dark',
@@ -1115,11 +1115,11 @@ export const ptBR = {
       buttonText: 'ENTENDI',
     },
     confirm_email_needed: {
-      title: 'Confirme seu email',
+      title: 'Confirme seu e-mail',
       body:
-        'Sua conta foi criada. Confirme seu email para ativar o acesso.\n' +
+        'Sua conta foi criada. Confirme seu e-mail para ativar o acesso.\n' +
         'Verifique a caixa de entrada e o spam.\n' +
-        'Depois disso, faça login normalmente.',
+        'Depois disso, realize o login normalmente.',
       variant: 'success',
       screen: 'light',
       buttonText: 'ENTENDI',
@@ -1192,7 +1192,7 @@ export const ptBR = {
 
     favorite_need_login: {
       title: 'Login necessário',
-      body: 'Faça login para favoritar este negócio.',
+      body: 'Realize o login para favoritar este negócio.',
       buttonText: 'ENTENDI',
     },
     favorite_only_client: {
