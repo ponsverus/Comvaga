@@ -617,7 +617,7 @@ export default function Home({ user, userType, onLogout }) {
                 'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
                 'Reagendamento inteligente em um clique pela área exclusiva do cliente',
                 'Alertas operacionais por e-mail e lembretes automáticos para clientes',
-                'Sincronia total com o Google Agenda.',
+                'Sincronia total com o Google Agenda',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2.5">
                   <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
