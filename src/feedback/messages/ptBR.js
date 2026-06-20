@@ -588,7 +588,7 @@ export const ptBR = {
       buttonText: 'OK',
     },
     partner_plan_unavailable: {
-      title: 'Parceria indisponivel',
+      title: 'Parceria indisponível',
       body: 'Parcerias desabilitadas neste negócio.',
       variant: 'warning',
       screen: 'dark',
@@ -602,7 +602,7 @@ export const ptBR = {
       buttonText: 'OK',
     },
     plan_feature_offers_unavailable: {
-      title: 'Oferta indisponivel',
+      title: 'Oferta indisponível',
       body: 'Recurso de ofertas restrito. Remova o valor promocional antes de continuar.',
       variant: 'warning',
       screen: 'dark',
@@ -1222,8 +1222,8 @@ export const ptBR = {
       buttonText: 'ENTENDI',
     },
     schedule_billing_required: {
-      title: 'Agenda indisponivel',
-      body: 'Este negocio precisa ativar um plano para receber novos agendamentos.',
+      title: 'Agenda indisponível',
+      body: 'Este negócio precisa ativar um plano para receber novos agendamentos.',
       buttonText: 'ENTENDI',
     },
     schedule_time_unavailable: {
