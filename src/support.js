@@ -1,9 +1,9 @@
 export const SUPPORT_PHONE_E164 = '5533999037979';
 
 export const SUPPORT_MESSAGES = {
-  client: 'Ola, sou cliente da Comvaga e preciso de ajuda. Pode me ajudar?',
-  professional: 'Ola, sou profissional da Comvaga e preciso de suporte. Pode me ajudar?',
-  public: 'Ola, gostaria de tirar uma duvida sobre a Comvaga. Pode me ajudar?',
+  client: 'Olá, sou cliente da Comvaga e preciso de ajuda. Pode me ajudar?',
+  professional: 'Olá, sou profissional da Comvaga e preciso de suporte. Pode me ajudar?',
+  public: 'Olá, gostaria de tirar uma dúvida sobre a Comvaga. Pode me ajudar?',
 };
 
 export function buildWhatsAppHref(message) {
