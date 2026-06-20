@@ -108,7 +108,7 @@ function getBillingAnnouncement(status) {
   if (current === 'blocked' || current === 'billing_required') {
     return {
       tone: 'danger',
-      text: 'Agenda bloqueada para novos agendamentos. Ative um plano com pagamento valido para liberar.',
+      text: 'Agenda bloqueada para novos agendamentos. Ative um plano com pagamento válido para liberar.',
     };
   }
 

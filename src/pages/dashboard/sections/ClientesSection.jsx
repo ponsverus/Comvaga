@@ -34,7 +34,7 @@ function ClienteCard({ cliente, itemLabelText, onAgendarCliente }) {
       </div>
 
       <div className="mb-4 space-y-3">
-        <div className="text-xs text-gray-500 uppercase mb-3">ULTIMO AGENDAMENTO</div>
+        <div className="text-xs text-gray-500 uppercase mb-3">ÚLTIMO AGENDAMENTO</div>
         <div className="min-w-0">
           <div className="text-primary text-sm leading-snug break-words">{cliente.ultimo_entrega_nome || itemLabelText}</div>
         </div>

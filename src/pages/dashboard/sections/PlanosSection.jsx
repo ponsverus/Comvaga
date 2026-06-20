@@ -32,7 +32,7 @@ function getPlanChangeErrorMessage(error) {
     return 'Este plano é incompatível com ofertas. Remova as ofertas ativas antes de trocar.';
   }
   if (raw.includes('asaas_checkout_failed')) {
-    return 'Nao foi possivel abrir o checkout do pagamento agora.';
+    return 'Houve um erro ao abrir o checkout do pagamento agora.';
   }
   return 'Houve uma falha durante a troca de plano.';
 }
