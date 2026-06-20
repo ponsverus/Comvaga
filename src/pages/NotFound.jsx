@@ -7,7 +7,7 @@ export default function NotFound() {
         <div className="text-6xl font-normal leading-none text-red-500 mb-6">:(</div>
 
         <h1 className="text-5xl font-normal uppercase mb-3">Erro 404</h1>
-        <p className="text-xl text-gray-300 font-normal uppercase mb-4">Pagina perdida</p>
+        <p className="text-xl text-gray-300 font-normal uppercase mb-4">Página perdida</p>
         <p className="text-gray-400 mb-8">
           O link acessado é inexistente ou foi removido.
         </p>
