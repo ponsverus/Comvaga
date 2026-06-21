@@ -457,7 +457,7 @@ export const ptBR = {
       buttonText: 'OK',
     },
     professional_almoco_blocked: {
-      title: 'Pausa bloqueado',
+      title: 'Pausa bloqueada',
       body: 'Há agendamentos futuros que entram em conflito com o novo horário da pausa.\nCancele esses agendamentos antes de salvar este ajuste.',
       variant: 'warning',
       screen: 'dark',
