@@ -82,7 +82,7 @@ export const ptBR = {
       buttonText: 'OK',
     },
     address_format_invalid: {
-      title: 'Endereço inválido',
+      title: 'Endere. inválido',
       body: 'Use o formato: "RUA, NÚMERO - CIDADE, ESTADO".',
       variant: 'danger',
       screen: 'dark',
@@ -177,13 +177,13 @@ export const ptBR = {
 
     entrega_promo_invalid: {
       title: 'Oferta inválida',
-      body: 'O preço de oferta precisa ser menor que o preço normal.',
+      body: 'O valor promocional precisa ser menor que o valor original.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
     entrega_price_invalid: {
-      title: 'Preço inválido',
+      title: 'Valor inválido',
       body: 'Informe um valor válido para continuar.',
       variant: 'danger',
       screen: 'dark',
@@ -457,8 +457,8 @@ export const ptBR = {
       buttonText: 'OK',
     },
     professional_almoco_blocked: {
-      title: 'Horário de almoço bloqueado',
-      body: 'Há horários futuros que entram em conflito com o novo horário de almoço.\nCancele esses horários antes de salvar esta mudança.',
+      title: 'Pausa bloqueado',
+      body: 'Há agendamentos futuros que entram em conflito com o novo horário da pausa.\nCancele esses agendamentos antes de salvar este ajuste.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -949,7 +949,7 @@ export const ptBR = {
 
   signupChoice: {
     navigate_error: {
-      title: 'Houve um erro ao avançar. Tente novamente.',
+      title: 'Houve um erro ao prosseguir. Tente novamente.',
       body:
         'Ocorreu uma falha ao abrir esta fase.\n' +
         'Tente novamente em alguns instantes.\n' +
@@ -1060,7 +1060,7 @@ export const ptBR = {
     },
     business_slug_invalid: {
       title: 'URL inválida',
-      body: 'A URL do negócio precisa ter pelo menos 3 caracteres ou mais, usando apenas letras, números e traços.',
+      body: 'A URL do negócio precisa ter pelo menos 3 caracteres, usando apenas letras e números.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -1080,28 +1080,28 @@ export const ptBR = {
       buttonText: 'OK',
     },
     address_street_required: {
-      title: 'Endereço incompleto',
+      title: 'Endere. incompleto',
       body: 'Informe a RUA do negócio.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
     address_number_required: {
-      title: 'Endereço incompleto',
-      body: 'Informe o NÚMERO do endereço.',
+      title: 'Endere. incompleto',
+      body: 'Informe o NÚMERO do endere.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
     address_city_required: {
-      title: 'Endereço incompleto',
+      title: 'Endere. incompleto',
       body: 'Informe a CIDADE.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
     address_state_required: {
-      title: 'Endereço incompleto',
+      title: 'Endere. incompleto',
       body: 'Informe o ESTADO.',
       variant: 'danger',
       screen: 'dark',
