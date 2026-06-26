@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { supabase } from './supabase';
 import { isPasswordRecoveryUrl } from './utils/auth';
-import { fetchUserAccessProfile, isValidType, normalizeOnboardingStatus } from './utils/profileAccess';
+import { fetchUserAccessProfile, isValidProfessionalRole, isValidType, normalizeOnboardingStatus } from './utils/profileAccess';
 
 import FeedbackProvider from './feedback/FeedbackProvider';
 
@@ -106,7 +106,7 @@ function LogoutRedirectResetter({ redirectPath, onClear }) {
   return null;
 }
 
-function SelecionarNegocioRouteGuard({ user, onLogout }) {
+function SelecionarNegocioRouteGuard({ user, onLogout, professionalRole }) {
   const [loading, setLoading] = useState(true);
   const [ownerBusinessCount, setOwnerBusinessCount] = useState(0);
 
@@ -140,7 +140,8 @@ function SelecionarNegocioRouteGuard({ user, onLogout }) {
   }, [user?.id]);
 
   if (loading) return <FullScreenLoading text="CARREGANDO..." />;
-  if (ownerBusinessCount > 1) return <SelecionarNegocio user={user} onLogout={onLogout} />;
+  if (professionalRole === 'partner') return <Navigate to="/dashboard" replace />;
+  if (ownerBusinessCount > 1) return <SelecionarNegocio user={user} onLogout={onLogout} professionalRole={professionalRole} />;
   return <Navigate to="/dashboard" replace />;
 }
 
@@ -149,6 +150,7 @@ export default function App() {
   const [userType,         setUserType]         = useState(null);
   const [onboardingStatus, setOnboardingStatus] = useState(null);
   const [onboardingFlow,   setOnboardingFlow]   = useState(null);
+  const [professionalRole, setProfessionalRole] = useState(null);
   const [accessState,      setAccessState]      = useState('active');
   const [booting,          setBooting]          = useState(true);
   const [typeLoading,      setTypeLoading]      = useState(false);
@@ -164,7 +166,7 @@ export default function App() {
   const isLoggedIn = !!user;
   const metadataPartnerSignup = user?.user_metadata?.partner_signup === true
     || String(user?.user_metadata?.partner_signup || '').toLowerCase() === 'true';
-  const isPartnerSignup = onboardingFlow === 'partner' || metadataPartnerSignup;
+  const isPartnerSignup = professionalRole === 'partner' || onboardingFlow === 'partner' || metadataPartnerSignup;
 
   const safeSet = useCallback((fn) => {
     if (aliveRef.current) fn();
@@ -193,6 +195,7 @@ export default function App() {
       setUserType(null);
       setOnboardingStatus(null);
       setOnboardingFlow(null);
+      setProfessionalRole(null);
       setAccessState('active');
     });
 
@@ -206,6 +209,7 @@ export default function App() {
           setUserType(null);
           setOnboardingStatus(null);
           setOnboardingFlow(null);
+          setProfessionalRole(null);
           setAccessState('active');
           loadedUserRef.current = null;
           setFatalError('Perfil inexistente. Crie ou conclua seu cadastro para prosseguir.');
@@ -218,6 +222,7 @@ export default function App() {
         setUserType(profile.type);
         setOnboardingStatus(profile.onboardingStatus);
         setOnboardingFlow(profile.onboardingFlow || null);
+        setProfessionalRole(isValidProfessionalRole(profile.professionalRole) ? profile.professionalRole : null);
         setAccessState(profile.accessState || 'active');
         setFatalError(null);
       });
@@ -236,6 +241,7 @@ export default function App() {
           setUserType(null);
           setOnboardingStatus(null);
           setOnboardingFlow(null);
+          setProfessionalRole(null);
           setAccessState('active');
           setFatalError(null);
           setPostLogoutRedirect('/login');
@@ -247,6 +253,7 @@ export default function App() {
         setUserType(null);
         setOnboardingStatus(null);
         setOnboardingFlow(null);
+        setProfessionalRole(null);
         setAccessState('active');
         setFatalError(e?.message || 'Falha ao carregar perfil.');
       });
@@ -278,6 +285,7 @@ export default function App() {
               setUserType(null);
               setOnboardingStatus(null);
               setOnboardingFlow(null);
+              setProfessionalRole(null);
               setAccessState('active');
               setFatalError(null);
               setTypeLoading(false);
@@ -292,6 +300,7 @@ export default function App() {
               setUserType(null);
               setOnboardingStatus(null);
               setOnboardingFlow(null);
+              setProfessionalRole(null);
               setAccessState('active');
               setBooting(false);
             });
@@ -310,6 +319,7 @@ export default function App() {
             setUserType(null);
             setOnboardingStatus(null);
             setOnboardingFlow(null);
+            setProfessionalRole(null);
             setAccessState('active');
             setFatalError(null);
             setTypeLoading(false);
@@ -325,6 +335,7 @@ export default function App() {
           setUserType(null);
           setOnboardingStatus(null);
           setOnboardingFlow(null);
+          setProfessionalRole(null);
           setAccessState('active');
           setFatalError(null);
           return;
@@ -337,7 +348,7 @@ export default function App() {
     return () => { aliveRef.current = false; subscription?.unsubscribe(); };
   }, [loadProfile, safeSet, setRecoveryMode]);
 
-  const handleLogin = useCallback((userData, type, nextOnboardingStatus = 'completed', nextAccessState = 'active', nextOnboardingFlow = null) => {
+  const handleLogin = useCallback((userData, type, nextOnboardingStatus = 'completed', nextAccessState = 'active', nextOnboardingFlow = null, nextProfessionalRole = null) => {
     loadedUserRef.current = userData?.id || null;
     setUser(userData || null);
     setUserType(isValidType(type) ? type : null);
@@ -347,6 +358,7 @@ export default function App() {
         : null
     );
     setOnboardingFlow(nextOnboardingFlow === 'partner' || nextOnboardingFlow === 'owner' ? nextOnboardingFlow : null);
+    setProfessionalRole(isValidProfessionalRole(nextProfessionalRole) ? nextProfessionalRole : null);
     setAccessState(nextAccessState);
     setFatalError(null);
     setPostLogoutRedirect(null);
@@ -363,6 +375,7 @@ export default function App() {
       setUserType(null);
       setOnboardingStatus(null);
       setOnboardingFlow(null);
+      setProfessionalRole(null);
       setAccessState('active');
       setFatalError(null);
       setTypeLoading(false);
@@ -379,6 +392,7 @@ export default function App() {
           setUserType(null);
           setOnboardingStatus(null);
           setOnboardingFlow(null);
+          setProfessionalRole(null);
           setAccessState('active');
           setBooting(false);
         });
@@ -394,6 +408,7 @@ export default function App() {
         setUserType(null);
         setOnboardingStatus(null);
         setOnboardingFlow(null);
+        setProfessionalRole(null);
         setAccessState('active');
         setBooting(false);
       });
@@ -521,7 +536,9 @@ export default function App() {
                     ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                     : accessState === 'partner_pending'
                       ? <Navigate to="/parceiro/aguardando" />
-                      : <CriarNegocio user={user} />
+                      : professionalRole === 'partner'
+                        ? <Navigate to="/dashboard" replace />
+                        : <CriarNegocio user={user} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to={postLogoutRedirect || "/login"} />
               ) : <Navigate to={postLogoutRedirect || "/login"} />
@@ -535,7 +552,7 @@ export default function App() {
                     ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                     : accessState === 'partner_pending'
                       ? <Navigate to="/parceiro/aguardando" />
-                      : <SelecionarNegocioRouteGuard user={user} onLogout={handleLogout} />
+                      : <SelecionarNegocioRouteGuard user={user} onLogout={handleLogout} professionalRole={professionalRole} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to={postLogoutRedirect || "/login"} />
               ) : <Navigate to={postLogoutRedirect || "/login"} />
