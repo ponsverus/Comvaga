@@ -170,6 +170,22 @@ export async function createAsaasCheckout(negocioId, planCode) {
   return data;
 }
 
+export async function cancelAsaasSubscription(negocioId) {
+  const { data, error } = await withTimeout(
+    supabase.functions.invoke('asaas-cancel-subscription', {
+      body: {
+        negocio_id: negocioId,
+      },
+    }),
+    8000,
+    'asaas-cancel-subscription'
+  );
+
+  if (error) throw error;
+  if (!data?.billing_status) throw new Error('billing_status_missing');
+  return data;
+}
+
 export async function fetchPartnerNegocioIds(userId) {
   const { data, error } = await withTimeout(
     supabase

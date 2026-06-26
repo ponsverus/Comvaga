@@ -104,8 +104,9 @@ function getBillingAnnouncement(status) {
   const current = String(status.status || '').toLowerCase();
   const daysUntilTrialEnd = Number(status.days_until_trial_end);
   const daysUntilBlock = Number(status.days_until_block);
+  const trialDays = Number(status.trial_days);
 
-  if (current === 'blocked' || current === 'billing_required') {
+  if (current === 'blocked' || current === 'billing_required' || current === 'canceled') {
     return {
       tone: 'danger',
       text: 'Agenda bloqueada para novos agendamentos. Ative um plano com pagamento válido para liberar.',
@@ -122,10 +123,16 @@ function getBillingAnnouncement(status) {
     };
   }
 
-  if (current === 'trialing' && Number.isFinite(daysUntilTrialEnd) && daysUntilTrialEnd <= 2) {
+  if (current === 'trialing' && Number.isFinite(daysUntilTrialEnd)) {
+    const total = Number.isFinite(trialDays) && trialDays > 0
+      ? ` DE ${trialDays} DIA${trialDays === 1 ? '' : 'S'}`
+      : '';
+    const text = daysUntilTrialEnd <= 0
+      ? `TESTE GRATIS ATIVO. ULTIMO DIA${total}.`
+      : `TESTE GRATIS ATIVO. FALTAM ${daysUntilTrialEnd} DIA${daysUntilTrialEnd === 1 ? '' : 'S'}${total}.`;
     return {
       tone: 'warning',
-      text: `MAIS ${daysUntilTrialEnd} dia${daysUntilTrialEnd === 1 ? '' : 's'} DE TESTES. CONFIGURE O PAGAMENTO.`,
+      text,
     };
   }
 
@@ -973,7 +980,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
             )}
 
             {activeTab === 'planos' && souDono && (
-              <PlanosSection negocioId={negocio.id} />
+              <PlanosSection negocioId={negocio.id} onBillingStatusChange={setBillingStatus} />
             )}
 
           </div>
