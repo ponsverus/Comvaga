@@ -275,7 +275,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
                     <div className="relative">
                       <ProfessionalIcon className="mx-auto mb-4 text-primary w-10 h-10 group-hover:scale-110 transition-transform" />
                       <div className="font-normal text-lg tracking-wide mb-1">PROFISSIONAL</div>
-                      <div className="text-xs text-gray-500">GERENCIAR NEGÃƒÆ’Ã¢â‚¬Å“CIO</div>
+                      <div className="text-xs text-gray-500">GERENCIAR NEGÓCIO</div>
                     </div>
                   </button>
                 </div>
@@ -317,7 +317,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
                       <div className="relative min-w-0 flex-1">
                       <input
                         type={showPassword ? 'text' : 'password'}
-                        placeholder="ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢"
+                        placeholder="••••••••"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         className="w-full bg-transparent px-0 py-2 pr-10 text-sm text-white placeholder-gray-600 outline-none focus:text-white"
@@ -366,7 +366,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
 
         <div className="text-center mt-12">
           <p className="text-xs text-gray-600 font-normal">
-            AO CONTINUAR, VOCE CONCORDA COM NOSSOS{' '}
+            AO CONTINUAR, VOCÊ CONCORDA COM NOSSOS{' '}
             <Link to="/termos" className="text-gray-500 hover:text-primary transition-colors">
               TERMOS DE USO
             </Link>
