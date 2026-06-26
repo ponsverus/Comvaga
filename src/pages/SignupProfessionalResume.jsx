@@ -240,6 +240,10 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           showMessage('signupProfessional.business_slug_taken');
           return;
         }
+        if (code === 'partner_cannot_create_business') {
+          showMessage('signupProfessional.partner_cannot_create_business');
+          return;
+        }
         if (code === 'usuario_nao_encontrado' || code === 'negocio_nao_encontrado') {
           showMessage('signupProfessional.profile_not_created');
           return;
@@ -276,7 +280,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         clearSelectedPlanIntent();
       }
 
-      onLogin(user, 'professional', 'completed');
+      onLogin(user, 'professional', 'completed', 'active', null, 'owner');
       navigate('/dashboard', { state: { negocioId: data.negocio_id } });
     } catch (err) {
       console.error('SignupProfessionalResume error:', err);
@@ -326,14 +330,14 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           <ProfessionalIcon className="mx-auto mb-4 text-primary w-12 h-12" />
           <h1 className="text-4xl font-normal mb-3 tracking-wide">{isWaitingRoom ? 'CRIAR VITRINE' : 'RETOMAR VITRINE'}</h1>
           <p className="text-gray-500 text-base font-normal">
-            {isWaitingRoom ? 'FINALIZE OS DADOS DO SEU NEGÓCIO PARA LIBERAR O DASHBOARD.' : 'SEU CADASTRO FICOU INCOMPLETO. FINALIZE OS DADOS PARA LIBERAR O DASHBOARD.'}
+            {isWaitingRoom ? 'FINALIZE OS DADOS DO SEU NEGÃƒâ€œCIO PARA LIBERAR O DASHBOARD.' : 'SEU CADASTRO FICOU INCOMPLETO. FINALIZE OS DADOS PARA LIBERAR O DASHBOARD.'}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {hasMultipleContexts && (
             <div>
-              <label className={labelClass}>QUAL NEGÓCIO DESEJA RETOMAR?</label>
+              <label className={labelClass}>QUAL NEGÃƒâ€œCIO DESEJA RETOMAR?</label>
               <select
                 value={selectedNegocioId}
                 onChange={(e) => setSelectedNegocioId(e.target.value)}
@@ -368,7 +372,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 onChange={(e) => handleNegocioNameChange(e.target.value)}
                 className={`${fieldInputClass} uppercase`}
                 required
-                placeholder="NOME DO NEGÓCIO"
+                placeholder="NOME DO NEGÃƒâ€œCIO"
               />
             </ResumeFieldRow>
 
@@ -389,7 +393,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 onChange={(e) => setFormData((prev) => ({ ...prev, tipoNegocio: e.target.value.toUpperCase() }))}
                 className={`${fieldInputClass} uppercase`}
                 required
-                placeholder="EX: BARBEARIA, CLÍNICA..."
+                placeholder="EX: BARBEARIA, CLÃƒÂNICA..."
               />
             </ResumeFieldRow>
 
@@ -440,7 +444,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 />
               </ResumeSplitField>
 
-              <ResumeSplitField label="NÚM.">
+              <ResumeSplitField label="NÃƒÅ¡M.">
                 <input
                   type="text"
                   value={formData.numero}

@@ -145,6 +145,10 @@ export default function CriarNegocio({ user }) {
           showMessage('signupProfessional.business_slug_invalid');
           return;
         }
+        if (code === 'partner_cannot_create_business') {
+          showMessage('signupProfessional.partner_cannot_create_business');
+          return;
+        }
         if (code === 'usuario_sem_permissao' || code === 'nao_autenticado') {
           showMessage('signupProfessional.profile_not_created');
           return;
@@ -188,10 +192,10 @@ export default function CriarNegocio({ user }) {
         </div>
 
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-normal mb-3 tracking-wide">NOVO NEGÓCIO</h1>
+          <h1 className="text-4xl font-normal mb-3 tracking-wide">NOVO NEGÃ“CIO</h1>
           <p className="text-gray-500 text-base font-normal">
             <span>AGORA, PREENCHA OS DADOS DO</span>
-            <span className="block text-primary sm:inline"> PRÓXIMO NEGÓCIO</span>
+            <span className="block text-primary sm:inline"> PRÃ“XIMO NEGÃ“CIO</span>
           </p>
         </div>
 
@@ -223,7 +227,7 @@ export default function CriarNegocio({ user }) {
                 type="text"
                 value={formData.tipoNegocio}
                 onChange={(e) => setFormData(prev => ({ ...prev, tipoNegocio: e.target.value.toUpperCase() }))}
-                placeholder="ESTÚDIO"
+                placeholder="ESTÃšDIO"
                 className={`${fieldInputClass} uppercase`}
                 required
               />
@@ -277,7 +281,7 @@ export default function CriarNegocio({ user }) {
                 />
               </SplitField>
 
-              <SplitField label="NÚMERO">
+              <SplitField label="NÃšMERO">
                 <input
                   type="text"
                   value={formData.numero}
@@ -326,7 +330,7 @@ export default function CriarNegocio({ user }) {
             disabled={loading}
             className="w-full py-3 bg-primary/10 border border-primary/30 hover:border-primary/60 hover:bg-primary/20 text-primary rounded-full font-normal text-sm tracking-wider transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {loading ? 'CRIANDO...' : 'CRIAR NEGÓCIO'}
+            {loading ? 'CRIANDO...' : 'CRIAR NEGÃ“CIO'}
           </button>
         </form>
       </div>
