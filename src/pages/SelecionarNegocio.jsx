@@ -29,7 +29,7 @@ function formatBusinessAddress(negocio) {
   ].filter(Boolean).join(' - ');
 }
 
-export default function SelecionarNegocio({ user, onLogout }) {
+export default function SelecionarNegocio({ user, onLogout, professionalRole = null }) {
   const navigate = useNavigate();
   const [negocios, setNegocios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -99,8 +99,8 @@ export default function SelecionarNegocio({ user, onLogout }) {
         </div>
 
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-normal mb-2 tracking-wide">QUAL NEGÓCIO?</h1>
-          <p className="text-gray-500 text-sm font-normal">SELECIONE O NEGÓCIO QUE DESEJA GERENCIAR</p>
+          <h1 className="text-3xl font-normal mb-2 tracking-wide">QUAL NEGÃ“CIO?</h1>
+          <p className="text-gray-500 text-sm font-normal">SELECIONE O NEGÃ“CIO QUE DESEJA GERENCIAR</p>
         </div>
 
         <div className="space-y-3 mb-6">
@@ -141,16 +141,18 @@ export default function SelecionarNegocio({ user, onLogout }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => navigate('/criar-negocio')}
-            className="flex h-11 flex-1 items-center justify-center rounded-full border border-primary/30 text-[12px] font-normal uppercase leading-none text-primary transition-colors hover:border-primary"
-          >
-            <span className="inline-flex items-center justify-center gap-2 leading-none">
-              <Plus className="w-4 h-4" />
-              CRIAR OUTRO
-            </span>
-          </button>
+          {professionalRole !== 'partner' && (
+            <button
+              type="button"
+              onClick={() => navigate('/criar-negocio')}
+              className="flex h-11 flex-1 items-center justify-center rounded-full border border-primary/30 text-[12px] font-normal uppercase leading-none text-primary transition-colors hover:border-primary"
+            >
+              <span className="inline-flex items-center justify-center gap-2 leading-none">
+                <Plus className="w-4 h-4" />
+                CRIAR OUTRO
+              </span>
+            </button>
+          )}
           <button
             type="button"
             onClick={onLogout}
