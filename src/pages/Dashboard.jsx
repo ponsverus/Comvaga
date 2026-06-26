@@ -147,6 +147,12 @@ function BillingAnnouncementBar({ announcement }) {
   );
 }
 
+const BILLING_CHECKOUT_MESSAGE_KEYS = {
+  success: 'dashboard.billing_checkout_success',
+  cancel: 'dashboard.billing_checkout_cancel',
+  expired: 'dashboard.billing_checkout_expired',
+};
+
 function DashboardTopCard({ icon, label, value, children, highlight = false }) {
   const baseClass = highlight
     ? 'bg-gradient-to-br from-green-500/20 to-emerald-600/20 border-green-500/30'
@@ -600,10 +606,29 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
 
   const TAB_LABELS = { 'visao-geral': 'GERAL', 'agendamentos': 'AGENDAMENTOS', 'cancelados': 'CANCELADOS', 'historico': 'HISTÓRICO', 'clientes': 'CLIENTES', 'entregas': tabEntregasLabel, 'profissionais': 'PROFISSIONAIS', 'dados': 'DADOS', 'info-negocio': 'INFO DO NEGÓCIO', 'planos': 'PLANOS' };
   useEffect(() => {
-    const queryTab = new URLSearchParams(location?.search || '').get('tab');
+    const searchParams = new URLSearchParams(location?.search || '');
+    const queryTab = searchParams.get('tab');
     const requestedTab = location?.state?.activeTab || queryTab;
     if (requestedTab && tabs.includes(requestedTab)) setActiveTab(requestedTab);
-  }, [location?.search, location?.state?.activeTab, tabs]);
+
+    const billingResult = String(searchParams.get('billing') || '').toLowerCase();
+    const messageKey = BILLING_CHECKOUT_MESSAGE_KEYS[billingResult];
+    if (!messageKey) return;
+
+    feedback?.showMessage?.(messageKey);
+    searchParams.delete('billing');
+    const nextSearch = searchParams.toString();
+    navigate(
+      {
+        pathname: location.pathname,
+        search: nextSearch ? `?${nextSearch}` : '',
+      },
+      {
+        replace: true,
+        state: location.state,
+      }
+    );
+  }, [feedback, location.pathname, location?.search, location.state, location?.state?.activeTab, navigate, tabs]);
 
   const agendarCliente = useCallback((cliente) => {
     if (!negocio?.slug || !cliente?.cliente_id) return;
