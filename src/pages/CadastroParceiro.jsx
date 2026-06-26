@@ -163,7 +163,7 @@ export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
                   type={showPassword ? 'text' : 'password'}
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  placeholder="MÃNIMO 7 CARACTERES"
+                  placeholder="MÍNIMO 7 CARACTERES"
                   className={`${fieldInputClass} pr-10`}
                   required
                   minLength={7}
