@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import {
+  cancelAsaasSubscription,
   createAsaasCheckout,
   fetchBillingPlans,
   fetchBusinessBillingStatus,
@@ -21,6 +22,17 @@ function statusText(status) {
   if (current === 'payment_required') return 'Pagamento necessário';
   if (current === 'canceled') return 'Cancelado';
   return 'Config.';
+}
+
+function getPlanCancelErrorMessage(error) {
+  const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
+  if (raw.includes('subscription_not_cancelable')) {
+    return 'Este plano nao possui pagamento ativo para cancelar.';
+  }
+  if (raw.includes('asaas_cancel_failed')) {
+    return 'Houve um erro ao cancelar a assinatura no pagamento agora.';
+  }
+  return 'Houve uma falha durante o cancelamento do plano.';
 }
 
 function getPlanChangeErrorMessage(error) {
@@ -126,11 +138,12 @@ function StarGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
   );
 }
 
-export default function PlanosSection({ negocioId }) {
+export default function PlanosSection({ negocioId, onBillingStatusChange }) {
   const [plans, setPlans] = useState([]);
   const [billingStatus, setBillingStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [savingPlan, setSavingPlan] = useState('');
+  const [cancelingPlan, setCancelingPlan] = useState('');
   const [error, setError] = useState('');
   const planScrollerRef = useRef(null);
   const planCardRefs = useRef({});
@@ -146,6 +159,7 @@ export default function PlanosSection({ negocioId }) {
       ]);
       setPlans(plansData);
       setBillingStatus(statusData);
+      onBillingStatusChange?.(statusData);
     } catch (err) {
       console.error('PlanosSection load error:', err);
       const requestKey = getRequestErrorKey(err);
@@ -159,7 +173,7 @@ export default function PlanosSection({ negocioId }) {
     } finally {
       setLoading(false);
     }
-  }, [negocioId]);
+  }, [negocioId, onBillingStatusChange]);
 
   useEffect(() => {
     loadBilling();
@@ -193,7 +207,10 @@ export default function PlanosSection({ negocioId }) {
     setError('');
     try {
       const checkout = await createAsaasCheckout(negocioId, planCode);
-      if (checkout?.billing_status) setBillingStatus(checkout.billing_status);
+      if (checkout?.billing_status) {
+        setBillingStatus(checkout.billing_status);
+        onBillingStatusChange?.(checkout.billing_status);
+      }
       window.location.assign(checkout.checkout_url);
     } catch (err) {
       console.error('createAsaasCheckout error:', err);
@@ -210,6 +227,35 @@ export default function PlanosSection({ negocioId }) {
     }
   };
 
+  const handleCancelPlan = async (planCode) => {
+    if (!negocioId || savingPlan || cancelingPlan) return;
+    const confirmed = window.confirm('Cancelar este plano? A vitrine sera bloqueada para novos agendamentos.');
+    if (!confirmed) return;
+
+    setCancelingPlan(planCode);
+    setError('');
+    try {
+      const result = await cancelAsaasSubscription(negocioId);
+      if (result?.billing_status) {
+        setBillingStatus(result.billing_status);
+        onBillingStatusChange?.(result.billing_status);
+      } else {
+        await loadBilling();
+      }
+    } catch (err) {
+      console.error('cancelAsaasSubscription error:', err);
+      const requestKey = getRequestErrorKey(err);
+      if (requestKey === 'alerts.request_timeout') {
+        setError('O cancelamento demorou demais. Tente novamente em instantes.');
+      } else if (requestKey === 'alerts.rate_limit_exceeded') {
+        setError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
+      } else {
+        setError(getPlanCancelErrorMessage(err));
+      }
+    } finally {
+      setCancelingPlan('');
+    }
+  };
   if (loading) {
     return (
       <div className="flex items-center justify-center py-14 text-gray-500">
@@ -241,8 +287,12 @@ export default function PlanosSection({ negocioId }) {
         {plans.map((plan) => {
           const active = plan.code === currentPlanCode;
           const saving = savingPlan === plan.code;
+          const canceling = cancelingPlan === plan.code;
+          const paymentStatus = String(billingStatus?.payment_method_status || '').toLowerCase();
+          const currentStatus = String(billingStatus?.status || '').toLowerCase();
+          const canCancel = active && currentStatus === 'active' && ['valid', 'none'].includes(paymentStatus);
           const needsPayment = active
-            && !['valid', 'none'].includes(String(billingStatus?.payment_method_status || '').toLowerCase());
+            && !['valid', 'none'].includes(paymentStatus);
           const content = PLAN_CONTENT[plan.code] || {
             label: plan.name,
             description: '',
@@ -306,12 +356,23 @@ export default function PlanosSection({ negocioId }) {
 
               <button
                 type="button"
-                disabled={(active && !needsPayment) || !!savingPlan}
+                disabled={(active && !needsPayment) || !!savingPlan || !!cancelingPlan}
                 onClick={() => handleSelectPlan(plan.code)}
                 className={`mt-4 flex items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active && !needsPayment ? 'cursor-default rounded-full bg-green-400/10 text-green-300 border border-green-400/30 text-xs font-normal uppercase tracking-wider' : content.buttonClass}`}
               >
                 {active && !needsPayment ? 'Plano ativo' : saving ? 'Abrindo checkout...' : needsPayment ? 'Adicionar pagamento' : content.buttonText}
               </button>
+
+              {canCancel && (
+                <button
+                  type="button"
+                  disabled={!!savingPlan || !!cancelingPlan}
+                  onClick={() => handleCancelPlan(plan.code)}
+                  className="mt-3 flex items-center justify-center rounded-full border border-red-500/40 bg-red-500/10 px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-red-300 transition-all hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {canceling ? 'Cancelando...' : 'Cancelar'}
+                </button>
+              )}
             </article>
           );
         })}
