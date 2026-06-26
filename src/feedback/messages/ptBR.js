@@ -59,6 +59,27 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    billing_checkout_success: {
+      title: 'Pagamento iniciado/confirmado',
+      body: 'Pagamento iniciado/confirmado. Seu plano será atualizado em instantes.',
+      variant: 'success',
+      screen: 'light',
+      buttonText: 'OK',
+    },
+    billing_checkout_cancel: {
+      title: 'Checkout cancelado',
+      body: 'Checkout cancelado. Você pode tentar novamente.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    billing_checkout_expired: {
+      title: 'Checkout expirado',
+      body: 'Checkout expirado. Gere um novo link de pagamento.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
     logo_updated: {
       title: 'Logo atualizada',
       body: 'Sua logo foi atualizada com sucesso.',
