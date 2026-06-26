@@ -330,14 +330,14 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           <ProfessionalIcon className="mx-auto mb-4 text-primary w-12 h-12" />
           <h1 className="text-4xl font-normal mb-3 tracking-wide">{isWaitingRoom ? 'CRIAR VITRINE' : 'RETOMAR VITRINE'}</h1>
           <p className="text-gray-500 text-base font-normal">
-            {isWaitingRoom ? 'FINALIZE OS DADOS DO SEU NEGÃƒâ€œCIO PARA LIBERAR O DASHBOARD.' : 'SEU CADASTRO FICOU INCOMPLETO. FINALIZE OS DADOS PARA LIBERAR O DASHBOARD.'}
+            {isWaitingRoom ? 'FINALIZE OS DADOS DO SEU NEGÓCIO PARA LIBERAR O DASHBOARD.' : 'SEU CADASTRO FICOU INCOMPLETO. FINALIZE OS DADOS PARA LIBERAR O DASHBOARD.'}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {hasMultipleContexts && (
             <div>
-              <label className={labelClass}>QUAL NEGÃƒâ€œCIO DESEJA RETOMAR?</label>
+              <label className={labelClass}>QUAL NEGÓCIO DESEJA RETOMAR?</label>
               <select
                 value={selectedNegocioId}
                 onChange={(e) => setSelectedNegocioId(e.target.value)}
@@ -372,7 +372,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 onChange={(e) => handleNegocioNameChange(e.target.value)}
                 className={`${fieldInputClass} uppercase`}
                 required
-                placeholder="NOME DO NEGÃƒâ€œCIO"
+                placeholder="NOME DO NEGÓCIO"
               />
             </ResumeFieldRow>
 
@@ -393,7 +393,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 onChange={(e) => setFormData((prev) => ({ ...prev, tipoNegocio: e.target.value.toUpperCase() }))}
                 className={`${fieldInputClass} uppercase`}
                 required
-                placeholder="EX: BARBEARIA, CLÃƒÂNICA..."
+                placeholder="EX: BARBEARIA, CLÍNICA..."
               />
             </ResumeFieldRow>
 
@@ -444,7 +444,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 />
               </ResumeSplitField>
 
-              <ResumeSplitField label="NÃƒÅ¡M.">
+              <ResumeSplitField label="NÚM.">
                 <input
                   type="text"
                   value={formData.numero}

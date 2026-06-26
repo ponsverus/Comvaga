@@ -105,7 +105,7 @@ export default function SignupProfessional({ onLogin }) {
         }
         throw authError;
       }
-      if (!authData?.user?.id) throw new Error('InexistÃªncia de usuÃ¡rio no retorno do Supabase.');
+      if (!authData?.user?.id) throw new Error('Inexistência de usuário no retorno do Supabase.');
 
       if (!authData.session) {
         showMessage('signupProfessional.confirm_email_needed');
@@ -125,7 +125,7 @@ export default function SignupProfessional({ onLogin }) {
       console.error('SignupProfessional error:', err);
       showMessage('alerts.action_failed_support');
       try { await supabase.auth.signOut(); } catch (signOutError) {
-        console.warn('Houve um problema no cadastro, mas seu acesso continua ativo. Por favor, atualize a pÃ¡gina.', signOutError);
+        console.warn('Houve um problema no cadastro, mas seu acesso continua ativo. Por favor, atualize a página.', signOutError);
       }
     } finally {
       setLoading(false);
@@ -195,7 +195,7 @@ export default function SignupProfessional({ onLogin }) {
                   className={`${fieldInputClass} pr-10`}
                   required
                   minLength={7}
-                  placeholder="MÃNIMO 7 CARACTERES"
+                  placeholder="MÍNIMO 7 CARACTERES"
                 />
                 <button
                   type="button"
@@ -228,13 +228,13 @@ export default function SignupProfessional({ onLogin }) {
 
         <div className="text-center mt-12">
           <p className="text-xs text-gray-600 font-normal">
-            AO CONTINUAR, VOCÃŠ CONCORDA COM NOSSOS{' '}
+            AO CONTINUAR, VOCÊ CONCORDA COM NOSSOS{' '}
             <Link to="/termos" className="text-gray-500 hover:text-primary transition-colors">
               TERMOS DE USO
             </Link>
             {' '}E{' '}
             <Link to="/privacidade" className="text-gray-500 hover:text-primary transition-colors">
-              POLÃTICA DE PRIVACIDADE
+              POLÍTICA DE PRIVACIDADE
             </Link>
           </p>
         </div>

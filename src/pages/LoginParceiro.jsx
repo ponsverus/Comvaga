@@ -247,7 +247,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="MÃƒÂNIMO 6 CARACTERES"
+                  placeholder="MÍNIMO 6 CARACTERES"
                   className={fieldInputClass}
                   required
                 />
@@ -286,7 +286,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
         <div className="text-center mb-8">
           <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-20 w-auto object-contain mx-auto mb-4" />
           <h1 className="text-3xl font-normal text-white uppercase">LOGIN PARCEIRO</h1>
-          <p className="text-gray-500 text-sm mt-2 font-normal">ACESSE O PAINEL DO SEU NEGÃƒâ€œCIO AGORA</p>
+          <p className="text-gray-500 text-sm mt-2 font-normal">ACESSE O PAINEL DO SEU NEGÓCIO AGORA</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -319,7 +319,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
                   type={showPassword ? 'text' : 'password'}
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢"
+                  placeholder="••••••••"
                   className={`${fieldInputClass} pr-10`}
                   required
                 />
@@ -338,7 +338,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
-                placeholder="SLUG DO NEGÃƒâ€œCIO"
+                placeholder="SLUG DO NEGÓCIO"
                 className={`${fieldInputClass} uppercase`}
                 required
               />

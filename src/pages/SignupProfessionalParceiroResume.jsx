@@ -114,7 +114,7 @@ export default function SignupProfessionalParceiroResume({ user, onLogin }) {
         <div className="text-center mb-8">
           <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-20 w-auto object-contain mx-auto mb-4" />
           <h1 className="text-3xl font-normal text-white uppercase">SOLICITAR PARCERIA</h1>
-          <p className="text-gray-500 text-sm mt-2 font-normal">INFORME O NEGÃ“CIO E AGUARDE O AVAL</p>
+          <p className="text-gray-500 text-sm mt-2 font-normal">INFORME O NEGÓCIO E AGUARDE O AVAL</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
