@@ -104,7 +104,7 @@ export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
       }
 
       if (suppressAuthRef) suppressAuthRef.current = false;
-      onLogin?.(signUpData.user, 'professional', 'pending', 'owner_resume', 'partner');
+      onLogin?.(signUpData.user, 'professional', 'pending', 'owner_resume', 'partner', 'partner');
       navigate('/cadastro/profissional-parceiro/retomada', { replace: true });
     } catch (e) {
       setAlerta({ body: e?.message || msgs.unexpected_error.body, variant: 'erro' });
@@ -163,7 +163,7 @@ export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
                   type={showPassword ? 'text' : 'password'}
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  placeholder="MÍNIMO 7 CARACTERES"
+                  placeholder="MÃNIMO 7 CARACTERES"
                   className={`${fieldInputClass} pr-10`}
                   required
                   minLength={7}
