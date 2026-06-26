@@ -905,6 +905,15 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
+    partner_use_partner_login: {
+      title: 'Use o Login Parceiro',
+      body:
+        'Esta conta pertence a um profissional parceiro.\n' +
+        'Acesse pelo Login Parceiro e informe o slug do negocio vinculado.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
     reset_email_required: {
       title: 'Informe seu e-mail',
       body:
@@ -1161,6 +1170,15 @@ export const ptBR = {
         'Seu perfil foi criado com tipo incorreto.\n' +
         'Acesse SUPORTE no rodapé da página para resolver.',
       variant: 'danger',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    partner_cannot_create_business: {
+      title: 'Use uma conta administradora',
+      body:
+        'Esta conta pertence a um profissional parceiro.\n' +
+        'Para criar negocios, entre com uma conta administradora.',
+      variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
