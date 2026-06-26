@@ -128,8 +128,8 @@ function getBillingAnnouncement(status) {
       ? ` DE ${trialDays} DIA${trialDays === 1 ? '' : 'S'}`
       : '';
     const text = daysUntilTrialEnd <= 0
-      ? `TESTE GRATIS ATIVO. ULTIMO DIA${total}.`
-      : `TESTE GRATIS ATIVO. FALTAM ${daysUntilTrialEnd} DIA${daysUntilTrialEnd === 1 ? '' : 'S'}${total}.`;
+      ? `TESTE GRÁTIS ATIVO. ULTIMO DIA${total}.`
+      : `TESTE GRÁTIS ATIVO. FALTAM ${daysUntilTrialEnd} DIA${daysUntilTrialEnd === 1 ? '' : 'S'}${total}.`;
     return {
       tone: 'warning',
       text,
