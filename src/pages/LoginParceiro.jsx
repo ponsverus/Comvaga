@@ -118,6 +118,11 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
         return setAlerta(msgs.not_partner);
       }
 
+      if (accessProfile?.professionalRole === 'owner') {
+        await supabase.auth.signOut();
+        return setAlerta(ptBR.parceiroCadastro.owner_cannot_request_partner_access);
+      }
+
       const { data: isOwner, error: ownerErr } = await supabase.rpc('is_owner_of_negocio', {
         p_negocio_id: negocio.id,
       });
@@ -150,6 +155,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
           'professional',
           accessProfile.onboardingStatus,
           'partner_pending',
+          'partner',
           'partner'
         );
         navigate('/parceiro/aguardando', { replace: true });
@@ -166,7 +172,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
 
       if (suppressAuthRef) suppressAuthRef.current = false;
       saveLastPartnerNegocio(uid, negocio.id);
-      onLogin(signInData.user, 'professional', 'completed', 'active');
+      onLogin(signInData.user, 'professional', 'completed', 'active', null, 'partner');
       navigate('/dashboard', { state: { negocioId: negocio.id } });
     } catch (e2) {
       setAlerta({ body: e2?.message || msgs.unexpected_error.body, variant: 'erro' });
@@ -241,7 +247,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="MÍNIMO 6 CARACTERES"
+                  placeholder="MÃƒÂNIMO 6 CARACTERES"
                   className={fieldInputClass}
                   required
                 />
@@ -280,7 +286,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
         <div className="text-center mb-8">
           <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-20 w-auto object-contain mx-auto mb-4" />
           <h1 className="text-3xl font-normal text-white uppercase">LOGIN PARCEIRO</h1>
-          <p className="text-gray-500 text-sm mt-2 font-normal">ACESSE O PAINEL DO SEU NEGÓCIO AGORA</p>
+          <p className="text-gray-500 text-sm mt-2 font-normal">ACESSE O PAINEL DO SEU NEGÃƒâ€œCIO AGORA</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -313,7 +319,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
                   type={showPassword ? 'text' : 'password'}
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢"
                   className={`${fieldInputClass} pr-10`}
                   required
                 />
@@ -332,7 +338,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
-                placeholder="SLUG DO NEGÓCIO"
+                placeholder="SLUG DO NEGÃƒâ€œCIO"
                 className={`${fieldInputClass} uppercase`}
                 required
               />
