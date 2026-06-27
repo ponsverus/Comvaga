@@ -705,7 +705,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
                     ? ownerBusinessCount > 1
                       ? <button type="button" onClick={() => navigate('/selecionar-negocio')} className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block">TROCAR NEGÓCIO</button>
                       : <span className="text-xs text-gray-500 -mt-0.5 block">DASHBOARD</span>
-                    : <button type="button" onClick={() => navigate('/selecionar-negocio-parceiro')} className="text-xs text-primary hover:text-yellow-500 -mt-0.5 block uppercase transition-colors">{parceiroProfissional?.nome || 'PARCEIRO'}</button>}
+                    : <button type="button" onClick={() => navigate('/selecionar-negocio-parceiro')} className="text-xs text-primary hover:text-yellow-500 -mt-0.5 block uppercase transition-colors">SELECIONAR NEGÓCIO</button>}
                 </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
