@@ -81,22 +81,9 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
         );
       }
 
-      if (userType === 'professional' && profile.professionalRole === 'partner') {
+      if (userType === 'professional' && profile.professionalRole !== 'owner') {
         await supabase.auth.signOut();
         showMessage('login.partner_use_partner_login');
-        return;
-      }
-
-      if (profile.accessState === 'partner_pending') {
-        onLogin?.(
-          authUser,
-          profile.type,
-          profile.onboardingStatus,
-          profile.accessState,
-          profile.onboardingFlow,
-          profile.professionalRole
-        );
-        navigate('/parceiro/aguardando', { replace: true });
         return;
       }
 
