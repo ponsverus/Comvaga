@@ -13,7 +13,6 @@ import SignupClient           from './pages/SignupClient';
 import SignupProfessional     from './pages/SignupProfessional';
 import CadastroParceiro       from './pages/CadastroParceiro';
 import LoginParceiro          from './pages/LoginParceiro';
-import PartnerPendingApproval from './pages/PartnerPendingApproval';
 import ResetPassword          from './pages/ResetPassword';
 import NotFound               from './pages/NotFound';
 
@@ -181,7 +180,6 @@ export default function App() {
   const getPostLoginPath = useCallback((type, currentAccessState, status, flow = onboardingFlow, role = professionalRole) => {
     if (type !== 'professional') return '/minha-area';
     if (role === 'partner' || flow === 'partner') return '/selecionar-negocio-parceiro';
-    if (currentAccessState === 'partner_pending') return '/parceiro/aguardando';
     if (flow === 'partner' && currentAccessState === 'owner_resume') return '/cadastro/profissional-parceiro/retomada';
     if (currentAccessState === 'owner_resume' || normalizeOnboardingStatus(type, status) === 'pending') {
       return '/cadastro/profissional/retomada';
@@ -454,17 +452,6 @@ export default function App() {
                   : <LoginParceiro onLogin={handleLogin} suppressAuthRef={suppressAuthRef} />
             } />
 
-            <Route path="/parceiro/aguardando" element={
-              isLoggedIn ? (
-                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
-                : userType === 'professional' && professionalRole === 'partner'
-                  ? <Navigate to="/selecionar-negocio-parceiro" replace />
-                : userType === 'professional' && accessState === 'partner_pending'
-                  ? <PartnerPendingApproval onLogout={handleLogout} />
-                  : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
-              ) : <Navigate to={postLogoutRedirect || "/login"} />
-            } />
-
             <Route path="/cadastro" element={
               isLoggedIn && userType
                 ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
@@ -513,8 +500,6 @@ export default function App() {
                 : userType === 'professional'
                   ? accessState === 'owner_resume'
                     ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
-                    : accessState === 'partner_pending'
-                      ? <Navigate to="/selecionar-negocio-parceiro" />
                     : <Dashboard user={user} onLogout={handleLogout} userType={userType} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to={postLogoutRedirect || "/login"} />
@@ -538,9 +523,7 @@ export default function App() {
                 : userType === 'professional'
                   ? accessState === 'owner_resume'
                     ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
-                    : accessState === 'partner_pending'
-                      ? <Navigate to="/selecionar-negocio-parceiro" />
-                      : professionalRole === 'partner'
+                    : professionalRole === 'partner'
                         ? <Navigate to="/selecionar-negocio-parceiro" replace />
                         : <CriarNegocio user={user} />
                 : userType ? <Navigate to="/minha-area" />
@@ -554,9 +537,7 @@ export default function App() {
                 : userType === 'professional'
                   ? accessState === 'owner_resume'
                     ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
-                    : accessState === 'partner_pending'
-                      ? <Navigate to="/selecionar-negocio-parceiro" />
-                      : <SelecionarNegocioRouteGuard user={user} onLogout={handleLogout} professionalRole={professionalRole} />
+                    : <SelecionarNegocioRouteGuard user={user} onLogout={handleLogout} professionalRole={professionalRole} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to={postLogoutRedirect || "/login"} />
               ) : <Navigate to={postLogoutRedirect || "/login"} />
