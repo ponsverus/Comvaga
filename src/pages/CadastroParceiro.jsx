@@ -47,6 +47,7 @@ function getEmailAvailabilityAlert(checkResult) {
 export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
   const navigate = useNavigate();
 
+  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -58,8 +59,10 @@ export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
     e.preventDefault();
     setAlerta(null);
 
+    const nomeClean = nome.trim().replace(/\s+/g, ' ');
     const emailClean = email.trim().toLowerCase();
 
+    if (!nomeClean) return setAlerta(msgs.nome_required);
     if (!emailClean || !emailClean.includes('@')) return setAlerta(msgs.email_invalid);
     if (senha.length < 7) return setAlerta(msgs.senha_too_short);
 
@@ -83,8 +86,9 @@ export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
           data: {
             type: 'professional',
             partner_signup: true,
+            nome: nomeClean,
           },
-          emailRedirectTo: `${window.location.origin}/cadastro/profissional-parceiro/retomada`,
+          emailRedirectTo: `${window.location.origin}/selecionar-negocio-parceiro`,
         },
       });
 
@@ -104,8 +108,8 @@ export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
       }
 
       if (suppressAuthRef) suppressAuthRef.current = false;
-      onLogin?.(signUpData.user, 'professional', 'pending', 'owner_resume', 'partner', 'partner');
-      navigate('/cadastro/profissional-parceiro/retomada', { replace: true });
+      onLogin?.(signUpData.user, 'professional', 'pending', 'active', 'partner', 'partner');
+      navigate('/selecionar-negocio-parceiro', { replace: true });
     } catch (e) {
       setAlerta({ body: e?.message || msgs.unexpected_error.body, variant: 'erro' });
       await supabase.auth.signOut();
@@ -146,6 +150,17 @@ export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-100">
+            <FieldRow label="NOME">
+              <input
+                type="text"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="NOME PROFISSIONAL"
+                className={`${fieldInputClass} uppercase`}
+                required
+              />
+            </FieldRow>
+
             <FieldRow label="E-MAIL">
               <input
                 type="email"
