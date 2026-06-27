@@ -477,6 +477,13 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    professional_future_bookings_blocked: {
+      title: 'Agendamentos futuros',
+      body: 'Este profissional tem agendamentos de hoje ou futuros.\nCancele ou reagende esses compromissos antes de inativar ou excluir o vínculo.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
     professional_almoco_blocked: {
       title: 'Pausa bloqueada',
       body: 'Há agendamentos futuros que entram em conflito com o novo horário da pausa.\nCancele esses agendamentos antes de salvar este ajuste.',
