@@ -3,8 +3,7 @@ import { withTimeout } from '../../../utils/withTimeout';
 
 function isAdminRemovedProfessional(row) {
   return row?.status === 'inativo'
-    && row?.motivo_inativo === 'excluido_admin'
-    && !row?.user_id;
+    && row?.motivo_inativo === 'excluido_admin';
 }
 
 export function getPublicUrl(bucket, path) {
