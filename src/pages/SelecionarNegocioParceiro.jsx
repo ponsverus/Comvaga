@@ -220,11 +220,11 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
 
       const status = String(data?.status || '');
       if (status === 'pending_approval') {
-        setAlert({ type: 'success', message: 'Solicitação enviada. Aguarde o aval do responsável pelo negócio.' });
+        setAlert({ type: 'success', message: 'Solicita. enviada. Aguarde o aval do responsável pelo negócio.' });
       } else if (status === 'ok') {
         setAlert({ type: 'success', message: 'Parceria ativa. Você já pode acessar o dashboard deste negócio.' });
       } else {
-        setAlert({ type: 'warning', message: 'Solicitação processada. Atualize a lista para conferir o status.' });
+        setAlert({ type: 'warning', message: 'Solicita. processada. Atualize a lista para conferir o status.' });
       }
 
       await loadCenter({ silent: true });
@@ -240,9 +240,9 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
       if (raw.includes('access_inactive')) {
         setAlert({ type: 'warning', message: 'Este vínculo está inativo ou excluído neste negócio.' });
       } else if (raw.includes('partner_plan_unavailable')) {
-        setAlert({ type: 'warning', message: 'Este negócio ainda não recebe parceiros no plano atual.' });
+        setAlert({ type: 'warning', message: '"Parcerias indisponíveis para este negócio' });
       } else if (raw.includes('owner_cannot_request_partner_access')) {
-        setAlert({ type: 'warning', message: 'Conta administradora não pode solicitar parceria.' });
+        setAlert({ type: 'warning', message: 'Parcerias indisponíveis para contas administradoras.' });
       } else {
         setAlert({ type: 'error', message: error?.message || 'Erro ao solicitar parceria.' });
       }
@@ -404,10 +404,10 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          {renderSection('Ativos', groups.ativos, 'Nenhum negócio ativo no momento.')}
-          {renderSection('Aguardando', groups.aguardando, 'Nenhuma solicitação aguardando aval.')}
-          {renderSection('Inativos', groups.inativos, 'Nenhum vínculo inativo.')}
-          {renderSection('Excluídos', groups.excluidos, 'Nenhum vínculo excluído.')}
+          {renderSection('Ativos', groups.ativos, ':(')}
+          {renderSection('Aguardando', groups.aguardando, ':(')}
+          {renderSection('Inativos', groups.inativos, ':(')}
+          {renderSection('Excluídos', groups.excluidos, ':(')}
         </div>
       </div>
     </div>
