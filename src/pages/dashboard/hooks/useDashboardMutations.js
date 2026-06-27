@@ -470,8 +470,13 @@ export function useDashboardMutations({
       );
       await uiAlert(novoStatus === 'ativo' ? 'dashboard.professional_activated' : 'dashboard.professional_inactivated', 'success');
       await reloadProfissionais();
-    } catch {
-      await uiAlert('dashboard.professional_toggle_error', 'error');
+    } catch (error) {
+      const msg = String(error?.message || '');
+      if (msg.includes('profissional_agendamentos_futuros_bloqueados')) {
+        await uiAlert('dashboard.professional_future_bookings_blocked', 'warning');
+      } else {
+        await uiAlert('dashboard.professional_toggle_error', 'error');
+      }
     } finally {
       unlockAction(lockKey);
     }
@@ -497,7 +502,9 @@ export function useDashboardMutations({
       else setEntregas([]);
     } catch (error) {
       const requestKey = getRequestErrorKey(error);
-      if (requestKey) await uiAlert(requestKey, 'warning');
+      const msg = String(error?.message || '');
+      if (msg.includes('profissional_agendamentos_futuros_bloqueados')) await uiAlert('dashboard.professional_future_bookings_blocked', 'warning');
+      else if (requestKey) await uiAlert(requestKey, 'warning');
       else await uiAlert('dashboard.professional_delete_error', 'error');
     } finally {
       unlockAction(lockKey);
