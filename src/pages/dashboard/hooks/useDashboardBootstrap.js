@@ -28,6 +28,10 @@ function isValidPartnerNegocioId(negocioId, negocioIds) {
   return !!negocioId && negocioIds.includes(negocioId);
 }
 
+function isActivePartnerProfessional(profissional) {
+  return String(profissional?.status || '').toLowerCase() === 'ativo';
+}
+
 export function useDashboardBootstrap({
   userId,
   locationNegocioId,
@@ -74,7 +78,9 @@ export function useDashboardBootstrap({
 
   const scopeProfissionais = useCallback((allProfissionais, negocioOwnerId) => {
     const ownerContext = negocioOwnerId === userId;
-    const scoped = ownerContext ? allProfissionais : allProfissionais.filter((item) => item.user_id === userId);
+    const scoped = ownerContext
+      ? allProfissionais
+      : allProfissionais.filter((item) => item.user_id === userId && isActivePartnerProfessional(item));
     return {
       scoped,
       parceiro: ownerContext ? null : (scoped[0] || null),
@@ -250,21 +256,12 @@ export function useDashboardBootstrap({
         return;
       }
 
-      setNegocio(negocioData);
-      const [galeriaResult, allProfissionais] = await Promise.all([
-        fetchGaleria(negocioData.id, { limit: GALERIA_PAGE_SIZE + 1, offset: 0 }),
-        fetchProfissionaisComStatus(negocioData.id),
-      ]);
-
+      const allProfissionais = await fetchProfissionaisComStatus(negocioData.id);
       if (!isCurrentRun()) return;
-      if (galeriaResult.error) {
-        await uiAlert('dashboard.gallery_load_warning', 'warning');
-      }
-      applyGaleriaPage(galeriaResult.data || []);
 
       const { scoped: scopedProfs, parceiro: meuProfissional } = scopeProfissionais(allProfissionais, negocioData.owner_id);
       const souDonoDoNegocio = negocioData.owner_id === userId;
-      if (!souDonoDoNegocio && !meuProfissional) {
+      if (!souDonoDoNegocio && !isActivePartnerProfessional(meuProfissional)) {
         setNegocio(null);
         setParceiroProfissional(null);
         setProfissionais([]);
@@ -279,8 +276,17 @@ export function useDashboardBootstrap({
         return;
       }
 
+      setNegocio(negocioData);
       setParceiroProfissional(meuProfissional);
       setProfissionais(scopedProfs);
+
+      const galeriaResult = await fetchGaleria(negocioData.id, { limit: GALERIA_PAGE_SIZE + 1, offset: 0 });
+      if (!isCurrentRun()) return;
+      if (galeriaResult.error) {
+        await uiAlert('dashboard.gallery_load_warning', 'warning');
+      }
+      applyGaleriaPage(galeriaResult.data || []);
+
       if (!scopedProfs.length) {
         setEntregas([]);
         setAgendamentos([]);

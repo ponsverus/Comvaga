@@ -22,6 +22,7 @@ const Vitrine                   = lazy(() => import('./pages/Vitrine'));
 const ClientArea                = lazy(() => import('./pages/ClientArea'));
 const CriarNegocio              = lazy(() => import('./pages/CriarNegocio'));
 const SelecionarNegocio         = lazy(() => import('./pages/SelecionarNegocio'));
+const SelecionarNegocioParceiro = lazy(() => import('./pages/SelecionarNegocioParceiro'));
 const SignupProfessionalResume  = lazy(() => import('./pages/SignupProfessionalResume'));
 const SignupProfessionalParceiroResume = lazy(() => import('./pages/SignupProfessionalParceiroResume'));
 
@@ -140,7 +141,7 @@ function SelecionarNegocioRouteGuard({ user, onLogout, professionalRole }) {
   }, [user?.id]);
 
   if (loading) return <FullScreenLoading text="CARREGANDO..." />;
-  if (professionalRole === 'partner') return <Navigate to="/dashboard" replace />;
+  if (professionalRole === 'partner') return <Navigate to="/selecionar-negocio-parceiro" replace />;
   if (ownerBusinessCount > 1) return <SelecionarNegocio user={user} onLogout={onLogout} professionalRole={professionalRole} />;
   return <Navigate to="/dashboard" replace />;
 }
@@ -177,15 +178,16 @@ export default function App() {
     setInRecovery(!!next);
   }, []);
 
-  const getPostLoginPath = useCallback((type, currentAccessState, status, flow = onboardingFlow) => {
+  const getPostLoginPath = useCallback((type, currentAccessState, status, flow = onboardingFlow, role = professionalRole) => {
     if (type !== 'professional') return '/minha-area';
+    if (role === 'partner' || flow === 'partner') return '/selecionar-negocio-parceiro';
     if (currentAccessState === 'partner_pending') return '/parceiro/aguardando';
     if (flow === 'partner' && currentAccessState === 'owner_resume') return '/cadastro/profissional-parceiro/retomada';
     if (currentAccessState === 'owner_resume' || normalizeOnboardingStatus(type, status) === 'pending') {
       return '/cadastro/profissional/retomada';
     }
     return '/dashboard';
-  }, [onboardingFlow]);
+  }, [onboardingFlow, professionalRole]);
 
   const loadProfile = useCallback(async (sessionUser) => {
     if (!sessionUser?.id) return null;
@@ -455,6 +457,8 @@ export default function App() {
             <Route path="/parceiro/aguardando" element={
               isLoggedIn ? (
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'professional' && professionalRole === 'partner'
+                  ? <Navigate to="/selecionar-negocio-parceiro" replace />
                 : userType === 'professional' && accessState === 'partner_pending'
                   ? <PartnerPendingApproval onLogout={handleLogout} />
                   : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
@@ -510,7 +514,7 @@ export default function App() {
                   ? accessState === 'owner_resume'
                     ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                     : accessState === 'partner_pending'
-                      ? <Navigate to="/parceiro/aguardando" />
+                      ? <Navigate to="/selecionar-negocio-parceiro" />
                     : <Dashboard user={user} onLogout={handleLogout} userType={userType} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to={postLogoutRedirect || "/login"} />
@@ -535,9 +539,9 @@ export default function App() {
                   ? accessState === 'owner_resume'
                     ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                     : accessState === 'partner_pending'
-                      ? <Navigate to="/parceiro/aguardando" />
+                      ? <Navigate to="/selecionar-negocio-parceiro" />
                       : professionalRole === 'partner'
-                        ? <Navigate to="/dashboard" replace />
+                        ? <Navigate to="/selecionar-negocio-parceiro" replace />
                         : <CriarNegocio user={user} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to={postLogoutRedirect || "/login"} />
@@ -551,11 +555,23 @@ export default function App() {
                   ? accessState === 'owner_resume'
                     ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                     : accessState === 'partner_pending'
-                      ? <Navigate to="/parceiro/aguardando" />
+                      ? <Navigate to="/selecionar-negocio-parceiro" />
                       : <SelecionarNegocioRouteGuard user={user} onLogout={handleLogout} professionalRole={professionalRole} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to={postLogoutRedirect || "/login"} />
               ) : <Navigate to={postLogoutRedirect || "/login"} />
+            } />
+
+            <Route path="/selecionar-negocio-parceiro" element={
+              isLoggedIn ? (
+                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
+                : userType === 'professional' && professionalRole === 'partner'
+                  ? <SelecionarNegocioParceiro user={user} onLogout={handleLogout} />
+                : userType === 'professional'
+                  ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
+                : userType ? <Navigate to="/minha-area" />
+                : <Navigate to={postLogoutRedirect || "/login"} />
+              ) : <Navigate to={postLogoutRedirect || "/login/parceiro"} />
             } />
 
             <Route path="*" element={<NotFound />} />
