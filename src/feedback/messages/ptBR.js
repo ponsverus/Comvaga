@@ -916,7 +916,7 @@ export const ptBR = {
       title: 'Use o Login Parceiro',
       body:
         'Esta conta pertence a um profissional parceiro.\n' +
-        'Acesse pelo Login Parceiro e informe o slug do negocio vinculado.',
+        'Acesse pelo Login Parceiro para entrar na central de negócios.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
