@@ -192,7 +192,7 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="MÍNIMO 6 CARACTERES"
+                  placeholder="MÍNIMO 7 CARACTERES"
                   className={fieldInputClass}
                   required
                 />
