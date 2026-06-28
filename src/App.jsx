@@ -23,7 +23,6 @@ const CriarNegocio              = lazy(() => import('./pages/CriarNegocio'));
 const SelecionarNegocio         = lazy(() => import('./pages/SelecionarNegocio'));
 const SelecionarNegocioParceiro = lazy(() => import('./pages/SelecionarNegocioParceiro'));
 const SignupProfessionalResume  = lazy(() => import('./pages/SignupProfessionalResume'));
-const SignupProfessionalParceiroResume = lazy(() => import('./pages/SignupProfessionalParceiroResume'));
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -180,7 +179,6 @@ export default function App() {
   const getPostLoginPath = useCallback((type, currentAccessState, status, flow = onboardingFlow, role = professionalRole) => {
     if (type !== 'professional') return '/minha-area';
     if (role === 'partner' || flow === 'partner') return '/selecionar-negocio-parceiro';
-    if (flow === 'partner' && currentAccessState === 'owner_resume') return '/cadastro/profissional-parceiro/retomada';
     if (currentAccessState === 'owner_resume' || normalizeOnboardingStatus(type, status) === 'pending') {
       return '/cadastro/profissional/retomada';
     }
@@ -473,25 +471,13 @@ export default function App() {
                 typeLoading ? <FullScreenLoading text="CARREGANDO..." />
                 : userType === 'professional'
                   ? isPartnerSignup && accessState === 'owner_resume'
-                    ? <Navigate to="/cadastro/profissional-parceiro/retomada" />
+                    ? <Navigate to="/selecionar-negocio-parceiro" />
                     : accessState === 'owner_resume'
                     ? <SignupProfessionalResume user={user} onLogin={handleLogin} />
                     : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
                   : userType ? <Navigate to="/minha-area" />
                   : <Navigate to="/login" />
               ) : <Navigate to="/login" />
-            } />
-
-            <Route path="/cadastro/profissional-parceiro/retomada" element={
-              isLoggedIn ? (
-                typeLoading ? <FullScreenLoading text="CARREGANDO..." />
-                : userType === 'professional'
-                  ? isPartnerSignup && accessState === 'owner_resume'
-                    ? <SignupProfessionalParceiroResume user={user} onLogin={handleLogin} />
-                    : <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
-                  : userType ? <Navigate to="/minha-area" />
-                  : <Navigate to="/login/parceiro" />
-              ) : <Navigate to="/login/parceiro" />
             } />
 
             <Route path="/dashboard" element={
