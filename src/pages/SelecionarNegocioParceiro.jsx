@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, LogOut, RefreshCw, Send } from 'lucide-react';
 import { ProfessionalIcon, SearchIcon } from '../components/icons';
@@ -103,6 +103,9 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
   const [requestingId, setRequestingId] = useState(null);
   const [nomeSolicitacao, setNomeSolicitacao] = useState('');
   const [alert, setAlert] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const desktopSearchRef = useRef(null);
+  const desktopSearchInputRef = useRef(null);
 
   const loadProfileName = useCallback(async () => {
     const fallback = String(user?.user_metadata?.nome || '').trim();
@@ -144,6 +147,26 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     loadProfileName();
     loadCenter();
   }, [loadCenter, loadProfileName]);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    desktopSearchInputRef.current?.focus();
+  }, [searchOpen]);
+
+  useEffect(() => {
+    if (!searchOpen) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (desktopSearchRef.current?.contains(event.target)) return;
+      setSearchOpen(false);
+      setTerm('');
+      setSearchRows([]);
+      setAlert(null);
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [searchOpen]);
 
   const selectBusiness = (row) => {
     if (!row?.can_open_dashboard || !row?.negocio_id || !user?.id) return;
@@ -252,7 +275,10 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
   const renderBusinessRow = (row, { searchResult = false } = {}) => {
     const canOpen = !searchResult && row?.can_open_dashboard;
     const canRequest = searchResult && row?.can_request;
-    const showAction = canOpen || canRequest || (searchResult && !canRequest && !row.profissional_id);
+    const unavailable = searchResult && !canRequest && !row.profissional_id;
+    const showAction = canOpen || canRequest;
+    const pillLabel = unavailable ? 'INDISPONÍVEL' : normalizeTag(row);
+    const pillClass = unavailable ? 'border-gray-500/30 bg-gray-500/10 text-gray-300' : tagClass(row);
     return (
       <div
         key={`${searchResult ? 'search' : 'link'}:${row.negocio_id}:${row.profissional_id || 'none'}`}
@@ -262,38 +288,33 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
           <BusinessAvatar negocio={row} />
           <BusinessInfo negocio={row} />
           <div className="flex shrink-0 items-start pt-0.5">
-            <span className={`rounded-full border px-3 py-1 text-[11px] font-normal uppercase ${tagClass(row)}`}>
-              {normalizeTag(row)}
+            <span className={`rounded-full border px-3 py-1 text-[11px] font-normal uppercase ${pillClass}`}>
+              {pillLabel}
             </span>
           </div>
         </div>
         {showAction && (
           <div className="mt-4">
-          {canOpen && (
-            <button
-              type="button"
-              onClick={() => selectBusiness(row)}
-              className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 text-xs font-normal uppercase text-black transition-colors hover:bg-yellow-400"
-            >
-              Acessar <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          )}
-          {canRequest && (
-            <button
-              type="button"
-              disabled={requestingId === row.negocio_id}
-              onClick={() => requestAccess(row)}
-              className="flex h-10 w-full items-center justify-center gap-2 rounded-full border border-primary/30 px-6 text-xs font-normal uppercase text-primary transition-colors hover:border-primary hover:bg-primary/10 disabled:opacity-60"
-            >
-              <Send className="h-3.5 w-3.5" />
-              {requestingId === row.negocio_id ? 'Enviando' : 'Solicitar'}
-            </button>
-          )}
-          {searchResult && !canRequest && !row.profissional_id && (
-            <span className="text-center text-[11px] uppercase text-gray-600">
-              Plano indisponível
-            </span>
-          )}
+            {canOpen && (
+              <button
+                type="button"
+                onClick={() => selectBusiness(row)}
+                className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 text-xs font-normal uppercase text-black transition-colors hover:bg-yellow-400"
+              >
+                Acessar <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            )}
+            {canRequest && (
+              <button
+                type="button"
+                disabled={requestingId === row.negocio_id}
+                onClick={() => requestAccess(row)}
+                className="flex h-10 w-full items-center justify-center gap-2 rounded-full border border-primary/30 px-6 text-xs font-normal uppercase text-primary transition-colors hover:border-primary hover:bg-primary/10 disabled:opacity-60"
+              >
+                <Send className="h-3.5 w-3.5" />
+                {requestingId === row.negocio_id ? 'Enviando' : 'Solicitar'}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -322,6 +343,51 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
         <div className="mb-8 flex items-center justify-between gap-4">
           <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-14 w-auto object-contain" />
           <div className="flex items-center gap-2">
+            <div ref={desktopSearchRef} className="relative hidden md:block">
+              <div
+                className={[
+                  'relative flex h-11 items-center overflow-hidden rounded-full transition-all duration-300 ease-out',
+                  searchOpen
+                    ? 'w-72 border border-white/10 bg-black/40 backdrop-blur-md lg:w-96'
+                    : 'w-11 border border-transparent bg-transparent',
+                ].join(' ')}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchOpen((open) => {
+                      if (open) {
+                        setTerm('');
+                        setSearchRows([]);
+                        setAlert(null);
+                      }
+                      return !open;
+                    });
+                  }}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-300 transition-colors hover:text-primary"
+                  aria-label="Pesquisar negócio"
+                >
+                  <SearchIcon strokeWidth={1.6} className="h-[18px] w-[18px]" />
+                </button>
+                <input
+                  ref={desktopSearchInputRef}
+                  type="search"
+                  value={term}
+                  onChange={(e) => setTerm(e.target.value)}
+                  placeholder="PESQUISAR NEGÓCIO"
+                  className={[
+                    'min-w-0 flex-1 bg-transparent pr-4 text-sm uppercase text-white placeholder:text-gray-500 focus:outline-none transition-opacity duration-200',
+                    searchOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
+                  ].join(' ')}
+                  tabIndex={searchOpen ? 0 : -1}
+                />
+                {searching && searchOpen && term.trim().length >= 3 && (
+                  <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
+                    <div className="h-4 w-4 rounded-full border border-primary border-t-transparent animate-spin" />
+                  </div>
+                )}
+              </div>
+            </div>
             <button
               type="button"
               onClick={refresh}
@@ -344,7 +410,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
         </div>
 
         <div className="mb-8">
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center md:hidden">
             <div className="relative flex h-11 w-full max-w-md items-center rounded-full border border-white/10 bg-black/40 backdrop-blur-md">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-300">
                 <SearchIcon strokeWidth={1.6} className="h-[18px] w-[18px]" />
@@ -379,8 +445,9 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
           {links.length ? (
             links.map((row) => renderBusinessRow(row))
           ) : (
-            <div className="rounded-custom border border-gray-900 bg-dark-100/50 px-4 py-5 text-center text-sm font-normal uppercase text-gray-500">
-              Sem negócios ativos. Aguardando aprovação ou solicite uma nova parceria.
+            <div className="px-4 py-8 text-center text-sm font-normal text-gray-500">
+              <div className="mb-2 text-xl">:(</div>
+              <div>Sem negócios ativos. Pesquise por um negócio e solicite uma parceria.</div>
             </div>
           )}
         </div>
