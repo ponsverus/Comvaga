@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, LogOut, RefreshCw, Send } from 'lucide-react';
 import { ProfessionalIcon, SearchIcon } from '../components/icons';
@@ -94,12 +94,9 @@ function AlertBox({ alert }) {
 
 export default function SelecionarNegocioParceiro({ user, onLogout }) {
   const navigate = useNavigate();
-  const searchWrapRef = useRef(null);
-  const searchInputRef = useRef(null);
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [term, setTerm] = useState('');
   const [searchRows, setSearchRows] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -148,24 +145,6 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     loadCenter();
   }, [loadCenter, loadProfileName]);
 
-  useEffect(() => {
-    if (!searchOpen) return;
-    searchInputRef.current?.focus();
-  }, [searchOpen]);
-
-  useEffect(() => {
-    if (!searchOpen) return;
-    const handlePointerDown = (event) => {
-      if (!searchWrapRef.current?.contains(event.target)) {
-        setSearchOpen(false);
-        setTerm('');
-        setSearchRows([]);
-      }
-    };
-    document.addEventListener('mousedown', handlePointerDown);
-    return () => document.removeEventListener('mousedown', handlePointerDown);
-  }, [searchOpen]);
-
   const selectBusiness = (row) => {
     if (!row?.can_open_dashboard || !row?.negocio_id || !user?.id) return;
     try {
@@ -202,7 +181,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
 
   useEffect(() => {
     const clean = term.trim();
-    if (!searchOpen || clean.length < 3) {
+    if (clean.length < 3) {
       setSearchRows([]);
       setSearching(false);
       return;
@@ -213,7 +192,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     }, 300);
 
     return () => window.clearTimeout(timeout);
-  }, [searchBusinesses, searchOpen, term]);
+  }, [searchBusinesses, term]);
 
   const requestAccess = async (row) => {
     const nome = (
@@ -279,10 +258,10 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
         key={`${searchResult ? 'search' : 'link'}:${row.negocio_id}:${row.profissional_id || 'none'}`}
         className="w-full bg-dark-100 border border-gray-800 rounded-custom p-4 transition-all text-left"
       >
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <BusinessAvatar negocio={row} />
           <BusinessInfo negocio={row} />
-          <div className="flex shrink-0 flex-col items-end gap-2">
+          <div className="flex shrink-0 items-start pt-0.5">
             <span className={`rounded-full border px-3 py-1 text-[11px] font-normal uppercase ${tagClass(row)}`}>
               {normalizeTag(row)}
             </span>
@@ -347,11 +326,11 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
               type="button"
               onClick={refresh}
               disabled={refreshing}
-              className="inline-flex items-center justify-center gap-2 rounded-button bg-dark-200 px-4 py-1.5 text-sm font-normal uppercase text-gray-300 transition-colors hover:bg-dark-100 hover:text-primary disabled:opacity-60 sm:py-2"
+              className="inline-flex h-11 w-11 items-center justify-center text-gray-300 transition-colors hover:text-primary disabled:opacity-60"
               title="Atualizar"
+              aria-label="Atualizar"
             >
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Atualizar</span>
+              <RefreshCw className={`h-6 w-6 ${refreshing ? 'animate-spin' : ''}`} />
             </button>
             <button
               type="button"
@@ -366,46 +345,22 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
 
         <div className="mb-8">
           <div className="flex items-center justify-center">
-            <div ref={searchWrapRef} className="relative">
-              <div
-                className={[
-                  'relative flex items-center overflow-hidden rounded-full bg-black/40 backdrop-blur-md transition-all duration-300 ease-out',
-                  searchOpen
-                    ? 'w-[min(24rem,calc(100vw-2rem))] border border-white/10 shadow-[0_0_0_1px_rgba(255,209,26,0.18)]'
-                    : 'w-11 border border-transparent bg-transparent backdrop-blur-0',
-                ].join(' ')}
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (searchOpen && !term) {
-                      setSearchOpen(false);
-                      return;
-                    }
-                    setSearchOpen(true);
-                  }}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-300 transition-colors hover:text-primary"
-                  aria-label="Pesquisar"
-                >
-                  <SearchIcon strokeWidth={1.6} className="h-[18px] w-[18px]" />
-                </button>
-                <input
-                  ref={searchInputRef}
-                  type="search"
-                  value={term}
-                  onChange={(e) => setTerm(e.target.value)}
+            <div className="relative flex h-11 w-full max-w-md items-center rounded-full border border-white/10 bg-black/40 backdrop-blur-md">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-300">
+                <SearchIcon strokeWidth={1.6} className="h-[18px] w-[18px]" />
+              </div>
+              <input
+                type="search"
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
                 placeholder="PESQUISAR NEGÓCIO"
-                  className={[
-                    'bg-transparent pr-4 text-sm uppercase text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300',
-                    searchOpen ? 'w-full opacity-100' : 'w-0 opacity-0',
-                  ].join(' ')}
-                />
+                className="min-w-0 flex-1 bg-transparent pr-4 text-sm uppercase text-white placeholder:text-gray-500 focus:outline-none"
+              />
                 {searching && term.trim().length >= 3 && (
                   <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
                     <div className="h-4 w-4 rounded-full border border-primary border-t-transparent animate-spin" />
                   </div>
                 )}
-              </div>
             </div>
           </div>
 
