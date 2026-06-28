@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, LogOut, RefreshCw, Search, Send } from 'lucide-react';
-import { ProfessionalIcon } from '../components/icons';
+import { ArrowRight, LogOut, RefreshCw, Send } from 'lucide-react';
+import { ProfessionalIcon, SearchIcon } from '../components/icons';
 import { supabase } from '../supabase';
 
 function getPublicUrl(bucket, path) {
@@ -92,18 +92,14 @@ function AlertBox({ alert }) {
   );
 }
 
-const emptyGroups = {
-  ativos: [],
-  aguardando: [],
-  inativos: [],
-  excluidos: [],
-};
-
 export default function SelecionarNegocioParceiro({ user, onLogout }) {
   const navigate = useNavigate();
+  const searchWrapRef = useRef(null);
+  const searchInputRef = useRef(null);
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [term, setTerm] = useState('');
   const [searchRows, setSearchRows] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -152,19 +148,23 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     loadCenter();
   }, [loadCenter, loadProfileName]);
 
-  const groups = useMemo(() => {
-    return (links || []).reduce((acc, item) => {
-      const key = item?.categoria === 'excluidos'
-        ? 'excluidos'
-        : item?.categoria === 'inativos'
-          ? 'inativos'
-          : item?.categoria === 'aguardando'
-            ? 'aguardando'
-            : 'ativos';
-      acc[key].push(item);
-      return acc;
-    }, { ...emptyGroups, ativos: [], aguardando: [], inativos: [], excluidos: [] });
-  }, [links]);
+  useEffect(() => {
+    if (!searchOpen) return;
+    searchInputRef.current?.focus();
+  }, [searchOpen]);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    const handlePointerDown = (event) => {
+      if (!searchWrapRef.current?.contains(event.target)) {
+        setSearchOpen(false);
+        setTerm('');
+        setSearchRows([]);
+      }
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, [searchOpen]);
 
   const selectBusiness = (row) => {
     if (!row?.can_open_dashboard || !row?.negocio_id || !user?.id) return;
@@ -176,13 +176,11 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     navigate('/dashboard', { state: { negocioId: row.negocio_id } });
   };
 
-  const searchBusinesses = async (e) => {
-    e?.preventDefault?.();
-    const clean = term.trim();
+  const searchBusinesses = useCallback(async (cleanTerm) => {
+    const clean = String(cleanTerm || '').trim();
     setAlert(null);
     if (clean.length < 3) {
       setSearchRows([]);
-      setAlert({ type: 'warning', message: 'Digite pelo menos 3 caracteres para pesquisar.' });
       return;
     }
 
@@ -200,7 +198,22 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     } finally {
       setSearching(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const clean = term.trim();
+    if (!searchOpen || clean.length < 3) {
+      setSearchRows([]);
+      setSearching(false);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      searchBusinesses(clean);
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
+  }, [searchBusinesses, searchOpen, term]);
 
   const requestAccess = async (row) => {
     const nome = nomeSolicitacao.trim().replace(/\s+/g, ' ');
@@ -259,22 +272,28 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
   const renderBusinessRow = (row, { searchResult = false } = {}) => {
     const canOpen = !searchResult && row?.can_open_dashboard;
     const canRequest = searchResult && row?.can_request;
+    const showAction = canOpen || canRequest || (searchResult && !canRequest && !row.profissional_id);
     return (
       <div
         key={`${searchResult ? 'search' : 'link'}:${row.negocio_id}:${row.profissional_id || 'none'}`}
-        className="w-full flex items-center gap-4 p-4 bg-dark-100 border border-gray-800 rounded-custom transition-all text-left"
+        className="w-full bg-dark-100 border border-gray-800 rounded-custom p-4 transition-all text-left"
       >
-        <BusinessAvatar negocio={row} />
-        <BusinessInfo negocio={row} />
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          <span className={`rounded-full border px-3 py-1 text-[11px] font-normal uppercase ${tagClass(row)}`}>
-            {normalizeTag(row)}
-          </span>
+        <div className="flex items-center gap-4">
+          <BusinessAvatar negocio={row} />
+          <BusinessInfo negocio={row} />
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <span className={`rounded-full border px-3 py-1 text-[11px] font-normal uppercase ${tagClass(row)}`}>
+              {normalizeTag(row)}
+            </span>
+          </div>
+        </div>
+        {showAction && (
+          <div className="mt-4 flex justify-center">
           {canOpen && (
             <button
               type="button"
               onClick={() => selectBusiness(row)}
-              className="inline-flex items-center gap-1 text-xs uppercase text-primary hover:text-yellow-500"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-6 text-xs font-normal uppercase text-black transition-colors hover:bg-yellow-400"
             >
               Acessar <ArrowRight className="h-3.5 w-3.5" />
             </button>
@@ -291,30 +310,15 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
             </button>
           )}
           {searchResult && !canRequest && !row.profissional_id && (
-            <span className="max-w-[120px] text-right text-[11px] uppercase text-gray-600">
+            <span className="text-center text-[11px] uppercase text-gray-600">
               Plano indisponível
             </span>
           )}
-        </div>
+          </div>
+        )}
       </div>
     );
   };
-
-  const renderSection = (title, rows, emptyText) => (
-    <section className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-normal uppercase tracking-wide text-gray-400">{title}</h2>
-        <span className="text-xs text-gray-600">{rows.length}</span>
-      </div>
-      {rows.length ? (
-        <div className="space-y-3">{rows.map((row) => renderBusinessRow(row))}</div>
-      ) : (
-        <div className="rounded-custom border border-gray-900 bg-dark-100/50 px-4 py-5 text-sm text-gray-600">
-          {emptyText}
-        </div>
-      )}
-    </section>
-  );
 
   if (loading) {
     return (
@@ -342,18 +346,19 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
               type="button"
               onClick={refresh}
               disabled={refreshing}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-800 text-gray-400 hover:border-primary hover:text-primary disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-button bg-dark-200 px-4 py-1.5 text-sm font-normal uppercase text-gray-300 transition-colors hover:bg-dark-100 hover:text-primary disabled:opacity-60 sm:py-2"
               title="Atualizar"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Atualizar</span>
             </button>
             <button
               type="button"
               onClick={() => onLogout('/login/parceiro')}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-red-500/40 px-4 text-xs uppercase text-red-400 hover:border-red-500 hover:text-red-300"
+              className="inline-flex items-center justify-center gap-2 rounded-button bg-red-600 px-4 py-1.5 text-sm font-normal uppercase transition-colors hover:bg-red-700 sm:py-2"
             >
               <LogOut className="h-4 w-4" />
-              Sair
+              <span className="hidden sm:inline">Sair</span>
             </button>
           </div>
         </div>
@@ -363,33 +368,57 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
           <p className="mt-2 text-sm font-normal uppercase text-gray-500">Selecione um negócio ativo ou solicite uma nova parceria</p>
         </div>
 
-        <div className="mb-8 rounded-custom border border-gray-800 bg-dark-100 p-4">
-          <form onSubmit={searchBusinesses} className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+        <div className="mb-8">
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <input
               type="text"
               value={nomeSolicitacao}
               onChange={(e) => setNomeSolicitacao(e.target.value)}
               placeholder="SEU NOME PROFISSIONAL"
-              className="h-11 rounded-button border border-gray-800 bg-black px-4 text-sm uppercase text-white outline-none focus:border-primary"
+              className="h-11 w-full max-w-sm rounded-full border border-white/10 bg-black/40 px-4 text-sm uppercase text-white outline-none backdrop-blur-md transition-colors placeholder:text-gray-500 focus:border-primary/40"
             />
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-600" />
-              <input
-                type="search"
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
+            <div ref={searchWrapRef} className="relative">
+              <div
+                className={[
+                  'relative flex items-center overflow-hidden rounded-full bg-black/40 backdrop-blur-md transition-all duration-300 ease-out',
+                  searchOpen
+                    ? 'w-[min(24rem,calc(100vw-2rem))] border border-white/10 shadow-[0_0_0_1px_rgba(255,209,26,0.18)]'
+                    : 'w-11 border border-transparent bg-transparent backdrop-blur-0',
+                ].join(' ')}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (searchOpen && !term) {
+                      setSearchOpen(false);
+                      return;
+                    }
+                    setSearchOpen(true);
+                  }}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-300 transition-colors hover:text-primary"
+                  aria-label="Pesquisar"
+                >
+                  <SearchIcon strokeWidth={1.6} className="h-[18px] w-[18px]" />
+                </button>
+                <input
+                  ref={searchInputRef}
+                  type="search"
+                  value={term}
+                  onChange={(e) => setTerm(e.target.value)}
                 placeholder="PESQUISAR NEGÓCIO"
-                className="h-11 w-full rounded-button border border-gray-800 bg-black pl-10 pr-4 text-sm uppercase text-white outline-none focus:border-primary"
-              />
+                  className={[
+                    'bg-transparent pr-4 text-sm uppercase text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300',
+                    searchOpen ? 'w-full opacity-100' : 'w-0 opacity-0',
+                  ].join(' ')}
+                />
+                {searching && term.trim().length >= 3 && (
+                  <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
+                    <div className="h-4 w-4 rounded-full border border-primary border-t-transparent animate-spin" />
+                  </div>
+                )}
+              </div>
             </div>
-            <button
-              type="submit"
-              disabled={searching}
-              className="h-11 rounded-button bg-primary px-5 text-sm font-normal uppercase text-black disabled:opacity-60"
-            >
-              {searching ? 'Buscando' : 'Buscar'}
-            </button>
-          </form>
+          </div>
 
           <div className="mt-4">
             <AlertBox alert={alert} />
@@ -403,11 +432,14 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
           )}
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          {renderSection('Ativos', groups.ativos, ':(')}
-          {renderSection('Aguardando', groups.aguardando, ':(')}
-          {renderSection('Inativos', groups.inativos, ':(')}
-          {renderSection('Excluídos', groups.excluidos, ':(')}
+        <div className="space-y-3">
+          {links.length ? (
+            links.map((row) => renderBusinessRow(row))
+          ) : (
+            <div className="rounded-custom border border-gray-900 bg-dark-100/50 px-4 py-5 text-sm text-gray-600">
+              :(
+            </div>
+          )}
         </div>
       </div>
     </div>
