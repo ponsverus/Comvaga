@@ -2,8 +2,7 @@ import { supabase } from '../../../supabase';
 import { withTimeout } from '../../../utils/withTimeout';
 
 function isAdminRemovedProfessional(row) {
-  return row?.status === 'inativo'
-    && row?.motivo_inativo === 'excluido_admin';
+  return row?.status === 'excluido';
 }
 
 export function getPublicUrl(bucket, path) {
@@ -495,7 +494,13 @@ export async function updateProfissionalStatus(profissionalId, negocioId, status
   const { error } = await withTimeout(
     supabase
       .from('profissionais')
-      .update({ status, motivo_inativo: motivoInativo })
+      .update({
+        status,
+        motivo_inativo: motivoInativo,
+        motivo_excluido: null,
+        excluido_em: null,
+        excluido_por: null,
+      })
       .eq('id', profissionalId)
       .eq('negocio_id', negocioId),
     6000,
