@@ -256,7 +256,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
       if (raw.includes('access_inactive')) {
         setAlert({ type: 'warning', message: 'Este vínculo está inativo ou excluído neste negócio.' });
       } else if (raw.includes('partner_plan_unavailable')) {
-        setAlert({ type: 'warning', message: '"Parcerias indisponíveis para este negócio' });
+        setAlert({ type: 'warning', message: 'Parcerias indisponíveis para este negócio' });
       } else if (raw.includes('owner_cannot_request_partner_access')) {
         setAlert({ type: 'warning', message: 'Parcerias indisponíveis para contas administradoras.' });
       } else {
