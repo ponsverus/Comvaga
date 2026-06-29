@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, LogOut, RefreshCw, Send } from 'lucide-react';
 import { ProfessionalIcon, SearchIcon } from '../components/icons';
+import { useFeedback } from '../feedback/useFeedback';
 import { supabase } from '../supabase';
 
 function getPublicUrl(bucket, path) {
@@ -93,6 +94,7 @@ function AlertBox({ alert }) {
 
 export default function SelecionarNegocioParceiro({ user, onLogout }) {
   const navigate = useNavigate();
+  const feedback = useFeedback();
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -272,11 +274,19 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     loadCenter({ silent: true });
   };
 
+  const uiAlert = useCallback((key, variant = 'info') => {
+    if (feedback?.showMessage) return feedback.showMessage(key, { variant });
+    return Promise.resolve();
+  }, [feedback]);
+
+  const uiConfirm = useCallback(async (key, variant = 'warning') => {
+    if (feedback?.confirm) return !!(await feedback.confirm(key, { variant }));
+    return false;
+  }, [feedback]);
+
   const deletePartnerAccount = async () => {
     if (deletingAccount) return;
-    const confirmed = window.confirm(
-      'Excluir sua conta de parceiro? Seu acesso será removido, o e-mail ficará liberado e os históricos dos negócios serão preservados.'
-    );
+    const confirmed = await uiConfirm('partnerCenter.account_delete_confirm', 'danger');
     if (!confirmed) return;
 
     setDeletingAccount(true);
@@ -284,6 +294,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     try {
       const { error } = await supabase.rpc('remove_partner_account_seguro');
       if (error) throw error;
+      uiAlert('partnerCenter.account_deleted', 'success');
       try {
         await onLogout('/login/parceiro');
       } catch {
@@ -292,22 +303,13 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     } catch (error) {
       const raw = String(error?.message || '').toLowerCase();
       if (raw.includes('profissional_agendamentos_futuros_bloqueados')) {
-        setAlert({
-          type: 'warning',
-          message: 'Cancele ou reagende seus agendamentos futuros antes de excluir a conta.',
-        });
+        uiAlert('partnerCenter.account_delete_future_bookings', 'warning');
       } else if (raw.includes('owner_account_requires_business_removal')) {
-        setAlert({
-          type: 'warning',
-          message: 'Contas administradoras precisam excluir seus negócios pelo dashboard.',
-        });
+        uiAlert('partnerCenter.account_delete_owner_blocked', 'warning');
       } else if (raw.includes('profissional_nao_encontrado')) {
-        setAlert({
-          type: 'warning',
-          message: 'Nenhum vínculo de parceiro foi encontrado para esta conta.',
-        });
+        uiAlert('partnerCenter.account_delete_no_link', 'warning');
       } else {
-        setAlert({ type: 'error', message: error?.message || 'Erro ao excluir conta.' });
+        uiAlert('partnerCenter.account_delete_error', 'danger');
       }
       setDeletingAccount(false);
     }
@@ -497,7 +499,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
             type="button"
             onClick={deletePartnerAccount}
             disabled={deletingAccount}
-            className="flex h-11 w-full max-w-md items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 px-6 text-xs font-normal uppercase text-red-300 transition-colors hover:border-red-400/50 hover:bg-red-500/15 disabled:opacity-60"
+            className="flex h-11 w-full items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 px-6 text-xs font-normal uppercase text-red-300 transition-colors hover:border-red-400/50 hover:bg-red-500/15 disabled:opacity-60"
           >
             {deletingAccount ? 'Excluindo conta' : 'Excluir conta'}
           </button>
