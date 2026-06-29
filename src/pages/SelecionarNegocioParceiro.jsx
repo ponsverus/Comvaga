@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, LogOut, RefreshCw, Send, Trash2 } from 'lucide-react';
+import { ArrowRight, LogOut, RefreshCw, Send } from 'lucide-react';
 import { ProfessionalIcon, SearchIcon } from '../components/icons';
 import { supabase } from '../supabase';
 
@@ -256,7 +256,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
       if (raw.includes('access_inactive')) {
         setAlert({ type: 'warning', message: 'Este vínculo está inativo ou excluído neste negócio.' });
       } else if (raw.includes('partner_plan_unavailable')) {
-        setAlert({ type: 'warning', message: 'Parcerias indisponíveis para este negócio' });
+        setAlert({ type: 'warning', message: '"Parcerias indisponíveis para este negócio' });
       } else if (raw.includes('owner_cannot_request_partner_access')) {
         setAlert({ type: 'warning', message: 'Parcerias indisponíveis para contas administradoras.' });
       } else {
@@ -300,6 +300,11 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
         setAlert({
           type: 'warning',
           message: 'Contas administradoras precisam excluir seus negócios pelo dashboard.',
+        });
+      } else if (raw.includes('profissional_nao_encontrado')) {
+        setAlert({
+          type: 'warning',
+          message: 'Nenhum vínculo de parceiro foi encontrado para esta conta.',
         });
       } else {
         setAlert({ type: 'error', message: error?.message || 'Erro ao excluir conta.' });
@@ -492,9 +497,8 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
             type="button"
             onClick={deletePartnerAccount}
             disabled={deletingAccount}
-            className="inline-flex items-center gap-2 text-xs font-normal uppercase text-red-400 transition-colors hover:text-red-300 disabled:opacity-60"
+            className="flex h-11 w-full max-w-md items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 px-6 text-xs font-normal uppercase text-red-300 transition-colors hover:border-red-400/50 hover:bg-red-500/15 disabled:opacity-60"
           >
-            <Trash2 className="h-4 w-4" />
             {deletingAccount ? 'Excluindo conta' : 'Excluir conta'}
           </button>
         </div>
