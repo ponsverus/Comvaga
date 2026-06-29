@@ -80,6 +80,15 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
+    billing_cancel_confirm: {
+      title: 'Cancelar plano?',
+      body: 'A vitrine será bloqueada para novos agendamentos até que um plano ativo seja selecionado.',
+      variant: 'warning',
+      screen: 'dark',
+      confirmText: 'CANCELAR PLANO',
+      cancelText: 'VOLTAR',
+      buttonText: 'CANCELAR PLANO',
+    },
     logo_updated: {
       title: 'Logo atualizada',
       body: 'Sua logo foi atualizada com sucesso.',
@@ -633,6 +642,55 @@ export const ptBR = {
       title: 'Oferta indisponível',
       body: 'Recurso de ofertas restrito. Remova o valor promocional antes de continuar.',
       variant: 'warning',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
+  },
+
+  partnerCenter: {
+    account_delete_confirm: {
+      title: 'Excluir conta',
+      body:
+        'Tem certeza que deseja excluir sua conta de parceiro?\n' +
+        'Este processo é irreversível. Você perderá o acesso imediatamente e o e-mail será desvinculado do nosso sistema.',
+      variant: 'danger',
+      screen: 'dark',
+      confirmText: 'EXCLUIR CONTA',
+      cancelText: 'VOLTAR',
+      buttonText: 'EXCLUIR CONTA',
+    },
+    account_deleted: {
+      title: 'Conta excluída',
+      body: 'Sua conta de parceiro foi excluída com sucesso.',
+      variant: 'success',
+      screen: 'light',
+      buttonText: 'OK',
+    },
+    account_delete_future_bookings: {
+      title: 'Agendamentos futuros',
+      body: 'Cancele ou reagende seus agendamentos de hoje ou futuros antes de excluir a conta.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    account_delete_owner_blocked: {
+      title: 'Conta administradora',
+      body: 'Contas administradoras precisam excluir seus negócios pelo dashboard.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    account_delete_no_link: {
+      title: 'Vínculo inexistente',
+      body: 'Nenhum vínculo de parceiro foi encontrado para esta conta.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    account_delete_error: {
+      title: 'Erro ao excluir conta',
+      body: 'Houve um erro ao tentar excluir sua conta. Tente novamente em alguns instantes.',
+      variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
     },
