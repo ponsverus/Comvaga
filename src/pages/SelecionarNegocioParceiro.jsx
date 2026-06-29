@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, LogOut, RefreshCw, Send } from 'lucide-react';
+import { ArrowRight, LogOut, RefreshCw, Send, Trash2 } from 'lucide-react';
 import { ProfessionalIcon, SearchIcon } from '../components/icons';
 import { supabase } from '../supabase';
 
@@ -31,10 +31,9 @@ function formatBusinessAddress(negocio) {
 
 function normalizeTag(row) {
   const status = String(row?.status || '').toLowerCase();
-  const motivo = String(row?.motivo_inativo || '').toLowerCase();
   if (status === 'ativo') return 'ATIVO';
   if (status === 'pendente') return 'AGUARDANDO';
-  if (status === 'inativo' && motivo === 'excluido_admin') return 'EXCLUÍDO';
+  if (status === 'excluido') return 'EXCLUÍDO';
   if (status === 'inativo') return 'INATIVO';
   return row?.tag === 'DISPONIVEL' ? 'DISPONÍVEL' : String(row?.tag || 'DISPONÍVEL');
 }
@@ -104,6 +103,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
   const [nomeSolicitacao, setNomeSolicitacao] = useState('');
   const [alert, setAlert] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const desktopSearchRef = useRef(null);
   const desktopSearchInputRef = useRef(null);
 
@@ -270,6 +270,42 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
   const refresh = () => {
     setRefreshing(true);
     loadCenter({ silent: true });
+  };
+
+  const deletePartnerAccount = async () => {
+    if (deletingAccount) return;
+    const confirmed = window.confirm(
+      'Excluir sua conta de parceiro? Seu acesso será removido, o e-mail ficará liberado e os históricos dos negócios serão preservados.'
+    );
+    if (!confirmed) return;
+
+    setDeletingAccount(true);
+    setAlert(null);
+    try {
+      const { error } = await supabase.rpc('remove_partner_account_seguro');
+      if (error) throw error;
+      try {
+        await onLogout('/login/parceiro');
+      } catch {
+        navigate('/login/parceiro', { replace: true });
+      }
+    } catch (error) {
+      const raw = String(error?.message || '').toLowerCase();
+      if (raw.includes('profissional_agendamentos_futuros_bloqueados')) {
+        setAlert({
+          type: 'warning',
+          message: 'Cancele ou reagende seus agendamentos futuros antes de excluir a conta.',
+        });
+      } else if (raw.includes('owner_account_requires_business_removal')) {
+        setAlert({
+          type: 'warning',
+          message: 'Contas administradoras precisam excluir seus negócios pelo dashboard.',
+        });
+      } else {
+        setAlert({ type: 'error', message: error?.message || 'Erro ao excluir conta.' });
+      }
+      setDeletingAccount(false);
+    }
   };
 
   const renderBusinessRow = (row, { searchResult = false } = {}) => {
@@ -447,9 +483,20 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
           ) : (
             <div className="px-4 py-8 text-center text-sm font-normal text-gray-500">
               <div className="mb-2 text-xl">:(</div>
-              <div>Sem negócios ativos. Pesquise por um negócio e solicite uma parceria.</div>
             </div>
           )}
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={deletePartnerAccount}
+            disabled={deletingAccount}
+            className="inline-flex items-center gap-2 text-xs font-normal uppercase text-red-400 transition-colors hover:text-red-300 disabled:opacity-60"
+          >
+            <Trash2 className="h-4 w-4" />
+            {deletingAccount ? 'Excluindo conta' : 'Excluir conta'}
+          </button>
         </div>
       </div>
     </div>
