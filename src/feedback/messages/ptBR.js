@@ -59,6 +59,15 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    business_delete_plan_active: {
+      title: 'Plano ativo',
+      body:
+        'Para  este negócio, primeiro cancele o plano ativo.\n' +
+        'Depois que a assinatura ficar cancelada, será possível excluí-lo.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
     billing_checkout_success: {
       title: 'Pagamento iniciado/confirmado',
       body: 'Pagamento iniciado/confirmado. Seu plano será atualizado em instantes.',
