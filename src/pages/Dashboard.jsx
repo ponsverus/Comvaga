@@ -482,6 +482,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     createEntrega,
     updateEntrega,
     deleteEntrega,
+    toggleStatusEntrega,
     toggleStatusProfissional,
     excluirProfissional,
     updateProfissional,
@@ -901,6 +902,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
                 emptyListMsg={emptyListMsg}
                 checarPermissao={checarPermissao}
                 deleteEntrega={deleteEntrega}
+                toggleStatusEntrega={toggleStatusEntrega}
                 allowOffers={allowOffers}
               />
             )}
