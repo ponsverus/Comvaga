@@ -2,10 +2,12 @@ import { useRef, useState } from 'react';
 import { supabase } from '../../../supabase';
 import { getDiasTrabalhoFromHorarios, timeToMinutes, toNumberOrNull, toUpperClean } from '../utils';
 import {
+  ativarEntregaSeguramente,
   aprovarParceiroProfissional,
   cancelarAgendamentoProfissional,
   concluirAgendamentoProfissional,
   deleteGaleriaItem,
+  inativarEntregaSeguramente,
   insertEntrega,
   insertGaleriaItem,
   insertProfissional,
@@ -447,6 +449,31 @@ export function useDashboardMutations({
     }
   };
 
+  const toggleStatusEntrega = async (entrega) => {
+    const lockKey = `entrega-status:${entrega?.id || 'item'}`;
+    if (!lockAction(lockKey)) return;
+    if (!await checarPermissao(entrega.profissional_id)) {
+      unlockAction(lockKey);
+      return;
+    }
+    try {
+      if (entrega.ativo) {
+        await inativarEntregaSeguramente(entrega.id);
+        await uiAlert('dashboard.entrega_inactivated', 'success');
+      } else {
+        await ativarEntregaSeguramente(entrega.id);
+        await uiAlert('dashboard.entrega_activated', 'success');
+      }
+      await reloadEntregas();
+    } catch (error) {
+      const requestKey = getRequestErrorKey(error);
+      if (requestKey) await uiAlert(requestKey, 'warning');
+      else await uiAlert('dashboard.entrega_toggle_error', 'error');
+    } finally {
+      unlockAction(lockKey);
+    }
+  };
+
   const toggleStatusProfissional = async (p) => {
     const lockKey = `profissional-status:${p?.id || 'item'}`;
     if (!lockAction(lockKey)) return;
@@ -702,6 +729,7 @@ export function useDashboardMutations({
     createEntrega,
     updateEntrega,
     deleteEntrega,
+    toggleStatusEntrega,
     toggleStatusProfissional,
     excluirProfissional,
     updateProfissional,
