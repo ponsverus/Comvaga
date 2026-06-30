@@ -251,6 +251,11 @@ export function useDashboardMutations({
 
       navigate('/criar-negocio', { replace: true });
     } catch (error) {
+      const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
+      if (raw.includes('business_subscription_active') || raw.includes('subscription_active_before_business_delete')) {
+        await uiAlert('dashboard.business_delete_plan_active', 'warning');
+        return;
+      }
       const requestKey = getRequestErrorKey(error);
       if (requestKey) await uiAlert(requestKey, 'warning');
       else await uiAlert('dashboard.business_delete_error', 'error');
