@@ -226,7 +226,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-
     business: {
 
       tab_title: {
@@ -307,6 +306,21 @@ export const ptBR = {
           body: 'O serv. foi removido da lista.',
           variant: 'success', screen: 'light', buttonText: 'OK',
         },
+        entrega_activated: {
+          title: 'Serv. ativado',
+          body: 'O serv. foi ativado com sucesso.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        entrega_inactivated: {
+          title: 'Serv. inativado',
+          body: 'O serv. foi inativado com sucesso.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        entrega_toggle_error: {
+          title: 'Erro',
+          body: 'Erro ao alterar o status do serv. agora. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
         entrega_delete_error: {
           title: 'Erro',
           body: 'Houve um erro ao excluir o serv. Tente novamente.',
@@ -356,6 +370,21 @@ export const ptBR = {
           body: 'A consulta foi removida da lista.',
           variant: 'success', screen: 'light', buttonText: 'OK',
         },
+        entrega_activated: {
+          title: 'Consulta ativada',
+          body: 'A consulta foi ativada com sucesso.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        entrega_inactivated: {
+          title: 'Consulta inativada',
+          body: 'A consulta foi inativada com sucesso.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        entrega_toggle_error: {
+          title: 'Erro',
+          body: 'Erro ao alterar o status da consulta agora. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
         entrega_delete_error: {
           title: 'Erro',
           body: 'Houve um erro ao excluir a consulta. Tente novamente.',
@@ -404,6 +433,21 @@ export const ptBR = {
           title: 'Aula excluída',
           body: 'A aula foi removida da lista.',
           variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        entrega_activated: {
+          title: 'Aula ativada',
+          body: 'A aula foi ativada com sucesso.',
+          variant: 'success', screen: 'light', buttonText: 'OK',
+        },
+        entrega_inactivated: {
+          title: 'Aula inativada',
+          body: 'A aula foi inativada com sucesso.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        entrega_toggle_error: {
+          title: 'Erro',
+          body: 'Erro ao alterar o status da aula agora. Tente novamente.',
+          variant: 'danger', screen: 'dark', buttonText: 'OK',
         },
         entrega_delete_error: {
           title: 'Erro',
