@@ -11,6 +11,7 @@ function ProfissionalEntregasBlock({
   emptyListMsg,
   checarPermissao,
   deleteEntrega,
+  toggleStatusEntrega,
   setEditingEntregaId,
   setFormEntrega,
   setShowNovaEntrega,
@@ -67,22 +68,36 @@ function ProfissionalEntregasBlock({
               {visibleEntregas.map(s => {
                 const preco = Number(s.preco ?? 0);
                 const promo = !allowOffers || s.preco_promocional == null ? null : Number(s.preco_promocional);
+                const isInativo = s.ativo === false;
                 return (
-                  <div key={s.id} className="bg-dark-100 border border-gray-800 rounded-custom p-5">
+                  <div key={s.id} className={`relative bg-dark-100 border rounded-custom p-5 ${isInativo ? 'border-gray-700 pt-12' : 'border-gray-800'}`}>
+                    {isInativo && (
+                      <span className="absolute top-3 right-3 text-[10px] px-3 py-1 rounded-full bg-gray-500/10 border border-gray-500/30 text-gray-300 font-normal uppercase">INATIVO</span>
+                    )}
                     <div className="flex justify-between items-start mb-3">
                       {promo != null && promo > 0 && promo < preco ? (<div className="text-xl font-normal text-green-400">R$ {promo.toFixed(2)}</div>) : (<div className="text-xl font-normal text-primary">R$ {preco.toFixed(2)}</div>)}
                       <span className="inline-flex items-center rounded-full border border-gray-700 bg-transparent px-3 py-1 text-xs text-gray-500">{s.duracao_minutos} MIN</span>
                     </div>
                     <h3 className="text-sm font-normal text-white mb-0.5">{s.nome}</h3>
                     <p className="text-xs text-gray-500 mb-4 uppercase">PROF: {profissional.nome}</p>
-                    <div className="flex gap-2">
+                    {isInativo && (
+                      <div className="text-xs text-gray-300 bg-gray-500/10 border border-gray-500/20 rounded-custom p-2 mb-3">
+                        INATIVO {s.motivo_inativo ? `- ${String(s.motivo_inativo).toUpperCase()}` : ''}
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <button onClick={() => toggleStatusEntrega(s)} className={`flex-1 py-2 rounded-button text-sm border font-normal uppercase ${isInativo ? 'bg-green-500/10 border-green-500/30 text-green-300' : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300'}`}>
+                          {isInativo ? 'ATIVAR' : 'INATIVAR'}
+                        </button>
+                        <button onClick={() => deleteEntrega(s)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
+                      </div>
                       <button onClick={async () => {
-                        if (!await checarPermissao(s.profissional_id)) return;
-                        setEditingEntregaId(s.id);
-                        setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: allowOffers ? String(s.preco_promocional ?? '') : '', profissional_id: s.profissional_id || '' });
-                        setShowNovaEntrega(true);
-                      }} className="flex-1 py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
-                      <button onClick={() => deleteEntrega(s)} className="flex-1 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
+                          if (!await checarPermissao(s.profissional_id)) return;
+                          setEditingEntregaId(s.id);
+                          setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: allowOffers ? String(s.preco_promocional ?? '') : '', profissional_id: s.profissional_id || '' });
+                          setShowNovaEntrega(true);
+                        }} className="w-full py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
                     </div>
                   </div>
                 );
@@ -143,6 +158,7 @@ export default function EntregasSection({
   emptyListMsg,
   checarPermissao,
   deleteEntrega,
+  toggleStatusEntrega,
   allowOffers = true,
 }) {
   return (
@@ -158,7 +174,10 @@ export default function EntregasSection({
       {profissionais.length === 0 ? <div className="text-gray-500">:(</div> : (
         <div className="space-y-4">
           {profissionais.map(p => {
-            const lista = (entregasPorProf.get(p.id) || []).slice().sort((a, b) => Number(b.preco || 0) - Number(a.preco || 0));
+            const lista = (entregasPorProf.get(p.id) || []).slice().sort((a, b) => {
+              if (a.ativo !== b.ativo) return a.ativo === false ? 1 : -1;
+              return Number(b.preco || 0) - Number(a.preco || 0);
+            });
             return (
               <ProfissionalEntregasBlock
                 key={p.id}
@@ -169,6 +188,7 @@ export default function EntregasSection({
                 emptyListMsg={emptyListMsg}
                 checarPermissao={checarPermissao}
                 deleteEntrega={deleteEntrega}
+                toggleStatusEntrega={toggleStatusEntrega}
                 setEditingEntregaId={setEditingEntregaId}
                 setFormEntrega={setFormEntrega}
                 setShowNovaEntrega={setShowNovaEntrega}
