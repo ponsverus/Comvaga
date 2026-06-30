@@ -70,21 +70,16 @@ function ProfissionalEntregasBlock({
                 const promo = !allowOffers || s.preco_promocional == null ? null : Number(s.preco_promocional);
                 const isInativo = s.ativo === false;
                 return (
-                  <div key={s.id} className={`relative bg-dark-100 border rounded-custom p-5 ${isInativo ? 'border-gray-700 pt-12' : 'border-gray-800'}`}>
-                    {isInativo && (
-                      <span className="absolute top-3 right-3 text-[10px] px-3 py-1 rounded-full bg-gray-500/10 border border-gray-500/30 text-gray-300 font-normal uppercase">INATIVO</span>
-                    )}
+                  <div key={s.id} className={`relative bg-dark-100 border rounded-custom p-5 ${isInativo ? 'border-gray-700' : 'border-gray-800'}`}>
                     <div className="flex justify-between items-start mb-3">
                       {promo != null && promo > 0 && promo < preco ? (<div className="text-xl font-normal text-green-400">R$ {promo.toFixed(2)}</div>) : (<div className="text-xl font-normal text-primary">R$ {preco.toFixed(2)}</div>)}
                       <span className="inline-flex items-center rounded-full border border-gray-700 bg-transparent px-3 py-1 text-xs text-gray-500">{s.duracao_minutos} MIN</span>
                     </div>
-                    <h3 className="text-sm font-normal text-white mb-0.5">{s.nome}</h3>
+                    <h3 className="flex items-center gap-2 text-sm font-normal text-white mb-0.5">
+                      <span>{s.nome}</span>
+                      {isInativo && <span className="w-2.5 h-2.5 rounded-full bg-gray-500 shrink-0" />}
+                    </h3>
                     <p className="text-xs text-gray-500 mb-4 uppercase">PROF: {profissional.nome}</p>
-                    {isInativo && (
-                      <div className="text-xs text-gray-300 bg-gray-500/10 border border-gray-500/20 rounded-custom p-2 mb-3">
-                        INATIVO {s.motivo_inativo ? `- ${String(s.motivo_inativo).toUpperCase()}` : ''}
-                      </div>
-                    )}
                     <div className="space-y-2">
                       <div className="flex gap-2">
                         <button onClick={() => toggleStatusEntrega(s)} className={`flex-1 py-2 rounded-button text-sm border font-normal uppercase ${isInativo ? 'bg-green-500/10 border-green-500/30 text-green-300' : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300'}`}>
