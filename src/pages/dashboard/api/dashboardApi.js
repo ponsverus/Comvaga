@@ -259,6 +259,26 @@ export async function removeEntregaSeguramente(entregaId) {
   return data;
 }
 
+export async function inativarEntregaSeguramente(entregaId) {
+  const { data, error } = await withTimeout(
+    supabase.rpc('inativar_entrega_segura', { p_entrega_id: entregaId }),
+    6500,
+    'inativar-entrega'
+  );
+  if (error) throw error;
+  return data;
+}
+
+export async function ativarEntregaSeguramente(entregaId) {
+  const { data, error } = await withTimeout(
+    supabase.rpc('ativar_entrega_segura', { p_entrega_id: entregaId }),
+    6500,
+    'ativar-entrega'
+  );
+  if (error) throw error;
+  return data;
+}
+
 export async function aprovarParceiroProfissional(profissionalId, negocioId) {
   const { data, error } = await withTimeout(
     supabase.rpc('aprovar_parceiro_profissional', {
@@ -299,7 +319,7 @@ export async function fetchEntregas(negocioId, profissionalIds) {
       .select('*, profissionais (id, nome)')
       .eq('negocio_id', negocioId)
       .in('profissional_id', profissionalIds)
-      .eq('ativo', true)
+      .is('motivo_excluido', null)
       .order('created_at', { ascending: false }),
     6000,
     'entregas-dashboard'
