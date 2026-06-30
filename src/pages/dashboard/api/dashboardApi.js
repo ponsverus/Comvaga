@@ -497,9 +497,6 @@ export async function updateProfissionalStatus(profissionalId, negocioId, status
       .update({
         status,
         motivo_inativo: motivoInativo,
-        motivo_excluido: null,
-        excluido_em: null,
-        excluido_por: null,
       })
       .eq('id', profissionalId)
       .eq('negocio_id', negocioId),
