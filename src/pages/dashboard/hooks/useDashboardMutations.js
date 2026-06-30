@@ -459,16 +459,16 @@ export function useDashboardMutations({
     try {
       if (entrega.ativo) {
         await inativarEntregaSeguramente(entrega.id);
-        await uiAlert('dashboard.entrega_inactivated', 'success');
+        await uiAlert(`dashboard.business.${businessGroup}.entrega_inactivated`, 'success');
       } else {
         await ativarEntregaSeguramente(entrega.id);
-        await uiAlert('dashboard.entrega_activated', 'success');
+        await uiAlert(`dashboard.business.${businessGroup}.entrega_activated`, 'success');
       }
       await reloadEntregas();
     } catch (error) {
       const requestKey = getRequestErrorKey(error);
       if (requestKey) await uiAlert(requestKey, 'warning');
-      else await uiAlert('dashboard.entrega_toggle_error', 'error');
+      else await uiAlert(`dashboard.business.${businessGroup}.entrega_toggle_error`, 'error');
     } finally {
       unlockAction(lockKey);
     }
