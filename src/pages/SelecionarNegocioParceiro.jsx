@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, LogOut, RefreshCw, Send } from 'lucide-react';
 import { ProfessionalIcon, SearchIcon } from '../components/icons';
 import { useFeedback } from '../feedback/useFeedback';
+import { ptBR } from '../feedback/messages/ptBR';
 import { supabase } from '../supabase';
 
 function getPublicUrl(bucket, path) {
@@ -258,7 +259,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
       if (raw.includes('access_inactive')) {
         setAlert({ type: 'warning', message: 'Este vínculo está inativo ou excluído neste negócio.' });
       } else if (raw.includes('partner_plan_unavailable')) {
-        setAlert({ type: 'warning', message: '"Parcerias indisponíveis para este negócio' });
+        setAlert({ type: 'warning', message: ptBR.dashboard.partner_plan_unavailable.body });
       } else if (raw.includes('owner_cannot_request_partner_access')) {
         setAlert({ type: 'warning', message: 'Parcerias indisponíveis para contas administradoras.' });
       } else {
