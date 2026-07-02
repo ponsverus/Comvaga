@@ -245,14 +245,14 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
   const souDono = negocio?.owner_id === user?.id;
   const parceiroProfissionalId = parceiroProfissional?.id ?? null;
   const acessoDashboardAutorizado = souDono || !!parceiroProfissional;
-  const billingFeatures = billingStatus?.features || {};
-  const allowAdvancedMetrics = billingFeatures.advanced_metrics !== false;
-  const allowFutureRevenue = billingFeatures.future_revenue === true;
-  const allowOffers = billingFeatures.offers === true;
+  const billingFeatures = souDono ? (billingStatus?.features || {}) : {};
+  const allowAdvancedMetrics = souDono ? billingFeatures.advanced_metrics !== false : true;
+  const allowFutureRevenue = souDono ? billingFeatures.future_revenue === true : false;
+  const allowOffers = souDono ? billingFeatures.offers === true : false;
 
   useEffect(() => {
     let active = true;
-    if (!negocio?.id || !acessoDashboardAutorizado) {
+    if (!negocio?.id || !souDono) {
       setBillingStatus(null);
       return () => { active = false; };
     }
@@ -264,7 +264,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
         if (active) setBillingStatus(null);
       });
     return () => { active = false; };
-  }, [acessoDashboardAutorizado, negocio?.id]);
+  }, [negocio?.id, souDono]);
 
   const checarPermissao = useCallback(async (profissionalId) => {
     if (!acessoDashboardAutorizado) {
