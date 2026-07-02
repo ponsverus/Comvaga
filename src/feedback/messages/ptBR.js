@@ -960,6 +960,13 @@ export const ptBR = {
       screen: 'light',
       buttonText: 'OK',
     },
+    account_delete_future_bookings: {
+      title: 'Agendamentos futuros',
+      body: 'Cancele ou reagende seus agendamentos de hoje ou futuros antes de excluir a conta.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
     account_delete_error: {
       title: 'Erro ao excluir conta',
       body: 'Houve um erro ao tentar excluir sua conta. Tente novamente em alguns instantes.',
