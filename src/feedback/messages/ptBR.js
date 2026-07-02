@@ -777,8 +777,6 @@ export const ptBR = {
     slug_required:        { body: 'Informe o slug do negócio para continuar.', variant: 'erro' },
     negocio_not_found:    { body: 'Negócio ausente. Verifique o slug informado e tente novamente.', variant: 'erro' },
     partner_plan_unavailable: { body: 'Parcerias desabilitadas neste negócio.', variant: 'erro' },
-    email_registered_client: { body: 'Este e-mail já pertence a uma conta de cliente. Use outro e-mail para solicitar acesso profissional.', variant: 'erro' },
-    email_registered_professional: { body: 'Este e-mail já pertence a uma conta profissional. Acesse como parceiro para solicitar ou acompanhar acessos.', variant: 'erro' },
     email_registered_unknown: { body: 'Este e-mail já está vinculado a uma conta existente. Acesse sua conta ou use outro e-mail.', variant: 'erro' },
     email_check_rate_limit: { body: 'Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.', variant: 'aviso' },
     access_unavailable:   { body: 'Erro ao solicitar acesso com este e-mail. Acesse sua conta de parceiro ou fale com o responsável pelo negócio.', variant: 'erro' },
