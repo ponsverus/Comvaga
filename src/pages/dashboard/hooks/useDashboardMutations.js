@@ -446,7 +446,9 @@ export function useDashboardMutations({
       await uiAlert(`dashboard.business.${businessGroup}.entrega_deleted`, 'success');
       await reloadEntregas();
     } catch (error) {
-      const requestKey = getRequestErrorKey(error);
+      const requestKey = getRequestErrorKey(error, {
+        entregaFutureBookingsKey: `dashboard.business.${businessGroup}.entrega_future_bookings_blocked`,
+      });
       if (requestKey) await uiAlert(requestKey, 'warning');
       else await uiAlert(`dashboard.business.${businessGroup}.entrega_delete_error`, 'error');
     } finally {
@@ -471,7 +473,9 @@ export function useDashboardMutations({
       }
       await reloadEntregas();
     } catch (error) {
-      const requestKey = getRequestErrorKey(error);
+      const requestKey = getRequestErrorKey(error, {
+        entregaFutureBookingsKey: `dashboard.business.${businessGroup}.entrega_future_bookings_blocked`,
+      });
       if (requestKey) await uiAlert(requestKey, 'warning');
       else await uiAlert(`dashboard.business.${businessGroup}.entrega_toggle_error`, 'error');
     } finally {
