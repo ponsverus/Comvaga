@@ -24,5 +24,9 @@ export function getRequestErrorKey(error, options = {}) {
     return options.entregaFutureBookingsKey || null;
   }
 
+  if (raw.includes('cliente_agendamentos_futuros_bloqueados')) {
+    return 'clientArea.account_delete_future_bookings';
+  }
+
   return null;
 }
