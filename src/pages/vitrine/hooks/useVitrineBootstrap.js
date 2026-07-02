@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  fetchBusinessBillingStatus,
+  fetchBusinessBookingAvailability,
   fetchOfficialDate,
   fetchVitrineDepoimentos,
   fetchVitrineEntregas,
@@ -101,7 +101,7 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
 
       setNegocio(negocioData);
       if (authUserId) {
-        fetchBusinessBillingStatus(negocioData.id)
+        fetchBusinessBookingAvailability(negocioData.id)
           .then((status) => {
             if (loadRunRef.current === runId) setBillingStatus(status);
           })
