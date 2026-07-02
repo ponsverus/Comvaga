@@ -335,6 +335,13 @@ export const ptBR = {
           body: 'Houve um erro ao excluir o serv. Tente novamente.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
         },
+        entrega_future_bookings_blocked: {
+          title: 'Serv. com agendamentos',
+          body:
+            'Este serv. possui agendamentos marcados para hoje ou para uma data futura.\n' +
+            'Cancele ou reagende esses agendamentos antes de inativar ou excluir.',
+          variant: 'warning', screen: 'dark', buttonText: 'ENTENDI',
+        },
         entrega_prof_required: {
           title: 'Selecione um profissional',
           body: 'Escolha um profissional para o serv.',
@@ -399,6 +406,13 @@ export const ptBR = {
           body: 'Houve um erro ao excluir a consulta. Tente novamente.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
         },
+        entrega_future_bookings_blocked: {
+          title: 'Consulta com agendamentos',
+          body:
+            'Esta consulta possui agendamentos marcados para hoje ou para uma data futura.\n' +
+            'Cancele ou reagende esses agendamentos antes de inativar ou excluir.',
+          variant: 'warning', screen: 'dark', buttonText: 'ENTENDI',
+        },
         entrega_prof_required: {
           title: 'Selecione um profissional',
           body: 'Escolha um profissional para esta consulta.',
@@ -462,6 +476,13 @@ export const ptBR = {
           title: 'Erro',
           body: 'Houve um erro ao excluir a aula. Tente novamente.',
           variant: 'danger', screen: 'dark', buttonText: 'OK',
+        },
+        entrega_future_bookings_blocked: {
+          title: 'Aula com agendamentos',
+          body:
+            'Esta aula possui agendamentos marcados para hoje ou para uma data futura.\n' +
+            'Cancele ou reagende esses agendamentos antes de inativar ou excluir.',
+          variant: 'warning', screen: 'dark', buttonText: 'ENTENDI',
         },
         entrega_prof_required: {
           title: 'Selecione um profissional',
