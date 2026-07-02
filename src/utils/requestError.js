@@ -1,5 +1,5 @@
-export function getRequestErrorKey(error) {
-  const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
+export function getRequestErrorKey(error, options = {}) {
+  const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''} ${error?.hint || ''}`.toLowerCase();
 
   if (
     raw.includes('rate_limit_exceeded')
@@ -18,6 +18,10 @@ export function getRequestErrorKey(error) {
     || raw.includes('demorou demais')
   ) {
     return 'alerts.request_timeout';
+  }
+
+  if (raw.includes('entrega_agendamentos_futuros_bloqueados')) {
+    return options.entregaFutureBookingsKey || null;
   }
 
   return null;
