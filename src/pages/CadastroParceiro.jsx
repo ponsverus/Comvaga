@@ -34,13 +34,10 @@ const fieldInputClass = 'w-full bg-transparent px-0 py-2 text-sm text-white plac
 
 function getEmailAvailabilityAlert(checkResult) {
   const reason = String(checkResult?.reason || '').trim();
-  const accountType = String(checkResult?.account_type || '').trim();
 
   if (reason === 'email_invalid') return msgs.email_invalid;
   if (reason === 'rate_limit_exceeded') return msgs.email_check_rate_limit;
   if (reason !== 'email_already_registered') return msgs.access_unavailable;
-  if (accountType === 'client') return msgs.email_registered_client;
-  if (accountType === 'professional') return msgs.email_registered_professional;
   return msgs.email_registered_unknown;
 }
 
