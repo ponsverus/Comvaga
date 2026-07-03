@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ProfessionalIcon } from '../components/icons';
-import { LogOut, Plus, UserCircle } from 'lucide-react';
+import { ProfessionalIcon, UserIcon } from '../components/icons';
+import { LogOut, Plus } from 'lucide-react';
 import { supabase } from '../supabase';
 
 function getPublicUrl(bucket, path) {
@@ -159,7 +159,7 @@ export default function SelecionarNegocio({ user, onLogout, professionalRole = n
             className="flex h-11 flex-1 items-center justify-center rounded-full border border-gray-700 text-[12px] font-normal uppercase leading-none text-gray-300 transition-colors hover:border-primary hover:text-primary"
           >
             <span className="inline-flex items-center justify-center gap-2 leading-none">
-              <UserCircle className="w-4 h-4" />
+              <UserIcon className="w-4 h-4" />
               MINHA CONTA
             </span>
           </button>
