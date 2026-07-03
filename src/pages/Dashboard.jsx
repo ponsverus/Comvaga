@@ -195,7 +195,7 @@ function didTransitionToCancelStatus(payload, knownStatuses) {
   return false;
 }
 
-export default function Dashboard({ user, onLogout, userType = 'professional' }) {
+export default function Dashboard({ user, onLogout, userType = 'professional', professionalRole = null }) {
   const navigate = useNavigate();
   const location = useLocation();
   const feedback = useFeedback();
@@ -635,7 +635,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
                   <h1 className="text-xl font-normal">{negocio.nome}</h1>
                   {souDono
                     ? ownerBusinessCount > 1
-                      ? <button type="button" onClick={() => navigate('/selecionar-negocio')} className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block">TROCAR NEGÓCIO</button>
+                      ? <button type="button" onClick={() => navigate('/selecionar-negocio')} className="text-xs text-gray-500 hover:text-primary transition-colors -mt-0.5 block">SELECIONAR NEGÓCIO</button>
                       : <span className="text-xs text-gray-500 -mt-0.5 block">DASHBOARD</span>
                     : <button type="button" onClick={() => navigate('/selecionar-negocio-parceiro')} className="text-xs text-primary hover:text-yellow-500 -mt-0.5 block uppercase transition-colors">SELECIONAR NEGÓCIO</button>}
                 </div>
@@ -921,7 +921,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
         onSubmit={updateProfissional}
       />
 
-      <AppFooter userType={userType} onLogout={onLogout} />
+      <AppFooter userType={userType} professionalRole={professionalRole} onLogout={onLogout} />
 
     </div>
   );

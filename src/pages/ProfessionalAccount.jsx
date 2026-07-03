@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { withTimeout } from '../utils/withTimeout';
@@ -213,8 +213,9 @@ export default function ProfessionalAccount({ user, onLogout, professionalRole =
             <button
               type="button"
               onClick={() => navigate('/criar-negocio')}
-              className="flex-1 rounded-button border border-primary/30 py-3 text-[12px] font-normal uppercase text-primary transition-colors hover:border-primary"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-button border border-primary/30 py-3 text-[12px] font-normal uppercase text-primary transition-colors hover:border-primary"
             >
+              <Plus className="h-4 w-4" />
               Criar outro
             </button>
           )}

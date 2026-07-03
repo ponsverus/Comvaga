@@ -488,7 +488,7 @@ export default function App() {
                 : userType === 'professional'
                   ? accessState === 'owner_resume'
                     ? <Navigate to={getPostLoginPath(userType, accessState, onboardingStatus)} />
-                    : <Dashboard user={user} onLogout={handleLogout} userType={userType} />
+                    : <Dashboard user={user} onLogout={handleLogout} userType={userType} professionalRole={professionalRole} />
                 : userType ? <Navigate to="/minha-area" />
                 : <Navigate to={postLogoutRedirect || "/login"} />
               ) : <Navigate to={postLogoutRedirect || "/login"} />
@@ -503,7 +503,7 @@ export default function App() {
               ) : <Navigate to="/login" />
             } />
 
-            <Route path="/v/:slug" element={<Vitrine user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} onLogout={handleLogout} />} />
+            <Route path="/v/:slug" element={<Vitrine user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} professionalRole={professionalRole} onLogout={handleLogout} />} />
 
             <Route path="/criar-negocio" element={
               isLoggedIn ? (

@@ -265,7 +265,7 @@ function SelectionBar({ itens, counterSingular, counterPlural, onConfirm, onClea
   );
 }
 
-export default function Vitrine({ user, userType, onLogout }) {
+export default function Vitrine({ user, userType, professionalRole = null, onLogout }) {
   const { slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -674,7 +674,7 @@ export default function Vitrine({ user, userType, onLogout }) {
       />
 
 
-      <AppFooter userType={userType} onLogout={onLogout} />
+      <AppFooter userType={userType} professionalRole={professionalRole} onLogout={onLogout} />
     </div>
   );
 }

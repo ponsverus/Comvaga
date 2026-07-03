@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getSupportHref } from '../support';
 
 function FooterLink({ to, href, children, onClick }) {
@@ -29,10 +29,16 @@ function FooterLink({ to, href, children, onClick }) {
 
 export default function AppFooter({
   userType = null,
+  professionalRole = null,
   onLogout,
 }) {
+  const { pathname } = useLocation();
   const isClient = userType === 'client';
   const isProfessional = userType === 'professional';
+  const isPartner = professionalRole === 'partner';
+  const professionalHomePath = isPartner ? '/selecionar-negocio-parceiro' : '/selecionar-negocio';
+  const professionalHomeLabel = isPartner ? 'SELECIONAR PARCERIA' : 'SELECIONAR NEGÃ“CIO';
+  const showClientAreaLink = isClient && pathname !== '/minha-area';
   const supportHref = getSupportHref(userType);
 
   return (
@@ -57,14 +63,14 @@ export default function AppFooter({
             <ul className="space-y-2">
               {isProfessional ? (
                 <>
-                  <li><FooterLink to="/dashboard">DASHBOARD</FooterLink></li>
+                  <li><FooterLink to={professionalHomePath}>{professionalHomeLabel}</FooterLink></li>
                   <li><FooterLink to="/conta-profissional">MINHA CONTA</FooterLink></li>
                   <li><FooterLink href={supportHref}>SUPORTE</FooterLink></li>
                   <li><FooterLink onClick={() => onLogout?.()}>SAIR</FooterLink></li>
                 </>
               ) : isClient ? (
                 <>
-                  <li><FooterLink to="/minha-area">MINHA ÁREA</FooterLink></li>
+                  {showClientAreaLink && <li><FooterLink to="/minha-area">MINHA ÁREA</FooterLink></li>}
                   <li><FooterLink to="/">HOME</FooterLink></li>
                   <li><FooterLink href={supportHref}>SUPORTE</FooterLink></li>
                   <li><FooterLink onClick={() => onLogout?.()}>SAIR</FooterLink></li>

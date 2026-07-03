@@ -233,7 +233,7 @@ export function useDashboardMutations({
         return;
       }
 
-      navigate('/criar-negocio', { replace: true });
+      navigate('/conta-profissional', { replace: true });
     } catch (error) {
       const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
       if (raw.includes('business_subscription_active') || raw.includes('subscription_active_before_business_delete')) {
