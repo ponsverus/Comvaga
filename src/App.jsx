@@ -142,6 +142,7 @@ function SelecionarNegocioRouteGuard({ user, onLogout, professionalRole }) {
   if (loading) return <FullScreenLoading text="CARREGANDO..." />;
   if (professionalRole === 'partner') return <Navigate to="/selecionar-negocio-parceiro" replace />;
   if (ownerBusinessCount > 1) return <SelecionarNegocio user={user} onLogout={onLogout} professionalRole={professionalRole} />;
+  if (ownerBusinessCount === 0) return <Navigate to="/conta-profissional" replace />;
   return <Navigate to="/dashboard" replace />;
 }
 
