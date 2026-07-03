@@ -921,7 +921,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
         onSubmit={updateProfissional}
       />
 
-      <AppFooter userType={userType} professionalRole={professionalRole} onLogout={onLogout} />
+      <AppFooter userType={userType} professionalRole={professionalRole} onLogout={handleDashboardLogout} />
 
     </div>
   );
