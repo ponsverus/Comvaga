@@ -28,7 +28,6 @@ import { withTimeout } from '../../../utils/withTimeout';
 
 export function useDashboardMutations({
   userId,
-  userEmail,
   negocio,
   businessGroup,
   parceiroProfissional,
@@ -59,9 +58,6 @@ export function useDashboardMutations({
   editingProfissionalId,
   setEditingProfissionalId,
   setShowEditProfissional,
-  novoEmail,
-  setNovaSenha,
-  setConfirmarSenha,
 }) {
   const [logoUploading, setLogoUploading] = useState(false);
   const [infoSaving, setInfoSaving] = useState(false);
@@ -70,7 +66,6 @@ export function useDashboardMutations({
   const [submittingEntrega, setSubmittingEntrega] = useState(false);
   const [submittingProfissional, setSubmittingProfissional] = useState(false);
   const [submittingAdminProf, setSubmittingAdminProf] = useState(false);
-  const [savingDados, setSavingDados] = useState(false);
   const [deletingBusiness, setDeletingBusiness] = useState(false);
   const actionLocksRef = useRef(new Set());
 
@@ -227,17 +222,6 @@ export function useDashboardMutations({
       await uiAlert('dashboard.business_deleted', 'success');
 
       const remaining = Number(result?.remaining_owner_businesses || 0);
-      const accountDeleted = !!result?.account_deleted;
-
-      if (accountDeleted) {
-        await withTimeout(
-          supabase.auth.signOut(),
-          6000,
-          'dashboard-sign-out'
-        );
-        navigate('/', { replace: true });
-        return;
-      }
 
       if (remaining > 1) {
         navigate('/selecionar-negocio', { replace: true });
@@ -254,6 +238,10 @@ export function useDashboardMutations({
       const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
       if (raw.includes('business_subscription_active') || raw.includes('subscription_active_before_business_delete')) {
         await uiAlert('dashboard.business_delete_plan_active', 'warning');
+        return;
+      }
+      if (raw.includes('business_future_bookings_blocked')) {
+        await uiAlert('dashboard.business_delete_future_bookings', 'warning');
         return;
       }
       const requestKey = getRequestErrorKey(error);
@@ -667,57 +655,6 @@ export function useDashboardMutations({
     }
   };
 
-  const salvarEmail = async () => {
-    const email = String(novoEmail || '').trim();
-    if (!email || !email.includes('@')) {
-      await uiAlert('dashboard.account_email_invalid', 'error');
-      return;
-    }
-    try {
-      setSavingDados(true);
-      const { error: updErr } = await withTimeout(
-        supabase.auth.updateUser({ email }),
-        6000,
-        'dashboard-email-update'
-      );
-      if (updErr) throw updErr;
-      await uiAlert('dashboard.account_email_update_sent', 'success');
-    } catch {
-      await uiAlert('dashboard.account_email_update_error', 'error');
-    } finally {
-      setSavingDados(false);
-    }
-  };
-
-  const salvarSenha = async (novaSenha, confirmarSenha) => {
-    const pass = String(novaSenha || '');
-    const conf = String(confirmarSenha || '');
-    if (pass.length < 7) {
-      await uiAlert('dashboard.account_password_too_short', 'error');
-      return;
-    }
-    if (pass !== conf) {
-      await uiAlert('dashboard.account_password_mismatch', 'error');
-      return;
-    }
-    try {
-      setSavingDados(true);
-      const { error: updErr } = await withTimeout(
-        supabase.auth.updateUser({ password: pass }),
-        6000,
-        'dashboard-password-update'
-      );
-      if (updErr) throw updErr;
-      setNovaSenha('');
-      setConfirmarSenha('');
-      await uiAlert('dashboard.account_password_updated', 'success');
-    } catch {
-      await uiAlert('dashboard.account_password_update_error', 'error');
-    } finally {
-      setSavingDados(false);
-    }
-  };
-
   return {
     logoUploading,
     infoSaving,
@@ -726,7 +663,6 @@ export function useDashboardMutations({
     submittingEntrega,
     submittingProfissional,
     submittingAdminProf,
-    savingDados,
     deletingBusiness,
     cadastrarAdminComoProfissional,
     uploadLogoNegocio,
@@ -745,8 +681,5 @@ export function useDashboardMutations({
     aprovarParceiro,
     confirmarAtendimento,
     cancelarAgendamento,
-    salvarEmail,
-    salvarSenha: (novaSenha, confirmarSenha) => salvarSenha(novaSenha, confirmarSenha),
-    currentEmail: userEmail || '',
   };
 }
