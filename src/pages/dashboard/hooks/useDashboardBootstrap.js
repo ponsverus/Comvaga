@@ -238,7 +238,8 @@ export function useDashboardBootstrap({
             : negocioIds[0];
 
         if (selectedNegocioId) return fetchNegocioById(selectedNegocioId);
-        return null;
+        navigate('/criar-negocio', { replace: true });
+        return '__redirect__';
       };
 
       let negocioData = null;

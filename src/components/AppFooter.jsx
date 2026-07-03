@@ -58,6 +58,7 @@ export default function AppFooter({
               {isProfessional ? (
                 <>
                   <li><FooterLink to="/dashboard">DASHBOARD</FooterLink></li>
+                  <li><FooterLink to="/conta-profissional">MINHA CONTA</FooterLink></li>
                   <li><FooterLink href={supportHref}>SUPORTE</FooterLink></li>
                   <li><FooterLink onClick={() => onLogout?.()}>SAIR</FooterLink></li>
                 </>

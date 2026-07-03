@@ -30,15 +30,10 @@ function SplitField({ label, children, divider = false }) {
 }
 
 const inputClass = 'w-full bg-transparent px-0 py-2 text-[14px] text-white placeholder-gray-600 outline-none focus:text-white';
-const pillInputClass = 'w-full rounded-full border border-gray-800 bg-transparent px-4 py-2 text-center text-[14px] text-white placeholder-gray-600 outline-none focus:border-primary/50 focus:text-white';
 const saveButtonClass = 'shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] font-normal uppercase text-primary disabled:opacity-50';
 const maskedPrivateValue = '••••••••';
 
 export default function InfoNegocioSection({
-  nomePerfil,
-  setNomePerfil,
-  savingPerfil,
-  salvarNomePerfil,
   salvarInfoNegocio,
   infoSaving,
   formInfo,
@@ -53,15 +48,6 @@ export default function InfoNegocioSection({
   loadMoreGaleria,
   getPublicUrl,
   removerImagemGaleria,
-  novoEmail,
-  setNovoEmail,
-  savingDados,
-  salvarEmail,
-  novaSenha,
-  setNovaSenha,
-  confirmarSenha,
-  setConfirmarSenha,
-  salvarSenha,
   deletingBusiness,
   excluirNegocio,
   navigate,
@@ -70,10 +56,8 @@ export default function InfoNegocioSection({
   const [visiblePrivateFields, setVisiblePrivateFields] = useState({
     instagram: false,
     facebook: false,
-    email: false,
   });
   const [savingBusinessField, setSavingBusinessField] = useState(null);
-  const [savingAccountField, setSavingAccountField] = useState(null);
   const gallerySentinelRef = useRef(null);
 
   useEffect(() => {
@@ -106,25 +90,6 @@ export default function InfoNegocioSection({
     }
   };
 
-  const saveEmailPrivateField = async () => {
-    try {
-      setSavingAccountField('email');
-      await Promise.resolve(salvarEmail());
-      hidePrivateField('email');
-    } finally {
-      setSavingAccountField(null);
-    }
-  };
-
-  const savePasswordField = async () => {
-    try {
-      setSavingAccountField('password');
-      await Promise.resolve(salvarSenha());
-    } finally {
-      setSavingAccountField(null);
-    }
-  };
-
   const businessSaveAction = (field) => (
     <button type="button" onClick={() => saveBusinessField(field)} disabled={infoSaving} className={saveButtonClass}>
       {savingBusinessField === field ? 'SALVANDO' : 'SALVAR'}
@@ -139,18 +104,6 @@ export default function InfoNegocioSection({
     ) : (
       <button type="button" onClick={() => revealPrivateField(field)} className={saveButtonClass}>
         VER ID
-      </button>
-    )
-  );
-
-  const privateEmailAction = (
-    visiblePrivateFields.email ? (
-      <button type="button" disabled={savingDados} onClick={saveEmailPrivateField} className={saveButtonClass}>
-        {savingAccountField === 'email' ? 'SALVANDO' : 'SALVAR'}
-      </button>
-    ) : (
-      <button type="button" onClick={() => revealPrivateField('email')} className={saveButtonClass}>
-        VER E-MAIL
       </button>
     )
   );
@@ -175,22 +128,6 @@ export default function InfoNegocioSection({
           {temaSaving ? 'SALVANDO' : ''}
         </span>
       </div>
-
-      <InfoRow
-        label="ADMIN"
-        action={(
-          <button type="button" onClick={salvarNomePerfil} disabled={savingPerfil} className={saveButtonClass}>
-            {savingPerfil ? 'SALVANDO' : 'SALVAR'}
-          </button>
-        )}
-      >
-        <input
-          value={nomePerfil}
-          onChange={(e) => setNomePerfil(e.target.value)}
-          className={`${inputClass} uppercase truncate pr-10 sm:pr-0`}
-          placeholder="NOME COMPLETO"
-        />
-      </InfoRow>
 
       <InfoRow label="NEGÓCIO" action={businessSaveAction('nome')}>
         <input
@@ -338,42 +275,6 @@ export default function InfoNegocioSection({
             ) : null}
           </>
         ) : null}
-      </div>
-
-      <InfoRow label="E-MAIL" action={privateEmailAction}>
-        <input
-          type={visiblePrivateFields.email ? 'email' : 'text'}
-          value={visiblePrivateFields.email ? novoEmail : maskedPrivateValue}
-          onChange={(e) => setNovoEmail(e.target.value)}
-          readOnly={!visiblePrivateFields.email}
-          className={`${inputClass} uppercase max-w-[calc(100vw-13.75rem)] truncate pr-4 sm:max-w-none sm:pr-0`}
-        />
-      </InfoRow>
-
-      <div className="border-b border-gray-800 px-4 py-3 sm:px-6">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <span className="text-[14px] leading-5 text-gray-500">SENHA</span>
-          <button type="button" disabled={savingDados} onClick={savePasswordField} className="shrink-0 rounded-full border border-green-500/40 px-3 py-1 text-[12px] font-normal uppercase text-green-300 disabled:opacity-50">
-            {savingAccountField === 'password' ? 'SALVANDO' : 'SALVAR'}
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <input
-            type="password"
-            value={novaSenha}
-            onChange={(e) => setNovaSenha(e.target.value)}
-            className={pillInputClass}
-            placeholder="NOVA SENHA"
-          />
-          <input
-            type="password"
-            value={confirmarSenha}
-            onChange={(e) => setConfirmarSenha(e.target.value)}
-            className={pillInputClass}
-            placeholder="CONFIRMAR"
-          />
-        </div>
       </div>
 
       <div className="flex items-center gap-3 px-4 py-4 sm:px-6">

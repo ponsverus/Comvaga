@@ -17,7 +17,6 @@ import EntregasSection from './dashboard/sections/EntregasSection';
 import ProfissionaisSection from './dashboard/sections/ProfissionaisSection';
 import InfoNegocioSection from './dashboard/sections/InfoNegocioSection';
 import PlanosSection from './dashboard/sections/PlanosSection';
-import AccountDataSection from './dashboard/sections/AccountDataSection';
 import {
   NOW_RPC_SEQUENCE,
   DEFAULT_PROFISSIONAL_HORARIOS,
@@ -38,7 +37,6 @@ import { useDashboardClientes } from './dashboard/hooks/useDashboardClientes';
 import { useDashboardHistorico } from './dashboard/hooks/useDashboardHistorico';
 import { useDashboardMetrics } from './dashboard/hooks/useDashboardMetrics';
 import { useDashboardMutations } from './dashboard/hooks/useDashboardMutations';
-import { withTimeout } from '../utils/withTimeout';
 
 function formatCurrency(value) {
   return `R$ ${Number(value || 0).toFixed(2)}`;
@@ -324,12 +322,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     tema: 'dark',
   });
 
-  const [nomePerfil, setNomePerfil] = useState('');
-  const [savingPerfil, setSavingPerfil] = useState(false);
-  const [novoEmail, setNovoEmail]           = useState(user?.email || '');
-  const [novaSenha, setNovaSenha]           = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
-
   const [notifAgendamentos, setNotifAgendamentos] = useState(0);
   const [notifCancelados, setNotifCancelados]     = useState(0);
 
@@ -337,29 +329,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
   const [editingProfissionalId, setEditingProfissionalId]     = useState(null);
   const [formProfissional, setFormProfissional] = useState({ nome: '', profissao: '', anos_experiencia: '', horarios: DEFAULT_PROFISSIONAL_HORARIOS });
 
-
-  useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
-  useEffect(() => {
-    let active = true;
-    if (!user?.id) return () => { active = false; };
-
-    (async () => {
-      const fallback = String(user?.user_metadata?.nome || '').trim();
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('nome')
-          .eq('id', user.id)
-          .maybeSingle();
-        if (error) throw error;
-        if (active) setNomePerfil(String(data?.nome || fallback).trim());
-      } catch {
-        if (active) setNomePerfil(fallback);
-      }
-    })();
-
-    return () => { active = false; };
-  }, [user?.id, user?.user_metadata?.nome]);
   useEffect(() => {
     if (!negocio) return;
     setFormInfo({
@@ -393,37 +362,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
   const adminJaEhProfissional = useMemo(() =>
     profissionais.some(p => p.user_id === user?.id),
   [profissionais, user?.id]);
-
-  const salvarNomePerfil = useCallback(async () => {
-    const nome = String(nomePerfil || '').trim();
-    if (!nome) {
-      await uiAlert('clientArea.profile_name_required', 'error');
-      return;
-    }
-    try {
-      setSavingPerfil(true);
-      const { error: updErr } = await withTimeout(
-        supabase.from('users').update({ nome }).eq('id', user.id),
-        6000,
-        'dashboard-profile-name-update'
-      );
-      if (updErr) throw updErr;
-      const { error: metaErr } = await withTimeout(
-        supabase.auth.updateUser({ data: { nome } }),
-        6000,
-        'dashboard-auth-name-update'
-      );
-      if (metaErr) {
-        console.warn('Falha ao atualizar metadados do usuário.', metaErr);
-      }
-      setNomePerfil(nome);
-      await uiAlert('clientArea.profile_name_updated', 'success');
-    } catch {
-      await uiAlert('clientArea.profile_name_update_error', 'error');
-    } finally {
-      setSavingPerfil(false);
-    }
-  }, [nomePerfil, uiAlert, user?.id]);
 
   const reloadAgendamentosRef = useRef(reloadAgendamentos);
   useEffect(() => { reloadAgendamentosRef.current = reloadAgendamentos; }, [reloadAgendamentos]);
@@ -470,7 +408,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     submittingEntrega,
     submittingProfissional,
     submittingAdminProf,
-    savingDados,
     deletingBusiness,
     cadastrarAdminComoProfissional,
     uploadLogoNegocio,
@@ -489,11 +426,8 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     aprovarParceiro,
     confirmarAtendimento,
     cancelarAgendamento,
-    salvarEmail,
-    salvarSenha,
   } = useDashboardMutations({
     userId: user?.id,
-    userEmail: user?.email,
     negocio,
     businessGroup,
     parceiroProfissional,
@@ -524,9 +458,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
     editingProfissionalId,
     setEditingProfissionalId,
     setShowEditProfissional,
-    novoEmail,
-    setNovaSenha,
-    setConfirmarSenha,
   });
 
   useEffect(() => {
@@ -606,7 +537,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
 
   const tabs = useMemo(() => (
     parceiroProfissional
-      ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais', 'dados']
+      ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais']
       : souDono
         ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais', 'info-negocio', 'planos']
         : ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais']
@@ -928,30 +859,8 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
               />
             )}
 
-            {activeTab === 'dados' && parceiroProfissional && (
-              <AccountDataSection
-                nomePerfil={nomePerfil}
-                setNomePerfil={setNomePerfil}
-                savingPerfil={savingPerfil}
-                salvarNomePerfil={salvarNomePerfil}
-                novoEmail={novoEmail}
-                setNovoEmail={setNovoEmail}
-                savingDados={savingDados}
-                salvarEmail={salvarEmail}
-                novaSenha={novaSenha}
-                setNovaSenha={setNovaSenha}
-                confirmarSenha={confirmarSenha}
-                setConfirmarSenha={setConfirmarSenha}
-                salvarSenha={() => salvarSenha(novaSenha, confirmarSenha)}
-              />
-            )}
-
             {activeTab === 'info-negocio' && souDono && (
               <InfoNegocioSection
-                nomePerfil={nomePerfil}
-                setNomePerfil={setNomePerfil}
-                savingPerfil={savingPerfil}
-                salvarNomePerfil={salvarNomePerfil}
                 salvarInfoNegocio={salvarInfoNegocio}
                 infoSaving={infoSaving}
                 formInfo={formInfo}
@@ -966,15 +875,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
                 loadMoreGaleria={loadMoreGaleria}
                 getPublicUrl={getPublicUrl}
                 removerImagemGaleria={removerImagemGaleria}
-                novoEmail={novoEmail}
-                setNovoEmail={setNovoEmail}
-                savingDados={savingDados}
-                salvarEmail={salvarEmail}
-                novaSenha={novaSenha}
-                setNovaSenha={setNovaSenha}
-                  confirmarSenha={confirmarSenha}
-                  setConfirmarSenha={setConfirmarSenha}
-                  salvarSenha={() => salvarSenha(novaSenha, confirmarSenha)}
                   deletingBusiness={deletingBusiness}
                   excluirNegocio={excluirNegocio}
                   navigate={navigate}
