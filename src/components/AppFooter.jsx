@@ -37,7 +37,7 @@ export default function AppFooter({
   const isProfessional = userType === 'professional';
   const isPartner = professionalRole === 'partner';
   const professionalHomePath = isPartner ? '/selecionar-negocio-parceiro' : '/selecionar-negocio';
-  const professionalHomeLabel = isPartner ? 'SELECIONAR PARCERIA' : 'SELECIONAR NEGÃ“CIO';
+  const professionalHomeLabel = isPartner ? 'SELECIONAR PARCERIA' : 'SELECIONAR NEGÓCIO';
   const showClientAreaLink = isClient && pathname !== '/minha-area';
   const supportHref = getSupportHref(userType);
 
