@@ -238,7 +238,7 @@ export function useDashboardBootstrap({
             : negocioIds[0];
 
         if (selectedNegocioId) return fetchNegocioById(selectedNegocioId);
-        navigate('/criar-negocio', { replace: true });
+        navigate('/conta-profissional', { replace: true });
         return '__redirect__';
       };
 

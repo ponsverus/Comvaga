@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { withTimeout } from '../utils/withTimeout';
@@ -176,7 +176,7 @@ export default function ProfessionalAccount({ user, onLogout, professionalRole =
 
   return (
     <div className="min-h-screen bg-black px-4 py-10 text-white">
-      <div className="mx-auto w-full max-w-2xl">
+      <div className="mx-auto w-full max-w-3xl">
         <div className="mb-8 flex items-center justify-between gap-4">
           <Link to={backPath} className="inline-flex items-center gap-2 text-sm uppercase text-gray-400 transition-colors hover:text-primary">
             <ArrowLeft className="h-4 w-4" />
@@ -190,7 +190,7 @@ export default function ProfessionalAccount({ user, onLogout, professionalRole =
           <p className="mt-2 text-sm uppercase text-gray-500">Dados de acesso do profissional</p>
         </div>
 
-        <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-100">
+        <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-100 p-6">
           <AccountDataSection
             nomePerfil={nomePerfil}
             setNomePerfil={setNomePerfil}
@@ -208,21 +208,23 @@ export default function ProfessionalAccount({ user, onLogout, professionalRole =
           />
         </div>
 
-        <div className="mt-6 rounded-custom border border-red-500/30 bg-red-500/10 p-5">
-          <div className="mb-4">
-            <h2 className="text-sm font-normal uppercase text-red-200">Excluir conta</h2>
-            <p className="mt-1 text-sm text-red-200/70">
-              Esta acao remove seu acesso profissional. Negocios ativos precisam ser excluidos pelo dashboard antes da conta.
-            </p>
-          </div>
+        <div className="mt-6 flex items-center gap-3">
+          {professionalRole !== 'partner' && (
+            <button
+              type="button"
+              onClick={() => navigate('/criar-negocio')}
+              className="flex-1 rounded-button border border-primary/30 py-3 text-[12px] font-normal uppercase text-primary transition-colors hover:border-primary"
+            >
+              Criar outro
+            </button>
+          )}
           <button
             type="button"
             onClick={excluirConta}
             disabled={deletingAccount}
-            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-button border border-red-500/40 px-6 text-xs font-normal uppercase text-red-200 transition-colors hover:border-red-400 disabled:opacity-60"
+            className="flex-1 rounded-button border border-red-500/30 py-3 text-[12px] font-normal uppercase text-red-400 transition-colors hover:border-red-400 disabled:opacity-50"
           >
-            <Trash2 className="h-4 w-4" />
-            {deletingAccount ? 'Excluindo conta' : 'Excluir conta'}
+            {deletingAccount ? 'Excluindo' : 'Excluir conta'}
           </button>
         </div>
       </div>
