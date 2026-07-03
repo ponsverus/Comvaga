@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, LogOut, RefreshCw, Send, UserCircle } from 'lucide-react';
-import { ProfessionalIcon, SearchIcon } from '../components/icons';
+import { ArrowRight, LogOut, RefreshCw, Send } from 'lucide-react';
+import { ProfessionalIcon, SearchIcon, UserIcon } from '../components/icons';
 import { ptBR } from '../feedback/messages/ptBR';
 import { supabase } from '../supabase';
 
@@ -457,7 +457,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
             onClick={() => navigate('/conta-profissional')}
             className="flex h-11 w-full items-center justify-center gap-2 rounded-full border border-gray-700 px-6 text-xs font-normal uppercase text-gray-300 transition-colors hover:border-primary hover:text-primary"
           >
-            <UserCircle className="h-4 w-4" />
+            <UserIcon className="h-4 w-4" />
             Minha conta
           </button>
         </div>
