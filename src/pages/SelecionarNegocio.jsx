@@ -67,7 +67,7 @@ export default function SelecionarNegocio({ user, onLogout, professionalRole = n
     }
 
     if (negocios.length === 0) {
-      navigate('/dashboard', { replace: true });
+      navigate('/conta-profissional', { replace: true });
     }
   }, [loading, negocios, navigate]);
 
@@ -87,23 +87,32 @@ export default function SelecionarNegocio({ user, onLogout, professionalRole = n
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-black text-white px-4 py-10 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
-      <div className="relative z-10 w-full max-w-md">
-        <div className="flex justify-center mb-8">
-          <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-16 w-auto object-contain" />
+      <div className="relative z-10 mx-auto w-full max-w-4xl">
+        <div className="mb-8 flex items-center justify-between gap-4">
+          <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-14 w-auto object-contain" />
+          <button
+            type="button"
+            onClick={onLogout}
+            className="inline-flex items-center justify-center gap-2 rounded-button bg-red-600 px-4 py-1.5 text-sm font-normal uppercase transition-colors hover:bg-red-700 sm:py-2"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">Sair</span>
+          </button>
         </div>
 
-        <div className="text-center mb-10">
+        <div className="mx-auto w-full max-w-md">
+          <div className="text-center mb-10">
           <h1 className="text-3xl font-normal mb-2 tracking-wide">QUAL NEGÓCIO?</h1>
           <p className="text-gray-500 text-sm font-normal">SELECIONE O NEGÓCIO QUE DESEJA GERENCIAR</p>
-        </div>
+          </div>
 
-        <div className="space-y-3 mb-6">
+          <div className="space-y-3 mb-6">
           {negocios.map((neg) => {
             const logoUrl = getPublicUrl('logos', neg.logo_path);
             const endereco = formatBusinessAddress(neg);
@@ -138,9 +147,9 @@ export default function SelecionarNegocio({ user, onLogout, professionalRole = n
               </button>
             );
           })}
-        </div>
+          </div>
 
-        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
           {professionalRole !== 'partner' && (
             <button
               type="button"
@@ -163,16 +172,7 @@ export default function SelecionarNegocio({ user, onLogout, professionalRole = n
               MINHA CONTA
             </span>
           </button>
-          <button
-            type="button"
-            onClick={onLogout}
-            className="flex h-11 flex-1 items-center justify-center rounded-full border border-red-500/40 text-[12px] font-normal uppercase leading-none text-red-400 transition-colors hover:border-red-500 hover:text-red-300"
-          >
-            <span className="inline-flex items-center justify-center gap-2 leading-none">
-              <LogOut className="w-4 h-4" />
-            SAIR
-            </span>
-          </button>
+          </div>
         </div>
       </div>
     </div>
