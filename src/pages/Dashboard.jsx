@@ -195,7 +195,7 @@ function didTransitionToCancelStatus(payload, knownStatuses) {
   return false;
 }
 
-export default function Dashboard({ user, onLogout, userType = 'professional' }) {
+export default function Dashboard({ user, onLogout, userType = 'professional', professionalRole = null }) {
   const navigate = useNavigate();
   const location = useLocation();
   const feedback = useFeedback();
@@ -921,7 +921,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional' })
         onSubmit={updateProfissional}
       />
 
-      <AppFooter userType={userType} onLogout={onLogout} />
+      <AppFooter userType={userType} professionalRole={professionalRole} onLogout={onLogout} />
 
     </div>
   );
