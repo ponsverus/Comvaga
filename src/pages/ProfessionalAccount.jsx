@@ -187,7 +187,7 @@ export default function ProfessionalAccount({ user, onLogout, professionalRole =
 
         <div className="mb-8">
           <h1 className="text-3xl font-normal uppercase tracking-wide">Minha conta</h1>
-          <p className="mt-2 text-sm uppercase text-gray-500">Dados de acesso do profissional</p>
+          <p className="mt-2 text-sm uppercase text-gray-500">CLIQUE, EDITE E SALVE</p>
         </div>
 
         <div className="overflow-hidden rounded-custom border border-gray-800 bg-dark-100 p-6">
