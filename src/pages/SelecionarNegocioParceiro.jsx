@@ -5,6 +5,8 @@ import { ProfessionalIcon, SearchIcon, UserIcon } from '../components/icons';
 import { ptBR } from '../feedback/messages/ptBR';
 import { supabase } from '../supabase';
 
+const msgs = ptBR.partnerBusinessCenter;
+
 function getPublicUrl(bucket, path) {
   if (!bucket || !path) return null;
   try {
@@ -135,7 +137,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     } catch (error) {
       setAlert({
         type: 'error',
-        message: error?.message || 'Erro ao carregar seus negócios.',
+        message: error?.message || msgs.load_error,
       });
     } finally {
       setLoading(false);
@@ -194,9 +196,9 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
       });
       if (error) throw error;
       setSearchRows(data || []);
-      if (!data?.length) setAlert({ type: 'warning', message: 'Nenhum negócio encontrado para essa busca.' });
+      if (!data?.length) setAlert({ type: 'warning', message: msgs.search_empty });
     } catch (error) {
-      setAlert({ type: 'error', message: error?.message || 'Erro ao pesquisar negócios.' });
+      setAlert({ type: 'error', message: error?.message || msgs.search_error });
     } finally {
       setSearching(false);
     }
@@ -236,11 +238,11 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
 
       const status = String(data?.status || '');
       if (status === 'pending_approval') {
-        setAlert({ type: 'success', message: 'Solicita. enviada. Aguarde o aval do responsável pelo negócio.' });
+        setAlert({ type: 'success', message: msgs.request_pending_approval });
       } else if (status === 'ok') {
-        setAlert({ type: 'success', message: 'Parceria ativa. Você já pode acessar o dashboard deste negócio.' });
+        setAlert({ type: 'success', message: msgs.request_active });
       } else {
-        setAlert({ type: 'warning', message: 'Solicita. processada. Atualize a lista para conferir o status.' });
+        setAlert({ type: 'warning', message: msgs.request_processed });
       }
 
       await loadCenter({ silent: true });
@@ -254,13 +256,13 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
     } catch (error) {
       const raw = String(error?.message || '').toLowerCase();
       if (raw.includes('access_inactive')) {
-        setAlert({ type: 'warning', message: 'Este vínculo está inativo ou excluído neste negócio.' });
+        setAlert({ type: 'warning', message: msgs.access_inactive });
       } else if (raw.includes('partner_plan_unavailable')) {
         setAlert({ type: 'warning', message: ptBR.dashboard.partner_plan_unavailable.body });
       } else if (raw.includes('owner_cannot_request_partner_access')) {
-        setAlert({ type: 'warning', message: 'Parcerias indisponíveis para contas administradoras.' });
+        setAlert({ type: 'warning', message: msgs.owner_cannot_request_partner_access });
       } else {
-        setAlert({ type: 'error', message: error?.message || 'Erro ao solicitar parceria.' });
+        setAlert({ type: 'error', message: error?.message || msgs.request_error });
       }
     } finally {
       setRequestingId(null);
