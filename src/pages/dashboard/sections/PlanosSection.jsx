@@ -7,6 +7,7 @@ import {
   fetchBusinessBillingStatus,
 } from '../api/dashboardApi';
 import { getRequestErrorKey } from '../../../utils/requestError';
+import { useFeedback } from '../../../feedback/useFeedback';
 
 function formatCurrencyFromCents(value) {
   return `R$ ${(Number(value || 0) / 100).toFixed(2).replace('.', ',')}`;
@@ -139,6 +140,7 @@ function StarGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
 }
 
 export default function PlanosSection({ negocioId, onBillingStatusChange }) {
+  const feedback = useFeedback();
   const [plans, setPlans] = useState([]);
   const [billingStatus, setBillingStatus] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -229,7 +231,7 @@ export default function PlanosSection({ negocioId, onBillingStatusChange }) {
 
   const handleCancelPlan = async (planCode) => {
     if (!negocioId || savingPlan || cancelingPlan) return;
-    const confirmed = window.confirm('Cancelar este plano? A vitrine sera bloqueada para novos agendamentos.');
+    const confirmed = await feedback.confirm('dashboard.billing_cancel_confirm');
     if (!confirmed) return;
 
     setCancelingPlan(planCode);
