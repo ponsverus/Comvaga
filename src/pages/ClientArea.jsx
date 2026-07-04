@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, X } from 'lucide-react';
-import { CalendarIcon, TimePastIcon } from '../components/icons';
+import { CalendarIcon, ProfessionalIcon, SearchIcon, TimePastIcon, UserIcon } from '../components/icons';
 import AppFooter from '../components/AppFooter';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
@@ -129,11 +129,18 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const [agendamentosLoadingMore, setAgendamentosLoadingMore] = useState(false);
   const [favoritosLoadingMore, setFavoritosLoadingMore] = useState(false);
   const [removingFavoritoId, setRemovingFavoritoId] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchRows, setSearchRows] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState('');
 
   const [avatarPath,      setAvatarPath]      = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef(null);
   const removingFavoritoRef = useRef(false);
+  const desktopSearchRef = useRef(null);
+  const desktopSearchInputRef = useRef(null);
 
   const [nomePerfil,   setNomePerfil]   = useState('');
   const [savingPerfil, setSavingPerfil] = useState(false);
@@ -157,6 +164,33 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
 
   const fetchClienteId = useCallback(async () => {
     return fetchCurrentClienteId();
+  }, []);
+
+  const searchHome = useCallback(async (cleanTerm) => {
+    const clean = String(cleanTerm || '').trim();
+    setSearchError('');
+
+    if (clean.length < 3) {
+      setSearchRows([]);
+      setSearching(false);
+      return;
+    }
+
+    setSearching(true);
+    try {
+      const { data, error } = await supabase.rpc('search_home', {
+        p_term: clean,
+        p_limit: 10,
+      });
+
+      if (error) throw error;
+      setSearchRows(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setSearchRows([]);
+      setSearchError(error?.message || 'Não foi possível realizar a busca agora.');
+    } finally {
+      setSearching(false);
+    }
   }, []);
 
   const fetchAgendamentos = useCallback(async ({ page = 0, limit = PAGE_SIZE, clienteId: clienteIdParam = clienteId } = {}) => {
@@ -279,6 +313,42 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   useEffect(() => {
     if (user?.id) loadData();
   }, [user?.id, loadData]);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    desktopSearchInputRef.current?.focus();
+  }, [searchOpen]);
+
+  useEffect(() => {
+    if (!searchOpen) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (desktopSearchRef.current?.contains(event.target)) return;
+      setSearchOpen(false);
+      setSearchTerm('');
+      setSearchRows([]);
+      setSearchError('');
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [searchOpen]);
+
+  useEffect(() => {
+    const clean = String(searchTerm || '').trim();
+    if (clean.length < 3) {
+      setSearchRows([]);
+      setSearchError('');
+      setSearching(false);
+      return undefined;
+    }
+
+    const timeout = window.setTimeout(() => {
+      searchHome(clean);
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
+  }, [searchHome, searchTerm]);
 
   const fetchAgendamentosRef = useRef(fetchAgendamentos);
   useEffect(() => { fetchAgendamentosRef.current = fetchAgendamentos; }, [fetchAgendamentos]);
@@ -630,6 +700,81 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const avatarUrl      = getPublicUrl('avatars', avatarPath);
   const nomeCabecalho  = String(nomePerfil || user?.user_metadata?.nome || '—').trim();
   const avatarFallback = nomeCabecalho?.[0]?.toUpperCase() || '?';
+  const renderSearchResult = (row) => {
+    const tipo = String(row?.tipo || '').toLowerCase();
+    const isNegocio = tipo === 'negocio';
+    const typeLabel = isNegocio ? 'NEGÓCIO' : 'PROFISSIONAL';
+    const subtitle = String(row?.subtitulo || '').trim();
+
+    return (
+      <Link
+        key={`${row?.tipo || 'item'}-${row?.id || row?.slug}`}
+        to={`/v/${row?.slug}`}
+        onClick={() => {
+          setSearchOpen(false);
+          setSearchTerm('');
+          setSearchRows([]);
+          setSearchError('');
+        }}
+        className="block border-b border-white/5 px-4 py-4 text-left transition-colors hover:bg-dark-200/90 last:border-b-0"
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-800 bg-dark-200">
+            {isNegocio ? (
+              <ProfessionalIcon className="h-5 w-5 text-primary" />
+            ) : (
+              <UserIcon className="h-5 w-5 text-blue-400" />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-sm font-normal uppercase text-white">{row?.nome || '—'}</div>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] uppercase text-primary">
+                {typeLabel}
+              </span>
+              {subtitle && (
+                <span className="truncate text-xs uppercase text-gray-500">{subtitle}</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  };
+
+  const renderSearchResults = ({ mobile = false } = {}) => {
+    const hasQuery = String(searchTerm || '').trim().length >= 3;
+    if (!hasQuery) return null;
+
+    const wrapClass = mobile
+      ? 'mt-3 overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl'
+      : 'absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl';
+
+    return (
+      <div className={wrapClass}>
+        {searching && (
+          <div className="px-4 py-4 text-sm text-gray-400">
+            BUSCANDO...
+          </div>
+        )}
+        {!searching && searchError && (
+          <div className="px-4 py-4 text-sm text-red-300">
+            {searchError}
+          </div>
+        )}
+        {!searching && !searchError && searchRows.length > 0 && (
+          <div>
+            {searchRows.map((row) => renderSearchResult(row))}
+          </div>
+        )}
+        {!searching && !searchError && searchRows.length === 0 && (
+          <div className="px-4 py-4 text-sm text-gray-400">
+            Nenhum resultado encontrado.
+          </div>
+        )}
+      </div>
+    );
+  };
   const renderSecaoAgendamentos = (titulo, lista) => {
     if (!lista.length) return null;
     return (
@@ -780,6 +925,51 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
               </div>
             </Link>
             <div className="flex items-center gap-2">
+              <div ref={desktopSearchRef} className="relative hidden md:block">
+                <div
+                  className={[
+                    'relative flex h-11 items-center overflow-hidden rounded-full transition-all duration-300 ease-out',
+                    searchOpen
+                      ? 'w-72 border border-white/10 bg-black/40 backdrop-blur-md lg:w-96'
+                      : 'w-11 border border-transparent bg-transparent',
+                  ].join(' ')}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (searchOpen && !String(searchTerm || '').trim()) {
+                        setSearchOpen(false);
+                        setSearchRows([]);
+                        setSearchError('');
+                        return;
+                      }
+                      setSearchOpen(true);
+                    }}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-300 transition-colors hover:text-primary"
+                    aria-label="Pesquisar negócio ou profissional"
+                  >
+                    <SearchIcon strokeWidth={1.6} className="h-[18px] w-[18px]" />
+                  </button>
+                  <input
+                    ref={desktopSearchInputRef}
+                    type="search"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="PESQUISAR NEGÓCIO OU PROFISSIONAL"
+                    className={[
+                      'min-w-0 flex-1 bg-transparent pr-4 text-sm uppercase text-white placeholder:text-gray-500 focus:outline-none transition-opacity duration-200',
+                      searchOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
+                    ].join(' ')}
+                    tabIndex={searchOpen ? 0 : -1}
+                  />
+                  {searching && searchOpen && String(searchTerm || '').trim().length >= 3 && (
+                    <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
+                      <div className="h-4 w-4 rounded-full border border-primary border-t-transparent animate-spin" />
+                    </div>
+                  )}
+                </div>
+                {searchOpen && renderSearchResults()}
+              </div>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={onPickAvatar} className="hidden" />
               <button onClick={openFilePicker} disabled={uploadingAvatar} className="h-9 px-5 bg-dark-200 border border-gray-800 hover:border-primary/50 rounded-button text-sm transition-all uppercase focus:outline-none">
                 {uploadingAvatar ? 'ENVIANDO...' : 'FOTO'}
@@ -800,22 +990,45 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
           </div>
         )}
 
+        <div className="mb-8 md:hidden">
+          <div className="mx-auto max-w-md">
+            <div className="relative flex h-11 items-center overflow-hidden rounded-full border border-white/10 bg-black/40 backdrop-blur-md">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-300">
+                <SearchIcon strokeWidth={1.6} className="h-[18px] w-[18px]" />
+              </div>
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="PESQUISAR NEGÓCIO OU PROFISSIONAL"
+                className="min-w-0 flex-1 bg-transparent pr-4 text-sm uppercase text-white placeholder:text-gray-500 focus:outline-none"
+              />
+              {searching && String(searchTerm || '').trim().length >= 3 && (
+                <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
+                  <div className="h-4 w-4 rounded-full border border-primary border-t-transparent animate-spin" />
+                </div>
+              )}
+            </div>
+            {renderSearchResults({ mobile: true })}
+          </div>
+        </div>
+
         <div className="mb-8">
           <h2 className="text-3xl sm:text-4xl font-normal mb-2">Olá {nomeCabecalho} :)</h2>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 items-start">
-          <Link to="/" className="bg-gradient-to-r from-primary to-yellow-600 rounded-custom p-6 hover:shadow-lg hover:shadow-primary/50 transition-all">
-            <CalendarIcon className="w-8 h-8 text-black mb-3" />
-            <h3 className="text-lg font-normal text-black mb-1">NOVO AGENDAMENTO</h3>
-          </Link>
+          <button onClick={() => setActiveTab('agendamentos')} className="bg-dark-100 border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all text-left">
+            <TimePastIcon className="w-8 h-8 text-blue-400 mb-3" />
+            <h3 className="text-lg font-normal mb-1">{agendamentos.length} AGENDAMENTOS</h3>
+          </button>
           <button onClick={() => setActiveTab('favoritos')} className="bg-dark-100 border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all text-left">
             <Heart filled size={32} className="text-red-500 mb-3" />
             <h3 className="text-lg font-normal mb-1">{favoritos.length} FAVORITOS</h3>
           </button>
-          <button onClick={() => setActiveTab('agendamentos')} className="bg-dark-100 border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all text-left">
-            <TimePastIcon className="w-8 h-8 text-blue-400 mb-3" />
-            <h3 className="text-lg font-normal mb-1">{agendamentos.length} AGENDAMENTOS</h3>
+          <button onClick={() => setActiveTab('dados')} className="bg-dark-100 border border-gray-800 rounded-custom p-6 hover:border-primary/50 transition-all text-left">
+            <UserIcon className="w-8 h-8 text-primary mb-3" />
+            <h3 className="text-lg font-normal mb-1">DADOS</h3>
           </button>
         </div>
 
