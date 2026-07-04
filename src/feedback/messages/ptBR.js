@@ -129,16 +129,6 @@ export const ptBR = {
       screen: 'light',
       buttonText: 'OK',
     },
-    address_format_invalid: {
-      title: 'Endere. inválido',
-      body: 'Use o formato: "RUA, NÚMERO - CIDADE, ESTADO".',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
-    address_format_invalid_inline: {
-      body: 'Use o formato: RUA, NÚMERO - CIDADE, ESTADO.',
-    },
     business_info_update_error: {
       title: 'Erro ao salvar',
       body: 'Erro ao salvar os dados do negócio agora. Tente novamente.',
@@ -730,55 +720,6 @@ export const ptBR = {
     },
   },
 
-  partnerCenter: {
-    account_delete_confirm: {
-      title: 'Excluir conta',
-      body:
-        'Tem certeza que deseja excluir sua conta de parceiro?\n' +
-        'Este processo é irreversível. Você perderá o acesso imediatamente e o e-mail será desvinculado do nosso sistema.',
-      variant: 'danger',
-      screen: 'dark',
-      confirmText: 'EXCLUIR CONTA',
-      cancelText: 'VOLTAR',
-      buttonText: 'EXCLUIR CONTA',
-    },
-    account_deleted: {
-      title: 'Conta excluída',
-      body: 'Sua conta de parceiro foi excluída com sucesso.',
-      variant: 'success',
-      screen: 'light',
-      buttonText: 'OK',
-    },
-    account_delete_future_bookings: {
-      title: 'Agendamentos futuros',
-      body: 'Cancele ou reagende seus agendamentos de hoje ou futuros antes de excluir a conta.',
-      variant: 'warning',
-      screen: 'dark',
-      buttonText: 'ENTENDI',
-    },
-    account_delete_owner_blocked: {
-      title: 'Conta administradora',
-      body: 'Contas administradoras precisam excluir seus negócios pelo dashboard.',
-      variant: 'warning',
-      screen: 'dark',
-      buttonText: 'ENTENDI',
-    },
-    account_delete_no_link: {
-      title: 'Vínculo inexistente',
-      body: 'Nenhum vínculo de parceiro foi encontrado para esta conta.',
-      variant: 'warning',
-      screen: 'dark',
-      buttonText: 'ENTENDI',
-    },
-    account_delete_error: {
-      title: 'Erro ao excluir conta',
-      body: 'Houve um erro ao tentar excluir sua conta. Tente novamente em alguns instantes.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
-  },
-
   professionalAccount: {
     account_delete_confirm: {
       title: 'Excluir conta',
@@ -827,14 +768,10 @@ export const ptBR = {
     nome_required:        { body: 'Informe seu nome para continuar.', variant: 'erro' },
     email_invalid:        { body: 'Informe um e-mail válido para continuar.', variant: 'erro' },
     senha_too_short:      { body: 'A senha deve ter pelo menos 7 caracteres.', variant: 'erro' },
-    slug_required:        { body: 'Informe o slug do negócio para continuar.', variant: 'erro' },
-    negocio_not_found:    { body: 'Negócio ausente. Verifique o slug informado e tente novamente.', variant: 'erro' },
-    partner_plan_unavailable: { body: 'Parcerias desabilitadas neste negócio.', variant: 'erro' },
     email_registered_unknown: { body: 'Este e-mail já está vinculado a uma conta existente. Acesse sua conta ou use outro e-mail.', variant: 'erro' },
     email_check_rate_limit: { body: 'Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.', variant: 'aviso' },
     access_unavailable:   { body: 'Erro ao solicitar acesso com este e-mail. Acesse sua conta de parceiro ou fale com o responsável pelo negócio.', variant: 'erro' },
     account_create_error: { body: 'Erro ao criar sua conta agora. Tente novamente.', variant: 'erro' },
-    access_inactive:      { body: 'Seu acesso está inativo. Entre em contato com o responsável pelo negócio.', variant: 'erro' },
     owner_cannot_request_partner_access: { body: 'Esta conta já gerencia este negócio. Acesse pela área profissional.', variant: 'erro' },
     unexpected_error:     { body: 'Ocorreu um erro inesperado. Tente novamente.', variant: 'erro' },
     success_title:        'Confirme seu e-mail',
@@ -844,12 +781,9 @@ export const ptBR = {
   parceiroLogin: {
     email_invalid:                  { body: 'Informe um e-mail válido para continuar.', variant: 'erro' },
     senha_too_short:                { body: 'A senha deve ter pelo menos 7 caracteres.', variant: 'erro' },
-    slug_required:                  { body: 'Informe o slug do negócio para continuar.', variant: 'erro' },
-    negocio_not_found:              { body: 'Negócio ausente. Verifique o slug informado e tente novamente.', variant: 'erro' },
     credentials_invalid:            { body: 'E-mail ou senha incorretos.', variant: 'erro' },
     auth_error:                     { body: 'Erro ao autenticar agora. Tente novamente.', variant: 'erro' },
     not_partner:                    { body: 'Este login pertence a outro tipo de conta para este negócio.', variant: 'erro' },
-    access_inactive:                { body: 'Seu acesso está inativo. Entre em contato com o responsável pelo negócio.', variant: 'erro' },
     unexpected_error:               { body: 'Ocorreu um erro inesperado. Tente novamente.', variant: 'erro' },
     reset_email_required:           { body: 'Digite seu e-mail antes de solicitar o resgate de senha.', variant: 'aviso' },
     reset_sent:                     { body: 'Link enviado. Confira sua caixa de entrada para redefinir a senha.', variant: 'sucesso' },
@@ -858,6 +792,18 @@ export const ptBR = {
     recovery_password_mismatch:     { body: 'As senhas divergem. Revise e tente novamente.', variant: 'erro' },
     recovery_password_updated:      { body: 'Senha atualizada com sucesso. Acesse sua conta com a nova senha.', variant: 'sucesso' },
     recovery_password_update_error: { body: 'Erro ao atualizar a senha agora. Tente novamente.', variant: 'erro' },
+  },
+
+  partnerBusinessCenter: {
+    load_error: 'Erro ao carregar seus negócios.',
+    search_empty: 'Nenhum negócio encontrado para essa busca.',
+    search_error: 'Erro ao pesquisar negócios.',
+    request_pending_approval: 'Solicita. enviada. Aguarde o aval do responsável pelo negócio.',
+    request_active: 'Parceria ativa. Você já pode acessar o dashboard deste negócio.',
+    request_processed: 'Solicita. processada. Atualize a lista para conferir o status.',
+    access_inactive: 'Este vínculo está inativo ou excluído neste negócio.',
+    owner_cannot_request_partner_access: 'Parcerias indisponíveis para contas administradoras.',
+    request_error: 'Erro ao solicitar parceria.',
   },
 
   clientArea: {
@@ -1071,7 +1017,7 @@ export const ptBR = {
     },
     depoimento_rate_limit: {
       title: 'Limite de depoimentos atingido',
-      body: 'Você já enviou muitos depoimentos hoje. Tente novamente amanhã.',
+      body: 'Você já enviou muitos depoimentos hoje. Tente novamente mais tarde.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -1299,13 +1245,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-    experience_invalid: {
-      title: 'Experiência inválida',
-      body: 'Informe um número válido de anos de experiência.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
     address_street_required: {
       title: 'Endere. incompleto',
       body: 'Informe a RUA do negócio.',
@@ -1384,16 +1323,6 @@ export const ptBR = {
       body:
         'Erro ao criar o negócio agora. ' +
         'Tente novamente em alguns instantes.\n' +
-        'Se persistir, acesse SUPORTE no rodapé da página.',
-      variant: 'danger',
-      screen: 'dark',
-      buttonText: 'ENTENDI',
-    },
-    professional_create_error: {
-      title: 'Erro ao criar profissional',
-      body:
-        'Erro ao concluir o cadastro do profissional. ' +
-        'Tente novamente.\n' +
         'Se persistir, acesse SUPORTE no rodapé da página.',
       variant: 'danger',
       screen: 'dark',
@@ -1514,7 +1443,7 @@ export const ptBR = {
     },
     depoimento_rate_limit: {
       title: 'Limite de depoimentos atingido',
-      body: 'Você já enviou muitos depoimentos hoje. Tente novamente amanhã.',
+      body: 'Você já enviou muitos depoimentos hoje. Tente novamente mais tarde.',
       buttonText: 'ENTENDI',
     },
     depoimento_send_error_title: 'Erro ao enviar depoimento',
