@@ -882,7 +882,11 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
             )}
 
             {activeTab === 'planos' && souDono && (
-              <PlanosSection negocioId={negocio.id} onBillingStatusChange={setBillingStatus} />
+              <PlanosSection
+                negocioId={negocio.id}
+                profissionais={profissionais}
+                onBillingStatusChange={setBillingStatus}
+              />
             )}
 
           </div>
