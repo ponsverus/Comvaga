@@ -93,6 +93,19 @@ function getPlanChangeErrorMessage(error) {
   return 'Houve uma falha durante a troca de plano.';
 }
 
+function getPlanLimit(plan) {
+  if (plan?.max_profissionais == null) return null;
+  const value = Number(plan.max_profissionais);
+  return Number.isFinite(value) ? value : null;
+}
+
+function getPlanLimitMessage(plan, count) {
+  const limit = getPlanLimit(plan);
+  if (limit == null) return '';
+  const plural = limit === 1 ? 'profissional ativo ou pendente' : 'profissionais ativos ou pendentes';
+  return `Este plano permite ate ${limit} ${plural}. Voce tem ${count}.`;
+}
+
 const PLAN_CONTENT = {
   essencial: {
     label: 'Essencial',
@@ -182,7 +195,7 @@ function StarGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
   );
 }
 
-export default function PlanosSection({ negocioId, onBillingStatusChange }) {
+export default function PlanosSection({ negocioId, profissionais = [], onBillingStatusChange }) {
   const feedback = useFeedback();
   const [plans, setPlans] = useState([]);
   const [billingStatus, setBillingStatus] = useState(null);
@@ -231,6 +244,10 @@ export default function PlanosSection({ negocioId, onBillingStatusChange }) {
     () => plans.find((plan) => plan.code === currentPlanCode) || null,
     [currentPlanCode, plans]
   );
+  const billableProfessionalsCount = useMemo(
+    () => profissionais.filter((item) => ['ativo', 'pendente'].includes(String(item?.status || '').toLowerCase())).length,
+    [profissionais]
+  );
 
   useEffect(() => {
     const scroller = planScrollerRef.current;
@@ -250,6 +267,13 @@ export default function PlanosSection({ negocioId, onBillingStatusChange }) {
 
   const handleSelectPlan = async (planCode) => {
     if (!negocioId || savingPlan) return;
+    const targetPlan = plans.find((plan) => plan.code === planCode);
+    const targetLimit = getPlanLimit(targetPlan);
+    if (targetLimit != null && billableProfessionalsCount > targetLimit) {
+      setError(getPlanLimitMessage(targetPlan, billableProfessionalsCount));
+      return;
+    }
+
     setSavingPlan(planCode);
     setError('');
     try {
@@ -345,6 +369,9 @@ export default function PlanosSection({ negocioId, onBillingStatusChange }) {
           const canCancel = active && currentStatus === 'active' && ['valid', 'none'].includes(paymentStatus);
           const needsPayment = active
             && !['valid', 'none'].includes(paymentStatus);
+          const planLimit = getPlanLimit(plan);
+          const planLimitBlocked = !active && planLimit != null && billableProfessionalsCount > planLimit;
+          const planLimitMessage = planLimitBlocked ? getPlanLimitMessage(plan, billableProfessionalsCount) : '';
           const selectedStatusLabel = statusText(billingStatus);
           const selectedStatusClass = statusBadgeClass(billingStatus);
           const selectedPaymentButtonText = statusButtonText(billingStatus);
@@ -412,12 +439,18 @@ export default function PlanosSection({ negocioId, onBillingStatusChange }) {
 
               <button
                 type="button"
-                disabled={(active && !needsPayment) || !!savingPlan || !!cancelingPlan}
+                disabled={(active && !needsPayment) || !!savingPlan || !!cancelingPlan || planLimitBlocked}
                 onClick={() => handleSelectPlan(plan.code)}
                 className={`mt-4 flex items-center justify-center transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active && !needsPayment ? 'cursor-default rounded-full bg-green-400/10 px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-green-300 border border-green-400/30' : active && needsPayment ? selectedPaymentButtonClass : content.buttonClass}`}
               >
-                {active && !needsPayment ? 'Plano ativo' : saving ? 'Abrindo checkout...' : active && needsPayment ? selectedPaymentButtonText : content.buttonText}
+                {planLimitBlocked ? 'Limite excedido' : active && !needsPayment ? 'Plano ativo' : saving ? 'Abrindo checkout...' : active && needsPayment ? selectedPaymentButtonText : content.buttonText}
               </button>
+
+              {planLimitBlocked && (
+                <p className="mt-3 text-xs leading-relaxed text-yellow-200">
+                  {planLimitMessage}
+                </p>
+              )}
 
               {canCancel && (
                 <button
