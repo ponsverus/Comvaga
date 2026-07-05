@@ -159,7 +159,7 @@ Deno.serve(async (req) => {
     const checkout = await callAsaas('/checkouts', checkoutPayload);
     if (!checkout?.id) throw new Error('asaas_checkout_without_id');
 
-    await admin.rpc('apply_gateway_subscription_event', {
+    const { error: eventError } = await admin.rpc('apply_gateway_subscription_event', {
       p_provider: ASAAS_PROVIDER,
       p_event_type: 'CHECKOUT_CREATED',
       p_payload: {
@@ -176,6 +176,7 @@ Deno.serve(async (req) => {
       p_payment_method_status: statusData?.payment_method_status || 'missing',
       p_status: statusData?.stored_status || statusData?.status || 'trialing',
     });
+    if (eventError) throw eventError;
 
     return jsonResponse({
       checkout_id: checkout.id,
