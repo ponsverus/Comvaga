@@ -19,10 +19,53 @@ function statusText(status) {
   if (current === 'trialing') return 'Teste grátis';
   if (current === 'past_due') return 'Pagamento pendente';
   if (current === 'blocked') return 'Agenda bloqueada';
-  if (current === 'billing_required') return 'Pagamento necessário';
+  if (current === 'billing_required') return 'Agenda bloqueada';
   if (current === 'payment_required') return 'Pagamento necessário';
   if (current === 'canceled') return 'Cancelado';
   return 'Config.';
+}
+
+function statusBadgeClass(status) {
+  const current = String(status?.status || '').toLowerCase();
+  const paymentStatus = String(status?.payment_method_status || '').toLowerCase();
+
+  if (current === 'active' && ['valid', 'none'].includes(paymentStatus)) {
+    return 'border-green-400/30 bg-green-400/10 text-green-300';
+  }
+  if (current === 'trialing') {
+    return 'border-primary/30 bg-primary/10 text-primary';
+  }
+  if (current === 'payment_required') {
+    return 'border-yellow-400/30 bg-yellow-400/10 text-yellow-200';
+  }
+  if (current === 'billing_required' || current === 'blocked' || current === 'past_due') {
+    return 'border-red-400/30 bg-red-400/10 text-red-200';
+  }
+  if (current === 'canceled') {
+    return 'border-gray-500/30 bg-gray-500/10 text-gray-300';
+  }
+
+  return 'border-gray-500/30 bg-gray-500/10 text-gray-300';
+}
+
+function statusButtonText(status) {
+  const current = String(status?.status || '').toLowerCase();
+  if (current === 'billing_required' || current === 'blocked' || current === 'past_due') {
+    return 'Regularizar pagamento';
+  }
+  if (current === 'canceled') return 'Reativar plano';
+  return 'Adicionar pagamento';
+}
+
+function statusButtonClass(status) {
+  const current = String(status?.status || '').toLowerCase();
+  if (current === 'billing_required' || current === 'blocked' || current === 'past_due') {
+    return 'rounded-full bg-yellow-400 px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-black hover:bg-yellow-300';
+  }
+  if (current === 'payment_required' || current === 'trialing') {
+    return 'rounded-full bg-primary px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-black hover:bg-primary/90';
+  }
+  return 'rounded-full border border-primary text-primary px-5 py-2.5 text-xs font-normal uppercase tracking-wider hover:bg-primary/10';
 }
 
 function getPlanCancelErrorMessage(error) {
@@ -182,6 +225,8 @@ export default function PlanosSection({ negocioId, onBillingStatusChange }) {
   }, [loadBilling]);
 
   const currentPlanCode = billingStatus?.plan_code || '';
+  const currentStatusLabel = statusText(billingStatus);
+  const currentStatusClass = statusBadgeClass(billingStatus);
   const selectedPlan = useMemo(
     () => plans.find((plan) => plan.code === currentPlanCode) || null,
     [currentPlanCode, plans]
@@ -271,9 +316,14 @@ export default function PlanosSection({ negocioId, onBillingStatusChange }) {
     <section className="space-y-6">
       <div>
         <h2 className="text-2xl font-normal text-white">PLANOS</h2>
-        <p className="mt-1 text-sm text-gray-500 uppercase">
-          PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || statusText(billingStatus)}</span>
-        </p>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-sm uppercase text-gray-500">
+          <span>PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || currentStatusLabel}</span></span>
+          {billingStatus?.status && (
+            <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-normal uppercase tracking-wide ${currentStatusClass}`}>
+              {currentStatusLabel}
+            </span>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -295,6 +345,10 @@ export default function PlanosSection({ negocioId, onBillingStatusChange }) {
           const canCancel = active && currentStatus === 'active' && ['valid', 'none'].includes(paymentStatus);
           const needsPayment = active
             && !['valid', 'none'].includes(paymentStatus);
+          const selectedStatusLabel = statusText(billingStatus);
+          const selectedStatusClass = statusBadgeClass(billingStatus);
+          const selectedPaymentButtonText = statusButtonText(billingStatus);
+          const selectedPaymentButtonClass = statusButtonClass(billingStatus);
           const content = PLAN_CONTENT[plan.code] || {
             label: plan.name,
             description: '',
@@ -326,8 +380,8 @@ export default function PlanosSection({ negocioId, onBillingStatusChange }) {
                   {content.label}
                 </span>
                 {active && (
-                  <span className="absolute right-4 top-8 sm:right-8 sm:top-10 rounded-full border border-green-400/30 bg-green-400/10 px-3 py-1 text-[10px] font-normal uppercase tracking-wide text-green-300">
-                    Ativo
+                  <span className={`absolute right-4 top-8 sm:right-8 sm:top-10 rounded-full border px-3 py-1 text-[10px] font-normal uppercase tracking-wide ${selectedStatusClass}`}>
+                    {selectedStatusLabel}
                   </span>
                 )}
                 <p className="text-2xl font-normal text-white mb-1">
@@ -360,9 +414,9 @@ export default function PlanosSection({ negocioId, onBillingStatusChange }) {
                 type="button"
                 disabled={(active && !needsPayment) || !!savingPlan || !!cancelingPlan}
                 onClick={() => handleSelectPlan(plan.code)}
-                className={`mt-4 flex items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active && !needsPayment ? 'cursor-default rounded-full bg-green-400/10 text-green-300 border border-green-400/30 text-xs font-normal uppercase tracking-wider' : content.buttonClass}`}
+                className={`mt-4 flex items-center justify-center transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active && !needsPayment ? 'cursor-default rounded-full bg-green-400/10 px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-green-300 border border-green-400/30' : active && needsPayment ? selectedPaymentButtonClass : content.buttonClass}`}
               >
-                {active && !needsPayment ? 'Plano ativo' : saving ? 'Abrindo checkout...' : needsPayment ? 'Adicionar pagamento' : content.buttonText}
+                {active && !needsPayment ? 'Plano ativo' : saving ? 'Abrindo checkout...' : active && needsPayment ? selectedPaymentButtonText : content.buttonText}
               </button>
 
               {canCancel && (
