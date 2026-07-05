@@ -8,6 +8,29 @@ import {
 } from '../api/dashboardApi';
 import { getRequestErrorKey } from '../../../utils/requestError';
 import { useFeedback } from '../../../feedback/useFeedback';
+import { ptBR } from '../../../feedback/messages/ptBR.js';
+
+function getByPath(obj, path) {
+  const parts = String(path || '').split('.');
+  let cur = obj;
+  for (const part of parts) {
+    if (!cur || typeof cur !== 'object') return null;
+    cur = cur[part];
+  }
+  return cur || null;
+}
+
+function interpolateMessage(value, params) {
+  return String(value || '').replace(/\{(\w+)\}/g, (_, key) => {
+    const next = params?.[key];
+    return next === undefined || next === null ? '' : String(next);
+  });
+}
+
+function messageBody(key, params) {
+  const entry = getByPath(ptBR, key);
+  return interpolateMessage(entry?.body || '', params);
+}
 
 function formatCurrencyFromCents(value) {
   return `R$ ${(Number(value || 0) / 100).toFixed(2).replace('.', ',')}`;
@@ -71,26 +94,26 @@ function statusButtonClass(status) {
 function getPlanCancelErrorMessage(error) {
   const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
   if (raw.includes('subscription_not_cancelable')) {
-    return 'Este plano nao possui pagamento ativo para cancelar.';
+    return messageBody('dashboard.billing_cancel_not_cancelable');
   }
   if (raw.includes('asaas_cancel_failed')) {
-    return 'Houve um erro ao cancelar a assinatura no pagamento agora.';
+    return messageBody('dashboard.billing_cancel_gateway_error');
   }
-  return 'Houve uma falha durante o cancelamento do plano.';
+  return messageBody('dashboard.billing_cancel_error');
 }
 
 function getPlanChangeErrorMessage(error) {
   const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
   if (raw.includes('plan_professional_limit_reached')) {
-    return 'Este plano possui um limite menor de profissionais. Reduza os profissionais ativos ou pendentes antes de trocar.';
+    return messageBody('dashboard.plan_professional_limit_reached');
   }
   if (raw.includes('feature_unavailable') && raw.includes('offers')) {
-    return 'Este plano é incompatível com ofertas. Remova as ofertas ativas antes de trocar.';
+    return messageBody('dashboard.plan_feature_offers_unavailable');
   }
   if (raw.includes('asaas_checkout_failed')) {
-    return 'Houve um erro ao abrir o checkout do pagamento agora.';
+    return messageBody('dashboard.billing_checkout_error');
   }
-  return 'Houve uma falha durante a troca de plano.';
+  return messageBody('dashboard.billing_plan_change_error');
 }
 
 function getPlanLimit(plan) {
@@ -102,8 +125,11 @@ function getPlanLimit(plan) {
 function getPlanLimitMessage(plan, count) {
   const limit = getPlanLimit(plan);
   if (limit == null) return '';
-  const plural = limit === 1 ? 'profissional ativo ou pendente' : 'profissionais ativos ou pendentes';
-  return `Este plano permite ate ${limit} ${plural}. Voce tem ${count}.`;
+  return messageBody('dashboard.plan_professional_limit_current', {
+    count,
+    limit,
+    professionalsLabel: limit === 1 ? 'profissional ativo ou pendente' : 'profissionais ativos ou pendentes',
+  });
 }
 
 const PLAN_CONTENT = {
@@ -222,11 +248,11 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
       console.error('PlanosSection load error:', err);
       const requestKey = getRequestErrorKey(err);
       if (requestKey === 'alerts.request_timeout') {
-        setError('O carregamento dos planos demorou demais. Tente novamente em instantes.');
+        setError(messageBody('alerts.request_timeout'));
       } else if (requestKey === 'alerts.rate_limit_exceeded') {
-        setError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
+        setError(messageBody('alerts.rate_limit_exceeded'));
       } else {
-        setError('Erro ao carregar os planos agora.');
+        setError(messageBody('dashboard.billing_plans_load_error'));
       }
     } finally {
       setLoading(false);
@@ -286,9 +312,9 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
       console.error('createAsaasCheckout error:', err);
       const requestKey = getRequestErrorKey(err);
       if (requestKey === 'alerts.request_timeout') {
-        setError('O checkout demorou demais para abrir. Tente novamente em instantes.');
+        setError(messageBody('dashboard.billing_checkout_timeout'));
       } else if (requestKey === 'alerts.rate_limit_exceeded') {
-        setError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
+        setError(messageBody('alerts.rate_limit_exceeded'));
       } else {
         setError(getPlanChangeErrorMessage(err));
       }
@@ -316,9 +342,9 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
       console.error('cancelAsaasSubscription error:', err);
       const requestKey = getRequestErrorKey(err);
       if (requestKey === 'alerts.request_timeout') {
-        setError('O cancelamento demorou demais. Tente novamente em instantes.');
+        setError(messageBody('dashboard.billing_cancel_timeout'));
       } else if (requestKey === 'alerts.rate_limit_exceeded') {
-        setError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
+        setError(messageBody('alerts.rate_limit_exceeded'));
       } else {
         setError(getPlanCancelErrorMessage(err));
       }
