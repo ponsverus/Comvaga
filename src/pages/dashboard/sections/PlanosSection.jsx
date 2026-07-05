@@ -239,7 +239,6 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
 
   const currentPlanCode = billingStatus?.plan_code || '';
   const currentStatusLabel = statusText(billingStatus);
-  const currentStatusClass = statusBadgeClass(billingStatus);
   const selectedPlan = useMemo(
     () => plans.find((plan) => plan.code === currentPlanCode) || null,
     [currentPlanCode, plans]
@@ -342,11 +341,6 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
         <h2 className="text-2xl font-normal text-white">PLANOS</h2>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-sm uppercase text-gray-500">
           <span>PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || currentStatusLabel}</span></span>
-          {billingStatus?.status && (
-            <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-normal uppercase tracking-wide ${currentStatusClass}`}>
-              {currentStatusLabel}
-            </span>
-          )}
         </div>
       </div>
 
@@ -371,7 +365,6 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
             && !['valid', 'none'].includes(paymentStatus);
           const planLimit = getPlanLimit(plan);
           const planLimitBlocked = !active && planLimit != null && billableProfessionalsCount > planLimit;
-          const planLimitMessage = planLimitBlocked ? getPlanLimitMessage(plan, billableProfessionalsCount) : '';
           const selectedStatusLabel = statusText(billingStatus);
           const selectedStatusClass = statusBadgeClass(billingStatus);
           const selectedPaymentButtonText = statusButtonText(billingStatus);
@@ -441,16 +434,10 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
                 type="button"
                 disabled={(active && !needsPayment) || !!savingPlan || !!cancelingPlan || planLimitBlocked}
                 onClick={() => handleSelectPlan(plan.code)}
-                className={`mt-4 flex items-center justify-center transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active && !needsPayment ? 'cursor-default rounded-full bg-green-400/10 px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-green-300 border border-green-400/30' : active && needsPayment ? selectedPaymentButtonClass : content.buttonClass}`}
+                className={`mt-4 flex min-h-[42px] items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active && !needsPayment ? 'cursor-default rounded-full bg-green-400/10 text-xs font-normal uppercase tracking-wider text-green-300 border border-green-400/30' : active && needsPayment ? selectedPaymentButtonClass : content.buttonClass}`}
               >
                 {planLimitBlocked ? 'Limite excedido' : active && !needsPayment ? 'Plano ativo' : saving ? 'Abrindo checkout...' : active && needsPayment ? selectedPaymentButtonText : content.buttonText}
               </button>
-
-              {planLimitBlocked && (
-                <p className="mt-3 text-xs leading-relaxed text-yellow-200">
-                  {planLimitMessage}
-                </p>
-              )}
 
               {canCancel && (
                 <button
