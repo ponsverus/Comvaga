@@ -106,7 +106,7 @@ Deno.serve(async (req) => {
     const mapped = mapEvent(eventType, entity);
     const admin = createAdminClient();
 
-    await admin.rpc('apply_gateway_subscription_event', {
+    const { error: applyError } = await admin.rpc('apply_gateway_subscription_event', {
       p_provider: ASAAS_PROVIDER,
       p_event_type: eventType,
       p_payload: payload,
@@ -123,10 +123,12 @@ Deno.serve(async (req) => {
         ? new Date().toISOString()
         : null,
     });
+    if (applyError) throw applyError;
 
     return jsonResponse({ received: true });
   } catch (error) {
     console.error('asaas-webhook failed:', error);
-    return jsonResponse({ error: error?.message || 'webhook_failed' }, 200);
+    return jsonResponse({ error: 'webhook_failed' }, 500);
   }
 });
+            
