@@ -108,6 +108,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const desktopSearchRef = useRef(null);
   const desktopSearchInputRef = useRef(null);
+  const searchResultsRef = useRef(null);
 
   const loadProfileName = useCallback(async () => {
     const fallback = String(user?.user_metadata?.nome || '').trim();
@@ -160,6 +161,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
 
     const handlePointerDown = (event) => {
       if (desktopSearchRef.current?.contains(event.target)) return;
+      if (searchResultsRef.current?.contains(event.target)) return;
       setSearchOpen(false);
       setTerm('');
       setSearchRows([]);
@@ -438,7 +440,7 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
           </div>
 
           {searchRows.length > 0 && (
-            <div className="mt-4 space-y-3">
+            <div ref={searchResultsRef} className="mt-4 space-y-3">
               {searchRows.map((row) => renderBusinessRow(row, { searchResult: true }))}
             </div>
           )}
