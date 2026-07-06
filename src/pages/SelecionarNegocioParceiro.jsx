@@ -243,8 +243,6 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
         setAlert({ type: 'success', message: msgs.request_pending_approval });
       } else if (status === 'ok') {
         setAlert({ type: 'success', message: msgs.request_active });
-      } else {
-        setAlert({ type: 'warning', message: msgs.request_processed });
       }
 
       await loadCenter({ silent: true });
