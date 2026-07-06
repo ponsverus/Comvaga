@@ -863,7 +863,6 @@ export const ptBR = {
     search_error: 'Erro ao pesquisar negócios.',
     request_pending_approval: 'Pedido enviado. Aguarde o aval do responsável pelo negócio.',
     request_active: 'Parceria ativa. Você já pode acessar o dashboard deste negócio.',
-    request_processed: 'Pedido processado. Atualize a lista para conferir o status.',
     access_inactive: 'Este vínculo está inativo ou excluído neste negócio.',
     owner_cannot_request_partner_access: 'Parcerias indisponíveis para contas administradoras.',
     request_error: 'Erro ao solicitar parceria.',
