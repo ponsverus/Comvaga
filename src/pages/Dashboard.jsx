@@ -97,12 +97,44 @@ function InfoPill({ label, value, tone = 'text-gray-300', border = 'border-gray-
   );
 }
 
+function isCancellationScheduled(status) {
+  return Boolean(status?.cancellation_scheduled)
+    || (
+      String(status?.status || '').toLowerCase() === 'active'
+      && Boolean(status?.canceled_at)
+      && Boolean(status?.access_ends_at || status?.cancel_at || status?.current_period_end)
+    );
+}
+
+function accessEndsAt(status) {
+  return status?.access_ends_at || status?.cancel_at || status?.current_period_end || null;
+}
+
+function formatDate(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date);
+}
+
 function getBillingAnnouncement(status) {
   if (!status) return null;
   const current = String(status.status || '').toLowerCase();
   const daysUntilTrialEnd = Number(status.days_until_trial_end);
   const daysUntilBlock = Number(status.days_until_block);
   const trialDays = Number(status.trial_days);
+
+  if (isCancellationScheduled(status)) {
+    const accessEndLabel = formatDate(accessEndsAt(status));
+    return {
+      tone: 'warning',
+      text: `PLANO CANCELADO. ACESSO LIBERADO${accessEndLabel ? ` ATE ${accessEndLabel}` : ''}.`,
+    };
+  }
 
   if (current === 'blocked' || current === 'billing_required' || current === 'canceled') {
     return {
