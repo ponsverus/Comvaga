@@ -45,21 +45,6 @@ function isCancellationScheduled(status) {
     );
 }
 
-function accessEndsAt(status) {
-  return status?.access_ends_at || status?.cancel_at || status?.current_period_end || null;
-}
-
-function formatDate(value) {
-  if (!value) return '';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date);
-}
-
 function statusText(status) {
   if (isCancellationScheduled(status)) return 'Cancelado';
   const current = String(status?.status || '').toLowerCase();
@@ -300,7 +285,6 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
   const currentPlanCode = billingStatus?.plan_code || '';
   const currentStatusLabel = statusText(billingStatus);
   const cancellationScheduled = isCancellationScheduled(billingStatus);
-  const accessEndLabel = formatDate(accessEndsAt(billingStatus));
   const selectedPlan = useMemo(
     () => plans.find((plan) => plan.code === currentPlanCode) || null,
     [currentPlanCode, plans]
@@ -403,11 +387,6 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
         <h2 className="text-2xl font-normal text-white">PLANOS</h2>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-sm uppercase text-gray-500">
           <span>PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || currentStatusLabel}</span></span>
-          {cancellationScheduled && (
-            <span className="rounded-full border border-yellow-400/30 bg-yellow-400/10 px-3 py-1 text-[10px] text-yellow-200">
-              CANCELADO{accessEndLabel ? ` - ACESSO ATE ${accessEndLabel}` : ''}
-            </span>
-          )}
         </div>
       </div>
 
@@ -479,11 +458,6 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
                 <p className={`text-sm leading-relaxed ${plan.code === 'profissional' ? 'text-gray-400' : 'text-gray-500'}`}>
                   {content.description}
                 </p>
-                {scheduledCancellation && (
-                  <p className="mt-3 rounded-custom border border-yellow-400/20 bg-yellow-400/10 px-3 py-2 text-xs leading-relaxed text-yellow-100">
-                    Renovacao cancelada. Acesso liberado{accessEndLabel ? ` ate ${accessEndLabel}` : ''}.
-                  </p>
-                )}
               </div>
 
               <div className="pt-5 flex flex-col gap-3 flex-grow">
