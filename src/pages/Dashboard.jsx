@@ -118,7 +118,7 @@ function formatDate(value) {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
-  }).format(date);
+  }).format(date).replace(/\//g, '.');
 }
 
 function getBillingAnnouncement(status) {
@@ -132,7 +132,7 @@ function getBillingAnnouncement(status) {
     const accessEndLabel = formatDate(accessEndsAt(status));
     return {
       tone: 'warning',
-      text: `PLANO CANCELADO. ACESSO LIBERADO${accessEndLabel ? ` ATE ${accessEndLabel}` : ''}.`,
+      text: `PLANO CANCELADO. ACESSO LIBERADO${accessEndLabel ? ` ATÉ ${accessEndLabel}` : ''}.`,
     };
   }
 
