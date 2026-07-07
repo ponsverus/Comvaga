@@ -36,7 +36,32 @@ function formatCurrencyFromCents(value) {
   return `R$ ${(Number(value || 0) / 100).toFixed(2).replace('.', ',')}`;
 }
 
+function isCancellationScheduled(status) {
+  return Boolean(status?.cancellation_scheduled)
+    || (
+      String(status?.status || '').toLowerCase() === 'active'
+      && Boolean(status?.canceled_at)
+      && Boolean(status?.access_ends_at || status?.cancel_at || status?.current_period_end)
+    );
+}
+
+function accessEndsAt(status) {
+  return status?.access_ends_at || status?.cancel_at || status?.current_period_end || null;
+}
+
+function formatDate(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date);
+}
+
 function statusText(status) {
+  if (isCancellationScheduled(status)) return 'Cancelado';
   const current = String(status?.status || '').toLowerCase();
   if (current === 'active') return 'Ativo';
   if (current === 'trialing') return 'Teste grátis';
@@ -49,6 +74,10 @@ function statusText(status) {
 }
 
 function statusBadgeClass(status) {
+  if (isCancellationScheduled(status)) {
+    return 'border-yellow-400/30 bg-yellow-400/10 text-yellow-200';
+  }
+
   const current = String(status?.status || '').toLowerCase();
   const paymentStatus = String(status?.payment_method_status || '').toLowerCase();
 
@@ -72,6 +101,7 @@ function statusBadgeClass(status) {
 }
 
 function statusButtonText(status) {
+  if (isCancellationScheduled(status)) return 'Reativar plano';
   const current = String(status?.status || '').toLowerCase();
   if (current === 'billing_required' || current === 'blocked' || current === 'past_due') {
     return 'Regularizar pagamento';
@@ -81,6 +111,10 @@ function statusButtonText(status) {
 }
 
 function statusButtonClass(status) {
+  if (isCancellationScheduled(status)) {
+    return 'rounded-full border border-primary text-primary px-5 py-2.5 text-xs font-normal uppercase tracking-wider hover:bg-primary/10';
+  }
+
   const current = String(status?.status || '').toLowerCase();
   if (current === 'billing_required' || current === 'blocked' || current === 'past_due') {
     return 'rounded-full bg-yellow-400 px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-black hover:bg-yellow-300';
@@ -265,6 +299,8 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
 
   const currentPlanCode = billingStatus?.plan_code || '';
   const currentStatusLabel = statusText(billingStatus);
+  const cancellationScheduled = isCancellationScheduled(billingStatus);
+  const accessEndLabel = formatDate(accessEndsAt(billingStatus));
   const selectedPlan = useMemo(
     () => plans.find((plan) => plan.code === currentPlanCode) || null,
     [currentPlanCode, plans]
@@ -367,6 +403,11 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
         <h2 className="text-2xl font-normal text-white">PLANOS</h2>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-sm uppercase text-gray-500">
           <span>PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || currentStatusLabel}</span></span>
+          {cancellationScheduled && (
+            <span className="rounded-full border border-yellow-400/30 bg-yellow-400/10 px-3 py-1 text-[10px] text-yellow-200">
+              CANCELADO{accessEndLabel ? ` - ACESSO ATE ${accessEndLabel}` : ''}
+            </span>
+          )}
         </div>
       </div>
 
@@ -386,9 +427,11 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
           const canceling = cancelingPlan === plan.code;
           const paymentStatus = String(billingStatus?.payment_method_status || '').toLowerCase();
           const currentStatus = String(billingStatus?.status || '').toLowerCase();
-          const canCancel = active && currentStatus === 'active' && ['valid', 'none'].includes(paymentStatus);
+          const scheduledCancellation = active && cancellationScheduled;
+          const canCancel = active && !scheduledCancellation && currentStatus === 'active' && ['valid', 'none'].includes(paymentStatus);
           const needsPayment = active
             && !['valid', 'none'].includes(paymentStatus);
+          const activeWithoutAction = active && !needsPayment && !scheduledCancellation;
           const planLimit = getPlanLimit(plan);
           const planLimitBlocked = !active && planLimit != null && billableProfessionalsCount > planLimit;
           const selectedStatusLabel = statusText(billingStatus);
@@ -436,6 +479,11 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
                 <p className={`text-sm leading-relaxed ${plan.code === 'profissional' ? 'text-gray-400' : 'text-gray-500'}`}>
                   {content.description}
                 </p>
+                {scheduledCancellation && (
+                  <p className="mt-3 rounded-custom border border-yellow-400/20 bg-yellow-400/10 px-3 py-2 text-xs leading-relaxed text-yellow-100">
+                    Renovacao cancelada. Acesso liberado{accessEndLabel ? ` ate ${accessEndLabel}` : ''}.
+                  </p>
+                )}
               </div>
 
               <div className="pt-5 flex flex-col gap-3 flex-grow">
@@ -458,11 +506,11 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
 
               <button
                 type="button"
-                disabled={(active && !needsPayment) || !!savingPlan || !!cancelingPlan || planLimitBlocked}
+                disabled={activeWithoutAction || !!savingPlan || !!cancelingPlan || planLimitBlocked}
                 onClick={() => handleSelectPlan(plan.code)}
-                className={`mt-4 flex min-h-[42px] items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${active && !needsPayment ? 'cursor-default rounded-full bg-green-400/10 text-xs font-normal uppercase tracking-wider text-green-300 border border-green-400/30' : active && needsPayment ? selectedPaymentButtonClass : content.buttonClass}`}
+                className={`mt-4 flex min-h-[42px] items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${activeWithoutAction ? 'cursor-default rounded-full bg-green-400/10 text-xs font-normal uppercase tracking-wider text-green-300 border border-green-400/30' : active && (needsPayment || scheduledCancellation) ? selectedPaymentButtonClass : content.buttonClass}`}
               >
-                {planLimitBlocked ? 'Limite excedido' : active && !needsPayment ? 'Plano ativo' : saving ? 'Abrindo checkout...' : active && needsPayment ? selectedPaymentButtonText : content.buttonText}
+                {planLimitBlocked ? 'Limite excedido' : activeWithoutAction ? 'Plano ativo' : saving ? 'Abrindo checkout...' : active && (needsPayment || scheduledCancellation) ? selectedPaymentButtonText : content.buttonText}
               </button>
 
               {canCancel && (
