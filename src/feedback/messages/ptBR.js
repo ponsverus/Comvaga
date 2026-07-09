@@ -78,8 +78,8 @@ export const ptBR = {
       buttonText: 'ENTENDI',
     },
     billing_checkout_success: {
-      title: 'Pagamento iniciado/confirmado',
-      body: 'Pagamento iniciado/confirmado. Seu plano será atualizado em instantes.',
+      title: 'Pagamento confirmado',
+      body: 'Pagamento confirmado. Seu plano será atualizado em instantes.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
@@ -1450,7 +1450,7 @@ export const ptBR = {
     },
     schedule_billing_required: {
       title: 'Agenda indisponível',
-      body: 'Este negócio precisa ativar um plano para receber novos agendamentos.',
+      body: 'Agendamentos online suspensos neste canal. Por favor, entre em contato direto com o proprietário deste estabelecimento para reservar seu horário.',
       buttonText: 'ENTENDI',
     },
     schedule_time_unavailable: {
