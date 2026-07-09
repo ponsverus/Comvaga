@@ -107,12 +107,23 @@ function isCancellationScheduled(status) {
 }
 
 function accessEndsAt(status) {
-  return status?.access_ends_at || status?.cancel_at || status?.current_period_end || null;
+  return status?.access_ends_on
+    || status?.access_ends_at
+    || status?.cancel_at
+    || status?.current_period_end
+    || null;
 }
 
 function formatDate(value) {
   if (!value) return '';
-  const date = new Date(value);
+  const text = String(value).trim();
+  const ymd = text.slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(ymd)) {
+    const [year, month, day] = ymd.split('-');
+    return `${day}.${month}.${year}`;
+  }
+
+  const date = new Date(text);
   if (Number.isNaN(date.getTime())) return '';
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
@@ -132,7 +143,7 @@ function getBillingAnnouncement(status) {
     const accessEndLabel = formatDate(accessEndsAt(status));
     return {
       tone: 'warning',
-      text: `PLANO CANCELADO. ACESSO LIBERADO${accessEndLabel ? ` ATÉ ${accessEndLabel}` : ''}.`,
+      text: `PLANO CANCELADO. ACESSO LIBERADO${accessEndLabel ? ` ATÉ ${accessEndLabel}` : ''}`,
     };
   }
 
