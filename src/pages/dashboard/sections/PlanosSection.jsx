@@ -41,7 +41,7 @@ function isCancellationScheduled(status) {
     || (
       String(status?.status || '').toLowerCase() === 'active'
       && Boolean(status?.canceled_at)
-      && Boolean(status?.access_ends_at || status?.cancel_at || status?.current_period_end)
+      && Boolean(status?.access_ends_on || status?.access_ends_at || status?.cancel_at || status?.current_period_end)
     );
 }
 
@@ -406,8 +406,13 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
           const canceling = cancelingPlan === plan.code;
           const paymentStatus = String(billingStatus?.payment_method_status || '').toLowerCase();
           const currentStatus = String(billingStatus?.status || '').toLowerCase();
+          const providerStatus = String(billingStatus?.provider_status || '').toUpperCase();
           const scheduledCancellation = active && cancellationScheduled;
-          const canCancel = active && !scheduledCancellation && currentStatus === 'active' && ['valid', 'none'].includes(paymentStatus);
+          const providerCancelable = providerStatus && !['INACTIVE', 'CANCELED', 'CANCELLED', 'DELETED'].includes(providerStatus);
+          const canCancel = active && !scheduledCancellation && (
+            (currentStatus === 'active' && ['valid', 'none'].includes(paymentStatus))
+            || providerCancelable
+          );
           const needsPayment = active
             && !['valid', 'none'].includes(paymentStatus);
           const activeWithoutAction = active && !needsPayment && !scheduledCancellation;
