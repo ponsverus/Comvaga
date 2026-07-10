@@ -29,12 +29,10 @@ function formatDateBR(ymd) {
 
 function getDowFromDateSP(dateStr) {
   if (!dateStr) return null;
-  const dt = new Date(`${dateStr}T12:00:00`);
-  const weekday = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Sao_Paulo', weekday: 'short',
-  }).format(dt);
-  const map = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-  return map[weekday] ?? null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateStr).trim());
+  if (!match) return null;
+  const [, year, month, day] = match;
+  return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))).getUTCDay();
 }
 
 function pad2(value) {
