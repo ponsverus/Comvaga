@@ -20,7 +20,6 @@ function buildProfissionalForm(p) {
 
 export default function ProfissionaisSection({
   souDono,
-  currentUserId,
   adminJaEhProfissional,
   cadastrarAdminComoProfissional,
   submittingAdminProf,
@@ -61,7 +60,6 @@ export default function ProfissionaisSection({
           const dotClass = STATUS_COLOR_CLASS[label] || 'bg-gray-500';
           const statusLabelView = label === 'ALMOCO' ? 'PAUSA' : p.status_label;
           const isEuMesmo = parceiroProfissional?.id === p.id;
-          const isAdminOwnProfessionalCard = souDono && p.user_id && p.user_id === currentUserId;
           const horarios = normalizeProfissionalHorarios(p);
           const horarioHoje = getHorarioPorDia(horarios, todayDow);
           const almocoInicio = horarioHoje?.almoco_inicio ? String(horarioHoje.almoco_inicio).slice(0, 5) : null;
@@ -148,9 +146,7 @@ export default function ProfissionaisSection({
                         <button onClick={() => toggleStatusProfissional(p)} className={`flex-1 py-2 rounded-button text-sm border font-normal uppercase ${isAtivo ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300' : 'bg-green-500/10 border-green-500/30 text-green-300'}`}>
                           {isAtivo ? 'INATIVAR' : 'ATIVAR'}
                         </button>
-                        {!isAdminOwnProfessionalCard && (
-                          <button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
-                        )}
+                        <button onClick={() => excluirProfissional(p)} className="flex-1 py-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-button text-sm font-normal uppercase">EXCLUIR</button>
                       </div>
                       <button onClick={openEditor} className="w-full py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
                     </div>
