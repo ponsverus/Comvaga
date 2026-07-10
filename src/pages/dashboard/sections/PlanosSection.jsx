@@ -5,6 +5,7 @@ import {
   createAsaasCheckout,
   fetchBillingPlans,
   fetchBusinessBillingStatus,
+  setBusinessPlan,
 } from '../api/dashboardApi';
 import { getRequestErrorKey } from '../../../utils/requestError';
 import { useFeedback } from '../../../feedback/useFeedback';
@@ -319,20 +320,31 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
       return;
     }
 
+    const currentStatus = String(billingStatus?.status || '').toLowerCase();
+    const freeAccessOpen = ['trialing', 'payment_required'].includes(currentStatus);
+
     setSavingPlan(planCode);
     setError('');
     try {
-      const checkout = await createAsaasCheckout(negocioId, planCode);
-      if (checkout?.billing_status) {
-        setBillingStatus(checkout.billing_status);
-        onBillingStatusChange?.(checkout.billing_status);
+      if (freeAccessOpen) {
+        const result = await setBusinessPlan(negocioId, planCode);
+        if (result) {
+          setBillingStatus(result);
+          onBillingStatusChange?.(result);
+        }
+      } else {
+        const checkout = await createAsaasCheckout(negocioId, planCode);
+        if (checkout?.billing_status) {
+          setBillingStatus(checkout.billing_status);
+          onBillingStatusChange?.(checkout.billing_status);
+        }
+        window.location.assign(checkout.checkout_url);
       }
-      window.location.assign(checkout.checkout_url);
     } catch (err) {
-      console.error('createAsaasCheckout error:', err);
+      console.error(freeAccessOpen ? 'setBusinessPlan error:' : 'createAsaasCheckout error:', err);
       const requestKey = getRequestErrorKey(err);
       if (requestKey === 'alerts.request_timeout') {
-        setError(messageBody('dashboard.billing_checkout_timeout'));
+        setError(freeAccessOpen ? messageBody('dashboard.billing_plan_change_error') : messageBody('dashboard.billing_checkout_timeout'));
       } else if (requestKey === 'alerts.rate_limit_exceeded') {
         setError(messageBody('alerts.rate_limit_exceeded'));
       } else {
@@ -419,7 +431,6 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
           const activeWithoutAction = active && !activeFreeAccess && !needsPayment && !scheduledCancellation;
           const planLimit = getPlanLimit(plan);
           const planLimitBlocked = !active && planLimit != null && billableProfessionalsCount > planLimit;
-          const planSelectionDeferred = !active && freeAccessOpen;
           const selectedStatusLabel = statusText(billingStatus);
           const selectedStatusClass = statusBadgeClass(billingStatus);
           const selectedPaymentButtonText = statusButtonText(billingStatus);
@@ -487,11 +498,11 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
 
               <button
                 type="button"
-                disabled={activeWithoutAction || activeFreeAccess || planSelectionDeferred || !!savingPlan || !!cancelingPlan || planLimitBlocked}
+                disabled={activeWithoutAction || activeFreeAccess || !!savingPlan || !!cancelingPlan || planLimitBlocked}
                 onClick={() => handleSelectPlan(plan.code)}
                 className={`mt-4 flex min-h-[42px] items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${activeFreeAccess ? 'cursor-default rounded-full border border-primary/40 bg-primary/10 text-xs font-normal uppercase tracking-wider text-primary' : activeWithoutAction ? 'cursor-default rounded-full bg-green-400/10 text-xs font-normal uppercase tracking-wider text-green-300 border border-green-400/30' : active && (needsPayment || scheduledCancellation) ? selectedPaymentButtonClass : content.buttonClass}`}
               >
-                {planLimitBlocked ? 'Limite excedido' : planSelectionDeferred ? 'Após teste grátis' : activeFreeAccess ? (currentStatus === 'payment_required' ? 'Cortesia ativa' : 'Teste grátis') : activeWithoutAction ? 'Plano ativo' : saving ? 'Abrindo checkout...' : active && (needsPayment || scheduledCancellation) ? selectedPaymentButtonText : content.buttonText}
+                {planLimitBlocked ? 'Limite excedido' : activeFreeAccess ? (currentStatus === 'payment_required' ? 'Cortesia ativa' : 'Teste grátis') : activeWithoutAction ? 'Plano ativo' : saving ? (freeAccessOpen ? 'Salvando...' : 'Abrindo checkout...') : active && (needsPayment || scheduledCancellation) ? selectedPaymentButtonText : content.buttonText}
               </button>
 
               {canCancel && (
