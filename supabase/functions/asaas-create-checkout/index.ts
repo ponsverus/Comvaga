@@ -5,7 +5,8 @@ type BillingPlan = {
   code: string;
   name: string;
   price_cents: number;
-  trial_days: number;
+  max_profissionais: number | null;
+  features: Record<string, unknown>;
 };
 
 const ASAAS_PROVIDER = 'asaas';
@@ -31,12 +32,6 @@ function asAsaasDateTime(date: Date) {
   return `${asDateOnly(date)} 00:00:00`;
 }
 
-function addDays(date: Date, days: number) {
-  const next = new Date(date);
-  next.setUTCDate(next.getUTCDate() + days);
-  return next;
-}
-
 function checkoutUrlFor(id: string) {
   const apiBase = Deno.env.get('ASAAS_BASE_URL') || DEFAULT_ASAAS_BASE_URL;
   const defaultBase = apiBase.includes('api-sandbox.') ? DEFAULT_SANDBOX_CHECKOUT_BASE_URL : DEFAULT_CHECKOUT_BASE_URL;
@@ -58,6 +53,10 @@ function centsToReais(cents: number) {
   return Number((Number(cents || 0) / 100).toFixed(2));
 }
 
+function hasFeature(plan: BillingPlan, feature: string) {
+  return plan.features?.[feature] === true;
+}
+
 async function callAsaas(path: string, body: Record<string, unknown>) {
   const apiKey = requiredEnv('ASAAS_API_KEY');
   const baseUrl = (Deno.env.get('ASAAS_BASE_URL') || DEFAULT_ASAAS_BASE_URL).replace(/\/+$/, '');
@@ -73,13 +72,21 @@ async function callAsaas(path: string, body: Record<string, unknown>) {
     body: JSON.stringify(body),
   });
 
-  const data = await response.json().catch(() => ({}));
+  const responseText = await response.text().catch(() => '');
+  let data: Record<string, unknown> = {};
+  try {
+    data = responseText ? JSON.parse(responseText) : {};
+  } catch {
+    data = {};
+  }
+
   if (!response.ok) {
-    console.error('Asaas checkout error:', response.status, data);
+    console.error('Asaas checkout error:', response.status, data || responseText);
     const asaasError = Array.isArray(data?.errors)
       ? data.errors.map((item: Record<string, unknown>) => item.description || item.message || item.code).filter(Boolean).join(' | ')
-      : data?.description || data?.message || JSON.stringify(data);
-    throw new Error(`asaas_checkout_failed: ${asaasError || response.status}`);
+      : data?.description || data?.message || responseText || JSON.stringify(data);
+    const details = String(asaasError || '').trim();
+    throw new Error(`asaas_checkout_failed (${response.status}): ${details || 'empty_response'}`);
   }
 
   return data;
@@ -114,7 +121,7 @@ Deno.serve(async (req) => {
     if (!negocioId || !planCode) return jsonResponse({ error: 'missing_required_fields' }, 400);
 
     const [{ data: plan, error: planFetchError }, { data: negocio, error: negocioError }] = await Promise.all([
-      admin.from('billing_plans').select('code, name, price_cents, trial_days').eq('code', planCode).eq('active', true).maybeSingle(),
+      admin.from('billing_plans').select('code, name, price_cents, max_profissionais, features').eq('code', planCode).eq('active', true).maybeSingle(),
       admin.from('negocios').select('id, owner_id, nome').eq('id', negocioId).maybeSingle(),
     ]);
 
@@ -123,16 +130,56 @@ Deno.serve(async (req) => {
     if (!plan) return jsonResponse({ error: 'plan_not_found' }, 404);
     if (!negocio || negocio.owner_id !== authData.user.id) return jsonResponse({ error: 'acao_nao_permitida' }, 403);
 
-    const { data: statusData, error: planError } = await userClient.rpc('set_business_plan', {
-      p_negocio_id: negocioId,
-      p_plan_code: planCode,
-    });
-    if (planError) throw planError;
-
     const selectedPlan = plan as BillingPlan;
+
+    if (selectedPlan.max_profissionais != null) {
+      const { count, error: countError } = await admin
+        .from('profissionais')
+        .select('id', { count: 'exact', head: true })
+        .eq('negocio_id', negocioId)
+        .in('status', ['ativo', 'pendente']);
+      if (countError) throw countError;
+      if (Number(count || 0) > selectedPlan.max_profissionais) {
+        return jsonResponse({ error: 'plan_professional_limit_reached' }, 400);
+      }
+    }
+
+    if (!hasFeature(selectedPlan, 'offers')) {
+      const { count, error: offersError } = await admin
+        .from('entregas')
+        .select('id', { count: 'exact', head: true })
+        .eq('negocio_id', negocioId)
+        .eq('ativo', true)
+        .gt('preco_promocional', 0);
+      if (offersError) throw offersError;
+      if (Number(count || 0) > 0) {
+        return jsonResponse({ error: 'feature_unavailable: offers' }, 400);
+      }
+    }
+
+    const { data: statusData, error: statusError } = await userClient.rpc('get_business_billing_status', {
+      p_negocio_id: negocioId,
+    });
+    if (statusError) throw statusError;
+
+    const currentStatus = String(statusData?.status || '').toLowerCase();
+    const paymentStatus = String(statusData?.payment_method_status || '').toLowerCase();
+    const canOpenCheckout = (
+      ['payment_required', 'billing_required', 'blocked', 'past_due', 'canceled'].includes(currentStatus)
+      || Boolean(statusData?.cancellation_scheduled)
+      || (currentStatus === 'active' && !['valid', 'none'].includes(paymentStatus))
+    );
+
+    if (!canOpenCheckout) {
+      return jsonResponse({
+        error: 'trial_access_active',
+        billing_status: statusData,
+      }, 409);
+    }
+
     const siteUrl = publicSiteUrl(req);
     const externalReference = `comvaga:${negocioId}:${selectedPlan.code}`;
-    const nextDueDate = asAsaasDateTime(addDays(new Date(), Number(selectedPlan.trial_days || 0)));
+    const nextDueDate = asAsaasDateTime(new Date());
     const checkoutPayload = {
       billingTypes: ['CREDIT_CARD'],
       chargeTypes: ['RECURRENT'],
@@ -159,22 +206,24 @@ Deno.serve(async (req) => {
     const checkout = await callAsaas('/checkouts', checkoutPayload);
     if (!checkout?.id) throw new Error('asaas_checkout_without_id');
 
-    const { error: eventError } = await admin.rpc('apply_gateway_subscription_event', {
+    const checkoutEventPayload = {
+      checkout,
+      checkout_request: {
+        externalReference,
+        planCode: selectedPlan.code,
+        nextDueDate,
+      },
+    };
+    const checkoutEventId = `checkout:${checkout.id}`;
+    const { error: eventError } = await admin.rpc('record_gateway_event', {
       p_provider: ASAAS_PROVIDER,
       p_event_type: 'CHECKOUT_CREATED',
-      p_payload: {
-        checkout,
-        checkout_request: {
-          externalReference,
-          planCode: selectedPlan.code,
-          nextDueDate,
-        },
-      },
-      p_provider_event_id: `checkout:${checkout.id}`,
+      p_payload: checkoutEventPayload,
+      p_provider_event_id: checkoutEventId,
       p_negocio_id: negocioId,
-      p_plan_code: selectedPlan.code,
-      p_payment_method_status: statusData?.payment_method_status || 'missing',
-      p_status: statusData?.stored_status || statusData?.status || 'trialing',
+      p_provider_customer_id: null,
+      p_provider_subscription_id: null,
+      p_provider_status: checkout?.status || null,
     });
     if (eventError) throw eventError;
 
