@@ -513,14 +513,18 @@ export function useDashboardMutations({
       unlockAction(lockKey);
       return;
     }
-    const ok = await uiConfirm('dashboard.professional_delete_confirm', 'warning');
+    const isSelfProfessional = Boolean(p?.user_id && p.user_id === userId && negocio?.owner_id === userId);
+    const ok = await uiConfirm(
+      isSelfProfessional ? 'dashboard.professional_self_delete_confirm' : 'dashboard.professional_delete_confirm',
+      'warning'
+    );
     if (!ok) {
       unlockAction(lockKey);
       return;
     }
     try {
       await removeProfissionalSeguramente(p.id);
-      await uiAlert('dashboard.professional_deleted', 'success');
+      await uiAlert(isSelfProfessional ? 'dashboard.professional_self_deleted' : 'dashboard.professional_deleted', 'success');
       const profs = await reloadProfissionais();
       if (profs?.length) await reloadEntregas(negocio.id, profs.map((item) => item.id));
       else setEntregas([]);
