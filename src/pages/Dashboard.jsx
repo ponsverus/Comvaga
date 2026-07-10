@@ -117,15 +117,15 @@ function accessEndsAt(status) {
 function formatDate(value) {
   if (!value) return '';
   const text = String(value).trim();
-  const ymd = text.slice(0, 10);
-  if (/^\d{4}-\d{2}-\d{2}$/.test(ymd)) {
-    const [year, month, day] = ymd.split('-');
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    const [year, month, day] = text.split('-');
     return `${day}.${month}.${year}`;
   }
 
-  const date = new Date(text);
+  const date = new Date(text.replace(' ', 'T'));
   if (Number.isNaN(date.getTime())) return '';
   return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -884,7 +884,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
             {activeTab === 'profissionais' && (
               <ProfissionaisSection
                 souDono={souDono}
-                currentUserId={user?.id ?? null}
                 adminJaEhProfissional={adminJaEhProfissional}
                 cadastrarAdminComoProfissional={cadastrarAdminComoProfissional}
                 submittingAdminProf={submittingAdminProf}
