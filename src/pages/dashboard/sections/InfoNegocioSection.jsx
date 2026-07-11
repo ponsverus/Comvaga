@@ -47,7 +47,7 @@ export default function InfoNegocioSection({
   galeriaLoadingMore,
   loadMoreGaleria,
   getPublicUrl,
-  removerImagemGaleria,
+  excluirImagemGaleria,
   deletingBusiness,
   excluirNegocio,
   navigate,
@@ -261,8 +261,8 @@ export default function InfoNegocioSection({
               {galeriaItems.map((item) => (
                 <div key={item.id || item.path} className="relative mb-px w-full break-inside-avoid overflow-hidden rounded-custom border border-gray-800 bg-dark-200">
                   <img src={getPublicUrl('galerias', item.path)} alt="Galeria" className="h-auto w-full object-contain" loading="lazy" />
-                  <button type="button" onClick={() => removerImagemGaleria(item)} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gray-700 bg-black/60 px-3 py-1 text-[12px] font-normal uppercase text-red-200 hover:border-red-400 sm:left-auto sm:right-2 sm:top-2 sm:translate-x-0 sm:translate-y-0">
-                    REMOVER
+                  <button type="button" onClick={() => excluirImagemGaleria(item)} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gray-700 bg-black/60 px-3 py-1 text-[12px] font-normal uppercase text-red-200 hover:border-red-400 sm:left-auto sm:right-2 sm:top-2 sm:translate-x-0 sm:translate-y-0">
+                    EXCLUIR
                   </button>
                 </div>
               ))}
