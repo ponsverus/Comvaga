@@ -458,7 +458,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     salvarTema,
     excluirNegocio,
     uploadGaleria,
-    removerImagemGaleria,
+    excluirImagemGaleria,
     createEntrega,
     updateEntrega,
     deleteEntrega,
@@ -916,7 +916,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
                 galeriaLoadingMore={galeriaLoadingMore}
                 loadMoreGaleria={loadMoreGaleria}
                 getPublicUrl={getPublicUrl}
-                removerImagemGaleria={removerImagemGaleria}
+                excluirImagemGaleria={excluirImagemGaleria}
                   deletingBusiness={deletingBusiness}
                   excluirNegocio={excluirNegocio}
                   navigate={navigate}
