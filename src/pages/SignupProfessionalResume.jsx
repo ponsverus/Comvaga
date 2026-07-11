@@ -276,6 +276,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       );
       if (planError) {
         console.warn('set_business_plan error:', planError);
+        showMessage('signupProfessional.plan_selection_failed');
       } else {
         clearSelectedPlanIntent();
       }
