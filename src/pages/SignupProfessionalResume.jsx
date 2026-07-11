@@ -281,7 +281,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
         clearSelectedPlanIntent();
       }
 
-      onLogin(user, 'professional', 'completed', 'active', null, 'owner');
+      onLogin(user, 'professional', 'completed', 'active', 'owner');
       navigate('/dashboard', { state: { negocioId: data.negocio_id } });
     } catch (err) {
       console.error('SignupProfessionalResume error:', err);
