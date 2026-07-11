@@ -78,8 +78,8 @@ export const ptBR = {
       buttonText: 'ENTENDI',
     },
     billing_checkout_success: {
-      title: 'Pagamento confirmado',
-      body: 'Pagamento confirmado. Seu plano será atualizado em instantes.',
+      title: 'Pagamento iniciado/confirmado',
+      body: 'Pagamento iniciado/confirmado. Seu plano será atualizado em instantes.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
@@ -246,13 +246,13 @@ export const ptBR = {
       buttonText: 'ENTENDI',
     },
     gallery_remove_confirm: {
-      title: 'Remover imagem?',
-      body: 'Tem certeza que deseja remover esta imagem da galeria?',
+      title: 'Excluir imagem?',
+      body: 'Tem certeza que deseja excluir esta imagem da galeria?',
       variant: 'warning',
       screen: 'dark',
-      confirmText: 'REMOVER',
+      confirmText: 'EXCLUIR',
       cancelText: 'CANCELAR',
-      buttonText: 'REMOVER',
+      buttonText: 'EXCLUIR',
     },
     gallery_image_removed: {
       title: 'Imagem removida',
@@ -263,7 +263,7 @@ export const ptBR = {
     },
     gallery_remove_error: {
       title: 'Erro',
-      body: 'Erro ao remover esta imagem agora. Tente novamente.',
+      body: 'Erro ao excluir esta imagem agora. Tente novamente.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -570,9 +570,28 @@ export const ptBR = {
       cancelText: 'CANCELAR',
       buttonText: 'EXCLUIR',
     },
+    professional_self_delete_confirm: {
+      title: 'Excluir cadastro profissional?',
+      body:
+        'Ao confirmar, você exclui apenas o seu cadastro como profissional deste negócio.\n' +
+        'Sua conta de admin e o gerenciamento do negócio continuam ativos.\n' +
+        'O histórico de atendimentos já realizados será preservado.',
+      variant: 'warning',
+      screen: 'dark',
+      confirmText: 'EXCLUIR MEU CADASTRO',
+      cancelText: 'CANCELAR',
+      buttonText: 'EXCLUIR MEU CADASTRO',
+    },
     professional_deleted: {
       title: 'Profissional excluído',
-      body: 'O profissional foi removido.',
+      body: 'O profissional foi excluído.',
+      variant: 'success',
+      screen: 'light',
+      buttonText: 'OK',
+    },
+    professional_self_deleted: {
+      title: 'Cadastro profissional excluído',
+      body: 'Seu cadastro como profissional foi excluído deste negócio. Sua conta de admin continua ativa.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
@@ -1005,7 +1024,7 @@ export const ptBR = {
     },
     account_delete_confirm: {
       title: 'Excluir conta',
-      body: 'Tem certeza que deseja excluir sua conta de cliente?\nIsso removerá permanentemente seus dados de acesso.',
+      body: 'Tem certeza que deseja excluir sua conta de cliente?\nIsso excluirá permanentemente seus dados de acesso.',
       variant: 'danger',
       screen: 'dark',
       confirmText: 'EXCLUIR CONTA',
