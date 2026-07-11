@@ -1427,6 +1427,16 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
+    plan_selection_failed: {
+      title: 'Houve um erro ao aplicar o plano escolhido',
+      body:
+        'Seu negócio foi criado normalmente, mas houve uma falha ao aplicar o plano ' +
+        'que você selecionou. O plano pode ser escolhido novamente em ' +
+        'Dashboard > Planos.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
   },
 
   vitrine: {
