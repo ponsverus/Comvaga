@@ -92,7 +92,6 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
         profile.type,
         profile.onboardingStatus,
         profile.accessState,
-        profile.onboardingFlow,
         profile.professionalRole
       );
 
