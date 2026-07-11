@@ -24,12 +24,19 @@ function normalizePlanCode(value: unknown) {
   return String(value || '').trim().toLowerCase();
 }
 
-function asDateOnly(date: Date) {
-  return date.toISOString().slice(0, 10);
+function asSaoPauloDateOnly(date: Date) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const byType = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${byType.year}-${byType.month}-${byType.day}`;
 }
 
 function asAsaasDateTime(date: Date) {
-  return `${asDateOnly(date)} 00:00:00`;
+  return `${asSaoPauloDateOnly(date)} 00:00:00`;
 }
 
 function checkoutUrlFor(id: string) {
