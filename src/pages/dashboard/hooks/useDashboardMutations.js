@@ -297,14 +297,14 @@ export function useDashboardMutations({
     }
   };
 
-  const removerImagemGaleria = async (item) => {
-    const lockKey = `galeria-remover:${item?.id || item?.path || 'item'}`;
+  const excluirImagemGaleria = async (item) => {
+    const lockKey = `galeria-excluir:${item?.id || item?.path || 'item'}`;
     if (!lockAction(lockKey)) return;
     if (!(await ensureOwnerAction())) {
       unlockAction(lockKey);
       return;
     }
-    const ok = await uiConfirm('dashboard.gallery_remove_confirm', 'warning');
+    const ok = await uiConfirm('dashboard.gallery_delete_confirm', 'warning');
     if (!ok) {
       unlockAction(lockKey);
       return;
@@ -312,9 +312,9 @@ export function useDashboardMutations({
     try {
       await deleteGaleriaItem(item.id);
       setGaleriaItems((prev) => prev.filter((x) => x.id !== item.id));
-      await uiAlert('dashboard.gallery_image_removed', 'success');
+      await uiAlert('dashboard.gallery_image_deleted', 'success');
     } catch {
-      await uiAlert('dashboard.gallery_remove_error', 'error');
+      await uiAlert('dashboard.gallery_delete_error', 'error');
     } finally {
       unlockAction(lockKey);
     }
@@ -674,7 +674,7 @@ export function useDashboardMutations({
     salvarTema,
     excluirNegocio,
     uploadGaleria,
-    removerImagemGaleria,
+    excluirImagemGaleria,
     createEntrega,
     updateEntrega,
     deleteEntrega,
