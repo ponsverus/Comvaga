@@ -119,7 +119,7 @@ export default function SignupProfessional({ onLogin }) {
       if (!dbType) { showMessage('signupProfessional.profile_not_created'); return; }
       if (dbType !== 'professional') { showMessage('signupProfessional.profile_wrong_type'); return; }
 
-      onLogin(sessionUser, 'professional', 'pending', 'owner_resume', 'owner', 'owner');
+      onLogin(sessionUser, 'professional', 'pending', 'owner_resume', 'owner');
       navigate('/cadastro/profissional/retomada');
     } catch (err) {
       console.error('SignupProfessional error:', err);
