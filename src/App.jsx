@@ -150,7 +150,6 @@ export default function App() {
   const [user,             setUser]             = useState(null);
   const [userType,         setUserType]         = useState(null);
   const [onboardingStatus, setOnboardingStatus] = useState(null);
-  const [onboardingFlow,   setOnboardingFlow]   = useState(null);
   const [professionalRole, setProfessionalRole] = useState(null);
   const [accessState,      setAccessState]      = useState('active');
   const [booting,          setBooting]          = useState(true);
@@ -167,7 +166,7 @@ export default function App() {
   const isLoggedIn = !!user;
   const metadataPartnerSignup = user?.user_metadata?.partner_signup === true
     || String(user?.user_metadata?.partner_signup || '').toLowerCase() === 'true';
-  const isPartnerSignup = professionalRole === 'partner' || onboardingFlow === 'partner' || metadataPartnerSignup;
+  const isPartnerSignup = professionalRole === 'partner' || metadataPartnerSignup;
 
   const safeSet = useCallback((fn) => {
     if (aliveRef.current) fn();
@@ -178,14 +177,14 @@ export default function App() {
     setInRecovery(!!next);
   }, []);
 
-  const getPostLoginPath = useCallback((type, currentAccessState, status, flow = onboardingFlow, role = professionalRole) => {
+  const getPostLoginPath = useCallback((type, currentAccessState, status, role = professionalRole) => {
     if (type !== 'professional') return '/minha-area';
-    if (role === 'partner' || flow === 'partner') return '/selecionar-negocio-parceiro';
+    if (role === 'partner') return '/selecionar-negocio-parceiro';
     if (currentAccessState === 'owner_resume' || normalizeOnboardingStatus(type, status) === 'pending') {
       return '/cadastro/profissional/retomada';
     }
     return '/dashboard';
-  }, [onboardingFlow, professionalRole]);
+  }, [professionalRole]);
 
   const loadProfile = useCallback(async (sessionUser) => {
     if (!sessionUser?.id) return null;
@@ -194,7 +193,6 @@ export default function App() {
       setTypeLoading(true);
       setUserType(null);
       setOnboardingStatus(null);
-      setOnboardingFlow(null);
       setProfessionalRole(null);
       setAccessState('active');
     });
@@ -208,7 +206,6 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
-          setOnboardingFlow(null);
           setProfessionalRole(null);
           setAccessState('active');
           loadedUserRef.current = null;
@@ -221,7 +218,6 @@ export default function App() {
       safeSet(() => {
         setUserType(profile.type);
         setOnboardingStatus(profile.onboardingStatus);
-        setOnboardingFlow(profile.onboardingFlow || null);
         setProfessionalRole(isValidProfessionalRole(profile.professionalRole) ? profile.professionalRole : null);
         setAccessState(profile.accessState || 'active');
         setFatalError(null);
@@ -240,7 +236,6 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
-          setOnboardingFlow(null);
           setProfessionalRole(null);
           setAccessState('active');
           setFatalError(null);
@@ -252,7 +247,6 @@ export default function App() {
       safeSet(() => {
         setUserType(null);
         setOnboardingStatus(null);
-        setOnboardingFlow(null);
         setProfessionalRole(null);
         setAccessState('active');
         setFatalError(e?.message || 'Falha ao carregar perfil.');
@@ -284,7 +278,6 @@ export default function App() {
               setUser(sessionUser);
               setUserType(null);
               setOnboardingStatus(null);
-              setOnboardingFlow(null);
               setProfessionalRole(null);
               setAccessState('active');
               setFatalError(null);
@@ -299,7 +292,6 @@ export default function App() {
               setUser(null);
               setUserType(null);
               setOnboardingStatus(null);
-              setOnboardingFlow(null);
               setProfessionalRole(null);
               setAccessState('active');
               setBooting(false);
@@ -318,7 +310,6 @@ export default function App() {
             setUser(session?.user || null);
             setUserType(null);
             setOnboardingStatus(null);
-            setOnboardingFlow(null);
             setProfessionalRole(null);
             setAccessState('active');
             setFatalError(null);
@@ -334,7 +325,6 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
-          setOnboardingFlow(null);
           setProfessionalRole(null);
           setAccessState('active');
           setFatalError(null);
@@ -348,7 +338,7 @@ export default function App() {
     return () => { aliveRef.current = false; subscription?.unsubscribe(); };
   }, [loadProfile, safeSet, setRecoveryMode]);
 
-  const handleLogin = useCallback((userData, type, nextOnboardingStatus = 'completed', nextAccessState = 'active', nextOnboardingFlow = null, nextProfessionalRole = null) => {
+  const handleLogin = useCallback((userData, type, nextOnboardingStatus = 'completed', nextAccessState = 'active', nextProfessionalRole = null) => {
     loadedUserRef.current = userData?.id || null;
     setUser(userData || null);
     setUserType(isValidType(type) ? type : null);
@@ -357,7 +347,6 @@ export default function App() {
         ? normalizeOnboardingStatus(type, nextOnboardingStatus)
         : null
     );
-    setOnboardingFlow(nextOnboardingFlow === 'partner' || nextOnboardingFlow === 'owner' ? nextOnboardingFlow : null);
     setProfessionalRole(isValidProfessionalRole(nextProfessionalRole) ? nextProfessionalRole : null);
     setAccessState(nextAccessState);
     setFatalError(null);
@@ -374,7 +363,6 @@ export default function App() {
       setUser(null);
       setUserType(null);
       setOnboardingStatus(null);
-      setOnboardingFlow(null);
       setProfessionalRole(null);
       setAccessState('active');
       setFatalError(null);
@@ -391,7 +379,6 @@ export default function App() {
           setUser(null);
           setUserType(null);
           setOnboardingStatus(null);
-          setOnboardingFlow(null);
           setProfessionalRole(null);
           setAccessState('active');
           setBooting(false);
@@ -407,7 +394,6 @@ export default function App() {
         setUser(null);
         setUserType(null);
         setOnboardingStatus(null);
-        setOnboardingFlow(null);
         setProfessionalRole(null);
         setAccessState('active');
         setBooting(false);
