@@ -12,10 +12,14 @@ export function normalizeOnboardingStatus(type, onboardingStatus) {
   return isValidOnboardingStatus(onboardingStatus) ? onboardingStatus : 'pending';
 }
 
-function getProfessionalAccessState(statuses, onboardingStatus) {
+function getProfessionalAccessState(statuses, onboardingStatus, professionalRole) {
   const hasPending = statuses.includes('pendente');
   const hasActive = statuses.includes('ativo');
 
+  if (professionalRole === 'partner') {
+    if (hasPending && !hasActive) return 'partner_pending';
+    return 'active';
+  }
   if (hasPending && !hasActive) return 'partner_pending';
   if (normalizeOnboardingStatus('professional', onboardingStatus) === 'pending' && !hasActive && !hasPending) {
     return 'owner_resume';
@@ -84,6 +88,10 @@ export async function fetchUserAccessProfile(userId) {
     onboardingFlow: isValidProfessionalOnboardingFlow(userData?.professional_onboarding_flow)
       ? userData.professional_onboarding_flow
       : null,
-    accessState: getProfessionalAccessState(statuses, onboardingStatus),
+    accessState: getProfessionalAccessState(
+      statuses,
+      onboardingStatus,
+      normalizeProfessionalRole(userData?.professional_role)
+    ),
   };
 }
