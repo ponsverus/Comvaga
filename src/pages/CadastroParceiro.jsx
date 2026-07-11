@@ -105,7 +105,7 @@ export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
       }
 
       if (suppressAuthRef) suppressAuthRef.current = false;
-      onLogin?.(signUpData.user, 'professional', 'pending', 'active', 'partner', 'partner');
+      onLogin?.(signUpData.user, 'professional', 'completed', 'active', 'partner');
       navigate('/selecionar-negocio-parceiro', { replace: true });
     } catch (e) {
       setAlerta({ body: e?.message || msgs.unexpected_error.body, variant: 'erro' });
