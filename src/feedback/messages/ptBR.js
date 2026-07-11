@@ -245,7 +245,7 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
-    gallery_remove_confirm: {
+    gallery_delete_confirm: {
       title: 'Excluir imagem?',
       body: 'Tem certeza que deseja excluir esta imagem da galeria?',
       variant: 'warning',
@@ -254,14 +254,14 @@ export const ptBR = {
       cancelText: 'CANCELAR',
       buttonText: 'EXCLUIR',
     },
-    gallery_image_removed: {
-      title: 'Imagem removida',
-      body: 'A imagem foi removida da galeria.',
+    gallery_image_deleted: {
+      title: 'Imagem excluída',
+      body: 'A imagem foi excluída da galeria.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
     },
-    gallery_remove_error: {
+    gallery_delete_error: {
       title: 'Erro',
       body: 'Erro ao excluir esta imagem agora. Tente novamente.',
       variant: 'danger',
