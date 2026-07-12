@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, X } from 'lucide-react';
-import { CalendarIcon, ProfessionalIcon, SearchIcon, TimePastIcon, UserIcon } from '../components/icons';
+import { LogOut } from 'lucide-react';
+import { SearchIcon, TimePastIcon, UserIcon } from '../components/icons';
 import AppFooter from '../components/AppFooter';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
@@ -19,91 +19,18 @@ import {
   removerContaCliente,
   removerFavoritoCliente,
 } from './clientArea/api/clientAreaApi';
-
-function formatDateBRFromISO(dateStr) {
-  if (!dateStr) return '';
-  const [y, m, d] = String(dateStr).split('-');
-  if (!y || !m || !d) return String(dateStr);
-  return `${d}.${m}.${y}`;
-}
-
-const moneyBR = (v) => {
-  const n = Number(v ?? 0);
-  if (!Number.isFinite(n)) return '0,00';
-  return n.toFixed(2).replace('.', ',');
-};
-
-const getPrecoFinalEntrega = (e) => {
-  const preco = Number(e?.preco ?? 0);
-  const promoRaw = e?.preco_promocional;
-  const promo = (promoRaw == null || promoRaw === '') ? 0 : Number(promoRaw);
-  const temPromo = Number.isFinite(promo) && promo > 0 && promo < preco;
-  return temPromo ? promo : preco;
-};
-
-const getValorAgendamento = (a) => {
-  const frozen = Number(a?.preco_final);
-  if (Number.isFinite(frozen) && frozen > 0) return frozen;
-  return getPrecoFinalEntrega(a?.entregas);
-};
-
-const PAGE_SIZE = 50;
-
-function isRateLimitError(error) {
-  const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
-  return raw.includes('rate_limit_exceeded') || raw.includes('limite diário') || raw.includes('too many requests');
-}
-
-const maskedPrivateValue = '••••••••';
-
-function Heart({ filled = false, className = '', size = 20 }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill={filled ? 'currentColor' : 'none'}
-      stroke="currentColor"
-      strokeWidth="1"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    </svg>
-  );
-}
-
-function ReviewStar({ active, onClick, label }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex h-8 w-8 items-center justify-center border-0 bg-transparent p-0 transition-transform hover:scale-105 focus:outline-none"
-      aria-label={label}
-    >
-      <span
-        aria-hidden="true"
-        className={`text-[26px] leading-none transition-opacity ${active ? 'text-primary opacity-100' : 'text-primary opacity-25'}`}
-      >
-        {'\u2605'}
-      </span>
-    </button>
-  );
-}
-
-function getPublicUrl(bucket, path) {
-  if (!path) return null;
-  try {
-    const stripped = path.replace(new RegExp(`^${bucket}/`), '');
-    const { data } = supabase.storage.from(bucket).getPublicUrl(stripped);
-    return data?.publicUrl || null;
-  } catch {
-    return null;
-  }
-}
+import Heart from './clientArea/components/Heart';
+import BookingsSection from './clientArea/components/BookingsSection';
+import FavoritesSection from './clientArea/components/FavoritesSection';
+import SearchResults from './clientArea/components/SearchResults';
+import {
+  PAGE_SIZE,
+  getPublicUrl,
+  isRateLimitError,
+  maskedPrivateValue,
+  mergeById,
+  sortByDateThenTimeDesc,
+} from './clientArea/utils';
 
 export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const navigate = useNavigate();
@@ -614,15 +541,6 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     }
   };
 
-  const mergeById = (current, incoming) => {
-    const seen = new Set();
-    return [...current, ...incoming].filter(item => {
-      if (!item?.id || seen.has(item.id)) return false;
-      seen.add(item.id);
-      return true;
-    });
-  };
-
   const carregarMaisAgendamentos = async () => {
     if (agendamentosLoadingMore || !agendamentosHasMore) return;
     try {
@@ -657,31 +575,6 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'agendado':               return 'bg-blue-500/20 border-blue-500/50 text-blue-400';
-      case 'concluido':              return 'bg-green-500/20 border-green-500/50 text-green-400';
-      case 'cancelado_cliente':
-      case 'cancelado_profissional': return 'bg-red-500/20 border-red-500/50 text-red-400';
-      default:                       return 'bg-gray-500/20 border-gray-500/50 text-gray-400';
-    }
-  };
-
-  const getStatusText = (status) => ({
-    agendado:               'AGENDADO',
-    concluido:              'CONCLUÍDO',
-    cancelado_cliente:      'CANCELADO',
-    cancelado_profissional: 'CANCELADO',
-  }[status] || String(status || '').toUpperCase());
-
-  const sortByDateThenTimeDesc = (list) =>
-    [...(list || [])].sort((a, b) => {
-      const da = String(a?.data || '');
-      const db = String(b?.data || '');
-      if (da !== db) return db.localeCompare(da);
-      return String(b?.hora_inicio || '00:00').localeCompare(String(a?.hora_inicio || '00:00'));
-    });
-
   const agendamentosPorStatus = useMemo(() => {
     const abertos = [], cancelados = [], concluidos = [];
     for (const a of (agendamentos || [])) {
@@ -700,204 +593,12 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const avatarUrl      = getPublicUrl('avatars', avatarPath);
   const nomeCabecalho  = String(nomePerfil || user?.user_metadata?.nome || '—').trim();
   const avatarFallback = nomeCabecalho?.[0]?.toUpperCase() || '?';
-  const renderSearchResult = (row) => {
-    const tipo = String(row?.tipo || '').toLowerCase();
-    const isNegocio = tipo === 'negocio';
-    const typeLabel = isNegocio ? 'NEGÓCIO' : 'PROFISSIONAL';
-    const subtitle = String(row?.subtitulo || '').trim();
-
-    return (
-      <Link
-        key={`${row?.tipo || 'item'}-${row?.id || row?.slug}`}
-        to={`/v/${row?.slug}`}
-        onClick={() => {
-          setSearchOpen(false);
-          setSearchTerm('');
-          setSearchRows([]);
-          setSearchError('');
-        }}
-        className="block border-b border-white/5 px-4 py-4 text-left transition-colors hover:bg-dark-200/90 last:border-b-0"
-      >
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-800 bg-dark-200">
-            {isNegocio ? (
-              <ProfessionalIcon className="h-5 w-5 text-primary" />
-            ) : (
-              <UserIcon className="h-5 w-5 text-blue-400" />
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-normal uppercase text-white">{row?.nome || '—'}</div>
-            <div className="mt-1 flex items-center gap-2">
-              <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] uppercase text-primary">
-                {typeLabel}
-              </span>
-              {subtitle && (
-                <span className="truncate text-xs uppercase text-gray-500">{subtitle}</span>
-              )}
-            </div>
-          </div>
-        </div>
-      </Link>
-    );
-  };
-
-  const renderSearchResults = ({ mobile = false } = {}) => {
-    const hasQuery = String(searchTerm || '').trim().length >= 3;
-    if (!hasQuery) return null;
-
-    const wrapClass = mobile
-      ? 'mt-3 overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl'
-      : 'absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl';
-
-    return (
-      <div className={wrapClass}>
-        {searching && (
-          <div className="px-4 py-4 text-sm text-gray-400">
-            BUSCANDO...
-          </div>
-        )}
-        {!searching && searchError && (
-          <div className="px-4 py-4 text-sm text-red-300">
-            {searchError}
-          </div>
-        )}
-        {!searching && !searchError && searchRows.length > 0 && (
-          <div>
-            {searchRows.map((row) => renderSearchResult(row))}
-          </div>
-        )}
-        {!searching && !searchError && searchRows.length === 0 && (
-          <div className="px-4 py-4 text-sm text-gray-400">
-            Nenhum resultado encontrado.
-          </div>
-        )}
-      </div>
-    );
-  };
-  const renderSecaoAgendamentos = (titulo, lista) => {
-    if (!lista.length) return null;
-    return (
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-xs sm:text-sm text-gray-400 uppercase tracking-wide">{titulo}</div>
-          <div className="text-xs text-gray-500">{lista.length}</div>
-        </div>
-        <div className="space-y-4">
-          {lista.map(ag => {
-            const nomeProfissionalDepoimento = String(ag.profissionais?.nome || '').trim();
-            const podeMarcarNovamente =
-              ['concluido', 'cancelado_cliente', 'cancelado_profissional'].includes(String(ag.status || '')) &&
-              !!ag.negocio_slug &&
-              !!ag.profissional_id &&
-              !!ag.entrega_id;
-            const podeAvaliar =
-              String(ag.status || '') === 'concluido' &&
-              !avaliacoesPorAgendamento[ag.id];
-            const depoimentoAberto = podeAvaliar && depoimentoAlvo?.id === ag.id;
-            return (
-            <div key={ag.id} className="overflow-hidden bg-dark-200 border border-gray-800 rounded-custom">
-              <div className="p-4 sm:p-5">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-normal text-white mb-1">{ag.profissionais?.negocios?.nome || '—'}</h3>
-                  <p className="text-sm text-gray-400 mb-2 uppercase">PROF: {ag.profissionais?.nome || '—'}</p>
-                  <p className="text-sm text-primary">{ag.entregas?.nome || '—'}</p>
-                </div>
-                <div className={`shrink-0 inline-flex px-3 py-1 rounded-button text-xs border ${getStatusColor(ag.status)}`}>
-                  {getStatusText(ag.status)}
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">DATA</div>
-                  <div className="text-sm text-white">{formatDateBRFromISO(ag.data)}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">HORÁRIO</div>
-                  <div className="text-sm text-white">{ag.hora_inicio || '—'}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">VALOR</div>
-                  <div className="text-sm text-white">R$ {moneyBR(getValorAgendamento(ag))}</div>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2">
-                {ag.status === 'agendado' && (
-                  <button
-                    onClick={() => cancelarAgendamento(ag.id)}
-                    className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-400 rounded-button text-sm transition-all"
-                  >
-                    CANCELAR
-                  </button>
-                )}
-                {podeMarcarNovamente && (
-                  <button
-                    onClick={() => marcarNovamente(ag)}
-                    className="w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase"
-                  >
-                    AGENDAR NOVAMENTE
-                  </button>
-                )}
-                {podeAvaliar && (
-                  <button
-                    onClick={() => abrirDepoimento(ag)}
-                    className="w-full py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-400 rounded-button text-sm transition-all uppercase"
-                  >
-                    DAR DEPOIMENTO
-                  </button>
-                )}
-              </div>
-              </div>
-              {depoimentoAberto && (
-                <div className="border-t border-gray-800 px-3 py-3 sm:px-5">
-                  <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                    <div className="flex shrink-0 items-center gap-0.5">
-                      {[1, 2, 3, 4, 5].map((nota) => (
-                        <ReviewStar
-                          key={nota}
-                          active={depoimentoNota >= nota}
-                          onClick={() => setDepoimentoNota(nota)}
-                          label={`${nota} estrela${nota > 1 ? 's' : ''}`}
-                        />
-                      ))}
-                    </div>
-
-                    <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                      <div className="flex min-w-0 flex-1 items-center gap-2">
-                      <label className="shrink-0 whitespace-nowrap text-sm font-normal uppercase text-gray-500 sm:text-sm sm:tracking-wide">
-                        Comentário:
-                      </label>
-
-                      <input
-                        type="text"
-                        value={depoimentoTexto}
-                        onChange={(event) => setDepoimentoTexto(event.target.value)}
-                        placeholder="OPCIONAL"
-                        className="min-w-[42px] flex-1 bg-transparent px-0 py-2 text-sm text-white placeholder-gray-600 outline-none focus:text-white"
-                      />
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={enviarDepoimentoAgendamento}
-                        disabled={depoimentoLoading}
-                        className="w-full shrink-0 rounded-button border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-normal uppercase text-primary transition-colors hover:bg-primary/30 hover:border-primary disabled:opacity-60 sm:w-auto sm:bg-transparent sm:px-4 sm:text-xs"
-                      >
-                        {depoimentoLoading
-                          ? 'ENVIANDO...'
-                          : `ENVIAR${nomeProfissionalDepoimento ? ` PARA ${nomeProfissionalDepoimento}` : ''}`}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )})}
-        </div>
-      </div>
-    );
-  };
+  const clearSearch = useCallback(() => {
+    setSearchOpen(false);
+    setSearchTerm('');
+    setSearchRows([]);
+    setSearchError('');
+  }, []);
 
   if (loading) {
     return (
@@ -968,7 +669,15 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                     </div>
                   )}
                 </div>
-                {searchOpen && renderSearchResults()}
+                {searchOpen && (
+                  <SearchResults
+                    searchTerm={searchTerm}
+                    searching={searching}
+                    searchError={searchError}
+                    searchRows={searchRows}
+                    onSelectResult={clearSearch}
+                  />
+                )}
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={onPickAvatar} className="hidden" />
               <button onClick={openFilePicker} disabled={uploadingAvatar} className="h-9 px-5 bg-dark-200 border border-gray-800 hover:border-primary/50 rounded-button text-sm transition-all uppercase focus:outline-none">
@@ -1009,7 +718,14 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                 </div>
               )}
             </div>
-            {renderSearchResults({ mobile: true })}
+            <SearchResults
+              mobile
+              searchTerm={searchTerm}
+              searching={searching}
+              searchError={searchError}
+              searchRows={searchRows}
+              onSelectResult={clearSearch}
+            />
           </div>
         </div>
 
@@ -1050,87 +766,34 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
           <div className={activeTab === 'dados' ? '' : 'p-4 sm:p-6'}>
 
             {activeTab === 'agendamentos' && (
-              <div>
-                {(agendamentosPorStatus.abertos.length || agendamentosPorStatus.cancelados.length || agendamentosPorStatus.concluidos.length) ? (
-                  <>
-                    {renderSecaoAgendamentos('EM ABERTO',  agendamentosPorStatus.abertos)}
-                    {renderSecaoAgendamentos('CONCLUÍDOS', agendamentosPorStatus.concluidos)}
-                    {renderSecaoAgendamentos('CANCELADOS', agendamentosPorStatus.cancelados)}
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center py-12 gap-4">
-                    <CalendarIcon className="block w-16 h-16 text-gray-500 opacity-40" />
-                    <Link to="/" className="inline-block px-6 py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button hover:shadow-lg transition-all">
-                      AGENDAR
-                    </Link>
-                  </div>
-                )}
-                {agendamentosHasMore && (
-                  <button
-                    type="button"
-                    onClick={carregarMaisAgendamentos}
-                    disabled={agendamentosLoadingMore}
-                    className="mt-2 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-60"
-                  >
-                    {agendamentosLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
-                  </button>
-                )}
-              </div>
+              <BookingsSection
+                groups={agendamentosPorStatus}
+                hasMore={agendamentosHasMore}
+                loadingMore={agendamentosLoadingMore}
+                onLoadMore={carregarMaisAgendamentos}
+                onCancel={cancelarAgendamento}
+                onRebook={marcarNovamente}
+                onOpenReview={abrirDepoimento}
+                reviewsByBooking={avaliacoesPorAgendamento}
+                reviewTarget={depoimentoAlvo}
+                reviewRating={depoimentoNota}
+                setReviewRating={setDepoimentoNota}
+                reviewText={depoimentoTexto}
+                setReviewText={setDepoimentoTexto}
+                reviewLoading={depoimentoLoading}
+                onSubmitReview={enviarDepoimentoAgendamento}
+              />
             )}
 
             {activeTab === 'favoritos' && (
-              <div>
-                {favoritos.length > 0 ? (
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
-                    {favoritos.map(fav => {
-                      const isNegocio   = fav.tipo === 'negocio';
-                      const nomeFav     = isNegocio ? (fav.negocios?.nome || '—') : (fav.profissionais?.nome || '—');
-                      const slug        = isNegocio ? fav.negocios?.slug : fav.profissionais?.negocios?.slug;
-                      const tipoNegocio = isNegocio ? (String(fav.negocios?.tipo_negocio || '').trim() || '—') : 'PROFISSIONAL';
-                      return (
-                        <div key={fav.id} className="bg-dark-200 border border-gray-800 rounded-custom p-4 relative group hover:border-primary/50 transition-all">
-                          <button
-                            type="button"
-                            aria-label="Remover favorito"
-                            onClick={() => removerFavorito(fav.id)}
-                            disabled={removingFavoritoId === fav.id}
-                            className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500/20 opacity-100 transition-all hover:bg-red-500/30 focus:outline-none sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 disabled:opacity-60"
-                          >
-                            <X className="w-4 h-4 text-red-400" />
-                          </button>
-                          <div className="mb-3">
-                            <Heart filled size={24} className="text-red-500 mb-3" />
-                            <h3 className="text-lg font-normal text-white mb-1">{nomeFav}</h3>
-                            <p className="text-xs text-gray-500 uppercase">{tipoNegocio}</p>
-                          </div>
-                          {slug && (
-                            <Link to={`/v/${slug}`} className="block w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm text-center transition-all">
-                              VER VITRINE
-                            </Link>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Heart filled size={64} className="text-red-500/30 mx-auto mb-4" />
-                    <Link to="/" className="inline-block px-6 py-3 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button hover:shadow-lg transition-all">
-                      EXPLORAR
-                    </Link>
-                  </div>
-                )}
-                {favoritosHasMore && (
-                  <button
-                    type="button"
-                    onClick={carregarMaisFavoritos}
-                    disabled={favoritosLoadingMore}
-                    className="mt-4 w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase disabled:opacity-60"
-                  >
-                    {favoritosLoadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
-                  </button>
-                )}
-              </div>
+              <FavoritesSection
+                favoritos={favoritos}
+                removingFavoritoId={removingFavoritoId}
+                hasMore={favoritosHasMore}
+                loadingMore={favoritosLoadingMore}
+                onRemove={removerFavorito}
+                onLoadMore={carregarMaisFavoritos}
+              />
             )}
 
             {activeTab === 'dados' && (
