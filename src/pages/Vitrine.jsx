@@ -458,7 +458,7 @@ export default function Vitrine({ user, userType, professionalRole = null, onLog
       console.error('Vitrine review send error:', e);
       openAlert({
         title: getMsg('depoimento_send_error_title', 'Erro ao enviar depoimento'),
-        body: getMsg('depoimento_send_error_body', 'Erro ao enviar seu depoimento agora. Tente novamente em instantes.'),
+        body: getMsg('depoimento_send_error_body', 'Tente novamente em instantes.'),
         buttonText: getMsg('common_ok', 'ENTENDI'),
       });
     }
