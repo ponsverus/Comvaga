@@ -21,9 +21,17 @@ function Stars5Char({ value = 0, size = 14 }) {
   );
 }
 
-export default function DepoimentosPaginados({ depoimentos, nomeNegocioLabel, isLight }) {
+export default function DepoimentosPaginados({
+  depoimentos,
+  nomeNegocioLabel,
+  isLight,
+  hasMore = false,
+  loadingMore = false,
+  onLoadMore,
+}) {
   const [pagina, setPagina] = useState(0);
-  const totalPaginas = Math.ceil(depoimentos.length / DEPOIMENTOS_POR_PAGINA);
+  const loadedPages = Math.max(1, Math.ceil(depoimentos.length / DEPOIMENTOS_POR_PAGINA));
+  const totalPaginas = loadedPages + (hasMore ? 1 : 0);
   const inicio = pagina * DEPOIMENTOS_POR_PAGINA;
   const itens = depoimentos.slice(inicio, inicio + DEPOIMENTOS_POR_PAGINA);
   const navBtnCl = isLight ? 'hover:bg-vcard2 text-vmuted hover:text-vtext' : 'hover:bg-vcard2 text-vsub hover:text-vtext';
@@ -32,12 +40,32 @@ export default function DepoimentosPaginados({ depoimentos, nomeNegocioLabel, is
   const touchStartRef = useRef(null);
 
   useEffect(() => {
-    const ultimaPaginaValida = Math.max(0, totalPaginas - 1);
+    const ultimaPaginaValida = Math.max(0, loadedPages - 1);
     setPagina((prev) => Math.min(prev, ultimaPaginaValida));
-  }, [totalPaginas]);
+  }, [loadedPages]);
 
   const goPrev = () => setPagina((p) => Math.max(0, p - 1));
-  const goNext = () => setPagina((p) => Math.min(totalPaginas - 1, p + 1));
+  const goToPage = async (targetPage) => {
+    const safeTarget = Math.max(0, Math.min(targetPage, totalPaginas - 1));
+    if (safeTarget < loadedPages) {
+      setPagina(safeTarget);
+      return;
+    }
+    if (!hasMore || loadingMore || typeof onLoadMore !== 'function') return;
+    try {
+      const didLoad = await onLoadMore();
+      if (didLoad !== false) setPagina(safeTarget);
+    } catch {
+      // Keep the current page if the next batch fails.
+    }
+  };
+  const goNext = () => {
+    if (pagina < loadedPages - 1) {
+      setPagina((p) => p + 1);
+      return;
+    }
+    goToPage(pagina + 1);
+  };
   const handleTouchStart = (event) => {
     const touch = event.touches?.[0];
     if (!touch) return;
@@ -92,7 +120,7 @@ export default function DepoimentosPaginados({ depoimentos, nomeNegocioLabel, is
       </div>
       {totalPaginas > 1 && (
         <div className="flex items-center justify-center gap-4 mt-6">
-          <button type="button" onClick={goPrev} disabled={pagina === 0} className={`inline-flex h-7 w-7 items-center justify-center rounded-full bg-transparent border border-vborder transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:border-vsub ${navBtnCl}`}>
+          <button type="button" onClick={goPrev} disabled={pagina === 0 || loadingMore} className={`inline-flex h-7 w-7 items-center justify-center rounded-full bg-transparent border border-vborder transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:border-vsub ${navBtnCl}`}>
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div className="flex items-center justify-center gap-3">
@@ -100,13 +128,14 @@ export default function DepoimentosPaginados({ depoimentos, nomeNegocioLabel, is
             <button
               type="button"
               key={i}
-              onClick={() => setPagina(i)}
+              onClick={() => goToPage(i)}
+              disabled={loadingMore}
               className={['rounded-full transition-all duration-300', i === pagina ? 'w-4 h-2 bg-vprimary' : `w-2 h-2 ${dotInact}`].join(' ')}
               aria-label={`Página ${i + 1}`}
             />
             ))}
           </div>
-          <button type="button" onClick={goNext} disabled={pagina === totalPaginas - 1} className={`inline-flex h-7 w-7 items-center justify-center rounded-full bg-transparent border border-vborder transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:border-vsub ${navBtnCl}`}>
+          <button type="button" onClick={goNext} disabled={loadingMore || (!hasMore && pagina >= loadedPages - 1)} className={`inline-flex h-7 w-7 items-center justify-center rounded-full bg-transparent border border-vborder transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:border-vsub ${navBtnCl}`}>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
