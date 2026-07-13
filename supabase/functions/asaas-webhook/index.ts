@@ -1,39 +1,5 @@
-import { createClient } from 'npm:@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, asaas-access-token',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
-function jsonResponse(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      ...corsHeaders,
-      'Content-Type': 'application/json',
-    },
-  });
-}
-
-function getSupabaseUrl() {
-  const url = Deno.env.get('SUPABASE_URL');
-  if (!url) throw new Error('missing_supabase_url');
-  return url;
-}
-
-function getSecretKey() {
-  return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-}
-
-function createAdminClient() {
-  const key = getSecretKey();
-  if (!key) throw new Error('missing_supabase_secret_key');
-
-  return createClient(getSupabaseUrl(), key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
+import { getCorsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { createAdminClient } from '../_shared/supabase.ts';
 
 const ASAAS_PROVIDER = 'asaas';
 
@@ -75,6 +41,22 @@ function errorMessage(error: unknown, fallback: string) {
     return String((error as { message?: unknown }).message || fallback);
   }
   return String(error || fallback);
+}
+
+async function timingSafeTokenMatch(received: string, expected: string) {
+  const encoder = new TextEncoder();
+  const [receivedHash, expectedHash] = await Promise.all([
+    crypto.subtle.digest('SHA-256', encoder.encode(received)),
+    crypto.subtle.digest('SHA-256', encoder.encode(expected)),
+  ]);
+  const receivedBytes = new Uint8Array(receivedHash);
+  const expectedBytes = new Uint8Array(expectedHash);
+
+  let diff = 0;
+  for (let i = 0; i < receivedBytes.length; i++) {
+    diff |= receivedBytes[i] ^ expectedBytes[i];
+  }
+  return diff === 0;
 }
 
 function providerSubscriptionId(payload: Record<string, unknown>, entity: Record<string, unknown>) {
@@ -275,20 +257,20 @@ async function processAsaasEvent(
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-  if (req.method !== 'POST') return jsonResponse({ error: 'method_not_allowed' }, 405);
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: getCorsHeaders(req) });
+  if (req.method !== 'POST') return jsonResponse({ error: 'method_not_allowed' }, 405, req);
 
   const expectedToken = Deno.env.get('ASAAS_WEBHOOK_TOKEN');
-  const receivedToken = req.headers.get('asaas-access-token');
-  if (!expectedToken || receivedToken !== expectedToken) {
-    return jsonResponse({ error: 'unauthorized' }, 401);
+  const receivedToken = req.headers.get('asaas-access-token') || '';
+  if (!expectedToken || !(await timingSafeTokenMatch(receivedToken, expectedToken))) {
+    return jsonResponse({ error: 'unauthorized' }, 401, req);
   }
 
   try {
     const payload = await req.json().catch(() => ({}));
     const eventType = String(payload?.event || '');
     const eventId = String(payload?.id || '');
-    if (!eventType || !eventId) return jsonResponse({ error: 'invalid_payload' }, 400);
+    if (!eventType || !eventId) return jsonResponse({ error: 'invalid_payload' }, 400, req);
 
     const entity = entityFromPayload(payload);
     const checkout = checkoutFromPayload(payload);
@@ -300,7 +282,7 @@ Deno.serve(async (req) => {
 
     if (!reference.negocioId && !customerId && !subscriptionId && !checkoutSession) {
       await recordIgnoredEvent(admin, payload, eventType, eventId, 'ignored_unlinked_event', entity);
-      return jsonResponse({ received: true, ignored: true });
+      return jsonResponse({ received: true, ignored: true }, 200, req);
     }
 
     const { data: gatewayEventId, error: recordError } = await admin.rpc('record_gateway_event', {
@@ -317,9 +299,9 @@ Deno.serve(async (req) => {
 
     waitUntil(processAsaasEvent(admin, payload, eventType, eventId, String(gatewayEventId)));
 
-    return jsonResponse({ received: true });
+    return jsonResponse({ received: true }, 200, req);
   } catch (error) {
     console.error('asaas-webhook failed:', error);
-    return jsonResponse({ error: 'webhook_failed' }, 500);
+    return jsonResponse({ error: 'webhook_failed' }, 500, req);
   }
 });
