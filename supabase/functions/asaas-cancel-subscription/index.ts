@@ -1,4 +1,4 @@
-import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { getCorsHeaders, jsonResponse } from '../_shared/cors.ts';
 import { createAdminClient, createUserClient } from '../_shared/supabase.ts';
 
 const ASAAS_PROVIDER = 'asaas';
@@ -57,10 +57,39 @@ async function cancelAsaasSubscription(subscriptionId: string) {
     const asaasError = Array.isArray(data?.errors)
       ? data.errors.map((item: Record<string, unknown>) => item.description || item.message || item.code).filter(Boolean).join(' | ')
       : data?.description || data?.message || JSON.stringify(data);
-    throw new Error(`asaas_cancel_failed: ${asaasError || response.status}`);
+    throw new Error(`asaas_cancel_failed (${response.status}): ${asaasError || 'empty_response'}`);
   }
 
   return data;
+}
+
+function isRetryableAsaasError(error: unknown) {
+  const message = errorMessage(error, '').toLowerCase();
+  const statusMatch = /asaas_cancel_failed \((\d{3})\)/.exec(message);
+  if (statusMatch) {
+    const status = Number(statusMatch[1]);
+    return status === 429 || status >= 500;
+  }
+
+  return message.includes('timeout')
+    || message.includes('network')
+    || message.includes('fetch');
+}
+
+async function cancelAsaasSubscriptionWithRetry(subscriptionId: string, attempts = 3) {
+  let lastError: unknown = null;
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await cancelAsaasSubscription(subscriptionId);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= attempts || !isRetryableAsaasError(error)) break;
+      await sleep(250 * attempt);
+    }
+  }
+
+  throw lastError || new Error('asaas_cancel_failed');
 }
 
 async function cancelBusinessSubscriptionWithRetry(
@@ -118,24 +147,62 @@ async function recordCancelSyncFailure(
   if (insertError) console.error('cancel sync failure log failed:', insertError);
 }
 
+async function fetchPendingCancelSync(
+  admin: ReturnType<typeof createAdminClient>,
+  subscription: Record<string, unknown>,
+  negocioId: string,
+  providerSubscriptionId: string,
+) {
+  if (!providerSubscriptionId) return null;
+
+  const { data, error } = await admin
+    .from('billing_events')
+    .select('id, payload')
+    .eq('provider', ASAAS_PROVIDER)
+    .eq('negocio_id', negocioId)
+    .eq('subscription_id', subscription.id)
+    .eq('provider_subscription_id', providerSubscriptionId)
+    .eq('event_type', 'GATEWAY_CANCELED_DB_SYNC_FAILED')
+    .not('processing_error', 'is', null)
+    .order('received_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error('pending cancel sync lookup failed:', error);
+    return null;
+  }
+  if (!data) return null;
+
+  const payload = (data.payload || {}) as Record<string, unknown>;
+  const providerResponse = (payload.provider_response || {}) as Record<string, unknown>;
+  const responseSubscriptionId = asText(providerResponse.id);
+  if (responseSubscriptionId && responseSubscriptionId !== providerSubscriptionId) return null;
+
+  return {
+    id: String(data.id),
+    payload,
+  };
+}
+
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-  if (req.method !== 'POST') return jsonResponse({ error: 'method_not_allowed' }, 405);
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: getCorsHeaders(req) });
+  if (req.method !== 'POST') return jsonResponse({ error: 'method_not_allowed' }, 405, req);
 
   try {
     const authorization = req.headers.get('authorization') || '';
     if (!authorization.toLowerCase().startsWith('bearer ')) {
-      return jsonResponse({ error: 'not_authenticated' }, 401);
+      return jsonResponse({ error: 'not_authenticated' }, 401, req);
     }
 
     const body = await req.json().catch(() => ({}));
     const negocioId = asText(body?.negocio_id);
-    if (!negocioId) return jsonResponse({ error: 'missing_required_fields' }, 400);
+    if (!negocioId) return jsonResponse({ error: 'missing_required_fields' }, 400, req);
 
     const userClient = createUserClient(authorization);
     const admin = createAdminClient();
     const { data: authData, error: authError } = await userClient.auth.getUser();
-    if (authError || !authData?.user?.id) return jsonResponse({ error: 'not_authenticated' }, 401);
+    if (authError || !authData?.user?.id) return jsonResponse({ error: 'not_authenticated' }, 401, req);
 
     const [{ data: negocio, error: negocioError }, { data: subscription, error: subscriptionError }] = await Promise.all([
       admin.from('negocios').select('id, owner_id').eq('id', negocioId).maybeSingle(),
@@ -148,9 +215,9 @@ Deno.serve(async (req) => {
 
     if (negocioError) throw negocioError;
     if (subscriptionError) throw subscriptionError;
-    if (!negocio || negocio.owner_id !== authData.user.id) return jsonResponse({ error: 'acao_nao_permitida' }, 403);
+    if (!negocio || negocio.owner_id !== authData.user.id) return jsonResponse({ error: 'acao_nao_permitida' }, 403, req);
     if (!subscription || !isSubscriptionCancelable(subscription)) {
-      return jsonResponse({ error: 'subscription_not_cancelable' }, 400);
+      return jsonResponse({ error: 'subscription_not_cancelable' }, 400, req);
     }
 
     let providerPayload: Record<string, unknown> = {
@@ -161,9 +228,42 @@ Deno.serve(async (req) => {
     const provider = String(subscription.provider || '').toLowerCase();
 
     if (provider === ASAAS_PROVIDER && providerSubscriptionId) {
+      const pendingSync = await fetchPendingCancelSync(admin, subscription, negocioId, providerSubscriptionId);
+      if (pendingSync) {
+        try {
+          const billingStatus = await cancelBusinessSubscriptionWithRetry(admin, {
+            p_negocio_id: negocioId,
+            p_actor_id: authData.user.id,
+            p_provider_event_id: `owner_cancel_retry:${negocioId}:${crypto.randomUUID()}`,
+            p_provider_payload: pendingSync.payload,
+          }, 5);
+
+          await admin
+            .from('billing_events')
+            .update({
+              processing_error: null,
+              processed_at: new Date().toISOString(),
+            })
+            .eq('id', pendingSync.id);
+
+          return jsonResponse({ billing_status: billingStatus }, 200, req);
+        } catch (syncError) {
+          console.error('pending cancel sync retry failed:', syncError);
+          await admin
+            .from('billing_events')
+            .update({
+              processing_error: errorMessage(syncError, 'sync_retry_failed_again'),
+              processed_at: new Date().toISOString(),
+            })
+            .eq('id', pendingSync.id);
+
+          return jsonResponse({ error: 'sync_retry_failed_again' }, 409, req);
+        }
+      }
+
       providerPayload = {
         ...providerPayload,
-        provider_response: await cancelAsaasSubscription(providerSubscriptionId),
+        provider_response: await cancelAsaasSubscriptionWithRetry(providerSubscriptionId),
       };
     }
 
@@ -190,9 +290,9 @@ Deno.serve(async (req) => {
       throw cancelError;
     }
 
-    return jsonResponse({ billing_status: billingStatus });
+    return jsonResponse({ billing_status: billingStatus }, 200, req);
   } catch (error) {
     console.error('asaas-cancel-subscription failed:', error);
-    return jsonResponse({ error: errorMessage(error, 'cancel_failed') }, 400);
+    return jsonResponse({ error: errorMessage(error, 'cancel_failed') }, 400, req);
   }
 });
