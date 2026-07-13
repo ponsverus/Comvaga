@@ -255,7 +255,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     setNegocio,
     profissionais,
     entregas,
-    setEntregas,
+    entregaPagesByProf,
     agendamentos,
     agendamentosHasMore,
     agendamentosLoadingMore,
@@ -271,6 +271,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     reloadNegocio,
     reloadProfissionais,
     reloadEntregas,
+    loadEntregasPage,
     reloadAgendamentos,
     loadMoreAgendamentos,
     loadMoreGaleria,
@@ -488,7 +489,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     uiPrompt,
     setNegocio,
     setGaleriaItems,
-    setEntregas,
     formInfo,
     setFormInfo,
     formEntrega,
@@ -568,6 +568,15 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
   const entregasPorProf = useMemo(() => {
     const map = new Map(); for (const p of profissionais) map.set(p.id, []); for (const s of entregas) { if (!map.has(s.profissional_id)) map.set(s.profissional_id, []); map.get(s.profissional_id).push(s); } return map;
   }, [profissionais, entregas]);
+
+  const entregasCountByProf = useMemo(() => {
+    const map = new Map();
+    for (const p of profissionais) {
+      const total = entregaPagesByProf?.[p.id]?.totalCount;
+      map.set(p.id, Number.isFinite(Number(total)) ? Number(total) : (entregasPorProf.get(p.id) || []).length);
+    }
+    return map;
+  }, [entregaPagesByProf, entregasPorProf, profissionais]);
 
   const faturamentoPorProfissionalHoje   = useMemo(() => { const arr = metricsHoje?.today?.por_profissional || []; if (!Array.isArray(arr)) return []; return arr.map(x => { if (!x) return null; const nome = String(x.nome ?? '').trim(); const valor = Number(x.faturamento ?? x.valor ?? 0); if (!nome) return null; return [nome, Number.isFinite(valor) ? valor : 0]; }).filter(Boolean).sort((a, b) => Number(b[1]) - Number(a[1])); }, [metricsHoje]);
   const faturamentoPorProfissionalFiltro = useMemo(() => { const arr = metricsDia?.selected_day?.por_profissional || []; if (!Array.isArray(arr)) return []; return arr.map(x => { if (!x) return null; const nome = String(x.nome ?? '').trim(); const valor = Number(x.faturamento ?? x.valor ?? 0); if (!nome) return null; return [nome, Number.isFinite(valor) ? valor : 0]; }).filter(Boolean).sort((a, b) => Number(b[1]) - Number(a[1])); }, [metricsDia]);
@@ -871,6 +880,8 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
                 btnAddLabel={btnAddLabel}
                 profissionais={profissionais}
                 entregasPorProf={entregasPorProf}
+                entregaPagesByProf={entregaPagesByProf}
+                loadEntregasPage={loadEntregasPage}
                 counterSingular={counterSingular}
                 counterPlural={counterPlural}
                 emptyListMsg={emptyListMsg}
@@ -891,6 +902,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
               todayDow={serverNow?.dow ?? null}
               parceiroProfissional={parceiroProfissional}
               entregas={entregas}
+              entregasCountByProf={entregasCountByProf}
                 counterPlural={counterPlural}
                 aprovarParceiro={aprovarParceiro}
                 excluirProfissional={excluirProfissional}
