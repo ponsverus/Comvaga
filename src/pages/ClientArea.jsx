@@ -114,7 +114,8 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       setSearchRows(Array.isArray(data) ? data : []);
     } catch (error) {
       setSearchRows([]);
-      setSearchError(error?.message || 'Não foi possível realizar a busca agora.');
+      console.error('Client search error:', error);
+      setSearchError('Não foi possível realizar a busca agora.');
     } finally {
       setSearching(false);
     }
@@ -222,7 +223,8 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
         setLoadError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
         uiAlert(requestKey, 'warning');
       } else {
-        setLoadError(error?.message || 'Erro ao carregar dados.');
+        console.error('Client area load error:', error);
+        setLoadError('Erro ao carregar dados.');
         uiAlert('clientArea.load_data_error', 'warning');
       }
       setAgendamentos([]);
@@ -495,7 +497,8 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
         feedback.showMessage('alerts.request_timeout', { variant: 'warning' });
         return;
       }
-      feedback.showMessage('clientArea.depoimento_send_error', { msg: e?.message || '' });
+      console.error('Client review send error:', e);
+      feedback.showMessage('clientArea.depoimento_send_error');
     } finally {
       setDepoimentoLoading(false);
     }
