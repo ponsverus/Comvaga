@@ -76,19 +76,56 @@ export async function fetchBusinessBookingAvailability(negocioId) {
   return data || null;
 }
 
-export async function fetchVitrineEntregas(profissionalIds) {
-  if (!profissionalIds.length) return [];
+function normalizeEntregaPageRows(rows) {
+  return (rows || []).map((row) => {
+    const normalized = { ...row };
+    delete normalized.total_count;
+    return normalized;
+  });
+}
+
+export async function fetchVitrineEntregasPage(profissionalId, { limit = 4, offset = 0 } = {}) {
+  if (!profissionalId) return { rows: [], totalCount: 0 };
+  const { data, error } = await withTimeout(
+    supabase.rpc('get_entregas_vitrine_paginadas', {
+      p_profissional_id: profissionalId,
+      p_limit: Math.max(1, Number(limit) || 1),
+      p_offset: Math.max(0, Number(offset) || 0),
+    }),
+    7000,
+    'entregas-vitrine'
+  );
+  if (error) throw error;
+  return {
+    rows: normalizeEntregaPageRows(data),
+    totalCount: Number(data?.[0]?.total_count || 0),
+  };
+}
+
+export async function fetchVitrineEntregaById({ entregaId, profissionalId }) {
+  if (!entregaId || !profissionalId) return null;
   const { data, error } = await withTimeout(
     supabase
       .from('entregas')
       .select('id, negocio_id, profissional_id, nome, duracao_minutos, preco, preco_promocional, ativo')
-      .in('profissional_id', profissionalIds)
-      .eq('ativo', true),
+      .eq('id', entregaId)
+      .eq('profissional_id', profissionalId)
+      .eq('ativo', true)
+      .is('excluido_em', null)
+      .is('motivo_excluido', null)
+      .maybeSingle(),
     7000,
-    'entregas'
+    'entrega-vitrine-id'
   );
   if (error) throw error;
-  return data || [];
+  if (!data) return null;
+  const preco = Number(data.preco ?? 0);
+  const promo = Number(data.preco_promocional ?? 0);
+  const temPromo = Number.isFinite(promo) && promo > 0 && promo < preco;
+  return {
+    ...data,
+    preco_final: temPromo ? promo : preco,
+  };
 }
 
 export async function fetchVitrineGaleria(negocioId, { limit = null, offset = 0 } = {}) {
