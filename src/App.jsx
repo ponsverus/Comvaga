@@ -249,8 +249,9 @@ export default function App() {
         setOnboardingStatus(null);
         setProfessionalRole(null);
         setAccessState('active');
-        setFatalError(e?.message || 'Falha ao carregar perfil.');
+        setFatalError('Falha ao carregar perfil.');
       });
+      console.error('Profile load error:', e);
       return null;
     } finally {
       safeSet(() => setTypeLoading(false));
