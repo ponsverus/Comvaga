@@ -27,6 +27,7 @@ export default function VitrineDepoimentosSection({
   reviewRef,
   reviewState,
   reviewActions,
+  pagination,
 }) {
   const labelClass = isLight ? 'text-vmuted' : 'text-gray-500';
   const inputClass = isLight
@@ -79,7 +80,14 @@ export default function VitrineDepoimentosSection({
           </div>
         </div>
 
-        <DepoimentosPaginados depoimentos={depoimentos} nomeNegocioLabel={nomeNegocioLabel} isLight={isLight} />
+        <DepoimentosPaginados
+          depoimentos={depoimentos}
+          nomeNegocioLabel={nomeNegocioLabel}
+          isLight={isLight}
+          hasMore={!!pagination?.hasMore}
+          loadingMore={!!pagination?.loadingMore}
+          onLoadMore={pagination?.onLoadMore}
+        />
       </div>
     </section>
   );
