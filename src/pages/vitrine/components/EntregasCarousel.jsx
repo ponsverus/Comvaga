@@ -150,6 +150,11 @@ function EntregaCard({
 
 export default function EntregasCarousel({
   lista,
+  pages = null,
+  totalCount = null,
+  loadingPage = null,
+  version = 0,
+  onLoadPage,
   profissional,
   selecaoProfId,
   servicosSelecionados,
@@ -163,9 +168,18 @@ export default function EntregasCarousel({
   const [animDir, setAnimDir] = useState(null);
   const [exibindo, setExibindo] = useState(0);
   const [animando, setAnimando] = useState(false);
+  const [loadingTargetPage, setLoadingTargetPage] = useState(null);
   const touchStartX = useRef(null);
   const animationTimeoutRef = useRef(null);
-  const totalPaginas = Math.ceil(lista.length / ENTREGAS_POR_PAGINA);
+  const totalItens = Number.isFinite(Number(totalCount)) ? Number(totalCount) : lista.length;
+  const totalPaginas = Math.ceil(totalItens / ENTREGAS_POR_PAGINA);
+  const getPageItems = (pageIndex) => {
+    if (pages && Object.prototype.hasOwnProperty.call(pages, pageIndex)) return pages[pageIndex] || [];
+    return lista.slice(
+      pageIndex * ENTREGAS_POR_PAGINA,
+      pageIndex * ENTREGAS_POR_PAGINA + ENTREGAS_POR_PAGINA
+    );
+  };
 
   useEffect(() => {
     if (animationTimeoutRef.current) {
@@ -176,7 +190,8 @@ export default function EntregasCarousel({
     setExibindo(0);
     setAnimDir(null);
     setAnimando(false);
-  }, [profissional.id]);
+    setLoadingTargetPage(null);
+  }, [profissional.id, version]);
 
   useEffect(() => {
     const ultimaPagina = Math.max(totalPaginas - 1, 0);
@@ -195,9 +210,24 @@ export default function EntregasCarousel({
     if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
   }, []);
 
-  const irPara = (idx) => {
+  const ensurePage = async (idx) => {
+    if (!pages || Object.prototype.hasOwnProperty.call(pages, idx) || typeof onLoadPage !== 'function') return true;
+    try {
+      setLoadingTargetPage(idx);
+      await onLoadPage(profissional.id, idx);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setLoadingTargetPage(null);
+    }
+  };
+
+  const irPara = async (idx) => {
     const alvo = Math.max(0, Math.min(idx, totalPaginas - 1));
-    if (alvo === pagina || animando) return;
+    if (alvo === pagina || animando || loadingTargetPage !== null || loadingPage !== null) return;
+    const loaded = await ensurePage(alvo);
+    if (!loaded) return;
     const dir = alvo > pagina ? 'left' : 'right';
     setAnimDir(dir);
     setAnimando(true);
@@ -222,18 +252,12 @@ export default function EntregasCarousel({
     touchStartX.current = null;
   };
 
-  if (!lista.length) return <p className="text-vmuted font-normal">{emptyMsg}</p>;
+  if (!totalItens) return <p className="text-vmuted font-normal">{emptyMsg}</p>;
 
   const paginaAnterior = exibindo;
   const paginaAlvo = pagina;
-  const itensAntigos = lista.slice(
-    paginaAnterior * ENTREGAS_POR_PAGINA,
-    paginaAnterior * ENTREGAS_POR_PAGINA + ENTREGAS_POR_PAGINA
-  );
-  const itensNovos = lista.slice(
-    paginaAlvo * ENTREGAS_POR_PAGINA,
-    paginaAlvo * ENTREGAS_POR_PAGINA + ENTREGAS_POR_PAGINA
-  );
+  const itensAntigos = getPageItems(paginaAnterior);
+  const itensNovos = getPageItems(paginaAlvo);
   const itensMostrados = animando ? itensAntigos : itensNovos;
   const translateSaindo = animDir === 'left' ? '-100%' : animDir === 'right' ? '100%' : '0%';
   const translateEntrando = animDir === 'left' ? '100%' : animDir === 'right' ? '-100%' : '0%';
@@ -298,7 +322,7 @@ export default function EntregasCarousel({
       </div>
       {totalPaginas > 1 && (
         <div className="flex items-center justify-center gap-3 mt-4">
-          <button type="button" onClick={() => irPara(pagina - 1)} disabled={pagina === 0} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}>
+          <button type="button" onClick={() => irPara(pagina - 1)} disabled={pagina === 0 || loadingTargetPage !== null || loadingPage !== null} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}>
             <ChevronLeft className="w-4 h-4" />
           </button>
           {Array.from({ length: totalPaginas }).map((_, i) => (
@@ -310,7 +334,7 @@ export default function EntregasCarousel({
               aria-label={`Página ${i + 1}`}
             />
           ))}
-          <button type="button" onClick={() => irPara(pagina + 1)} disabled={pagina === totalPaginas - 1} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}>
+          <button type="button" onClick={() => irPara(pagina + 1)} disabled={pagina === totalPaginas - 1 || loadingTargetPage !== null || loadingPage !== null} className={`p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${navBtnCl}`}>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
