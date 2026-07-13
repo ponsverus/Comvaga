@@ -324,7 +324,8 @@ export function useDashboardBootstrap({
         setError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
         uiAlert(requestKey, 'warning');
       } else {
-        setError(e?.message || 'Erro inesperado.');
+        console.error('Dashboard bootstrap error:', e);
+        setError('Erro inesperado.');
       }
       setBootstrapState('error');
     }
