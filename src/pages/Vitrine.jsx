@@ -455,9 +455,10 @@ export default function Vitrine({ user, userType, professionalRole = null, onLog
         alertKey('depoimento_rate_limit', 'Limite de depoimentos atingido', 'Você já enviou muitos depoimentos hoje.\n\nTente novamente amanhã.', 'ENTENDI');
         return;
       }
+      console.error('Vitrine review send error:', e);
       openAlert({
         title: getMsg('depoimento_send_error_title', 'Erro ao enviar depoimento'),
-        body: `${getMsg('depoimento_send_error_body', 'Erro ao enviar depoimento:')} ${e?.message || ''}`,
+        body: getMsg('depoimento_send_error_body', 'Erro ao enviar seu depoimento agora. Tente novamente em instantes.'),
         buttonText: getMsg('common_ok', 'ENTENDI'),
       });
     }
