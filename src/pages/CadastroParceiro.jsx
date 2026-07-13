@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 import { ptBR } from '../feedback/messages/ptBR';
+import { getParceiroCadastroAlert } from '../utils/friendlyErrors';
 
 const msgs = ptBR.parceiroCadastro;
 
@@ -108,7 +109,8 @@ export default function CadastroParceiro({ onLogin, suppressAuthRef }) {
       onLogin?.(signUpData.user, 'professional', 'completed', 'active', 'partner');
       navigate('/selecionar-negocio-parceiro', { replace: true });
     } catch (e) {
-      setAlerta({ body: e?.message || msgs.unexpected_error.body, variant: 'erro' });
+      setAlerta(getParceiroCadastroAlert(e, msgs));
+      console.error('Partner signup error:', e);
       await supabase.auth.signOut();
     } finally {
       if (suppressAuthRef) suppressAuthRef.current = false;
