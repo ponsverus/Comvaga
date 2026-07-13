@@ -12,12 +12,15 @@ import { getRequestErrorKey } from '../../../utils/requestError';
 
 const EMPTY_NOW = { ts: null, dow: 0, date: '', source: 'db', minutes: 0 };
 const GALERIA_PAGE_SIZE = 12;
+const DEPOIMENTOS_PAGE_SIZE = 12;
 
 export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = null }) {
   const [negocio, setNegocio] = useState(null);
   const [profissionais, setProfissionais] = useState([]);
   const [entregas, setEntregas] = useState([]);
   const [depoimentos, setDepoimentos] = useState([]);
+  const [depoimentosHasMore, setDepoimentosHasMore] = useState(false);
+  const [depoimentosLoadingMore, setDepoimentosLoadingMore] = useState(false);
   const [galeriaItems, setGaleriaItems] = useState([]);
   const [galeriaHasMore, setGaleriaHasMore] = useState(false);
   const [galeriaLoadingMore, setGaleriaLoadingMore] = useState(false);
@@ -34,9 +37,27 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
   }, [rpcSequence]);
 
   const refreshDepoimentos = useCallback(async (negocioId) => {
-    const deps = await fetchVitrineDepoimentos(negocioId);
-    setDepoimentos(deps);
-    return deps;
+    const deps = await fetchVitrineDepoimentos(negocioId, { limit: DEPOIMENTOS_PAGE_SIZE + 1, offset: 0 });
+    const visibleRows = deps.slice(0, DEPOIMENTOS_PAGE_SIZE);
+    setDepoimentos(visibleRows);
+    setDepoimentosHasMore(deps.length > DEPOIMENTOS_PAGE_SIZE);
+    return visibleRows;
+  }, []);
+
+  const applyDepoimentosPage = useCallback((rows, mode = 'replace') => {
+    const safeRows = rows || [];
+    const visibleRows = safeRows.slice(0, DEPOIMENTOS_PAGE_SIZE);
+    setDepoimentosHasMore(safeRows.length > DEPOIMENTOS_PAGE_SIZE);
+
+    if (mode === 'append') {
+      setDepoimentos((current) => {
+        const existingIds = new Set(current.map((item) => item.id));
+        return [...current, ...visibleRows.filter((item) => !existingIds.has(item.id))];
+      });
+      return;
+    }
+
+    setDepoimentos(visibleRows);
   }, []);
 
   const applyGaleriaPage = useCallback((rows, mode = 'replace') => {
@@ -70,6 +91,22 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
     }
   }, [applyGaleriaPage, galeriaHasMore, galeriaItems.length, galeriaLoadingMore, negocio?.id]);
 
+  const loadMoreDepoimentos = useCallback(async () => {
+    if (!negocio?.id || depoimentosLoadingMore || !depoimentosHasMore) return;
+
+    try {
+      setDepoimentosLoadingMore(true);
+      const rows = await fetchVitrineDepoimentos(negocio.id, {
+        limit: DEPOIMENTOS_PAGE_SIZE + 1,
+        offset: depoimentos.length,
+      });
+      applyDepoimentosPage(rows, 'append');
+      return rows.slice(0, DEPOIMENTOS_PAGE_SIZE).length > 0;
+    } finally {
+      setDepoimentosLoadingMore(false);
+    }
+  }, [applyDepoimentosPage, depoimentos.length, depoimentosHasMore, depoimentosLoadingMore, negocio?.id]);
+
   const loadVitrine = useCallback(async () => {
     const runId = loadRunRef.current + 1;
     loadRunRef.current = runId;
@@ -92,6 +129,8 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
         setProfissionais([]);
         setEntregas([]);
         setDepoimentos([]);
+        setDepoimentosHasMore(false);
+        setDepoimentosLoadingMore(false);
         setGaleriaItems([]);
         setGaleriaHasMore(false);
         setGaleriaLoadingMore(false);
@@ -120,13 +159,13 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
       const [entregasData, galeriaData, deps] = await Promise.all([
         fetchVitrineEntregas(profissionalIds),
         fetchVitrineGaleria(negocioData.id, { limit: GALERIA_PAGE_SIZE + 1, offset: 0 }),
-        fetchVitrineDepoimentos(negocioData.id),
+        fetchVitrineDepoimentos(negocioData.id, { limit: DEPOIMENTOS_PAGE_SIZE + 1, offset: 0 }),
       ]);
       if (loadRunRef.current !== runId) return;
 
       setEntregas(entregasData);
       applyGaleriaPage(galeriaData);
-      setDepoimentos(deps);
+      applyDepoimentosPage(deps);
     } catch (e) {
       if (loadRunRef.current !== runId) return;
       const requestKey = getRequestErrorKey(e);
@@ -140,6 +179,8 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
       setProfissionais([]);
       setEntregas([]);
       setDepoimentos([]);
+      setDepoimentosHasMore(false);
+      setDepoimentosLoadingMore(false);
       setGaleriaItems([]);
       setGaleriaHasMore(false);
       setGaleriaLoadingMore(false);
@@ -150,7 +191,7 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
         setLoading(false);
       }
     }
-  }, [applyGaleriaPage, authUserId, fetchNowFromDb, getMsg, slug]);
+  }, [applyDepoimentosPage, applyGaleriaPage, authUserId, fetchNowFromDb, getMsg, slug]);
 
   useEffect(() => {
     loadVitrine();
@@ -168,6 +209,8 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
     profissionais,
     entregas,
     depoimentos,
+    depoimentosHasMore,
+    depoimentosLoadingMore,
     galeriaItems,
     galeriaHasMore,
     galeriaLoadingMore,
@@ -177,6 +220,7 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
     serverNow,
     fetchNowFromDb,
     refreshDepoimentos,
+    loadMoreDepoimentos,
     loadMoreGaleria,
     loadVitrine,
   };
