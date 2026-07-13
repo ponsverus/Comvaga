@@ -274,6 +274,7 @@ export default function Vitrine({ user, userType, professionalRole = null, onLog
     negocio,
     profissionais,
     entregas,
+    entregaPagesByProf,
     depoimentos,
     depoimentosHasMore,
     depoimentosLoadingMore,
@@ -288,6 +289,7 @@ export default function Vitrine({ user, userType, professionalRole = null, onLog
     refreshDepoimentos,
     loadMoreDepoimentos,
     loadMoreGaleria,
+    loadEntregasPage,
     loadVitrine,
   } = useVitrineBootstrap({
     slug,
@@ -517,6 +519,7 @@ export default function Vitrine({ user, userType, professionalRole = null, onLog
     negocio,
     profissionais,
     entregas,
+    entregaPagesByProf,
     depoimentos,
     galeriaItems,
     isProfessional,
@@ -603,6 +606,7 @@ export default function Vitrine({ user, userType, professionalRole = null, onLog
         emptyListMsg={emptyListMsg}
         counterSingular={counterSingular}
         counterPlural={counterPlural}
+        onLoadPage={loadEntregasPage}
         booking={{
           ...bookingSectionState,
           isProfessional: isProfessional && !bookingSectionState.isAssistedBooking,

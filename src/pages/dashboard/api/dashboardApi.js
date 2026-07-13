@@ -312,21 +312,37 @@ export async function cancelarAgendamentoProfissional(agendamentoId) {
   return data;
 }
 
-export async function fetchEntregas(negocioId, profissionalIds) {
+export async function fetchEntregasPage({
+  negocioId,
+  profissionalId,
+  limit = 6,
+  offset = 0,
+}) {
+  if (!negocioId || !profissionalId) return { rows: [], totalCount: 0 };
   const { data, error } = await withTimeout(
-    supabase
-      .from('entregas')
-      .select('*, profissionais (id, nome)')
-      .eq('negocio_id', negocioId)
-      .in('profissional_id', profissionalIds)
-      .is('motivo_excluido', null)
-      .order('created_at', { ascending: false }),
-    6000,
-    'entregas-dashboard'
+    supabase.rpc('get_entregas_dashboard_paginadas', {
+      p_negocio_id: negocioId,
+      p_profissional_id: profissionalId,
+      p_limit: Math.max(1, Number(limit) || 1),
+      p_offset: Math.max(0, Number(offset) || 0),
+    }),
+    7000,
+    'entregas-dashboard-page'
   );
 
   if (error) throw error;
-  return data || [];
+  const rows = (data || []).map((item) => {
+    const { prof_id: profId, prof_nome: profNome, ...row } = item;
+    delete row.total_count;
+    return {
+      ...row,
+      profissionais: { id: profId, nome: profNome },
+    };
+  });
+  return {
+    rows,
+    totalCount: Number(data?.[0]?.total_count || 0),
+  };
 }
 
 export async function fetchAgendamentosNegocio({

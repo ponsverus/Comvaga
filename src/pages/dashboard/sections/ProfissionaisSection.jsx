@@ -26,6 +26,7 @@ export default function ProfissionaisSection({
   profissionais,
   parceiroProfissional,
   entregas,
+  entregasCountByProf,
   counterPlural,
   todayDow,
   aprovarParceiro,
@@ -60,6 +61,7 @@ export default function ProfissionaisSection({
           const dotClass = STATUS_COLOR_CLASS[label] || 'bg-gray-500';
           const statusLabelView = label === 'ALMOCO' ? 'PAUSA' : p.status_label;
           const isEuMesmo = parceiroProfissional?.id === p.id;
+          const entregasCount = entregasCountByProf?.get?.(p.id) ?? entregas.filter((s) => s.profissional_id === p.id).length;
           const horarios = normalizeProfissionalHorarios(p);
           const horarioHoje = getHorarioPorDia(horarios, todayDow);
           const almocoInicio = horarioHoje?.almoco_inicio ? String(horarioHoje.almoco_inicio).slice(0, 5) : null;
@@ -98,7 +100,7 @@ export default function ProfissionaisSection({
 
               {!isPendente && (
                 <>
-                  <div className="text-sm text-gray-400 mb-3">{entregas.filter((s) => s.profissional_id === p.id).length} {counterPlural}</div>
+                  <div className="text-sm text-gray-400 mb-3">{entregasCount} {counterPlural}</div>
                   <div className="text-xs text-gray-500 mb-3">
                     <Clock className="w-4 h-4 inline mr-1" />{pausaTexto}
                   </div>

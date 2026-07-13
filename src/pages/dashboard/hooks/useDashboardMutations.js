@@ -45,7 +45,6 @@ export function useDashboardMutations({
   uiPrompt,
   setNegocio,
   setGaleriaItems,
-  setEntregas,
   formInfo,
   setFormInfo,
   formEntrega,
@@ -353,7 +352,7 @@ export function useDashboardMutations({
       await insertEntrega(payload);
       await uiAlert(`dashboard.business.${businessGroup}.entrega_created`, 'success');
       resetEntregaForm();
-      await reloadEntregas();
+      await reloadEntregas(negocio.id, [profId]);
     } catch (e2) {
       const billingKey = getBillingErrorKey(e2);
       const msg = String(e2?.message || '');
@@ -401,7 +400,10 @@ export function useDashboardMutations({
         await uiAlert(`dashboard.business.${businessGroup}.entrega_updated`, 'success');
       }
       resetEntregaForm();
-      await reloadEntregas();
+      await reloadEntregas(
+        negocio.id,
+        mudouProfissional ? [entregaAtual.profissional_id, profId].filter(Boolean) : [profId]
+      );
     } catch (e2) {
       const billingKey = getBillingErrorKey(e2);
       const msg = String(e2?.message || '');
@@ -432,7 +434,7 @@ export function useDashboardMutations({
     try {
       await removeEntregaSeguramente(entrega.id);
       await uiAlert(`dashboard.business.${businessGroup}.entrega_deleted`, 'success');
-      await reloadEntregas();
+      await reloadEntregas(negocio.id, [entrega.profissional_id]);
     } catch (error) {
       const requestKey = getRequestErrorKey(error, {
         entregaFutureBookingsKey: `dashboard.business.${businessGroup}.entrega_future_bookings_blocked`,
@@ -459,7 +461,7 @@ export function useDashboardMutations({
         await ativarEntregaSeguramente(entrega.id);
         await uiAlert(`dashboard.business.${businessGroup}.entrega_activated`, 'success');
       }
-      await reloadEntregas();
+      await reloadEntregas(negocio.id, [entrega.profissional_id]);
     } catch (error) {
       const requestKey = getRequestErrorKey(error, {
         entregaFutureBookingsKey: `dashboard.business.${businessGroup}.entrega_future_bookings_blocked`,
@@ -527,7 +529,7 @@ export function useDashboardMutations({
       await uiAlert(isSelfProfessional ? 'dashboard.professional_self_deleted' : 'dashboard.professional_deleted', 'success');
       const profs = await reloadProfissionais();
       if (profs?.length) await reloadEntregas(negocio.id, profs.map((item) => item.id));
-      else setEntregas([]);
+      else await reloadEntregas(negocio.id, []);
     } catch (error) {
       const requestKey = getRequestErrorKey(error);
       const msg = String(error?.message || '');

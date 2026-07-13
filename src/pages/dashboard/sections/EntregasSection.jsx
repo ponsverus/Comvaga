@@ -6,6 +6,8 @@ const ENTREGAS_PER_PAGE = 6;
 function ProfissionalEntregasBlock({
   profissional,
   lista,
+  pageState,
+  onLoadPage,
   counterSingular,
   counterPlural,
   emptyListMsg,
@@ -18,29 +20,50 @@ function ProfissionalEntregasBlock({
   allowOffers = true,
 }) {
   const [page, setPage] = useState(0);
-  const pageCount = Math.max(1, Math.ceil(lista.length / ENTREGAS_PER_PAGE));
+  const totalCount = Number.isFinite(Number(pageState?.totalCount)) ? Number(pageState.totalCount) : lista.length;
+  const pageCount = Math.max(1, Math.ceil(totalCount / ENTREGAS_PER_PAGE));
   const currentPage = Math.min(page, pageCount - 1);
+  const loadingPage = pageState?.loadingPage ?? null;
 
   useEffect(() => {
     setPage((prev) => Math.min(prev, pageCount - 1));
   }, [pageCount]);
 
+  useEffect(() => {
+    setPage(0);
+  }, [profissional.id, pageState?.version]);
+
   const visibleEntregas = useMemo(() => {
+    const pages = pageState?.pages || {};
+    if (Object.prototype.hasOwnProperty.call(pages, currentPage)) return pages[currentPage] || [];
     const start = currentPage * ENTREGAS_PER_PAGE;
     return lista.slice(start, start + ENTREGAS_PER_PAGE);
-  }, [currentPage, lista]);
+  }, [currentPage, lista, pageState?.pages]);
 
-  const goPrev = () => setPage((prev) => Math.max(prev - 1, 0));
-  const goNext = () => setPage((prev) => Math.min(prev + 1, pageCount - 1));
+  const goToPage = async (targetPage) => {
+    const nextPage = Math.max(0, Math.min(targetPage, pageCount - 1));
+    if (nextPage === currentPage || loadingPage !== null) return;
+    const pages = pageState?.pages || {};
+    if (!Object.prototype.hasOwnProperty.call(pages, nextPage) && typeof onLoadPage === 'function') {
+      try {
+        await onLoadPage(profissional.id, nextPage);
+      } catch {
+        return;
+      }
+    }
+    setPage(nextPage);
+  };
+  const goPrev = () => goToPage(currentPage - 1);
+  const goNext = () => goToPage(currentPage + 1);
 
   return (
     <div className="bg-dark-200 border border-gray-800 rounded-custom p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="font-normal text-lg uppercase">{profissional.nome}</div>
-        <div className="text-xs text-gray-500">{lista.length} {lista.length === 1 ? counterSingular : counterPlural}</div>
+        <div className="text-xs text-gray-500">{totalCount} {totalCount === 1 ? counterSingular : counterPlural}</div>
       </div>
 
-      {lista.length ? (
+      {totalCount ? (
         <div>
           <div className="relative md:px-16">
             {pageCount > 1 ? (
@@ -48,7 +71,7 @@ function ProfissionalEntregasBlock({
                 <button
                   type="button"
                   onClick={goPrev}
-                  disabled={currentPage === 0}
+                  disabled={currentPage === 0 || loadingPage !== null}
                   className="hidden md:inline-flex absolute left-3 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -56,7 +79,7 @@ function ProfissionalEntregasBlock({
                 <button
                   type="button"
                   onClick={goNext}
-                  disabled={currentPage === pageCount - 1}
+                  disabled={currentPage === pageCount - 1 || loadingPage !== null}
                   className="hidden md:inline-flex absolute right-3 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
                 >
                   <ChevronRight className="w-5 h-5" />
@@ -105,7 +128,7 @@ function ProfissionalEntregasBlock({
               <button
                 type="button"
                 onClick={goPrev}
-                disabled={currentPage === 0}
+                disabled={currentPage === 0 || loadingPage !== null}
                 className="inline-flex md:hidden items-center justify-center w-10 h-10 rounded-full border border-gray-700 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -116,7 +139,7 @@ function ProfissionalEntregasBlock({
                   <button
                     key={index}
                     type="button"
-                    onClick={() => setPage(index)}
+                    onClick={() => goToPage(index)}
                     className={`w-2.5 h-2.5 rounded-full transition-colors ${index === currentPage ? 'bg-primary' : 'bg-gray-600 hover:bg-gray-400'}`}
                     aria-label={`Ir para pagina ${index + 1}`}
                   />
@@ -126,7 +149,7 @@ function ProfissionalEntregasBlock({
               <button
                 type="button"
                 onClick={goNext}
-                disabled={currentPage === pageCount - 1}
+                disabled={currentPage === pageCount - 1 || loadingPage !== null}
                 className="inline-flex md:hidden items-center justify-center w-10 h-10 rounded-full border border-gray-700 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -148,6 +171,8 @@ export default function EntregasSection({
   btnAddLabel,
   profissionais,
   entregasPorProf,
+  entregaPagesByProf = {},
+  loadEntregasPage,
   counterSingular,
   counterPlural,
   emptyListMsg,
@@ -173,11 +198,14 @@ export default function EntregasSection({
               if (a.ativo !== b.ativo) return a.ativo === false ? 1 : -1;
               return Number(b.preco || 0) - Number(a.preco || 0);
             });
+            const pageState = entregaPagesByProf?.[p.id] || { pages: { 0: lista }, totalCount: lista.length, loadingPage: null, version: 0 };
             return (
               <ProfissionalEntregasBlock
                 key={p.id}
                 profissional={p}
                 lista={lista}
+                pageState={pageState}
+                onLoadPage={loadEntregasPage}
                 counterSingular={counterSingular}
                 counterPlural={counterPlural}
                 emptyListMsg={emptyListMsg}

@@ -9,6 +9,7 @@ export function useVitrinePresentation({
   negocio,
   profissionais,
   entregas,
+  entregaPagesByProf = {},
   depoimentos,
   galeriaItems,
   isProfessional,
@@ -90,6 +91,7 @@ export function useVitrinePresentation({
   const profissionaisView = useMemo(() => (
     profissionais.map((prof) => {
       const totalEntregas = (entregasPorProf.get(prof.id) || []).length;
+      const totalEntregasPaginadas = entregaPagesByProf?.[prof.id]?.totalCount;
       const horarioExibicao = getHorarioExibicao(prof);
       const statusKey = resolveProfissionalStatusKey(prof);
       return {
@@ -104,22 +106,31 @@ export function useVitrinePresentation({
         almoco: getAlmocoRange(prof),
         horarioIni: String(horarioExibicao?.horario_inicio || '08:00').slice(0, 5),
         horarioFim: String(horarioExibicao?.horario_fim || '18:00').slice(0, 5),
-        totalEntregas,
+        totalEntregas: Number.isFinite(Number(totalEntregasPaginadas)) ? Number(totalEntregasPaginadas) : totalEntregas,
       };
     })
-  ), [depoimentosPorProf, entregasPorProf, getAlmocoRange, getHorarioExibicao, getPublicUrl, profissionais]);
+  ), [depoimentosPorProf, entregaPagesByProf, entregasPorProf, getAlmocoRange, getHorarioExibicao, getPublicUrl, profissionais]);
 
   const entregaCards = useMemo(() => (
     profissionais.map((prof) => {
-      const lista = (entregasPorProf.get(prof.id) || []).slice().sort((a, b) => {
-        const pa = Number(getPrecoFinalServico(a) ?? 0);
-        const pb = Number(getPrecoFinalServico(b) ?? 0);
-        if (pb !== pa) return pb - pa;
-        return String(a.nome || '').localeCompare(String(b.nome || ''));
-      }).map((entrega) => ({ ...entrega, preco_final: getPrecoFinalServico(entrega) }));
-      return { id: prof.id, nome: prof.nome, profissional: prof, lista };
+      const pageState = entregaPagesByProf?.[prof.id] || { pages: {}, totalCount: 0, loadingPage: null, version: 0 };
+      const pages = Object.fromEntries(Object.entries(pageState.pages || {}).map(([page, rows]) => [
+        page,
+        (rows || []).map((entrega) => ({ ...entrega, preco_final: getPrecoFinalServico(entrega) })),
+      ]));
+      const lista = (entregasPorProf.get(prof.id) || []).map((entrega) => ({ ...entrega, preco_final: getPrecoFinalServico(entrega) }));
+      return {
+        id: prof.id,
+        nome: prof.nome,
+        profissional: prof,
+        lista,
+        pages,
+        totalEntregas: Number(pageState.totalCount || 0),
+        loadingPage: pageState.loadingPage,
+        version: pageState.version || 0,
+      };
     })
-  ), [entregasPorProf, getPrecoFinalServico, profissionais]);
+  ), [entregaPagesByProf, entregasPorProf, getPrecoFinalServico, profissionais]);
 
   const galeriaView = useMemo(() => (
     galeriaItems
