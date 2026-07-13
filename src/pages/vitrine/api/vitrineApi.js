@@ -114,9 +114,15 @@ export async function fetchVitrineGaleria(negocioId, { limit = null, offset = 0 
   return data || [];
 }
 
-export async function fetchVitrineDepoimentos(negocioId) {
+export async function fetchVitrineDepoimentos(negocioId, { limit = null, offset = 0 } = {}) {
+  const params = { p_negocio_id: negocioId };
+  if (limit != null) {
+    params.p_limit = Math.max(1, Number(limit) || 1);
+    params.p_offset = Math.max(0, Number(offset) || 0);
+  }
+
   const { data, error } = await withTimeout(
-    supabase.rpc('get_depoimentos_vitrine', { p_negocio_id: negocioId }),
+    supabase.rpc('get_depoimentos_vitrine', params),
     7000,
     'depoimentos'
   );
