@@ -56,7 +56,8 @@ export function useDashboardClientes({ negocioId }) {
         } else if (requestKey === 'alerts.rate_limit_exceeded') {
           setClientesError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
         } else {
-          setClientesError(error?.message || 'Erro ao carregar clientes.');
+          console.error('Dashboard clients load error:', error);
+          setClientesError('Erro ao carregar clientes.');
         }
       })
       .finally(() => {
@@ -82,7 +83,8 @@ export function useDashboardClientes({ negocioId }) {
       } else if (requestKey === 'alerts.rate_limit_exceeded') {
         setClientesError('Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.');
       } else {
-        setClientesError(error?.message || 'Erro ao carregar mais clientes.');
+        console.error('Dashboard clients load more error:', error);
+        setClientesError('Erro ao carregar mais clientes.');
       }
     } finally {
       setClientesLoadingMore(false);
