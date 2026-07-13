@@ -136,9 +136,10 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
       if (error) throw error;
       setLinks(data || []);
     } catch (error) {
+      console.error('Partner business center load error:', error);
       setAlert({
         type: 'error',
-        message: error?.message || msgs.load_error,
+        message: msgs.load_error,
       });
     } finally {
       setLoading(false);
@@ -200,7 +201,8 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
       setSearchRows(data || []);
       if (!data?.length) setAlert({ type: 'warning', message: msgs.search_empty });
     } catch (error) {
-      setAlert({ type: 'error', message: error?.message || msgs.search_error });
+      console.error('Partner business search error:', error);
+      setAlert({ type: 'error', message: msgs.search_error });
     } finally {
       setSearching(false);
     }
@@ -262,7 +264,8 @@ export default function SelecionarNegocioParceiro({ user, onLogout }) {
       } else if (raw.includes('owner_cannot_request_partner_access')) {
         setAlert({ type: 'warning', message: msgs.owner_cannot_request_partner_access });
       } else {
-        setAlert({ type: 'error', message: error?.message || msgs.request_error });
+        console.error('Partner access request error:', error);
+        setAlert({ type: 'error', message: msgs.request_error });
       }
     } finally {
       setRequestingId(null);

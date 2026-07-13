@@ -133,7 +133,8 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
       if (requestKey === 'alerts.request_timeout') {
         setError(getMsg('load_timeout', 'Demorou demais para carregar. Tente novamente.'));
       } else {
-        setError(e?.message || getMsg('load_error', 'Erro ao carregar a vitrine.'));
+        console.error('Vitrine load error:', e);
+        setError(getMsg('load_error', 'Erro ao carregar a vitrine.'));
       }
       setNegocio(null);
       setProfissionais([]);

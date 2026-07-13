@@ -864,6 +864,8 @@ export const ptBR = {
     email_invalid:                  { body: 'Informe um e-mail válido para continuar.', variant: 'erro' },
     senha_too_short:                { body: 'A senha deve ter pelo menos 7 caracteres.', variant: 'erro' },
     credentials_invalid:            { body: 'E-mail ou senha incorretos.', variant: 'erro' },
+    email_not_confirmed:            { body: 'Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada e spam.', variant: 'aviso' },
+    rate_limit_exceeded:            { body: 'Muitas tentativas em pouco tempo. Aguarde um minuto e tente novamente.', variant: 'aviso' },
     auth_error:                     { body: 'Erro ao autenticar agora. Tente novamente.', variant: 'erro' },
     not_partner:                    { body: 'Este login pertence a outro tipo de conta para este negócio.', variant: 'erro' },
     unexpected_error:               { body: 'Ocorreu um erro inesperado. Tente novamente.', variant: 'erro' },
@@ -1091,7 +1093,7 @@ export const ptBR = {
     },
     depoimento_send_error: {
       title: 'Erro ao enviar depoimento',
-      body: 'Erro ao enviar seu depoimento: {msg}',
+      body: 'Erro ao enviar seu depoimento agora. Tente novamente em instantes.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
@@ -1122,9 +1124,60 @@ export const ptBR = {
     auth_error: {
       title: 'Acesso indisponível no momento.',
       body:
-        '{msg}\n' +
         'Confira seu e-mail, sua senha e o tipo selecionado.\n' +
         'Se o problema persistir, acesse SUPORTE no rodapé da página para falar com a gente.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    credentials_invalid: {
+      title: 'E-mail ou senha incorretos',
+      body:
+        'Revise seus dados de acesso e tente novamente.\n' +
+        'Se precisar, clique em TROCAR SENHA.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    email_not_confirmed: {
+      title: 'Confirme seu e-mail',
+      body:
+        'Antes de entrar, confirme seu cadastro pelo link enviado ao seu e-mail.\n' +
+        'Verifique também a pasta de spam.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    account_type_required: {
+      title: 'Escolha o tipo de conta',
+      body: 'Selecione CLIENTE ou PROFISSIONAL antes de entrar.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    account_type_mismatch: {
+      title: 'Tipo de conta incorreto',
+      body:
+        'Esta conta pertence a outro tipo de acesso.\n' +
+        'Volte e selecione o tipo correto para entrar.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    profile_not_ready: {
+      title: 'Cadastro ainda indisponível',
+      body:
+        'Seu perfil segue em preparo para o acesso.\n' +
+        'Aguarde alguns segundos e tente novamente.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    session_expired_or_invalid: {
+      title: 'Link expirado ou inválido',
+      body:
+        'Solicite um novo link e tente novamente.\n' +
+        'Por cuidado, links de resgate podem expirar.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
@@ -1159,7 +1212,6 @@ export const ptBR = {
     reset_error: {
       title: 'Houve um erro ao enviar o link agora.',
       body:
-        '{msg}\n' +
         'Tente novamente em instantes.\n' +
         'Se persistir, acesse SUPORTE no rodapé da página.',
       variant: 'warning',
@@ -1192,7 +1244,6 @@ export const ptBR = {
     recovery_password_update_error: {
       title: 'Erro ao atualizar senha',
       body:
-        '{msg}\n' +
         'Tente novamente.\n' +
         'Se persistir, acesse SUPORTE no rodapé da página.',
       variant: 'danger',
@@ -1538,6 +1589,6 @@ export const ptBR = {
       buttonText: 'ENTENDI',
     },
     depoimento_send_error_title: 'Erro ao enviar depoimento',
-    depoimento_send_error_body: 'Erro ao enviar seu depoimento:',
+    depoimento_send_error_body: 'Erro ao enviar seu depoimento agora. Tente novamente em instantes.',
   },
 };

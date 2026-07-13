@@ -5,6 +5,11 @@ import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { fetchUserAccessProfile } from '../utils/profileAccess';
 import { clearPasswordRecoveryState } from '../utils/auth';
+import {
+  getLoginAuthAlertKey,
+  getPasswordResetRequestAlertKey,
+  getPasswordUpdateAlertKey,
+} from '../utils/friendlyErrors';
 import { ProfessionalIcon, UserIcon } from '../components/icons';
 
 export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
@@ -96,7 +101,7 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
       );
 
     } catch (err) {
-      showMessage('login.auth_error', { msg: err?.message || '' });
+      showMessage(getLoginAuthAlertKey(err));
       console.error('Login error:', err);
     } finally {
       setLoading(false);
@@ -123,7 +128,8 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
 
       showMessage('login.reset_sent');
     } catch (e) {
-      showMessage('login.reset_error', { msg: e?.message || '' });
+      showMessage(getPasswordResetRequestAlertKey(e));
+      console.error('Password reset request error:', e);
     } finally {
       setResetLoading(false);
     }
@@ -154,7 +160,8 @@ export default function Login({ onLogin, inRecovery: inRecoveryProp = false }) {
       clearPasswordRecoveryState();
       navigate('/login');
     } catch (e2) {
-      showMessage('login.recovery_password_update_error', { msg: e2?.message || '' });
+      showMessage(getPasswordUpdateAlertKey(e2));
+      console.error('Password update error:', e2);
     } finally {
       setRecoveryLoading(false);
     }
