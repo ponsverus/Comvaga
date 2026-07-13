@@ -6,6 +6,7 @@ export default function VitrineEntregasSection({
   emptyListMsg,
   counterSingular,
   counterPlural,
+  onLoadPage,
   booking,
 }) {
   return (
@@ -21,10 +22,15 @@ export default function VitrineEntregasSection({
                 <div key={card.id} className="bg-vcard border border-vborder rounded-custom p-6 hover:border-vprimary/50 transition-all">
                   <div className="flex items-center justify-between mb-4">
                     <div className="font-normal text-lg uppercase">{card.nome}</div>
-                    <div className="text-xs text-vmuted font-normal">{card.lista.length} {card.lista.length === 1 ? counterSingular : counterPlural}</div>
+                    <div className="text-xs text-vmuted font-normal">{card.totalEntregas} {card.totalEntregas === 1 ? counterSingular : counterPlural}</div>
                   </div>
                   <EntregasCarousel
                     lista={card.lista}
+                    pages={card.pages}
+                    totalCount={card.totalEntregas}
+                    loadingPage={card.loadingPage}
+                    version={card.version}
+                    onLoadPage={onLoadPage}
                     profissional={card.profissional}
                     selecaoProfId={booking.selecaoProfId}
                     servicosSelecionados={booking.servicosSelecionados}
