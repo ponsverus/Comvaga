@@ -1,4 +1,4 @@
-import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { getCorsHeaders, jsonResponse } from '../_shared/cors.ts';
 import { createAdminClient, createUserClient } from '../_shared/supabase.ts';
 
 type BillingPlan = {
@@ -100,8 +100,8 @@ async function callAsaas(path: string, body: Record<string, unknown>) {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-  if (req.method !== 'POST') return jsonResponse({ error: 'method_not_allowed' }, 405);
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: getCorsHeaders(req) });
+  if (req.method !== 'POST') return jsonResponse({ error: 'method_not_allowed' }, 405, req);
 
   let adminForDebug: ReturnType<typeof createAdminClient> | null = null;
   let debugNegocioId: string | null = null;
@@ -111,21 +111,21 @@ Deno.serve(async (req) => {
   try {
     const authorization = req.headers.get('authorization') || '';
     if (!authorization.toLowerCase().startsWith('bearer ')) {
-      return jsonResponse({ error: 'not_authenticated' }, 401);
+      return jsonResponse({ error: 'not_authenticated' }, 401, req);
     }
 
     const userClient = createUserClient(authorization);
     const admin = createAdminClient();
     adminForDebug = admin;
     const { data: authData, error: authError } = await userClient.auth.getUser();
-    if (authError || !authData?.user?.id) return jsonResponse({ error: 'not_authenticated' }, 401);
+    if (authError || !authData?.user?.id) return jsonResponse({ error: 'not_authenticated' }, 401, req);
 
     const body = await req.json().catch(() => ({}));
     const negocioId = String(body?.negocio_id || '').trim();
     const planCode = normalizePlanCode(body?.plan_code);
     debugNegocioId = negocioId || null;
     debugPlanCode = planCode || null;
-    if (!negocioId || !planCode) return jsonResponse({ error: 'missing_required_fields' }, 400);
+    if (!negocioId || !planCode) return jsonResponse({ error: 'missing_required_fields' }, 400, req);
 
     const [{ data: plan, error: planFetchError }, { data: negocio, error: negocioError }] = await Promise.all([
       admin.from('billing_plans').select('code, name, price_cents, max_profissionais, features').eq('code', planCode).eq('active', true).maybeSingle(),
@@ -134,8 +134,8 @@ Deno.serve(async (req) => {
 
     if (planFetchError) throw planFetchError;
     if (negocioError) throw negocioError;
-    if (!plan) return jsonResponse({ error: 'plan_not_found' }, 404);
-    if (!negocio || negocio.owner_id !== authData.user.id) return jsonResponse({ error: 'acao_nao_permitida' }, 403);
+    if (!plan) return jsonResponse({ error: 'plan_not_found' }, 404, req);
+    if (!negocio || negocio.owner_id !== authData.user.id) return jsonResponse({ error: 'acao_nao_permitida' }, 403, req);
 
     const selectedPlan = plan as BillingPlan;
 
@@ -147,7 +147,7 @@ Deno.serve(async (req) => {
         .in('status', ['ativo', 'pendente']);
       if (countError) throw countError;
       if (Number(count || 0) > selectedPlan.max_profissionais) {
-        return jsonResponse({ error: 'plan_professional_limit_reached' }, 400);
+        return jsonResponse({ error: 'plan_professional_limit_reached' }, 400, req);
       }
     }
 
@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
         .gt('preco_promocional', 0);
       if (offersError) throw offersError;
       if (Number(count || 0) > 0) {
-        return jsonResponse({ error: 'feature_unavailable: offers' }, 400);
+        return jsonResponse({ error: 'feature_unavailable: offers' }, 400, req);
       }
     }
 
@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
       return jsonResponse({
         error: 'trial_access_active',
         billing_status: statusData,
-      }, 409);
+      }, 409, req);
     }
 
     const siteUrl = publicSiteUrl(req);
@@ -238,7 +238,7 @@ Deno.serve(async (req) => {
       checkout_id: checkout.id,
       checkout_url: checkout.url || checkout.link || checkoutUrlFor(checkout.id),
       billing_status: statusData,
-    });
+    }, 200, req);
   } catch (error) {
     console.error('asaas-create-checkout failed:', error);
     try {
@@ -259,6 +259,6 @@ Deno.serve(async (req) => {
     } catch (debugError) {
       console.error('checkout debug insert failed:', debugError);
     }
-    return jsonResponse({ error: error?.message || 'checkout_failed' }, 400);
+    return jsonResponse({ error: error?.message || 'checkout_failed' }, 400, req);
   }
 });
