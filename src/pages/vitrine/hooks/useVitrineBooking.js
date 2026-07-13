@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { fetchVitrineEntregaById } from '../api/vitrineApi';
 
 export function useVitrineBooking({
   user,
@@ -48,19 +49,31 @@ export function useVitrineBooking({
     if (!rebook || loading || !negocio?.id || !bookingAllowed) return;
     const rebookKey = `${location.key || location.pathname}:${rebook.profissionalId || ''}:${rebook.entregaId || ''}`;
     if (rebookAppliedRef.current === rebookKey) return;
-    const profissional = profissionais.find((item) => item.id === rebook.profissionalId);
-    const servico = entregas.find((item) =>
-      item.id === rebook.entregaId &&
-      item.profissional_id === rebook.profissionalId &&
-      item.ativo !== false
-    );
-    if (!profissional || !servico) return;
-    rebookAppliedRef.current = rebookKey;
-    setSelecaoProfId(null);
-    setServicosSelecionados([]);
-    revokeCurrentIcs();
-    setFlow({ step: 'booking', profissional, servicosSelecionados: [servico], lastSlot: null });
-    navigate(location.pathname, { replace: true, state: {} });
+    let cancelled = false;
+    (async () => {
+      const profissional = profissionais.find((item) => item.id === rebook.profissionalId);
+      let servico = entregas.find((item) =>
+        item.id === rebook.entregaId &&
+        item.profissional_id === rebook.profissionalId &&
+        item.ativo !== false
+      );
+      if (!servico) {
+        servico = await fetchVitrineEntregaById({
+          entregaId: rebook.entregaId,
+          profissionalId: rebook.profissionalId,
+        }).catch(() => null);
+      }
+      if (cancelled || !profissional || !servico) return;
+      rebookAppliedRef.current = rebookKey;
+      setSelecaoProfId(null);
+      setServicosSelecionados([]);
+      revokeCurrentIcs();
+      setFlow({ step: 'booking', profissional, servicosSelecionados: [servico], lastSlot: null });
+      navigate(location.pathname, { replace: true, state: {} });
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [bookingAllowed, entregas, loading, location.key, location.pathname, location.state, navigate, negocio?.id, profissionais, revokeCurrentIcs]);
 
   const requireLogin = useCallback(async () => {
