@@ -5,6 +5,7 @@ import { supabase } from '../supabase';
 import { ptBR } from '../feedback/messages/ptBR';
 import { fetchUserAccessProfile } from '../utils/profileAccess';
 import { clearPasswordRecoveryState } from '../utils/auth';
+import { getParceiroLoginAlert } from '../utils/friendlyErrors';
 
 const msgs = ptBR.parceiroLogin;
 
@@ -119,7 +120,8 @@ export default function LoginParceiro({ onLogin, suppressAuthRef, inRecovery: in
       );
       navigate('/selecionar-negocio-parceiro', { replace: true });
     } catch (e2) {
-      setAlerta({ body: e2?.message || msgs.unexpected_error.body, variant: 'erro' });
+      setAlerta(getParceiroLoginAlert(e2, msgs));
+      console.error('Partner login error:', e2);
       await supabase.auth.signOut();
     } finally {
       if (suppressAuthRef) suppressAuthRef.current = false;
