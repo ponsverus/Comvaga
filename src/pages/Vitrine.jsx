@@ -275,6 +275,8 @@ export default function Vitrine({ user, userType, professionalRole = null, onLog
     profissionais,
     entregas,
     depoimentos,
+    depoimentosHasMore,
+    depoimentosLoadingMore,
     galeriaItems,
     galeriaHasMore,
     galeriaLoadingMore,
@@ -284,6 +286,7 @@ export default function Vitrine({ user, userType, professionalRole = null, onLog
     serverNow,
     fetchNowFromDb,
     refreshDepoimentos,
+    loadMoreDepoimentos,
     loadMoreGaleria,
     loadVitrine,
   } = useVitrineBootstrap({
@@ -629,6 +632,11 @@ export default function Vitrine({ user, userType, professionalRole = null, onLog
           setNota: setDepoimentoNota,
           setTexto: setDepoimentoTexto,
           onEnviar: enviarDepoimento,
+        }}
+        pagination={{
+          hasMore: depoimentosHasMore,
+          loadingMore: depoimentosLoadingMore,
+          onLoadMore: loadMoreDepoimentos,
         }}
       />
 
