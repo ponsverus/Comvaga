@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { clearPasswordRecoveryState } from '../utils/auth';
+import { getPasswordUpdateAlertKey } from '../utils/friendlyErrors';
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -37,7 +38,8 @@ export default function ResetPassword() {
       clearPasswordRecoveryState();
       navigate('/login', { replace: true });
     } catch (error) {
-      showMessage('login.recovery_password_update_error', { msg: error?.message || '' });
+      showMessage(getPasswordUpdateAlertKey(error));
+      console.error('ResetPassword update error:', error);
     } finally {
       setLoading(false);
     }
