@@ -87,6 +87,9 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const [depoimentoNota, setDepoimentoNota] = useState(5);
   const [depoimentoTexto, setDepoimentoTexto] = useState('');
 
+  const getVisiblePageRows = useCallback((rows, limit = PAGE_SIZE) => (rows || []).slice(0, limit), []);
+  const getHasMoreRows = useCallback((rows, limit = PAGE_SIZE) => (rows || []).length > limit, []);
+
   useEffect(() => { setNovoEmail(user?.email || ''); }, [user?.email]);
 
   const fetchClienteId = useCallback(async () => {
@@ -202,18 +205,20 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       ]);
       setClienteId(currentClienteId);
       const [agendamentosRows, favoritosRows] = await Promise.all([
-        fetchAgendamentos({ clienteId: currentClienteId }),
-        fetchFavoritos({ clienteId: currentClienteId }),
+        fetchAgendamentos({ clienteId: currentClienteId, limit: PAGE_SIZE + 1 }),
+        fetchFavoritos({ clienteId: currentClienteId, limit: PAGE_SIZE + 1 }),
       ]);
+      const visibleAgendamentos = getVisiblePageRows(agendamentosRows);
+      const visibleFavoritos = getVisiblePageRows(favoritosRows);
       setNomePerfil(perfil.nome);
       setAvatarPath(perfil.avatarPath);
-      setAgendamentos(agendamentosRows);
-      setFavoritos(favoritosRows);
-      await syncAvaliacoesConcluidas(agendamentosRows);
+      setAgendamentos(visibleAgendamentos);
+      setFavoritos(visibleFavoritos);
+      await syncAvaliacoesConcluidas(visibleAgendamentos);
       setAgendamentosPage(0);
       setFavoritosPage(0);
-      setAgendamentosHasMore(agendamentosRows.length === PAGE_SIZE);
-      setFavoritosHasMore(favoritosRows.length === PAGE_SIZE);
+      setAgendamentosHasMore(getHasMoreRows(agendamentosRows));
+      setFavoritosHasMore(getHasMoreRows(favoritosRows));
     } catch (error) {
       const requestKey = getRequestErrorKey(error);
       if (requestKey === 'alerts.request_timeout') {
@@ -237,7 +242,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, loadPerfil, fetchClienteId, fetchAgendamentos, fetchFavoritos, syncAvaliacoesConcluidas, uiAlert]);
+  }, [user?.id, loadPerfil, fetchClienteId, fetchAgendamentos, fetchFavoritos, getHasMoreRows, getVisiblePageRows, syncAvaliacoesConcluidas, uiAlert]);
 
   useEffect(() => {
     if (user?.id) loadData();
@@ -295,10 +300,11 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
         async () => {
           try {
             const limit = (agendamentosPageRef.current + 1) * PAGE_SIZE;
-            const ags = await fetchAgendamentosRef.current({ limit });
-            setAgendamentos(ags);
-            await syncAvaliacoesConcluidas(ags);
-            setAgendamentosHasMore(ags.length === limit);
+            const rows = await fetchAgendamentosRef.current({ limit: limit + 1 });
+            const visibleRows = getVisiblePageRows(rows, limit);
+            setAgendamentos(visibleRows);
+            await syncAvaliacoesConcluidas(visibleRows);
+            setAgendamentosHasMore(getHasMoreRows(rows, limit));
           } catch (error) {
             console.warn('Falha ao atualizar agendamentos em tempo real.', error);
           }
@@ -306,7 +312,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [clienteId, syncAvaliacoesConcluidas]);
+  }, [clienteId, getHasMoreRows, getVisiblePageRows, syncAvaliacoesConcluidas]);
 
   const openFilePicker = () => fileInputRef.current?.click();
 
@@ -431,10 +437,11 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       await cancelarAgendamentoCliente(agendamentoId);
       uiAlert('clientArea.booking_canceled', 'danger');
       const limit = (agendamentosPage + 1) * PAGE_SIZE;
-      const ags = await fetchAgendamentos({ limit });
-      setAgendamentos(ags);
-      await syncAvaliacoesConcluidas(ags);
-      setAgendamentosHasMore(ags.length === limit);
+      const rows = await fetchAgendamentos({ limit: limit + 1 });
+      const visibleRows = getVisiblePageRows(rows, limit);
+      setAgendamentos(visibleRows);
+      await syncAvaliacoesConcluidas(visibleRows);
+      setAgendamentosHasMore(getHasMoreRows(rows, limit));
     } catch (error) {
       const requestKey = getRequestErrorKey(error);
       if (requestKey) {
@@ -549,12 +556,13 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     try {
       setAgendamentosLoadingMore(true);
       const nextPage = agendamentosPage + 1;
-      const rows = await fetchAgendamentos({ page: nextPage });
-      const merged = mergeById(agendamentos, rows);
+      const rows = await fetchAgendamentos({ page: nextPage, limit: PAGE_SIZE + 1 });
+      const visibleRows = getVisiblePageRows(rows);
+      const merged = mergeById(agendamentos, visibleRows);
       setAgendamentos(merged);
       await syncAvaliacoesConcluidas(merged);
       setAgendamentosPage(nextPage);
-      setAgendamentosHasMore(rows.length === PAGE_SIZE);
+      setAgendamentosHasMore(getHasMoreRows(rows));
     } catch {
       uiAlert('clientArea.load_more_agendamentos_error', 'warning');
     } finally {
@@ -567,10 +575,10 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     try {
       setFavoritosLoadingMore(true);
       const nextPage = favoritosPage + 1;
-      const rows = await fetchFavoritos({ page: nextPage });
-      setFavoritos(prev => mergeById(prev, rows));
+      const rows = await fetchFavoritos({ page: nextPage, limit: PAGE_SIZE + 1 });
+      setFavoritos(prev => mergeById(prev, getVisiblePageRows(rows)));
       setFavoritosPage(nextPage);
-      setFavoritosHasMore(rows.length === PAGE_SIZE);
+      setFavoritosHasMore(getHasMoreRows(rows));
     } catch {
       uiAlert('clientArea.load_more_favoritos_error', 'warning');
     } finally {
