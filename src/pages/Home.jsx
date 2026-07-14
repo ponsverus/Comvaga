@@ -2,22 +2,20 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { TimeIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon } from '../components/icons';
+import { TimeIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon, ProfessionalIcon } from '../components/icons';
 import { getSupportHref } from '../support';
 import { saveSelectedPlanIntent } from '../utils/plans';
 
 const planSignupTo = (planCode) => `/cadastro/profissional?plano=${planCode}`;
-const DEFAULT_BUSINESS_LOGO = '/Comvaga Logo.png';
-
 function getBusinessLogoUrl(path) {
-  if (!path) return DEFAULT_BUSINESS_LOGO;
+  if (!path) return null;
   try {
     if (/^https?:\/\//i.test(path)) return path;
     const stripped = path.replace(/^logos\//, '');
     const { data } = supabase.storage.from('logos').getPublicUrl(stripped);
-    return data?.publicUrl || DEFAULT_BUSINESS_LOGO;
+    return data?.publicUrl || null;
   } catch {
-    return DEFAULT_BUSINESS_LOGO;
+    return null;
   }
 }
 
@@ -99,6 +97,7 @@ function SearchBox({
         <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl">
           {resultadosBusca.map((r, i) => {
             const isNegocio = String(r?.tipo || '').toLowerCase() === 'negocio';
+            const businessLogoUrl = isNegocio ? getBusinessLogoUrl(r.logo_path) : null;
 
             return (
               <Link
@@ -113,12 +112,20 @@ function SearchBox({
               >
                 {isNegocio ? (
                   <div className="flex items-center gap-3">
-                    <img
-                      src={getBusinessLogoUrl(r.logo_path)}
-                      alt=""
-                      className="h-10 w-10 shrink-0 rounded-full border border-white/10 bg-black object-cover"
-                      loading="lazy"
-                    />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-dark-200">
+                      {businessLogoUrl ? (
+                        <img
+                          src={businessLogoUrl}
+                          alt=""
+                          className="h-full w-full rounded-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-primary to-yellow-600">
+                          <ProfessionalIcon className="h-5 w-5 text-black" />
+                        </div>
+                      )}
+                    </div>
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-normal text-white uppercase">{r.nome}</div>
                       {r.subtitulo && (
