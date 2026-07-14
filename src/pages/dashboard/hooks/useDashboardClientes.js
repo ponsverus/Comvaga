@@ -16,12 +16,13 @@ export function useDashboardClientes({ negocioId }) {
     if (!negocioId) return;
     const rows = await fetchClientesDashboard({
       negocioId,
-      limit: CLIENTES_PAGE_SIZE,
+      limit: CLIENTES_PAGE_SIZE + 1,
       offset: page * CLIENTES_PAGE_SIZE,
     });
+    const visibleRows = rows.slice(0, CLIENTES_PAGE_SIZE);
 
     setClientes((prev) => {
-      const next = append ? [...prev, ...rows] : rows;
+      const next = append ? [...prev, ...visibleRows] : visibleRows;
       const seen = new Set();
       return next.filter((item) => {
         if (!item?.cliente_id || seen.has(item.cliente_id)) return false;
@@ -29,7 +30,7 @@ export function useDashboardClientes({ negocioId }) {
         return true;
       });
     });
-    setClientesHasMore(rows.length === CLIENTES_PAGE_SIZE);
+    setClientesHasMore(rows.length > CLIENTES_PAGE_SIZE);
   }, [negocioId]);
 
   useEffect(() => {
