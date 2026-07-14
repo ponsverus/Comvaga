@@ -7,6 +7,19 @@ import { getSupportHref } from '../support';
 import { saveSelectedPlanIntent } from '../utils/plans';
 
 const planSignupTo = (planCode) => `/cadastro/profissional?plano=${planCode}`;
+const DEFAULT_BUSINESS_LOGO = '/Comvaga Logo.png';
+
+function getBusinessLogoUrl(path) {
+  if (!path) return DEFAULT_BUSINESS_LOGO;
+  try {
+    if (/^https?:\/\//i.test(path)) return path;
+    const stripped = path.replace(/^logos\//, '');
+    const { data } = supabase.storage.from('logos').getPublicUrl(stripped);
+    return data?.publicUrl || DEFAULT_BUSINESS_LOGO;
+  } catch {
+    return DEFAULT_BUSINESS_LOGO;
+  }
+}
 
 function SearchBox({
   searchOpen,
@@ -84,23 +97,46 @@ function SearchBox({
 
       {searchOpen && resultadosBusca.length > 0 && (
         <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl">
-          {resultadosBusca.map((r, i) => (
-            <Link
-              key={`${r.tipo}-${r.id}-${i}`}
-              to={`/v/${r.slug}`}
-              onClick={() => {
-                setSearchOpen(false);
-                setSearchTerm('');
-                setResultadosBusca([]);
-              }}
-              className="block border-b border-white/5 px-5 py-4 transition-colors hover:bg-dark-200/90 last:border-b-0"
-            >
-              <div className="font-normal text-white uppercase">{r.nome}</div>
-              {r.subtitulo && (
-                <div className="mt-1 text-sm text-gray-400">{r.subtitulo}</div>
-              )}
-            </Link>
-          ))}
+          {resultadosBusca.map((r, i) => {
+            const isNegocio = String(r?.tipo || '').toLowerCase() === 'negocio';
+
+            return (
+              <Link
+                key={`${r.tipo}-${r.id}-${i}`}
+                to={`/v/${r.slug}`}
+                onClick={() => {
+                  setSearchOpen(false);
+                  setSearchTerm('');
+                  setResultadosBusca([]);
+                }}
+                className="block border-b border-white/5 px-5 py-4 transition-colors hover:bg-dark-200/90 last:border-b-0"
+              >
+                {isNegocio ? (
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={getBusinessLogoUrl(r.logo_path)}
+                      alt=""
+                      className="h-10 w-10 shrink-0 rounded-full border border-white/10 bg-black object-cover"
+                      loading="lazy"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-normal text-white uppercase">{r.nome}</div>
+                      {r.subtitulo && (
+                        <div className="mt-1 truncate text-sm text-gray-400">{r.subtitulo}</div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="font-normal text-white uppercase">{r.nome}</div>
+                    {r.subtitulo && (
+                      <div className="mt-1 text-sm text-gray-400">{r.subtitulo}</div>
+                    )}
+                  </>
+                )}
+              </Link>
+            );
+          })}
         </div>
       )}
 
@@ -205,7 +241,30 @@ export default function Home({ user, userType, onLogout }) {
         if (error) throw error;
         if (cancelled) return;
 
-        setResultadosBusca((data || []).filter((item) => item.slug));
+        const rows = (data || []).filter((item) => item.slug);
+        const negocioIds = rows
+          .filter((item) => String(item?.tipo || '').toLowerCase() === 'negocio' && item.id)
+          .map((item) => item.id);
+
+        if (!negocioIds.length) {
+          setResultadosBusca(rows);
+          return;
+        }
+
+        const { data: negociosLogo, error: logosError } = await supabase
+          .from('negocios')
+          .select('id, logo_path')
+          .in('id', negocioIds);
+
+        if (logosError) throw logosError;
+        if (cancelled) return;
+
+        const logoById = new Map((negociosLogo || []).map((item) => [item.id, item.logo_path]));
+        setResultadosBusca(rows.map((item) => (
+          String(item?.tipo || '').toLowerCase() === 'negocio'
+            ? { ...item, logo_path: logoById.get(item.id) || null }
+            : item
+        )));
       } catch (error) {
         if (cancelled) return;
         console.error('Erro na busca:', error);
