@@ -30,18 +30,19 @@ export function useDashboardHistorico({
       profissionalIds: profIds,
       dataInicio: date,
       dataFim: date,
-      limit: AG_PAGE_SIZE,
+      limit: AG_PAGE_SIZE + 1,
       offset: page * AG_PAGE_SIZE,
     });
+    const visibleRows = rows.slice(0, AG_PAGE_SIZE);
 
     setHistoricoAgendamentos((prev) => {
-      const next = append ? [...prev, ...rows] : rows;
+      const next = append ? [...prev, ...visibleRows] : visibleRows;
       const seen = new Set();
       return next
         .filter((item) => (seen.has(item.id) ? false : (seen.add(item.id), true)))
         .sort(compareAgendamentoDateTimeDesc);
     });
-    setHistoricoHasMore(rows.length === AG_PAGE_SIZE);
+    setHistoricoHasMore(rows.length > AG_PAGE_SIZE);
     setHistoricoError('');
   }, [negocioId]);
 
