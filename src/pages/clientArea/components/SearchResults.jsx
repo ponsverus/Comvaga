@@ -1,11 +1,27 @@
 import { Link } from 'react-router-dom';
-import { ProfessionalIcon, UserIcon } from '../../../components/icons';
+import { ProfessionalIcon } from '../../../components/icons';
 
 function SearchResult({ row, onSelect }) {
   const tipo = String(row?.tipo || '').toLowerCase();
   const isNegocio = tipo === 'negocio';
   const typeLabel = isNegocio ? 'NEG\u00d3CIO' : 'PROFISSIONAL';
   const subtitle = String(row?.subtitulo || '').trim();
+
+  if (!isNegocio) {
+    return (
+      <Link
+        key={`${row?.tipo || 'item'}-${row?.id || row?.slug}`}
+        to={`/v/${row?.slug}`}
+        onClick={onSelect}
+        className="block border-b border-white/5 px-5 py-4 text-left transition-colors hover:bg-dark-200/90 last:border-b-0"
+      >
+        <div className="font-normal text-white uppercase">{row?.nome || '\u2014'}</div>
+        {subtitle && (
+          <div className="mt-1 text-sm text-gray-400">{subtitle}</div>
+        )}
+      </Link>
+    );
+  }
 
   return (
     <Link
@@ -16,11 +32,7 @@ function SearchResult({ row, onSelect }) {
     >
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-800 bg-dark-200">
-          {isNegocio ? (
-            <ProfessionalIcon className="h-5 w-5 text-primary" />
-          ) : (
-            <UserIcon className="h-5 w-5 text-blue-400" />
-          )}
+          <ProfessionalIcon className="h-5 w-5 text-primary" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-normal uppercase text-white">{row?.nome || '\u2014'}</div>
