@@ -37,6 +37,13 @@ function formatCurrencyFromCents(value) {
   return `R$ ${(Number(value || 0) / 100).toFixed(2).replace('.', ',')}`;
 }
 
+function formatDateBR(value) {
+  if (!value) return '';
+  const [year, month, day] = String(value).slice(0, 10).split('-');
+  if (!year || !month || !day) return '';
+  return `${day}/${month}/${year}`;
+}
+
 function isCancellationScheduled(status) {
   return Boolean(status?.cancellation_scheduled)
     || (
@@ -286,6 +293,8 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
   const currentPlanCode = billingStatus?.plan_code || '';
   const currentStatusLabel = statusText(billingStatus);
   const cancellationScheduled = isCancellationScheduled(billingStatus);
+  const planChangeScheduled = Boolean(billingStatus?.plan_change_scheduled);
+  const pendingPlanDate = formatDateBR(billingStatus?.pending_plan_effective_on || billingStatus?.pending_plan_effective_at);
   const selectedPlan = useMemo(
     () => plans.find((plan) => plan.code === currentPlanCode) || null,
     [currentPlanCode, plans]
@@ -338,7 +347,9 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
           setBillingStatus(checkout.billing_status);
           onBillingStatusChange?.(checkout.billing_status);
         }
-        window.location.assign(checkout.checkout_url);
+        if (checkout?.checkout_url) {
+          window.location.assign(checkout.checkout_url);
+        }
       }
     } catch (err) {
       console.error(freeAccessOpen ? 'setBusinessPlan error:' : 'createAsaasCheckout error:', err);
@@ -399,6 +410,12 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
         <h2 className="text-2xl font-normal text-white">PLANOS</h2>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-sm uppercase text-gray-500">
           <span>PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || currentStatusLabel}</span></span>
+          {planChangeScheduled && (
+            <span>
+              MUDANCA AGENDADA: <span className="text-primary">{billingStatus?.pending_plan_name || billingStatus?.pending_plan_code}</span>
+              {pendingPlanDate ? <span> EM {pendingPlanDate}</span> : null}
+            </span>
+          )}
         </div>
       </div>
 
@@ -414,6 +431,7 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
       >
         {plans.map((plan) => {
           const active = plan.code === currentPlanCode;
+          const pendingForPlan = planChangeScheduled && billingStatus?.pending_plan_code === plan.code;
           const saving = savingPlan === plan.code;
           const canceling = cancelingPlan === plan.code;
           const paymentStatus = String(billingStatus?.payment_method_status || '').toLowerCase();
@@ -498,11 +516,11 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
 
               <button
                 type="button"
-                disabled={activeWithoutAction || activeFreeAccess || !!savingPlan || !!cancelingPlan || planLimitBlocked}
+                disabled={activeWithoutAction || activeFreeAccess || pendingForPlan || !!savingPlan || !!cancelingPlan || planLimitBlocked}
                 onClick={() => handleSelectPlan(plan.code)}
                 className={`mt-4 flex min-h-[42px] items-center justify-center px-5 py-2.5 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${activeFreeAccess ? 'cursor-default rounded-full border border-primary/40 bg-primary/10 text-xs font-normal uppercase tracking-wider text-primary' : activeWithoutAction ? 'cursor-default rounded-full bg-green-400/10 text-xs font-normal uppercase tracking-wider text-green-300 border border-green-400/30' : active && (needsPayment || scheduledCancellation) ? selectedPaymentButtonClass : content.buttonClass}`}
               >
-                {planLimitBlocked ? 'Limite excedido' : activeFreeAccess ? 'Teste grátis' : activeWithoutAction ? 'Plano ativo' : saving ? (freeAccessOpen ? 'Salvando...' : 'Abrindo checkout...') : active && (needsPayment || scheduledCancellation) ? selectedPaymentButtonText : content.buttonText}
+                {planLimitBlocked ? 'Limite excedido' : pendingForPlan ? 'Agendado' : activeFreeAccess ? 'Teste grátis' : activeWithoutAction ? 'Plano ativo' : saving ? (freeAccessOpen ? 'Salvando...' : 'Abrindo checkout...') : active && (needsPayment || scheduledCancellation) ? selectedPaymentButtonText : content.buttonText}
               </button>
 
               {canCancel && (
