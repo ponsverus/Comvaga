@@ -5,6 +5,36 @@ function isAdminRemovedProfessional(row) {
   return row?.status === 'excluido';
 }
 
+async function normalizeFunctionError(error) {
+  if (!error) return error;
+
+  const response = error.context;
+  if (!response || typeof response.clone !== 'function') return error;
+
+  let payload = null;
+  try {
+    payload = await response.clone().json();
+  } catch {
+    try {
+      const text = await response.clone().text();
+      payload = text ? { error: text } : null;
+    } catch {
+      payload = null;
+    }
+  }
+
+  const message = payload?.error || payload?.message || error.message;
+  const nextError = new Error(String(message || 'edge_function_error'));
+  nextError.name = error.name;
+  nextError.code = payload?.code || error.code;
+  nextError.details = payload?.details || error.details;
+  nextError.hint = payload?.hint || error.hint;
+  nextError.status = response.status || error.status;
+  nextError.context = response;
+  nextError.payload = payload;
+  return nextError;
+}
+
 export function getPublicUrl(bucket, path) {
   if (!bucket || !path) return null;
   try {
@@ -163,7 +193,7 @@ export async function createAsaasCheckout(negocioId, planCode) {
     'asaas-checkout'
   );
 
-  if (error) throw error;
+  if (error) throw await normalizeFunctionError(error);
   if (!data?.checkout_url && !data?.billing_status) throw new Error('checkout_url_missing');
   return data;
 }
@@ -179,7 +209,7 @@ export async function cancelAsaasSubscription(negocioId) {
     'asaas-cancel-subscription'
   );
 
-  if (error) throw error;
+  if (error) throw await normalizeFunctionError(error);
   if (!data?.billing_status) throw new Error('billing_status_missing');
   return data;
 }
