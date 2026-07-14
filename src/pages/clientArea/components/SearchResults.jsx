@@ -4,7 +4,6 @@ import { ProfessionalIcon } from '../../../components/icons';
 function SearchResult({ row, onSelect }) {
   const tipo = String(row?.tipo || '').toLowerCase();
   const isNegocio = tipo === 'negocio';
-  const typeLabel = isNegocio ? 'NEG\u00d3CIO' : 'PROFISSIONAL';
   const subtitle = String(row?.subtitulo || '').trim();
 
   if (!isNegocio) {
@@ -36,14 +35,9 @@ function SearchResult({ row, onSelect }) {
         </div>
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-normal uppercase text-white">{row?.nome || '\u2014'}</div>
-          <div className="mt-1 flex items-center gap-2">
-            <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] uppercase text-primary">
-              {typeLabel}
-            </span>
-            {subtitle && (
-              <span className="truncate text-xs uppercase text-gray-500">{subtitle}</span>
-            )}
-          </div>
+          {subtitle && (
+            <div className="mt-1 truncate text-xs uppercase text-gray-500">{subtitle}</div>
+          )}
         </div>
       </div>
     </Link>
