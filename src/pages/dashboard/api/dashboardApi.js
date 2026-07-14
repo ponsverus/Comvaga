@@ -164,7 +164,7 @@ export async function createAsaasCheckout(negocioId, planCode) {
   );
 
   if (error) throw error;
-  if (!data?.checkout_url) throw new Error('checkout_url_missing');
+  if (!data?.checkout_url && !data?.billing_status) throw new Error('checkout_url_missing');
   return data;
 }
 
