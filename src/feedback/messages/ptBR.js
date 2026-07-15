@@ -710,7 +710,7 @@ export const ptBR = {
     },
     account_email_update_sent: {
       title: 'Acesso enviado',
-      body: 'Confira seu e-mail para confirmar a troca.',
+      body: 'Enviamos um link para o seu e-mail atual e outro para o novo. Você precisa clicar em ambos para a troca.',
       variant: 'success',
       screen: 'light',
       buttonText: 'OK',
