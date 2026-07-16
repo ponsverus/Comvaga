@@ -415,7 +415,7 @@ export default function App() {
 
         <Suspense fallback={<FullScreenLoading />}>
           <Routes>
-            <Route path="/" element={<Home user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} onLogout={handleLogout} />} />
+            <Route path="/" element={<Home user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} professionalRole={isLoggedIn ? professionalRole : null} onLogout={handleLogout} />} />
 
             <Route path="/reset-password" element={<ResetPassword />} />
 
