@@ -226,7 +226,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
     ? isPartner ? '/selecionar-negocio-parceiro' : '/dashboard'
     : '/minha-area';
   const loggedAreaLabel = userType === 'professional'
-    ? isPartner ? 'SELECIONAR PARCERIA' : 'DASHBOARD'
+    ? isPartner ? 'SELECIONAR NEGÓCIO' : 'DASHBOARD'
     : 'MINHA ÁREA';
   const supportHref = getSupportHref(userType);
 
