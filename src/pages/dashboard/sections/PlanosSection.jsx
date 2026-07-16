@@ -41,18 +41,11 @@ function formatDateBR(value) {
   if (!value) return '';
   const [year, month, day] = String(value).slice(0, 10).split('-');
   if (!year || !month || !day) return '';
-  return `${day}/${month}/${year}`;
-}
-
-function formatDateBRDot(value) {
-  if (!value) return '';
-  const [year, month, day] = String(value).slice(0, 10).split('-');
-  if (!year || !month || !day) return '';
   return `${day}.${month}.${year}`;
 }
 
 function getRenewalDate(status) {
-  return formatDateBRDot(status?.current_period_end);
+  return formatDateBR(status?.current_period_end);
 }
 
 function getAccessEndDate(status) {
