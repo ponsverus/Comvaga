@@ -340,12 +340,17 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
         'avatar-path-update'
       );
       if (updErr) throw updErr;
-      if (oldPath && oldPath !== path) {
-        await withTimeout(
-          supabase.storage.from('avatars').remove([oldPath]),
-          6000,
-          'avatar-remove-old'
-        );
+      const normalizedOldPath = oldPath ? String(oldPath).replace(/^avatars\//, '') : null;
+      if (normalizedOldPath && normalizedOldPath !== path) {
+        try {
+          await withTimeout(
+            supabase.storage.from('avatars').remove([normalizedOldPath]),
+            6000,
+            'avatar-remove-old'
+          );
+        } catch (removeError) {
+          console.warn('Falha ao remover avatar antigo imediatamente; limpeza já foi enfileirada pelo banco.', removeError);
+        }
       }
       setAvatarPath(path);
       uiAlert('clientArea.avatar_updated', 'success');
