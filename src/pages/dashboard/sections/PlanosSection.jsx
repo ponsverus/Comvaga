@@ -44,6 +44,17 @@ function formatDateBR(value) {
   return `${day}/${month}/${year}`;
 }
 
+function formatDateBRDot(value) {
+  if (!value) return '';
+  const [year, month, day] = String(value).slice(0, 10).split('-');
+  if (!year || !month || !day) return '';
+  return `${day}.${month}.${year}`;
+}
+
+function getRenewalDate(status) {
+  return formatDateBRDot(status?.current_period_end);
+}
+
 function getAccessEndDate(status) {
   return formatDateBR(
     status?.access_ends_on
@@ -336,6 +347,7 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
   const pendingPlanDate = formatDateBR(billingStatus?.pending_plan_effective_on || billingStatus?.pending_plan_effective_at);
   const pendingPlanLabel = billingStatus?.pending_plan_name || billingStatus?.pending_plan_code || '';
   const accessEndDate = getAccessEndDate(billingStatus);
+  const renewalDate = getRenewalDate(billingStatus);
   const planTimelineText = buildPlanTimelineText({
     canceledOrCancellationScheduled,
     planChangeScheduled,
@@ -458,7 +470,9 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
         <h2 className="text-2xl font-normal text-white">PLANOS</h2>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-sm uppercase text-gray-500">
           <span>PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || currentStatusLabel}</span></span>
-          <span>STATUS: <span className="text-primary">{currentStatusLabel}</span></span>
+          {renewalDate && !canceledOrCancellationScheduled && (
+            <span>RENOVA: <span className="text-primary">{renewalDate}</span></span>
+          )}
           {accessEndDate && canceledOrCancellationScheduled && (
             <span>ACESSO ATE: <span className="text-primary">{accessEndDate}</span></span>
           )}
