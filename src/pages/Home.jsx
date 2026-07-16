@@ -213,7 +213,7 @@ function PreviewFacebookIcon({ className = '' }) {
 }
 
 
-export default function Home({ user, userType, onLogout }) {
+export default function Home({ user, userType, professionalRole = null, onLogout }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [resultadosBusca, setResultadosBusca] = useState([]);
@@ -221,6 +221,13 @@ export default function Home({ user, userType, onLogout }) {
 
   const { showMessage } = useFeedback();
   const isLogged = !!user && !!userType;
+  const isPartner = userType === 'professional' && professionalRole === 'partner';
+  const loggedAreaLink = userType === 'professional'
+    ? isPartner ? '/selecionar-negocio-parceiro' : '/dashboard'
+    : '/minha-area';
+  const loggedAreaLabel = userType === 'professional'
+    ? isPartner ? 'SELECIONAR PARCERIA' : 'DASHBOARD'
+    : 'MINHA ÁREA';
   const supportHref = getSupportHref(userType);
 
   useEffect(() => {
@@ -836,10 +843,10 @@ export default function Home({ user, userType, onLogout }) {
                   <>
                     <li>
                       <Link
-                        to={userType === 'professional' ? '/dashboard' : '/minha-area'}
+                        to={loggedAreaLink}
                         className="text-gray-500 hover:text-primary transition-colors text-sm"
                       >
-                        {userType === 'professional' ? 'DASHBOARD' : 'MINHA ÁREA'}
+                        {loggedAreaLabel}
                       </Link>
                     </li>
                     <li>
