@@ -529,6 +529,18 @@ export async function insertGaleriaItem(negocioId, path) {
   if (error) throw error;
 }
 
+export async function enqueueGaleriaOrphanDelete(negocioId, path) {
+  const { error } = await withTimeout(
+    supabase.rpc('enqueue_galeria_orphan_storage_delete', {
+      p_negocio_id: negocioId,
+      p_path: path,
+    }),
+    6000,
+    'galeria-enqueue-orphan-delete'
+  );
+  if (error) throw error;
+}
+
 export async function deleteGaleriaItem(itemId) {
   const { error } = await withTimeout(
     supabase.from('galerias').delete().eq('id', itemId),
