@@ -7,6 +7,7 @@ import {
   cancelarAgendamentoProfissional,
   concluirAgendamentoProfissional,
   deleteGaleriaItem,
+  enqueueGaleriaOrphanDelete,
   inativarEntregaSeguramente,
   insertEntrega,
   insertGaleriaItem,
@@ -149,11 +150,15 @@ export function useDashboardMutations({
       await updateNegocioLogo(negocio.id, userId, { logo_path: filePath });
       if (oldPath && String(oldPath).replace(/^logos\//, '') !== filePath) {
         const normalizedOldPath = String(oldPath).replace(/^logos\//, '');
-        await withTimeout(
-          supabase.storage.from('logos').remove([normalizedOldPath]),
-          6000,
-          'logo-remove-old'
-        );
+        try {
+          await withTimeout(
+            supabase.storage.from('logos').remove([normalizedOldPath]),
+            6000,
+            'logo-remove-old'
+          );
+        } catch (removeError) {
+          console.warn('Falha ao remover logo antigo imediatamente; limpeza ja foi enfileirada pelo banco.', removeError);
+        }
       }
       await uiAlert('dashboard.logo_updated', 'success');
       await reloadNegocio();
@@ -279,11 +284,19 @@ export function useDashboardMutations({
         try {
           await insertGaleriaItem(negocio.id, filePath);
         } catch {
-          await withTimeout(
-            supabase.storage.from('galerias').remove([filePath]),
-            6000,
-            'galeria-remove-orphan'
-          );
+          try {
+            await withTimeout(
+              supabase.storage.from('galerias').remove([filePath]),
+              6000,
+              'galeria-remove-orphan'
+            );
+          } catch (removeError) {
+            try {
+              await enqueueGaleriaOrphanDelete(negocio.id, filePath);
+            } catch (queueError) {
+              console.warn('Falha ao enfileirar limpeza de imagem orfa da galeria.', queueError || removeError);
+            }
+          }
           await uiAlert('dashboard.gallery_upload_error', 'error');
         }
       }
