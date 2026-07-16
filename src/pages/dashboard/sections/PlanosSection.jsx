@@ -469,7 +469,7 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
       <div>
         <h2 className="text-2xl font-normal text-white">PLANOS</h2>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-sm uppercase text-gray-500">
-          <span>PLANO ATUAL: <span className="text-primary">{selectedPlan?.name || currentStatusLabel}</span></span>
+          <span>ATUAL: <span className="text-primary">{selectedPlan?.name || currentStatusLabel}</span></span>
           {renewalDate && !canceledOrCancellationScheduled && (
             <span>RENOVA: <span className="text-primary">{renewalDate}</span></span>
           )}
