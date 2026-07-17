@@ -261,29 +261,45 @@ export function useDashboardMutations({
     if (!(await ensureOwnerAction())) return;
     try {
       setGalleryUploading(true);
-      for (const file of Array.from(files)) {
+      const selectedFiles = Array.from(files);
+      let addedCount = 0;
+      let invalidFormatCount = 0;
+      let tooLargeCount = 0;
+      let failedCount = 0;
+
+      for (const file of selectedFiles) {
         if (!isImageFile(file)) {
-          await uiAlert('dashboard.gallery_invalid_format', 'error');
+          invalidFormatCount += 1;
           continue;
         }
         if (file.size > 4 * 1024 * 1024) {
-          await uiAlert('dashboard.gallery_too_large', 'error');
+          tooLargeCount += 1;
           continue;
         }
-        const convertedFile = await convertImageToWebp(file);
-        const filePath = `${negocio.id}/${crypto.randomUUID()}.webp`;
-        const { error: upErr } = await withTimeout(
-          supabase.storage.from('galerias').upload(filePath, convertedFile, { contentType: convertedFile.type }),
-          10000,
-          'galeria-upload'
-        );
-        if (upErr) {
-          await uiAlert('dashboard.gallery_upload_error', 'error');
-          continue;
-        }
+
+        let convertedFile = null;
         try {
-          await insertGaleriaItem(negocio.id, filePath);
+          convertedFile = await convertImageToWebp(file);
         } catch {
+          failedCount += 1;
+          continue;
+        }
+
+        const filePath = `${negocio.id}/${crypto.randomUUID()}.webp`;
+        let uploaded = false;
+        try {
+          const { error: upErr } = await withTimeout(
+            supabase.storage.from('galerias').upload(filePath, convertedFile, { contentType: convertedFile.type }),
+            10000,
+            'galeria-upload'
+          );
+          if (upErr) throw upErr;
+          uploaded = true;
+          await insertGaleriaItem(negocio.id, filePath);
+          addedCount += 1;
+        } catch (uploadError) {
+          failedCount += 1;
+          if (!uploaded) continue;
           try {
             await withTimeout(
               supabase.storage.from('galerias').remove([filePath]),
@@ -294,14 +310,28 @@ export function useDashboardMutations({
             try {
               await enqueueGaleriaOrphanDelete(negocio.id, filePath);
             } catch (queueError) {
-              console.warn('Falha ao enfileirar limpeza de imagem orfa da galeria.', queueError || removeError);
+              console.warn('Falha ao enfileirar limpeza de imagem orfa da galeria.', queueError || removeError || uploadError);
             }
           }
-          await uiAlert('dashboard.gallery_upload_error', 'error');
         }
       }
-      await uiAlert('dashboard.gallery_updated', 'success');
-      await reloadGaleria();
+
+      if (addedCount > 0) await reloadGaleria();
+
+      const rejectedCount = invalidFormatCount + tooLargeCount + failedCount;
+      if (addedCount > 0 && rejectedCount > 0) {
+        await uiAlert('dashboard.gallery_partial_upload', 'warning');
+      } else if (addedCount > 0) {
+        await uiAlert('dashboard.gallery_updated', 'success');
+      } else if (invalidFormatCount > 0 && tooLargeCount === 0 && failedCount === 0) {
+        await uiAlert('dashboard.gallery_invalid_format', 'error');
+      } else if (tooLargeCount > 0 && invalidFormatCount === 0 && failedCount === 0) {
+        await uiAlert('dashboard.gallery_too_large', 'error');
+      } else if (failedCount > 0 && invalidFormatCount === 0 && tooLargeCount === 0) {
+        await uiAlert('dashboard.gallery_upload_error', 'error');
+      } else {
+        await uiAlert('dashboard.gallery_no_images_added', 'error');
+      }
     } catch {
       await uiAlert('dashboard.gallery_update_error', 'error');
     } finally {
