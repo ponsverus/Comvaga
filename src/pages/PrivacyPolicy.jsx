@@ -101,7 +101,7 @@ const sections = [
     title: '12. Contato',
     body: [
       'Para exercer direitos, tirar dúvidas ou solicitar informações sobre privacidade, use o link de suporte disponível no rodapé desta página.',
-      'Antes da publicação definitiva, os dados jurídicos do controlador, como razão social, CNPJ, endereço e e-mail do encarregado ou canal de privacidade, devem ser preenchidos conforme a estrutura formal da empresa.',
+      'Antes da publicação definitiva, os dados jurídicos do controlador, como razão social, CNPJ, endereço e e-mail do encarregado ou canal de privacidade, devem ser preenchidos conforme a estrutura formal da empresa. Para falar com a Comvaga sobre privacidade, acesse o link de suporte disponível no rodapé.',
     ],
   },
 ];
@@ -132,11 +132,6 @@ export default function PrivacyPolicyPage() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-custom border border-primary/20 bg-primary/5 p-5">
-          <p className="text-sm leading-relaxed text-gray-300">
-            Para falar com a Comvaga sobre privacidade, acesse o link de suporte disponível no rodapé.
-          </p>
-        </div>
       </main>
       <AppFooter />
     </div>
