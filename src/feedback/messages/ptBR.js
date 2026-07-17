@@ -313,25 +313,25 @@ export const ptBR = {
       },
 
       button_add: {
-        servicos:  'ADD SERV',
+        servicos:  'ADD SERV.',
         consultas: 'CONSULTA',
         aulas:     'AULA',
       },
 
       modal_new: {
-        servicos:  'NOVO SERV',
+        servicos:  'NOVO SERV.',
         consultas: 'NOVA CONSULTA',
         aulas:     'NOVA AULA',
       },
 
       modal_edit: {
-        servicos:  'EDITAR SERV',
+        servicos:  'EDITAR SERV.',
         consultas: 'EDITAR CONSULTA',
         aulas:     'EDITAR AULA',
       },
 
       counter_singular: {
-        servicos:  'SERV',
+        servicos:  'SERV.',
         consultas: 'CONSULTA',
         aulas:     'AULA',
       },
@@ -1555,12 +1555,12 @@ export const ptBR = {
 
     business: {
       section_title: {
-        servicos:  'SERVS',
+        servicos:  'Servs',
         consultas: 'Consultas',
         aulas:     'Aulas',
       },
       counter_singular: {
-        servicos:  'SERV',
+        servicos:  'SERV.',
         consultas: 'CONSULTA',
         aulas:     'AULA',
       },
