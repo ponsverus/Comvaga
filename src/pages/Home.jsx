@@ -922,13 +922,16 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             <div>
               <h4 className="text-white font-normal mb-4">LEGAL</h4>
               <ul className="space-y-2">
-                {['PRIVACIDADE', 'TERMOS'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                      {link}
-                    </a>
-                  </li>
-                ))}
+                <li>
+                  <Link to="/privacidade" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                    PRIVACIDADE
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/termos" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                    TERMOS
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
