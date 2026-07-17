@@ -90,6 +90,7 @@ export function useVitrinePresentation({
 
   const profissionaisView = useMemo(() => (
     profissionais.map((prof) => {
+      const hojeDow = serverNow.date ? getDowFromDateSP(serverNow.date) : null;
       const totalEntregas = (entregasPorProf.get(prof.id) || []).length;
       const totalEntregasPaginadas = entregaPagesByProf?.[prof.id]?.totalCount;
       const horarioExibicao = getHorarioExibicao(prof);
@@ -106,6 +107,7 @@ export function useVitrinePresentation({
         almoco: getAlmocoRange(prof),
         horarioIni: String(horarioExibicao?.horario_inicio || '08:00').slice(0, 5),
         horarioFim: String(horarioExibicao?.horario_fim || '18:00').slice(0, 5),
+        todayDow: hojeDow,
         totalEntregas: Number.isFinite(Number(totalEntregasPaginadas)) ? Number(totalEntregasPaginadas) : totalEntregas,
       };
     })
@@ -152,8 +154,6 @@ export function useVitrinePresentation({
     telClass: isLight ? 'text-vtext hover:text-vsub' : 'text-primary hover:text-yellow-500',
     addrClass: 'text-vsub',
     mediaColor: isLight ? 'text-vtext' : 'text-primary',
-    profissaoTag: isLight ? 'bg-black border-black text-white' : 'bg-primary/20 border-primary/30 text-primary',
-    almocoBadge: isLight ? 'text-amber-700' : 'text-yellow-400',
     depBtn: isLight ? (isProfessional ? 'bg-vcard2 border-vborder2 text-vmuted cursor-not-allowed' : 'bg-vcard2 hover:bg-vcard border-vborder text-vtext') : (isProfessional ? 'bg-vcard border-vborder2 text-vmuted cursor-not-allowed' : 'bg-primary/20 hover:bg-primary/30 border-primary/50 text-primary'),
     depoModalBg: isLight ? 'bg-vcard border-vborder' : 'bg-dark-100 border-gray-800',
     depoModalTitle: isLight ? 'text-vtext' : 'text-white',
