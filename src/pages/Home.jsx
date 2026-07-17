@@ -538,35 +538,46 @@ export default function Home({ user, userType, professionalRole = null, onLogout
 
                   <div className="mb-4 px-2">
                     <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Profissionais</div>
-                    <div className="bg-white/5 border border-white/10 rounded-[3px] p-3 flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-normal text-black text-base shrink-0">
-                        R
+                    <div className="bg-white/5 border border-white/10 rounded-[3px] p-3">
+                      <div className="flex items-start gap-2.5 mb-2">
+                        <div className="w-10 h-10 rounded-[3px] bg-primary flex items-center justify-center font-normal text-black text-base shrink-0">
+                          R
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="min-w-0 text-xs font-normal text-white uppercase leading-tight">EVERTON RAMOS</span>
+                            <span className="inline-flex shrink-0 items-center gap-1 text-primary">
+                              <StarGlyph sizeClass="h-2.5 w-2.5 text-[10px] text-yellow-400" />
+                              <span className="text-[10px] font-normal leading-none">5.0</span>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 mt-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
+                            <span className="text-[9px] text-gray-500 uppercase">Aberto</span>
+                          </div>
+                          <p className="text-[9px] text-gray-500 mt-1">BARBEIRO</p>
+                          <p className="text-[9px] text-gray-500 mt-0.5">7 ANOS DE EXPERIÊNCIA</p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-1 mb-0.5">
-                          <span className="text-xs font-normal text-white uppercase leading-tight">EVERTON RAMOS</span>
-                          <span className="text-[9px] font-normal uppercase border border-white/15 text-white-400 rounded-full px-2.5 py-0.5 shrink-0">BARBEIRO</span>
-                        </div>
-                        <div className="flex items-center gap-1 mb-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
-                          <span className="text-[9px] text-gray-500 uppercase">Aberto</span>
-                        </div>
-                        <div className="flex items-center gap-1 mb-1">
-                          <StarGlyph sizeClass="h-2.5 w-2.5 text-[10px]" />
-                          <span className="text-xs font-normal text-primary">5.0</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-500 font-normal">
-                            <TimeIcon className="w-2.5 h-2.5 shrink-0" />
-                            08:00 - 18:00
-                          </span>
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-orange-500 font-normal">
-                            PAUSA 12:00 - 13:00
-                          </span>
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] text-gray-500 font-normal">
-                            7 SERVS
-                          </span>
-                        </div>
+                      <div className="text-[10px] text-gray-400 mb-2">7 SERVS</div>
+                      <div className="text-[9px] text-gray-500 mb-2">
+                        <TimeIcon className="w-2.5 h-2.5 inline mr-1" />
+                        PAUSA 12:00 - 13:00
+                      </div>
+                      <div className="text-[9px] text-gray-500">
+                        <span className="text-gray-500">DOM</span>
+                        <span className="mx-1 text-gray-700">•</span>
+                        <span className="text-gray-400">SEG</span>
+                        <span className="mx-1 text-gray-700">•</span>
+                        <span className="text-primary">TER • 08:00 - 18:00</span>
+                        <span className="mx-1 text-gray-700">•</span>
+                        <span className="text-gray-400">QUA</span>
+                        <span className="mx-1 text-gray-700">•</span>
+                        <span className="text-gray-400">QUI</span>
+                        <span className="mx-1 text-gray-700">•</span>
+                        <span className="text-gray-400">SEX</span>
+                        <span className="mx-1 text-gray-700">•</span>
+                        <span className="text-gray-500">SÁB</span>
                       </div>
                     </div>
                   </div>
