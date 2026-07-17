@@ -8,6 +8,10 @@ import {
 
 const PROFISSIONAIS_POR_PAGINA = 3;
 
+function StarChar({ size = 16, className = 'text-primary' }) {
+  return <span className={className} style={{ fontSize: size, lineHeight: 1 }} aria-hidden="true">★</span>;
+}
+
 export default function VitrineProfessionalsDashboardSection({
   cards,
   counterSingular,
@@ -79,7 +83,15 @@ export default function VitrineProfessionalsDashboardSection({
                   )}
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-normal uppercase text-vtext">{prof.nome}</h3>
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="min-w-0 font-normal uppercase text-vtext">{prof.nome}</h3>
+                      {prof.depInfo?.media && (
+                        <div className="inline-flex shrink-0 items-center gap-1 text-vprimary">
+                          <StarChar size={15} className="text-vprimary" />
+                          <span className="text-sm font-normal leading-none">{prof.depInfo.media}</span>
+                        </div>
+                      )}
+                    </div>
                     {prof.status?.label && (
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${prof.status.color || 'bg-gray-500'}`} />
