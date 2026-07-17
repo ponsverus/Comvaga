@@ -537,18 +537,18 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   </div>
 
                   <div className="mb-4 px-2">
-                    <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Profissionais</div>
+                    <div className="text-lg font-normal text-white tracking-tight mb-2">Profissionais</div>
                     <div className="bg-white/5 border border-white/10 rounded-[3px] p-3">
                       <div className="flex items-start gap-2.5 mb-2">
                         <div className="w-10 h-10 rounded-[3px] bg-primary flex items-center justify-center font-normal text-black text-base shrink-0">
-                          R
+                          E
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <span className="min-w-0 text-xs font-normal text-white uppercase leading-tight">EVERTON RAMOS</span>
-                            <span className="inline-flex shrink-0 items-center gap-1 text-primary">
+                            <span className="inline-flex shrink-0 items-center gap-1">
                               <StarGlyph sizeClass="h-2.5 w-2.5 text-[10px] text-yellow-400" />
-                              <span className="text-[10px] font-normal leading-none">5.0</span>
+                              <span className="text-[10px] font-normal leading-none text-gray-500">5.0</span>
                             </span>
                           </div>
                           <div className="flex items-center gap-1 mt-1">
@@ -583,7 +583,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   </div>
 
                   <div className="space-y-4 mb-0 px-2">
-                    <div className="text-[10px] font-normal text-gray-400 uppercase tracking-widest mb-2">Servs</div>
+                    <div className="text-lg font-normal text-white tracking-tight mb-2">Servs</div>
                     
                     {[
                       { n: 'CORTE', p: 'R$ 40,00', d: '30 min' },
