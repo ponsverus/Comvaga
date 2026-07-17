@@ -15,6 +15,8 @@ import CadastroParceiro       from './pages/CadastroParceiro';
 import LoginParceiro          from './pages/LoginParceiro';
 import ResetPassword          from './pages/ResetPassword';
 import NotFound               from './pages/NotFound';
+import PrivacyPolicy          from './pages/PrivacyPolicy';
+import TermsOfUse             from './pages/TermsOfUse';
 
 const Dashboard                 = lazy(() => import('./pages/Dashboard'));
 const Vitrine                   = lazy(() => import('./pages/Vitrine'));
@@ -416,6 +418,9 @@ export default function App() {
         <Suspense fallback={<FullScreenLoading />}>
           <Routes>
             <Route path="/" element={<Home user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} professionalRole={isLoggedIn ? professionalRole : null} onLogout={handleLogout} />} />
+
+            <Route path="/privacidade" element={<PrivacyPolicy />} />
+            <Route path="/termos" element={<TermsOfUse />} />
 
             <Route path="/reset-password" element={<ResetPassword />} />
 
