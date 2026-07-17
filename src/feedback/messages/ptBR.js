@@ -221,6 +221,20 @@ export const ptBR = {
       screen: 'light',
       buttonText: 'OK',
     },
+    gallery_partial_upload: {
+      title: 'Galeria atualizada parcialmente',
+      body: 'Algumas imagens foram adicionadas, mas outras falharam em ser enviadas. Tente novamente com as imagens que faltaram.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
+    gallery_no_images_added: {
+      title: 'Nenhuma imagem adicionada',
+      body: 'Nenhuma imagem foi adicionada a galeria. Verifique os arquivos e tente novamente.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
     gallery_update_error: {
       title: 'Erro',
       body: 'Erro ao concluir o envio das imagens. Tente novamente.',
