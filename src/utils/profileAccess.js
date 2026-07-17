@@ -4,7 +4,6 @@ const PROFILE_TABLE = 'users';
 
 export const isValidType = (t) => t === 'client' || t === 'professional';
 export const isValidOnboardingStatus = (s) => s === 'pending' || s === 'completed';
-export const isValidProfessionalOnboardingFlow = (s) => s === 'owner' || s === 'partner';
 export const isValidProfessionalRole = (s) => s === 'owner' || s === 'partner';
 
 export function normalizeOnboardingStatus(type, onboardingStatus) {
@@ -36,13 +35,11 @@ export async function fetchUserAccessProfile(userId) {
     const { data, error } = await supabase.rpc('get_user_access_profile');
     if (!error && data && isValidType(data.type)) {
       const onboardingStatus = data.onboardingStatus ?? data.onboarding_status;
-      const onboardingFlow = data.onboardingFlow ?? data.onboarding_flow;
       const professionalRole = data.professionalRole ?? data.professional_role;
       return {
         type: data.type,
         professionalRole: normalizeProfessionalRole(professionalRole),
         onboardingStatus: normalizeOnboardingStatus(data.type, onboardingStatus),
-        onboardingFlow: isValidProfessionalOnboardingFlow(onboardingFlow) ? onboardingFlow : null,
         accessState: data.accessState || 'active',
       };
     }
@@ -52,7 +49,7 @@ export async function fetchUserAccessProfile(userId) {
 
   const { data: userData, error: userError } = await supabase
     .from(PROFILE_TABLE)
-    .select('type, onboarding_status, professional_onboarding_flow, professional_role')
+    .select('type, onboarding_status, professional_role')
     .eq('id', userId)
     .maybeSingle();
 
@@ -66,7 +63,6 @@ export async function fetchUserAccessProfile(userId) {
       type,
       professionalRole: null,
       onboardingStatus: 'completed',
-      onboardingFlow: null,
       accessState: 'active',
     };
   }
@@ -85,9 +81,6 @@ export async function fetchUserAccessProfile(userId) {
     type,
     professionalRole: normalizeProfessionalRole(userData?.professional_role),
     onboardingStatus,
-    onboardingFlow: isValidProfessionalOnboardingFlow(userData?.professional_onboarding_flow)
-      ? userData.professional_onboarding_flow
-      : null,
     accessState: getProfessionalAccessState(
       statuses,
       onboardingStatus,
