@@ -111,7 +111,7 @@ const sections = [
     body: [
       'Estes termos são regidos pelas leis da República Federativa do Brasil.',
       'Para dúvidas, suporte, pedidos de remoção de conteúdo, cancelamento, privacidade ou reclamações, use o link de suporte disponível no rodapé desta página.',
-      'Antes da publicação definitiva, os dados jurídicos da empresa, como razão social, CNPJ, endereço e e-mail oficial, devem ser preenchidos conforme a estrutura formal da Comvaga.',
+      'Antes da publicação definitiva, os dados jurídicos da empresa, como razão social, CNPJ, endereço e e-mail oficial, devem ser preenchidos conforme a estrutura formal da Comvaga. Para falar com a Comvaga sobre estes termos, acesse o link de suporte disponível no rodapé.',
     ],
   },
 ];
@@ -142,11 +142,6 @@ export default function TermsOfUsePage() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-custom border border-primary/20 bg-primary/5 p-5">
-          <p className="text-sm leading-relaxed text-gray-300">
-            Para falar com a Comvaga sobre estes termos, acesse o link de suporte disponível no rodapé.
-          </p>
-        </div>
       </main>
       <AppFooter />
     </div>

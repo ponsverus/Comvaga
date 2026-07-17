@@ -873,7 +873,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   <>
                     <li>
                       <Link to="/login" className="text-gray-500 hover:text-primary transition-colors text-sm">
-                        ENTRAR
+                        LOGIN
                       </Link>
                     </li>
                     <li>
