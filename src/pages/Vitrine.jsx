@@ -595,9 +595,6 @@ export default function Vitrine({ user, userType, professionalRole = null, onLog
         cards={profissionaisView}
         counterSingular={counterSingular}
         counterPlural={counterPlural}
-        profissaoTag={styles.profissaoTag}
-        mediaColor={styles.mediaColor}
-        almocoBadge={styles.almocoBadge}
       />
 
       <VitrineEntregasSection
