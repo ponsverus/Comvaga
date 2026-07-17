@@ -77,7 +77,7 @@ export default function AppFooter({
                 </>
               ) : (
                 <>
-                  <li><FooterLink to="/login">ENTRAR</FooterLink></li>
+                  <li><FooterLink to="/login">LOGIN</FooterLink></li>
                   <li><FooterLink to="/cadastro">CADASTRAR GRÁTIS</FooterLink></li>
                   <li><FooterLink to="/login/parceiro">LOGIN PARCEIRO</FooterLink></li>
                   <li><FooterLink to="/cadastro/parceiro">CADASTRO PARCEIRO</FooterLink></li>
