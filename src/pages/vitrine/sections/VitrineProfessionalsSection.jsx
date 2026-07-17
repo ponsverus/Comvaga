@@ -87,7 +87,7 @@ export default function VitrineProfessionalsDashboardSection({
                       <h3 className="min-w-0 font-normal uppercase text-vtext">{prof.nome}</h3>
                       {prof.depInfo?.media && (
                         <div className="inline-flex shrink-0 items-center gap-1 text-vprimary">
-                          <StarChar size={15} className="text-vprimary" />
+                          <<StarChar size={15} className="text-yellow-400" />" />
                           <span className="text-sm font-normal leading-none">{prof.depInfo.media}</span>
                         </div>
                       )}
