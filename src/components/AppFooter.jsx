@@ -90,7 +90,7 @@ export default function AppFooter({
           <div>
             <h4 className="text-white font-normal mb-4">EMPRESA</h4>
             <ul className="space-y-2">
-              <li><FooterLink href="#">SOBRE</FooterLink></li>
+              <li><FooterLink to="/sobre">SOBRE</FooterLink></li>
               <li><FooterLink href="#">BLOG</FooterLink></li>
             </ul>
           </div>
