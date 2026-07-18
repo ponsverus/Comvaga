@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { TimeIcon, CheckDoubleIcon, ZapIcon, SearchIcon, SelectIcon, CalendarIcon, CheckedIcon, ProfessionalIcon } from '../components/icons';
+import { CheckDoubleIcon, ZapIcon, SearchIcon, ProfessionalIcon } from '../components/icons';
 import { getSupportHref } from '../support';
 import { saveSelectedPlanIntent } from '../utils/plans';
 
@@ -185,33 +185,6 @@ function SmileGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
     </span>
   );
 }
-
-function PreviewHeartIcon({ className = '' }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    </svg>
-  );
-}
-
-function PreviewInstagramIcon({ className = '' }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
-      <path d="M16.5 7.5h.01" />
-      <circle cx="12" cy="12" r="4" />
-    </svg>
-  );
-}
-
-function PreviewFacebookIcon({ className = '' }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-    </svg>
-  );
-}
-
 
 export default function Home({ user, userType, professionalRole = null, onLogout }) {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -510,116 +483,12 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             </div>
 
             <div className="relative z-10 w-full flex items-center justify-center bg-dark-200 p-8 sm:p-16 px-4 sm:px-8 md:px-16 lg:px-24">
-              <div className="relative w-full max-w-[380px] bg-dark-100 border border-gray-700 rounded-[3px] overflow-hidden shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
-                <div className="h-16 sm:h-20 bg-gradient-to-br from-primary/20 to-yellow-600/30 relative">
-                  <div className="absolute -bottom-10 left-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-dark-100 border-4 border-dark-100 overflow-hidden shadow-xl">
-                     <div className="w-full h-full bg-gray-800 flex items-center justify-center font-black text-primary text-2xl">V</div>
-                  </div>
-                </div>
-
-                <div className="pt-12 pb-6 px-4 sm:px-6">
-                  <div className="mb-6 px-2">
-                    <div className="flex items-center gap-1">
-                      <div className="text-lg font-normal text-white uppercase tracking-tight">VIKINGS</div>
-                      <CheckedIcon className="w-[13px] h-[13px] text-primary shrink-0" />
-                    </div>
-                    <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                      <StarGlyph sizeClass="h-3 w-3 text-[12px]" /> 4.9
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      <div className="w-[22px] h-[22px] rounded-full border border-white/15 flex items-center justify-center text-gray-400">
-                        <PreviewInstagramIcon />
-                      </div>
-                      <div className="w-[22px] h-[22px] rounded-full border border-white/15 flex items-center justify-center text-gray-400">
-                        <PreviewFacebookIcon />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mb-4 px-2">
-                    <div className="text-lg font-normal text-white tracking-tight mb-2">Profissionais</div>
-                    <div className="bg-white/5 border border-white/10 rounded-[3px] p-3">
-                      <div className="flex items-start gap-2.5 mb-2">
-                        <div className="w-10 h-10 rounded-[3px] bg-primary flex items-center justify-center font-normal text-black text-base shrink-0">
-                          R
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="min-w-0 text-xs font-normal text-white uppercase leading-tight">EVERTON RAMOS</span>
-                            <span className="inline-flex shrink-0 items-center gap-1">
-                              <StarGlyph sizeClass="h-2.5 w-2.5 text-[10px] text-yellow-400" />
-                              <span className="text-[10px] font-normal leading-none text-gray-500">5.0</span>
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 mt-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
-                            <span className="text-[9px] text-gray-500 uppercase">Aberto</span>
-                          </div>
-                          <p className="text-[9px] text-gray-500 mt-1">BARBEIRO</p>
-                          <p className="text-[9px] text-gray-500 mt-0.5">7 ANOS DE EXPERIÊNCIA</p>
-                        </div>
-                      </div>
-                      <div className="text-[10px] text-gray-400 mb-2">7 SERVS</div>
-                      <div className="text-[9px] text-gray-500 mb-2">
-                        <TimeIcon className="w-2.5 h-2.5 inline mr-1" />
-                        PAUSA 12:00 - 13:00
-                      </div>
-                      <div className="text-[9px] text-gray-500">
-                        <span className="text-gray-500">DOM</span>
-                        <span className="mx-1 text-gray-700">•</span>
-                        <span className="text-gray-400">SEG</span>
-                        <span className="mx-1 text-gray-700">•</span>
-                        <span className="text-primary">TER • 08:00 - 18:00</span>
-                        <span className="mx-1 text-gray-700">•</span>
-                        <span className="text-gray-400">QUA</span>
-                        <span className="mx-1 text-gray-700">•</span>
-                        <span className="text-gray-400">QUI</span>
-                        <span className="mx-1 text-gray-700">•</span>
-                        <span className="text-gray-400">SEX</span>
-                        <span className="mx-1 text-gray-700">•</span>
-                        <span className="text-gray-500">SÁB</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 mb-0 px-2">
-                    <div className="text-lg font-normal text-white tracking-tight mb-2">Servs</div>
-                    
-                    {[
-                      { n: 'CORTE', p: 'R$ 40,00', d: '30 min' },
-                      { n: 'BARBA', p: 'R$ 20,00', d: '15 min' }
-                    ].map((s, idx) => (
-                      <div key={idx} className="bg-white/5 border border-white/10 rounded-[3px] p-4 flex flex-col gap-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="text-sm font-normal text-white uppercase">{s.n}</div>
-                            <div className="flex items-center gap-1.5 mt-1">
-                              <TimeIcon className="w-3 h-3 text-gray-500" />
-                              <span className="text-[10px] text-gray-500 font-normal uppercase">{s.d}</span>
-                            </div>
-                          </div>
-                          <div className="text-primary font-normal text-sm">{s.p}</div>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <div className="flex-1 h-8 rounded-full border border-white/15 flex items-center justify-center gap-2 px-3 hover:bg-white/5 transition-colors cursor-pointer">
-                            <CalendarIcon className="w-3.5 h-3.5 text-white/40" />
-                            <span className="text-[10px] font-normal text-white/70 uppercase">Agendar</span>
-                          </div>
-                          <div className="flex-1 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center gap-2 px-3 hover:bg-primary/20 transition-colors cursor-pointer">
-                            <SelectIcon className="w-3.5 h-3.5 text-white/40" />
-                            <span className="text-[10px] font-normal text-primary uppercase">Selecionar</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="absolute top-4 right-4 flex gap-2">
-                   <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-primary"><StarGlyph sizeClass="h-4 w-4 text-[16px]" /></div>
-                   <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white/40"><PreviewHeartIcon /></div>
-                </div>
+              <div className="relative w-full max-w-[380px] overflow-hidden rounded-[3px] border border-gray-700 bg-dark-100 shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
+                <img
+                  src="/Comvaga Vitrine Exemplo.png"
+                  alt="Print da vitrine exemplo da Comvaga"
+                  className="block h-auto w-full"
+                />
               </div>
               <div className="absolute -inset-10 bg-primary/10 blur-[80px] -z-10 rounded-full"></div>
             </div>
