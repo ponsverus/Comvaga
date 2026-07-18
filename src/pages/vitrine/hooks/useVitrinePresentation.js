@@ -111,7 +111,7 @@ export function useVitrinePresentation({
         totalEntregas: Number.isFinite(Number(totalEntregasPaginadas)) ? Number(totalEntregasPaginadas) : totalEntregas,
       };
     })
-  ), [depoimentosPorProf, entregaPagesByProf, entregasPorProf, getAlmocoRange, getHorarioExibicao, getPublicUrl, profissionais]);
+  ), [depoimentosPorProf, entregaPagesByProf, entregasPorProf, getAlmocoRange, getHorarioExibicao, getPublicUrl, getDowFromDateSP, profissionais, serverNow.date]);
 
   const entregaCards = useMemo(() => (
     profissionais.map((prof) => {
