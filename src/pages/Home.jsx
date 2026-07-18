@@ -541,7 +541,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                     <div className="bg-white/5 border border-white/10 rounded-[3px] p-3">
                       <div className="flex items-start gap-2.5 mb-2">
                         <div className="w-10 h-10 rounded-[3px] bg-primary flex items-center justify-center font-normal text-black text-base shrink-0">
-                          E
+                          R
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
@@ -920,13 +920,16 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             <div>
               <h4 className="text-white font-normal mb-4">EMPRESA</h4>
               <ul className="space-y-2">
-                {['SOBRE', 'BLOG'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-primary transition-colors text-sm">
-                      {link}
-                    </a>
-                  </li>
-                ))}
+                <li>
+                  <Link to="/sobre" className="text-gray-400 hover:text-primary transition-colors text-sm">
+                    SOBRE
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-primary transition-colors text-sm">
+                    BLOG
+                  </a>
+                </li>
               </ul>
             </div>
 
