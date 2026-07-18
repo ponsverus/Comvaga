@@ -132,6 +132,10 @@ export default function PrivacyPolicyPage() {
           ))}
         </div>
 
+        <p className="mt-10 text-sm leading-relaxed text-gray-500">
+          Política atualizado em: 18 de julho de 2026.
+        </p>
+
       </main>
       <AppFooter />
     </div>
