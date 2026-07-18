@@ -129,21 +129,12 @@ export async function fetchVitrineEntregaById({ entregaId, profissionalId }) {
 }
 
 export async function fetchVitrineGaleria(negocioId, { limit = null, offset = 0 } = {}) {
-  let query = supabase
-      .from('galerias')
-      .select('id, path, ordem')
-      .eq('negocio_id', negocioId)
-      .order('ordem', { ascending: true })
-      .order('created_at', { ascending: true });
-
-  if (limit != null) {
-    const from = Math.max(0, Number(offset) || 0);
-    const to = from + Math.max(1, Number(limit) || 1) - 1;
-    query = query.range(from, to);
-  }
-
   const { data, error } = await withTimeout(
-    query,
+    supabase.rpc('get_galerias_vitrine', {
+      p_negocio_id: negocioId,
+      p_limit: limit == null ? null : Math.max(1, Number(limit) || 1),
+      p_offset: Math.max(0, Number(offset) || 0),
+    }),
     7000,
     'galerias'
   );
