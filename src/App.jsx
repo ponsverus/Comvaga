@@ -15,6 +15,7 @@ import CadastroParceiro       from './pages/CadastroParceiro';
 import LoginParceiro          from './pages/LoginParceiro';
 import ResetPassword          from './pages/ResetPassword';
 import NotFound               from './pages/NotFound';
+import About                  from './pages/About';
 import PrivacyPolicy          from './pages/PrivacyPolicy';
 import TermsOfUse             from './pages/TermsOfUse';
 
@@ -421,6 +422,7 @@ export default function App() {
 
             <Route path="/privacidade" element={<PrivacyPolicy />} />
             <Route path="/termos" element={<TermsOfUse />} />
+            <Route path="/sobre" element={<About />} />
 
             <Route path="/reset-password" element={<ResetPassword />} />
 
