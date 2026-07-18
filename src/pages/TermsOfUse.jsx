@@ -142,6 +142,10 @@ export default function TermsOfUsePage() {
           ))}
         </div>
 
+        <p className="mt-10 text-sm leading-relaxed text-gray-500">
+          Política atualizada em: 18 de julho de 2026.
+        </p>
+
       </main>
       <AppFooter />
     </div>
