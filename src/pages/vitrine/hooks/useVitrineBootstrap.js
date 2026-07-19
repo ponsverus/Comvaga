@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   fetchBusinessBookingAvailability,
   fetchOfficialDate,
@@ -9,35 +9,18 @@ import {
   fetchVitrineProfissionais,
 } from '../api/vitrineApi';
 import { getRequestErrorKey } from '../../../utils/requestError';
+import { flattenEntregaPages } from '../../../utils/entregas';
 
 const EMPTY_NOW = { ts: null, dow: 0, date: '', source: 'db', minutes: 0 };
 const GALERIA_PAGE_SIZE = 12;
 const DEPOIMENTOS_PAGE_SIZE = 12;
 const ENTREGAS_PAGE_SIZE = 4;
 
-function flattenEntregaPages(pagesByProf) {
-  const seen = new Set();
-  const rows = [];
-  Object.values(pagesByProf || {}).forEach((entry) => {
-    Object.keys(entry?.pages || {})
-      .map(Number)
-      .sort((a, b) => a - b)
-      .forEach((page) => {
-        (entry.pages[page] || []).forEach((item) => {
-          if (!item?.id || seen.has(item.id)) return;
-          seen.add(item.id);
-          rows.push(item);
-        });
-      });
-  });
-  return rows;
-}
-
 export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = null }) {
   const [negocio, setNegocio] = useState(null);
   const [profissionais, setProfissionais] = useState([]);
-  const [entregas, setEntregas] = useState([]);
   const [entregaPagesByProf, setEntregaPagesByProf] = useState({});
+  const entregas = useMemo(() => flattenEntregaPages(entregaPagesByProf), [entregaPagesByProf]);
   const [depoimentos, setDepoimentos] = useState([]);
   const [depoimentosHasMore, setDepoimentosHasMore] = useState(false);
   const [depoimentosLoadingMore, setDepoimentosLoadingMore] = useState(false);
@@ -55,10 +38,6 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
     setServerNow(payload);
     return payload;
   }, [rpcSequence]);
-
-  useEffect(() => {
-    setEntregas(flattenEntregaPages(entregaPagesByProf));
-  }, [entregaPagesByProf]);
 
   const loadEntregasPage = useCallback(async (profissionalId, page = 0, { force = false } = {}) => {
     if (!profissionalId) return [];
