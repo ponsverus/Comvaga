@@ -5,6 +5,7 @@ import { useFeedback } from '../feedback/useFeedback';
 import { CheckDoubleIcon, ZapIcon, SearchIcon, ProfessionalIcon } from '../components/icons';
 import { getSupportHref } from '../support';
 import { saveSelectedPlanIntent } from '../utils/plans';
+import { searchHome } from '../utils/searchHome';
 
 const planSignupTo = (planCode) => `/cadastro/profissional?plano=${planCode}`;
 function getBusinessLogoUrl(path) {
@@ -220,38 +221,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
       if (!cancelled) setBuscando(true);
 
       try {
-        const { data, error } = await supabase.rpc('search_home', {
-          p_term: term,
-          p_limit: 10,
-        });
-
-        if (error) throw error;
+        const rows = await searchHome(term, { limit: 10 });
         if (cancelled) return;
-
-        const rows = (data || []).filter((item) => item.slug);
-        const negocioIds = rows
-          .filter((item) => String(item?.tipo || '').toLowerCase() === 'negocio' && item.id)
-          .map((item) => item.id);
-
-        if (!negocioIds.length) {
-          setResultadosBusca(rows);
-          return;
-        }
-
-        const { data: negociosLogo, error: logosError } = await supabase
-          .from('negocios')
-          .select('id, logo_path')
-          .in('id', negocioIds);
-
-        if (logosError) throw logosError;
-        if (cancelled) return;
-
-        const logoById = new Map((negociosLogo || []).map((item) => [item.id, item.logo_path]));
-        setResultadosBusca(rows.map((item) => (
-          String(item?.tipo || '').toLowerCase() === 'negocio'
-            ? { ...item, logo_path: logoById.get(item.id) || null }
-            : item
-        )));
+        setResultadosBusca(rows);
       } catch (error) {
         if (cancelled) return;
         console.error('Erro na busca:', error);
