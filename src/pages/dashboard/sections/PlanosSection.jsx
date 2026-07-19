@@ -4,7 +4,6 @@ import {
   cancelAsaasSubscription,
   createAsaasCheckout,
   fetchBillingPlans,
-  fetchBusinessBillingStatus,
   setBusinessPlan,
 } from '../api/dashboardApi';
 import { getRequestErrorKey } from '../../../utils/requestError';
@@ -37,24 +36,12 @@ function formatCurrencyFromCents(value) {
   return `R$ ${(Number(value || 0) / 100).toFixed(2).replace('.', ',')}`;
 }
 
-function formatDateBR(value) {
-  if (!value) return '';
-  const [year, month, day] = String(value).slice(0, 10).split('-');
-  if (!year || !month || !day) return '';
-  return `${day}.${month}.${year}`;
-}
-
 function getRenewalDate(status) {
-  return formatDateBR(status?.current_period_end);
+  return status?.current_period_end_label || '';
 }
 
 function getAccessEndDate(status) {
-  return formatDateBR(
-    status?.access_ends_on
-    || status?.access_ends_at
-    || status?.cancel_at
-    || status?.current_period_end
-  );
+  return status?.access_ends_label || '';
 }
 
 function buildPlanTimelineText({
@@ -88,7 +75,7 @@ function isCancellationScheduled(status) {
     || (
       String(status?.status || '').toLowerCase() === 'active'
       && Boolean(status?.canceled_at)
-      && Boolean(status?.access_ends_on || status?.access_ends_at || status?.cancel_at || status?.current_period_end)
+      && Boolean(status?.access_ends_label || status?.access_ends_on)
     );
 }
 
@@ -291,29 +278,34 @@ function StarGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
   );
 }
 
-export default function PlanosSection({ negocioId, profissionais = [], onBillingStatusChange }) {
+export default function PlanosSection({
+  negocioId,
+  profissionais = [],
+  billingStatus = null,
+  billingLoading = false,
+  onBillingStatusChange,
+  reloadBillingStatus,
+}) {
   const feedback = useFeedback();
   const [plans, setPlans] = useState([]);
-  const [billingStatus, setBillingStatus] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [plansLoading, setPlansLoading] = useState(true);
   const [savingPlan, setSavingPlan] = useState('');
   const [cancelingPlan, setCancelingPlan] = useState('');
   const [error, setError] = useState('');
   const planScrollerRef = useRef(null);
   const planCardRefs = useRef({});
 
-  const loadBilling = useCallback(async () => {
-    if (!negocioId) return;
-    setLoading(true);
+  const loadPlans = useCallback(async () => {
+    if (!negocioId) {
+      setPlans([]);
+      setPlansLoading(false);
+      return;
+    }
+    setPlansLoading(true);
     setError('');
     try {
-      const [plansData, statusData] = await Promise.all([
-        fetchBillingPlans(),
-        fetchBusinessBillingStatus(negocioId),
-      ]);
+      const plansData = await fetchBillingPlans();
       setPlans(plansData);
-      setBillingStatus(statusData);
-      onBillingStatusChange?.(statusData);
     } catch (err) {
       console.error('PlanosSection load error:', err);
       const requestKey = getRequestErrorKey(err);
@@ -325,19 +317,20 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
         setError(messageBody('dashboard.billing_plans_load_error'));
       }
     } finally {
-      setLoading(false);
+      setPlansLoading(false);
     }
-  }, [negocioId, onBillingStatusChange]);
+  }, [negocioId]);
 
   useEffect(() => {
-    loadBilling();
-  }, [loadBilling]);
+    loadPlans();
+  }, [loadPlans]);
 
+  const loading = plansLoading || billingLoading;
   const currentPlanCode = billingStatus?.plan_code || '';
   const currentStatusLabel = statusText(billingStatus);
   const canceledOrCancellationScheduled = isCanceledOrCancellationScheduled(billingStatus);
   const planChangeScheduled = Boolean(billingStatus?.plan_change_scheduled);
-  const pendingPlanDate = formatDateBR(billingStatus?.pending_plan_effective_on || billingStatus?.pending_plan_effective_at);
+  const pendingPlanDate = billingStatus?.pending_plan_effective_label || '';
   const pendingPlanLabel = billingStatus?.pending_plan_name || billingStatus?.pending_plan_code || '';
   const accessEndDate = getAccessEndDate(billingStatus);
   const renewalDate = getRenewalDate(billingStatus);
@@ -391,13 +384,11 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
       if (freeAccessOpen) {
         const result = await setBusinessPlan(negocioId, planCode);
         if (result) {
-          setBillingStatus(result);
           onBillingStatusChange?.(result);
         }
       } else {
         const checkout = await createAsaasCheckout(negocioId, planCode);
         if (checkout?.billing_status) {
-          setBillingStatus(checkout.billing_status);
           onBillingStatusChange?.(checkout.billing_status);
         }
         if (checkout?.checkout_url) {
@@ -429,10 +420,9 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
     try {
       const result = await cancelAsaasSubscription(negocioId);
       if (result?.billing_status) {
-        setBillingStatus(result.billing_status);
         onBillingStatusChange?.(result.billing_status);
       } else {
-        await loadBilling();
+        await reloadBillingStatus?.();
       }
     } catch (err) {
       console.error('cancelAsaasSubscription error:', err);
@@ -505,8 +495,7 @@ export default function PlanosSection({ negocioId, profissionais = [], onBilling
           const selectedCanceledOrCancellationScheduled = active && canceledOrCancellationScheduled;
           const canCancel = active
             && !selectedCanceledOrCancellationScheduled
-            && currentStatus === 'active'
-            && ['valid', 'none'].includes(paymentStatus);
+            && Boolean(billingStatus?.can_cancel_subscription);
           const activeFreeAccess = active && freeAccessOpen;
           const needsPayment = active
             && !activeFreeAccess
