@@ -145,6 +145,15 @@ export const isCancelStatus = (s) => normalizeStatus(s).includes('cancelado');
 export const isDoneStatus = (s) => normalizeStatus(s) === 'concluido';
 export const computeStatusFromDb = (a) => String(a?.status || '');
 
+export function isCancellationScheduled(status) {
+  return Boolean(status?.cancellation_scheduled)
+    || (
+      String(status?.status || '').toLowerCase() === 'active'
+      && Boolean(status?.canceled_at)
+      && Boolean(status?.access_ends_label || status?.access_ends_on)
+    );
+}
+
 export function formatDateBRFromISO(dateStr) {
   if (!dateStr) return 'Selecionar';
   const [y, m, d] = String(dateStr).split('-');
