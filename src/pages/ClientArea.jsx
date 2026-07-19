@@ -7,6 +7,7 @@ import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { convertImageToWebp, isImageFile } from '../utils/media';
 import { getRequestErrorKey } from '../utils/requestError';
+import { searchHome } from '../utils/searchHome';
 import { withTimeout } from '../utils/withTimeout';
 import {
   cancelarAgendamentoCliente,
@@ -96,7 +97,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     return fetchCurrentClienteId();
   }, []);
 
-  const searchHome = useCallback(async (cleanTerm) => {
+  const runSearchHome = useCallback(async (cleanTerm) => {
     const clean = String(cleanTerm || '').trim();
     setSearchError('');
 
@@ -108,13 +109,8 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
 
     setSearching(true);
     try {
-      const { data, error } = await supabase.rpc('search_home', {
-        p_term: clean,
-        p_limit: 10,
-      });
-
-      if (error) throw error;
-      setSearchRows(Array.isArray(data) ? data : []);
+      const rows = await searchHome(clean, { limit: 10 });
+      setSearchRows(rows);
     } catch (error) {
       setSearchRows([]);
       console.error('Client search error:', error);
@@ -278,11 +274,11 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     }
 
     const timeout = window.setTimeout(() => {
-      searchHome(clean);
+      runSearchHome(clean);
     }, 300);
 
     return () => window.clearTimeout(timeout);
-  }, [searchHome, searchTerm]);
+  }, [runSearchHome, searchTerm]);
 
   const fetchAgendamentosRef = useRef(fetchAgendamentos);
   useEffect(() => { fetchAgendamentosRef.current = fetchAgendamentos; }, [fetchAgendamentos]);
@@ -349,7 +345,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
             'avatar-remove-old'
           );
         } catch (removeError) {
-          console.warn('Falha ao remover avatar antigo imediatamente; limpeza já foi enfileirada pelo banco.', removeError);
+          console.warn('Falha ao remover avatar antigo imediatamente; limpeza ja foi enfileirada pelo banco.', removeError);
         }
       }
       setAvatarPath(path);
