@@ -27,6 +27,7 @@ import {
   getAgInicio,
   getBizLabel,
   isCancelStatus,
+  isCancellationScheduled,
   normalizeStatus,
   sameDay,
   timeToMinutes,
@@ -97,15 +98,6 @@ function InfoPill({ label, value, tone = 'text-gray-300', border = 'border-gray-
   );
 }
 
-function isCancellationScheduled(status) {
-  return Boolean(status?.cancellation_scheduled)
-    || (
-      String(status?.status || '').toLowerCase() === 'active'
-      && Boolean(status?.canceled_at)
-      && Boolean(status?.access_ends_label || status?.access_ends_on)
-    );
-}
-
 function getBillingAnnouncement(status) {
   if (!status) return null;
   const current = String(status.status || '').toLowerCase();
@@ -138,16 +130,13 @@ function getBillingAnnouncement(status) {
     };
   }
 
-  if (current === 'trialing' && Number.isFinite(daysUntilTrialEnd)) {
+  if (current === 'trialing' && Number.isFinite(daysUntilTrialEnd) && daysUntilTrialEnd > 0) {
     const total = Number.isFinite(trialDays) && trialDays > 0
       ? ` DE ${trialDays} DIA${trialDays === 1 ? '' : 'S'}`
       : '';
-    const text = daysUntilTrialEnd <= 0
-      ? `TESTE GRÁTIS ATIVO. ULTIMO DIA${total}.`
-      : `TESTE GRÁTIS ATIVO. FALTAM ${daysUntilTrialEnd} DIA${daysUntilTrialEnd === 1 ? '' : 'S'}${total}.`;
     return {
       tone: 'warning',
-      text,
+      text: `TESTE GRÁTIS ATIVO. FALTAM ${daysUntilTrialEnd} DIA${daysUntilTrialEnd === 1 ? '' : 'S'}${total}.`,
     };
   }
 
