@@ -9,6 +9,7 @@ import {
 import { getRequestErrorKey } from '../../../utils/requestError';
 import { useFeedback } from '../../../feedback/useFeedback';
 import { ptBR } from '../../../feedback/messages/ptBR.js';
+import { isCancellationScheduled } from '../utils';
 
 function getByPath(obj, path) {
   const parts = String(path || '').split('.');
@@ -68,15 +69,6 @@ function buildPlanTimelineText({
   }
 
   return '';
-}
-
-function isCancellationScheduled(status) {
-  return Boolean(status?.cancellation_scheduled)
-    || (
-      String(status?.status || '').toLowerCase() === 'active'
-      && Boolean(status?.canceled_at)
-      && Boolean(status?.access_ends_label || status?.access_ends_on)
-    );
 }
 
 function isCanceledOrCancellationScheduled(status) {
