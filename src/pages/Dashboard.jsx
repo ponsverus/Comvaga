@@ -102,34 +102,8 @@ function isCancellationScheduled(status) {
     || (
       String(status?.status || '').toLowerCase() === 'active'
       && Boolean(status?.canceled_at)
-      && Boolean(status?.access_ends_at || status?.cancel_at || status?.current_period_end)
+      && Boolean(status?.access_ends_label || status?.access_ends_on)
     );
-}
-
-function accessEndsAt(status) {
-  return status?.access_ends_on
-    || status?.access_ends_at
-    || status?.cancel_at
-    || status?.current_period_end
-    || null;
-}
-
-function formatDate(value) {
-  if (!value) return '';
-  const text = String(value).trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
-    const [year, month, day] = text.split('-');
-    return `${day}.${month}.${year}`;
-  }
-
-  const date = new Date(text.replace(' ', 'T'));
-  if (Number.isNaN(date.getTime())) return '';
-  return new Intl.DateTimeFormat('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date).replace(/\//g, '.');
 }
 
 function getBillingAnnouncement(status) {
@@ -140,7 +114,7 @@ function getBillingAnnouncement(status) {
   const trialDays = Number(status.trial_days);
 
   if (isCancellationScheduled(status)) {
-    const accessEndLabel = formatDate(accessEndsAt(status));
+    const accessEndLabel = status?.access_ends_label || '';
     return {
       tone: 'warning',
       text: `PLANO CANCELADO. ACESSO LIBERADO${accessEndLabel ? ` ATÉ ${accessEndLabel}` : ''}`,
@@ -249,6 +223,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
 
   const [activeTab, setActiveTab] = useState('agendamentos');
   const [billingStatus, setBillingStatus] = useState(null);
+  const [billingLoading, setBillingLoading] = useState(false);
   const {
     parceiroProfissional,
     negocio,
@@ -296,16 +271,41 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     let active = true;
     if (!negocio?.id || !souDono) {
       setBillingStatus(null);
+      setBillingLoading(false);
       return () => { active = false; };
     }
+    setBillingLoading(true);
     fetchBusinessBillingStatus(negocio.id)
       .then((status) => {
         if (active) setBillingStatus(status);
       })
       .catch(() => {
         if (active) setBillingStatus(null);
+      })
+      .finally(() => {
+        if (active) setBillingLoading(false);
       });
     return () => { active = false; };
+  }, [negocio?.id, souDono]);
+
+  const reloadBillingStatus = useCallback(async () => {
+    if (!negocio?.id || !souDono) {
+      setBillingStatus(null);
+      setBillingLoading(false);
+      return null;
+    }
+
+    setBillingLoading(true);
+    try {
+      const status = await fetchBusinessBillingStatus(negocio.id);
+      setBillingStatus(status);
+      return status;
+    } catch {
+      setBillingStatus(null);
+      return null;
+    } finally {
+      setBillingLoading(false);
+    }
   }, [negocio?.id, souDono]);
 
   const checarPermissao = useCallback(async (profissionalId) => {
@@ -939,7 +939,10 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
               <PlanosSection
                 negocioId={negocio.id}
                 profissionais={profissionais}
+                billingStatus={billingStatus}
+                billingLoading={billingLoading}
                 onBillingStatusChange={setBillingStatus}
+                reloadBillingStatus={reloadBillingStatus}
               />
             )}
 
