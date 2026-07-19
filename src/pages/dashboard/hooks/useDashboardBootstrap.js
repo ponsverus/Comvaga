@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   fetchAgendamentosNegocio,
   fetchEntregasPage,
@@ -11,28 +11,11 @@ import {
   fetchProfissionaisComStatus,
 } from '../api/dashboardApi';
 import { getRequestErrorKey } from '../../../utils/requestError';
+import { flattenEntregaPages } from '../../../utils/entregas';
 
 const AGENDAMENTOS_PAGE_SIZE = 50;
 const GALERIA_PAGE_SIZE = 12;
 const ENTREGAS_PAGE_SIZE = 6;
-
-function flattenEntregaPages(pagesByProf) {
-  const seen = new Set();
-  const rows = [];
-  Object.values(pagesByProf || {}).forEach((entry) => {
-    Object.keys(entry?.pages || {})
-      .map(Number)
-      .sort((a, b) => a - b)
-      .forEach((page) => {
-        (entry.pages[page] || []).forEach((item) => {
-          if (!item?.id || seen.has(item.id)) return;
-          seen.add(item.id);
-          rows.push(item);
-        });
-      });
-  });
-  return rows;
-}
 
 function getLastPartnerNegocioId(userId) {
   if (!userId) return null;
@@ -61,8 +44,8 @@ export function useDashboardBootstrap({
   const [parceiroProfissional, setParceiroProfissional] = useState(null);
   const [negocio, setNegocio] = useState(null);
   const [profissionais, setProfissionais] = useState([]);
-  const [entregas, setEntregas] = useState([]);
   const [entregaPagesByProf, setEntregaPagesByProf] = useState({});
+  const entregas = useMemo(() => flattenEntregaPages(entregaPagesByProf), [entregaPagesByProf]);
   const [agendamentos, setAgendamentos] = useState([]);
   const [agendamentosHasMore, setAgendamentosHasMore] = useState(false);
   const [agendamentosLoadingMore, setAgendamentosLoadingMore] = useState(false);
@@ -116,10 +99,6 @@ export function useDashboardBootstrap({
     setParceiroProfissional(parceiro);
     return scoped;
   }, [negocio?.id, negocio?.owner_id, scopeProfissionais]);
-
-  useEffect(() => {
-    setEntregas(flattenEntregaPages(entregaPagesByProf));
-  }, [entregaPagesByProf]);
 
   const loadEntregasPage = useCallback(async (profissionalId, page = 0, { force = false } = {}) => {
     const id = negocio?.id;
@@ -484,7 +463,6 @@ export function useDashboardBootstrap({
     setProfissionais,
     entregas,
     entregaPagesByProf,
-    setEntregas,
     agendamentos,
     setAgendamentos,
     agendamentosHasMore,
