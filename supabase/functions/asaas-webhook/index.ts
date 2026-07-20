@@ -251,7 +251,7 @@ function mapEvent(eventType: string, entity: Record<string, unknown>) {
     return { status: null, paymentMethodStatus: null };
   }
   if (event === 'CHECKOUT_CANCELED' || event === 'CHECKOUT_EXPIRED') {
-    return { status: 'payment_required', paymentMethodStatus: 'missing' };
+    return { status: 'payment_grace', paymentMethodStatus: 'missing' };
   }
   if (event === 'SUBSCRIPTION_DELETED' || event === 'SUBSCRIPTION_INACTIVATED') {
     return { status: 'canceled', paymentMethodStatus: 'expired' };
@@ -272,7 +272,7 @@ function mapEvent(eventType: string, entity: Record<string, unknown>) {
     || event === 'PAYMENT_REFUNDED'
     || event === 'PAYMENT_CHARGEBACK_REQUESTED'
   ) {
-    return { status: 'payment_required', paymentMethodStatus: 'failed' };
+    return { status: 'payment_grace', paymentMethodStatus: 'failed' };
   }
   return { status: null, paymentMethodStatus: null };
 }
