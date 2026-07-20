@@ -1542,7 +1542,7 @@ export const ptBR = {
       body: 'Você está logado como PROFISSIONAL.\nPara agendar, entre com uma conta CLIENTE.',
       buttonText: 'ENTENDI',
     },
-    schedule_billing_required: {
+    schedule_blocked: {
       title: 'Agenda indisponível',
       body: 'Agendamentos online suspensos neste canal. Por favor, entre em contato direto com o proprietário deste estabelecimento para reservar seu horário.',
       buttonText: 'ENTENDI',
