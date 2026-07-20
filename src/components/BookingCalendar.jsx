@@ -237,7 +237,7 @@ export default function BookingCalendar({
     } catch (e) {
       const msg     = String(e?.message || '').toLowerCase();
       const limited = isRateLimitError(e);
-      const billingRequired = msg.includes('blocked') || msg.includes('billing_required');
+      const scheduleBlocked = msg.includes('blocked');
       const expired = msg.includes('agendamento_horario_expirado')
         || msg.includes('horario_expirado');
       const overlap = msg.includes('conflito')
@@ -246,7 +246,7 @@ export default function BookingCalendar({
         || msg.includes('sobrepos')
         || msg.includes('exclusion')
         || String(e?.code || '') === '23P01';
-      if (billingRequired) {
+      if (scheduleBlocked) {
         setConfirmError('Agenda indisponível. Este negócio precisa ativar um plano para receber novos agendamentos.');
       } else if (limited) {
         setConfirmError('Muitas tentativas de agendamento. Aguarde um minuto e tente novamente.');
