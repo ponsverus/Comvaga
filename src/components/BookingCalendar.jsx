@@ -237,7 +237,7 @@ export default function BookingCalendar({
     } catch (e) {
       const msg     = String(e?.message || '').toLowerCase();
       const limited = isRateLimitError(e);
-      const billingRequired = msg.includes('billing_required');
+      const billingRequired = msg.includes('blocked') || msg.includes('billing_required');
       const expired = msg.includes('agendamento_horario_expirado')
         || msg.includes('horario_expirado');
       const overlap = msg.includes('conflito')
