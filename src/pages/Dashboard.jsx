@@ -113,14 +113,14 @@ function getBillingAnnouncement(status) {
     };
   }
 
-  if (current === 'blocked' || current === 'billing_required' || current === 'canceled') {
+  if (current === 'blocked' || current === 'canceled') {
     return {
       tone: 'danger',
       text: 'AGENDA BLOQUEADA. REGULARIZE SEU PLANO.',
     };
   }
 
-  if (current === 'payment_required' || current === 'past_due') {
+  if (current === 'payment_grace' || current === 'past_due') {
     const suffix = Number.isFinite(daysUntilBlock) && daysUntilBlock > 0
       ? ` BLOQUEIO EM ${daysUntilBlock} DIA${daysUntilBlock === 1 ? '' : 'S'}.`
       : '';
