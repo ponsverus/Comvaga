@@ -82,8 +82,7 @@ function statusText(status) {
   if (current === 'trialing') return 'Teste grátis';
   if (current === 'past_due') return 'Pagamento pendente';
   if (current === 'blocked') return 'Agenda bloqueada';
-  if (current === 'billing_required') return 'Agenda bloqueada';
-  if (current === 'payment_required') return 'Pagamento necessário';
+  if (current === 'payment_grace') return 'Pagamento necessário';
   if (current === 'canceled') return 'Cancelado';
   return 'Config.';
 }
@@ -102,10 +101,10 @@ function statusBadgeClass(status) {
   if (current === 'trialing') {
     return 'border-primary/30 bg-primary/10 text-primary';
   }
-  if (current === 'payment_required') {
+  if (current === 'payment_grace') {
     return 'border-yellow-400/30 bg-yellow-400/10 text-yellow-200';
   }
-  if (current === 'billing_required' || current === 'blocked' || current === 'past_due') {
+  if (current === 'blocked' || current === 'past_due') {
     return 'border-red-400/30 bg-red-400/10 text-red-200';
   }
   if (current === 'canceled') {
@@ -118,7 +117,7 @@ function statusBadgeClass(status) {
 function statusButtonText(status) {
   if (isCancellationScheduled(status)) return 'Reativar plano';
   const current = String(status?.status || '').toLowerCase();
-  if (current === 'billing_required' || current === 'blocked' || current === 'past_due') {
+  if (current === 'blocked' || current === 'past_due') {
     return 'Regularizar pagamento';
   }
   if (current === 'canceled') return 'Reativar plano';
@@ -131,10 +130,10 @@ function statusButtonClass(status) {
   }
 
   const current = String(status?.status || '').toLowerCase();
-  if (current === 'billing_required' || current === 'blocked' || current === 'past_due') {
+  if (current === 'blocked' || current === 'past_due') {
     return 'rounded-full bg-yellow-400 px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-black hover:bg-yellow-300';
   }
-  if (current === 'payment_required' || current === 'trialing') {
+  if (current === 'payment_grace' || current === 'trialing') {
     return 'rounded-full bg-primary px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-black hover:bg-primary/90';
   }
   return 'rounded-full border border-primary text-primary px-5 py-2.5 text-xs font-normal uppercase tracking-wider hover:bg-primary/10';
