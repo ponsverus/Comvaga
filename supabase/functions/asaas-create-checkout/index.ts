@@ -372,7 +372,7 @@ Deno.serve(async (req) => {
     }
 
     const canOpenCheckout = (
-      ['payment_required', 'billing_required', 'blocked', 'past_due', 'canceled'].includes(currentStatus)
+      ['payment_grace', 'blocked', 'past_due', 'canceled'].includes(currentStatus)
       || Boolean(statusData?.cancellation_scheduled)
       || (currentStatus === 'active' && !['valid', 'none'].includes(paymentStatus))
     );
