@@ -79,7 +79,7 @@ export function useVitrineBooking({
   const requireLogin = useCallback(async () => {
     if (!bookingAllowed) {
       alertKey(
-        'schedule_billing_required',
+        'schedule_blocked',
         'Agenda indisponível',
         'Este negócio precisa ativar um plano para receber novos agendamentos.',
         'ENTENDI'
