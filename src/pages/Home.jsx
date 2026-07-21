@@ -381,7 +381,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               <div>
                 <h3 className="text-2xl font-normal mb-3 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">CANCELOU?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
+                  <span className="text-primary">Cancelou?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
                 </p>
               </div>
             </div>
@@ -395,7 +395,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               <div>
                 <h3 className="text-2xl font-normal mb-3 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">A MAIORIA DOS SISTEMAS EXIBE TODOS OS HORÁRIOS LIVRES.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
+                  <span className="text-primary">A maioria dos sistemas exibe todos os horários livres.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
                 </p>
               </div>
             </div>
@@ -409,7 +409,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               <div>
                 <h3 className="text-2xl font-normal mb-3 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">O CLIENTE SELECIONA MAIS DE UM TRABALHO.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
+                  <span className="text-primary">O cliente seleciona mais de um trabalho.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
                 </p>
               </div>
             </div>
@@ -422,7 +422,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
 
-          <div className="grid lg:grid-cols-2 gap-px bg-gray-800 items-stretch w-full">
+          <div className="grid gap-px bg-gray-800 items-stretch w-full">
             <div className="relative z-10 text-center lg:text-left bg-dark-200 p-8 sm:p-16 flex flex-col justify-center px-4 sm:px-8 md:px-16 lg:px-24">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6 self-center lg:self-start">
                 <span className="relative flex h-2 w-2">
@@ -454,16 +454,6 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               </div>
             </div>
 
-            <div className="relative z-10 w-full flex items-center justify-center bg-dark-200 p-8 sm:p-16 px-4 sm:px-8 md:px-16 lg:px-24">
-              <div className="relative w-full max-w-[380px] overflow-hidden rounded-[3px] border border-gray-700 bg-dark-100 shadow-2xl transform rotate-2 lg:rotate-2 hover:rotate-0 transition-transform duration-700">
-                <img
-                  src="/Comvaga Vitrine Exemplo.png"
-                  alt="Print da vitrine exemplo da Comvaga"
-                  className="block h-auto w-full"
-                />
-              </div>
-              <div className="absolute -inset-10 bg-primary/10 blur-[80px] -z-10 rounded-full"></div>
-            </div>
           </div>
         </div>
       </section>
@@ -536,10 +526,11 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 'Reabertura automática de horários cancelados na agenda',
                 'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
                 'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
-                'Controle individual para um único profissional com indicadores básicos de agendamentos e receita',
+                'Indicadores completos de agendamentos e receita, com comparativo ao dia anterior e por período.',
+                'Métricas de faturamento e desempenho operacional por data ou período',
+                'Montagem de ofertas nos trabalhos oferecidos',
+                'Comprometimento da agenda e receita futura projetada',
                 'Agendamento assistido pelo profissional',
-                'Vitrine profissional',
-                'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
                 'Reagendamento inteligente em um clique pela área exclusiva do cliente',
                 'Alertas operacionais por e-mail e lembretes automáticos para clientes',
                 'Sincronia total com o Google Agenda',
@@ -577,18 +568,14 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
               </p>
               <p className="text-sm text-gray-400 leading-relaxed">
-                Para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.
+                Para negócios em crescimento com equipe de até 3 profissionais.
               </p>
             </div>
 
             <div className="pt-5 flex flex-col gap-3 flex-grow">
               {[
                 'Tudo do plano ESSENCIAL',
-                'Painel admin: controle de múltiplos profissionais',
-                'Painel individual para cada profissional parceiro',
-                'Até 5 profissionais parceiros sem taxas ou custos adicionais',
-                'Métricas de faturamento e desempenho operacional por data ou período',
-                'Montagem de ofertas nos trabalhos oferecidos',                  
+                'Até 3 profissionais parceiros sem taxas ou custos adicionais',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2.5">
                   <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
@@ -602,7 +589,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             <div className="mt-8 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
               <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
               <span className="text-xs font-normal text-primary uppercase tracking-wide">
-                PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM MAIS BENEFÍCIOS
+                PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM ATÉ 3 PROFISSIONAIS
               </span>
             </div>
 
@@ -633,9 +620,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
 
             <div className="pt-5 flex flex-col gap-3 flex-grow">
               {[
-                'Tudo do plano PROFISSIONAL',
                 'Profissionais ilimitados e sem custo extra por parceiro',                 
-                'Comprometimento da agenda e receita futura projetada',
                 'Acesso antecipado a novos recursos',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2.5">
