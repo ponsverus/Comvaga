@@ -60,6 +60,17 @@ export default function SignupClient({ onLogin }) {
       if (!email.includes('@')) { showMessage('signupClient.email_invalid'); return; }
       if (password.length < 7) { showMessage('signupClient.password_too_short'); return; }
 
+      const { data: emailStatus, error: emailStatusError } = await supabase.rpc('check_signup_email_availability', {
+        p_email: email,
+      });
+
+      if (emailStatusError) throw emailStatusError;
+      if (emailStatus?.available === false) {
+        const reason = String(emailStatus?.reason || '').trim();
+        showMessage(reason === 'email_invalid' ? 'signupClient.email_invalid' : 'signupClient.email_already_exists');
+        return;
+      }
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
