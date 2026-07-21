@@ -20,6 +20,16 @@ function isEmailAlreadyExistsError(err) {
   );
 }
 
+function getEmailAvailabilityMessageKey(checkResult) {
+  const reason = String(checkResult?.reason || '').trim();
+
+  if (reason === 'email_invalid') return 'signupProfessional.email_invalid';
+  if (reason === 'rate_limit_exceeded') return 'alerts.rate_limit_exceeded';
+  if (reason === 'email_already_registered') return 'signupProfessional.email_already_exists';
+
+  return 'alerts.action_failed_support';
+}
+
 async function fetchProfileTypeWithRetry(userId) {
   const delays = [200, 300, 400, 500, 600, 600, 700, 800];
 
@@ -95,8 +105,7 @@ export default function SignupProfessional({ onLogin }) {
 
       if (emailStatusError) throw emailStatusError;
       if (emailStatus?.available === false) {
-        const reason = String(emailStatus?.reason || '').trim();
-        showMessage(reason === 'email_invalid' ? 'signupProfessional.email_invalid' : 'signupProfessional.email_already_exists');
+        showMessage(getEmailAvailabilityMessageKey(emailStatus));
         return;
       }
 
