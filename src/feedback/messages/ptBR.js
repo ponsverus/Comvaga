@@ -1358,7 +1358,7 @@ export const ptBR = {
       title: 'E-mail já cadastrado',
       body:
         'Este e-mail já possui uma conta.\n' +
-        'Use a tela de login do parceiro ou recupere o acesso, se necessário.',
+        'Use a tela de login para entrar ou recupere o acesso, se necessário.',
       variant: 'warning',
       screen: 'dark',
       buttonText: 'ENTENDI',
