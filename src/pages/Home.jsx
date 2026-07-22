@@ -423,7 +423,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
 
           <div className="bg-gray-800 w-full">
-            <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center justify-center bg-dark-200 px-4 py-16 text-center sm:px-8 sm:py-20 md:px-16 lg:px-24">
+            <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center justify-center px-4 py-16 text-center sm:px-8 sm:py-20 md:px-16 lg:px-24">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -590,7 +590,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             <div className="mt-8 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
               <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
               <span className="text-xs font-normal text-primary uppercase tracking-wide">
-                PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM ATÉ 3 PROFISSIONAIS
+                PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM ATÉ 3 PROFISSIONAIS.
               </span>
             </div>
 
