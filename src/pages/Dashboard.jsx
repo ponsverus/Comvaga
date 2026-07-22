@@ -251,9 +251,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
   const souDono = negocio?.owner_id === user?.id;
   const parceiroProfissionalId = parceiroProfissional?.id ?? null;
   const acessoDashboardAutorizado = souDono || !!parceiroProfissional;
-  const allowAdvancedMetrics = true;
-  const allowFutureRevenue = true;
-  const allowOffers = true;
 
   useEffect(() => {
     let active = true;
@@ -463,7 +460,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     negocio,
     businessGroup,
     parceiroProfissional,
-    allowOffers,
     reloadNegocio,
     reloadProfissionais,
       reloadEntregas,
@@ -811,8 +807,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
                 metricsFutureBookings={metricsFutureBookings}
                 metricsFutureBookingsLoading={metricsFutureBookingsLoading}
                 counterSingular={counterSingular}
-                allowAdvancedMetrics={allowAdvancedMetrics}
-                allowFutureRevenue={allowFutureRevenue}
               />
             )}
 
@@ -876,7 +870,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
                 checarPermissao={checarPermissao}
                 deleteEntrega={deleteEntrega}
                 toggleStatusEntrega={toggleStatusEntrega}
-                allowOffers={allowOffers}
               />
             )}
 
@@ -948,7 +941,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
         parceiroProfissional={parceiroProfissional}
         profissionais={profissionais}
         submittingEntrega={submittingEntrega}
-        allowOffers={allowOffers}
         onClose={() => {
           setShowNovaEntrega(false);
           setEditingEntregaId(null);
