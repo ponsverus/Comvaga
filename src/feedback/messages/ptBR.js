@@ -807,13 +807,6 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
-    plan_feature_offers_unavailable: {
-      title: 'Oferta indisponível',
-      body: 'Recurso de ofertas restrito. Remova o valor promocional antes de continuar.',
-      variant: 'warning',
-      screen: 'dark',
-      buttonText: 'OK',
-    },
   },
 
   professionalAccount: {
