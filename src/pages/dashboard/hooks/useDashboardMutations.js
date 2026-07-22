@@ -32,7 +32,6 @@ export function useDashboardMutations({
   negocio,
   businessGroup,
   parceiroProfissional,
-  allowOffers = true,
   reloadNegocio,
   reloadProfissionais,
   reloadEntregas,
@@ -376,7 +375,7 @@ export function useDashboardMutations({
       const profId = formEntrega.profissional_id;
       if (!await checarPermissao(profId)) return;
       const preco = toNumberOrNull(formEntrega.preco);
-      const promo = allowOffers ? toNumberOrNull(formEntrega.preco_promocional) : null;
+      const promo = toNumberOrNull(formEntrega.preco_promocional);
       if (preco == null) throw new Error('Preco invalido.');
       if (promo != null && promo >= preco) throw new Error('Preco de oferta deve ser menor.');
       const payload = {
@@ -418,7 +417,7 @@ export function useDashboardMutations({
       const profId = formEntrega.profissional_id;
       if (!await checarPermissao(profId)) return;
       const preco = toNumberOrNull(formEntrega.preco);
-      const promo = allowOffers ? toNumberOrNull(formEntrega.preco_promocional) : null;
+      const promo = toNumberOrNull(formEntrega.preco_promocional);
       if (!toUpperClean(formEntrega.nome)) throw new Error('Nome da entrega e obrigatorio.');
       if (!profId) throw new Error('Selecione um profissional.');
       if (!toNumberOrNull(formEntrega.duracao_minutos)) throw new Error('Duracao invalida.');
