@@ -550,7 +550,7 @@ export default function PlanosSection({
                 <div className="mt-8 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
                   <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
                   <span className="text-xs font-normal text-primary uppercase tracking-wide">
-                    PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM MAIS BENEFÍCIOS
+                    PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM ATÉ 3 PROFISSIONAIS
                   </span>
                 </div>
               )}
