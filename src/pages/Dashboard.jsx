@@ -251,10 +251,9 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
   const souDono = negocio?.owner_id === user?.id;
   const parceiroProfissionalId = parceiroProfissional?.id ?? null;
   const acessoDashboardAutorizado = souDono || !!parceiroProfissional;
-  const billingFeatures = souDono ? (billingStatus?.features || {}) : {};
-  const allowAdvancedMetrics = souDono ? billingFeatures.advanced_metrics !== false : true;
-  const allowFutureRevenue = souDono ? billingFeatures.future_revenue === true : false;
-  const allowOffers = souDono ? billingFeatures.offers === true : false;
+  const allowAdvancedMetrics = true;
+  const allowFutureRevenue = true;
+  const allowOffers = true;
 
   useEffect(() => {
     let active = true;
