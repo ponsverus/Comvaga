@@ -91,7 +91,6 @@ export function useDashboardMutations({
 
   const getBillingErrorKey = (error) => {
     const raw = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
-    if (raw.includes('feature_unavailable') && raw.includes('offers')) return 'dashboard.plan_feature_offers_unavailable';
     if (raw.includes('plan_professional_limit_reached')) return 'dashboard.plan_professional_limit_reached';
     if (raw.includes('partner_plan_unavailable')) return 'dashboard.partner_plan_unavailable';
     return null;
