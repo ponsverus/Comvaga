@@ -17,7 +17,6 @@ function ProfissionalEntregasBlock({
   setEditingEntregaId,
   setFormEntrega,
   setShowNovaEntrega,
-  allowOffers = true,
 }) {
   const [page, setPage] = useState(0);
   const totalCount = Number.isFinite(Number(pageState?.totalCount)) ? Number(pageState.totalCount) : lista.length;
@@ -90,7 +89,7 @@ function ProfissionalEntregasBlock({
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
               {visibleEntregas.map(s => {
                 const preco = Number(s.preco ?? 0);
-                const promo = !allowOffers || s.preco_promocional == null ? null : Number(s.preco_promocional);
+                const promo = s.preco_promocional == null ? null : Number(s.preco_promocional);
                 const isInativo = s.ativo === false;
                 return (
                   <div key={s.id} className={`relative bg-dark-100 border rounded-custom p-5 ${isInativo ? 'border-gray-700' : 'border-gray-800'}`}>
@@ -113,7 +112,7 @@ function ProfissionalEntregasBlock({
                       <button onClick={async () => {
                           if (!await checarPermissao(s.profissional_id)) return;
                           setEditingEntregaId(s.id);
-                          setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: allowOffers ? String(s.preco_promocional ?? '') : '', profissional_id: s.profissional_id || '' });
+                          setFormEntrega({ nome: s.nome || '', duracao_minutos: String(s.duracao_minutos ?? ''), preco: String(s.preco ?? ''), preco_promocional: String(s.preco_promocional ?? ''), profissional_id: s.profissional_id || '' });
                           setShowNovaEntrega(true);
                         }} className="w-full py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 rounded-button text-sm font-normal uppercase">EDITAR</button>
                     </div>
@@ -179,7 +178,6 @@ export default function EntregasSection({
   checarPermissao,
   deleteEntrega,
   toggleStatusEntrega,
-  allowOffers = true,
 }) {
   return (
     <div>
@@ -215,7 +213,6 @@ export default function EntregasSection({
                 setEditingEntregaId={setEditingEntregaId}
                 setFormEntrega={setFormEntrega}
                 setShowNovaEntrega={setShowNovaEntrega}
-                allowOffers={allowOffers}
               />
             );
           })}
