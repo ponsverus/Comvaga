@@ -220,7 +220,11 @@ const PLAN_CONTENT = {
     ],
     checkClass: 'text-primary',
     textClass: 'text-gray-300',
-    highlight: 'MESMO VALOR DO ESSENCIAL COM ATÉ 3 PROFISSIONAIS',
+    highlight: (
+      <>
+        PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM ATÉ 3 PROFISSIONAIS.
+      </>
+    ),
     buttonText: 'Selecionar plano',
     buttonClass: 'bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30',
   },
@@ -550,7 +554,7 @@ export default function PlanosSection({
                 <div className="mt-8 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
                   <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
                   <span className="text-xs font-normal text-primary uppercase tracking-wide">
-                    PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM ATÉ 3 PROFISSIONAIS.
+                    {content.highlight}
                   </span>
                 </div>
               )}
