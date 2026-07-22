@@ -207,7 +207,7 @@ const PLAN_CONTENT = {
   },
   profissional: {
     label: 'Profissional',
-    description: 'Para negócios em crescimento com equipe de até 3 profissionais.',
+    description: 'Para negócios em crescimento que precisam ampliar sua equipe.',
     badgeClass: 'text-primary bg-primary/15',
     price: (
       <>
@@ -216,7 +216,7 @@ const PLAN_CONTENT = {
     ),
     items: [
       'Tudo do plano ESSENCIAL',
-      'Até 3 profissionais parceiros sem taxas ou custos adicionais',
+      'Até 3 profissionais cadastrados',
     ],
     checkClass: 'text-primary',
     textClass: 'text-gray-300',
@@ -226,7 +226,7 @@ const PLAN_CONTENT = {
   },
   premium: {
     label: 'Premium Real',
-    description: 'Experiência completa com acesso ilimitado a todos os recursos.',
+    description: 'Para negócios que querem crescer sem limites e aproveitar primeiro as novas possibilidades.',
     badgeClass: 'text-gray-400 bg-gray-800',
     price: (
       <>
@@ -234,7 +234,7 @@ const PLAN_CONTENT = {
       </>
     ),
     items: [
-      'Profissionais ilimitados e sem custo extra por parceiro',
+      'Profissionais ilimitados',
       'Acesso antecipado a novos recursos',
     ],
     checkClass: 'text-gray-600',
@@ -550,7 +550,7 @@ export default function PlanosSection({
                 <div className="mt-8 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
                   <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
                   <span className="text-xs font-normal text-primary uppercase tracking-wide">
-                    PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM ATÉ 3 PROFISSIONAIS
+                    PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM ATÉ 3 PROFISSIONAIS.
                   </span>
                 </div>
               )}
