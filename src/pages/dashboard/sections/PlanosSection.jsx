@@ -155,9 +155,6 @@ function getPlanChangeErrorMessage(error) {
   if (raw.includes('plan_professional_limit_reached')) {
     return messageBody('dashboard.plan_professional_limit_reached');
   }
-  if (raw.includes('feature_unavailable') && raw.includes('offers')) {
-    return messageBody('dashboard.plan_feature_offers_unavailable');
-  }
   if (raw.includes('asaas_checkout_failed')) {
     return messageBody('dashboard.billing_checkout_error');
   }
@@ -194,14 +191,14 @@ const PLAN_CONTENT = {
       'Reabertura automática de horários cancelados na agenda',
       'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
       'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
-      'Controle individual para um único profissional com indicadores básicos de agendamentos e receita',
+      'Indicadores de agendamentos e receita, com comparativo ao dia anterior, além de indicadores de receita por período.',
+      'Montagem de ofertas nos trabalhos oferecidos',
+      'Comprometimento da agenda e receita futura projetada',
       'Agendamento assistido pelo profissional',
-      'Vitrine profissional',
-      'Sistema segmentado: Notas e depoimentos separados por profissional e por negócio',
       'Reagendamento inteligente em um clique pela área exclusiva do cliente',
       'Alertas por e-mail em tempo real',
       'Lembrete automático 30 min antes',
-      'Sincronia total com o Google Agenda.',
+      'Sincronia total com o Google Agenda',
     ],
     checkClass: 'text-gray-600',
     textClass: 'text-gray-400',
@@ -210,7 +207,7 @@ const PLAN_CONTENT = {
   },
   profissional: {
     label: 'Profissional',
-    description: 'Para negócios em crescimento, com inteligência de dados e gerenciamento centralizado de equipe.',
+    description: 'Para negócios em crescimento com equipe de até 3 profissionais.',
     badgeClass: 'text-primary bg-primary/15',
     price: (
       <>
@@ -219,15 +216,11 @@ const PLAN_CONTENT = {
     ),
     items: [
       'Tudo do plano ESSENCIAL',
-      'Painel admin: controle de múltiplos profissionais',
-      'Painel individual para cada profissional parceiro',
-      'Até 5 profissionais parceiros sem taxas ou custos adicionais',
-      'Métricas de faturamento e desempenho operacional por data ou período',
-      'Montagem de ofertas nos trabalhos oferecidos',
+      'Até 3 profissionais parceiros sem taxas ou custos adicionais',
     ],
     checkClass: 'text-primary',
     textClass: 'text-gray-300',
-    highlight: 'MESMO VALOR DO ESSENCIAL COM MAIS BENEFÍCIOS',
+    highlight: 'MESMO VALOR DO ESSENCIAL COM ATÉ 3 PROFISSIONAIS',
     buttonText: 'Selecionar plano',
     buttonClass: 'bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30',
   },
@@ -241,9 +234,7 @@ const PLAN_CONTENT = {
       </>
     ),
     items: [
-      'Tudo do plano PROFISSIONAL',
       'Profissionais ilimitados e sem custo extra por parceiro',
-      'Comprometimento da agenda e receita futura projetada',
       'Acesso antecipado a novos recursos',
     ],
     checkClass: 'text-gray-600',
