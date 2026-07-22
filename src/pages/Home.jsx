@@ -422,9 +422,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
 
-          <div className="grid gap-px bg-gray-800 items-stretch w-full">
-            <div className="relative z-10 text-center lg:text-left bg-dark-200 p-8 sm:p-16 flex flex-col justify-center px-4 sm:px-8 md:px-16 lg:px-24">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6 self-center lg:self-start">
+          <div className="bg-gray-800 w-full">
+            <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center justify-center bg-dark-200 px-4 py-16 text-center sm:px-8 sm:py-20 md:px-16 lg:px-24">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -437,11 +437,11 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 <span className="text-primary">UMA VITRINE PROFISSIONAL.</span>
               </h2>
               
-              <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-3xl">
                 Seu negócio merece mais do que um link de WhatsApp. Permita que seus clientes enxerguem seus trabalhos, depoimentos, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
                   href="https://comvaga.com.br/v/vikings"
                   target="_blank"
@@ -526,13 +526,14 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 'Reabertura automática de horários cancelados na agenda',
                 'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
                 'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
-                'Indicadores completos de agendamentos e receita, com comparativo ao dia anterior e por período.',
+                'Indicadores de agendamentos e receita, com comparativo ao dia anterior, além de indicadores de receita por período.',
                 'Métricas de faturamento e desempenho operacional por data ou período',
                 'Montagem de ofertas nos trabalhos oferecidos',
                 'Comprometimento da agenda e receita futura projetada',
                 'Agendamento assistido pelo profissional',
                 'Reagendamento inteligente em um clique pela área exclusiva do cliente',
-                'Alertas operacionais por e-mail e lembretes automáticos para clientes',
+                'Alertas por e-mail em tempo real',
+                'Lembrete automático 30 min antes',
                 'Sincronia total com o Google Agenda',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2.5">
@@ -568,14 +569,14 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
               </p>
               <p className="text-sm text-gray-400 leading-relaxed">
-                Para negócios em crescimento com equipe de até 3 profissionais.
+                Para negócios em crescimento que precisam ampliar sua equipe.
               </p>
             </div>
 
             <div className="pt-5 flex flex-col gap-3 flex-grow">
               {[
                 'Tudo do plano ESSENCIAL',
-                'Até 3 profissionais parceiros sem taxas ou custos adicionais',
+                'Até 3 profissionais cadastrados',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2.5">
                   <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
@@ -614,13 +615,13 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 R$ 69<span className="text-base font-normal text-gray-500">,99/mês</span>
               </p>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Experiência completa com acesso ilimitado a todos os recursos.
+                Para negócios que querem crescer sem limites e aproveitar primeiro as novas possibilidades.
               </p>
             </div>
 
             <div className="pt-5 flex flex-col gap-3 flex-grow">
               {[
-                'Profissionais ilimitados e sem custo extra por parceiro',                 
+                'Profissionais ilimitados',                 
                 'Acesso antecipado a novos recursos',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2.5">
