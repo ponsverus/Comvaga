@@ -189,7 +189,7 @@ export async function createAsaasCheckout(negocioId, planCode) {
         plan_code: planCode,
       },
     }),
-    8000,
+    25000,
     'asaas-checkout'
   );
 
