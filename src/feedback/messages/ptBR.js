@@ -121,6 +121,27 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
+    billing_checkout_reconciliation_pending: {
+      title: 'Checkout em conferência',
+      body: 'Aguarde alguns instantes e tente abrir novamente, pois o registro do seu checkout segue em andamento; a Comvaga evita gerar um novo pedido enquanto houver dúvida sobre o anterior.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    billing_checkout_conflict: {
+      title: 'Já existe um checkout aberto',
+      body: 'Existe um checkout válido aberto para outro pedido. Finalize este pagamento ou aguarde ele expirar antes de gerar um checkout diferente.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    billing_checkout_in_progress: {
+      title: 'Checkout sendo preparado',
+      body: 'O processamento deste checkout já está em andamento. Aguarde alguns instantes e clique novamente para abrir o mesmo link.',
+      variant: 'info',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
     billing_checkout_error: {
       title: 'Erro no checkout',
       body: 'Houve um erro ao abrir o checkout do pagamento agora.',
