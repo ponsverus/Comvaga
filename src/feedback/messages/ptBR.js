@@ -121,6 +121,27 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
+    billing_checkout_reconciliation_pending: {
+      title: 'Checkout em conferência',
+      body: 'A confirmação da criação do checkout ainda está em andamento. Aguarde alguns instantes e tente abrir novamente; um novo checkout não será criado enquanto houver dúvida sobre o anterior.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    billing_checkout_conflict: {
+      title: 'Já existe um checkout aberto',
+      body: 'Há um checkout válido aberto para outra seleção. Conclua esse pagamento ou aguarde a expiração antes de gerar um checkout diferente.',
+      variant: 'warning',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
+    billing_checkout_in_progress: {
+      title: 'Checkout sendo preparado',
+      body: 'A criação deste checkout já está em andamento. Aguarde alguns instantes e clique novamente para abrir o mesmo link.',
+      variant: 'info',
+      screen: 'dark',
+      buttonText: 'ENTENDI',
+    },
     billing_checkout_error: {
       title: 'Erro no checkout',
       body: 'Houve um erro ao abrir o checkout do pagamento agora.',
