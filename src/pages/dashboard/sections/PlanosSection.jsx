@@ -155,6 +155,15 @@ function getPlanChangeErrorMessage(error) {
   if (raw.includes('plan_professional_limit_reached')) {
     return messageBody('dashboard.plan_professional_limit_reached');
   }
+  if (raw.includes('checkout_reconciliation_pending')) {
+    return messageBody('dashboard.billing_checkout_reconciliation_pending');
+  }
+  if (raw.includes('checkout_conflict')) {
+    return messageBody('dashboard.billing_checkout_conflict');
+  }
+  if (raw.includes('checkout_in_progress')) {
+    return messageBody('dashboard.billing_checkout_in_progress');
+  }
   if (raw.includes('asaas_checkout_failed')) {
     return messageBody('dashboard.billing_checkout_error');
   }
