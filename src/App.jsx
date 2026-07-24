@@ -358,8 +358,15 @@ export default function App() {
   }, []);
 
   const handleLogout = useCallback(async (redirectTo = '/login') => {
+    const safeRedirect = (
+      typeof redirectTo === 'string'
+      && redirectTo.startsWith('/')
+    )
+      ? redirectTo
+      : '/login';
+
     loadedUserRef.current = null;
-    setPostLogoutRedirect(redirectTo);
+    setPostLogoutRedirect(safeRedirect);
     try {
       await supabase.auth.signOut();
     } finally {
