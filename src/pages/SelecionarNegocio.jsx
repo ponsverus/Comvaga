@@ -98,7 +98,7 @@ export default function SelecionarNegocio({ user, onLogout, professionalRole = n
           <img src="/Comvaga Logo.png" alt="COMVAGA" className="h-14 w-auto object-contain" />
           <button
             type="button"
-            onClick={onLogout}
+            onClick={() => onLogout?.()}
             className="inline-flex items-center justify-center gap-2 rounded-button bg-red-600 px-4 py-1.5 text-sm font-normal uppercase transition-colors hover:bg-red-700 sm:py-2"
           >
             <LogOut className="h-4 w-4" />
