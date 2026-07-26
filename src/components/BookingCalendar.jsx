@@ -456,25 +456,15 @@ export default function BookingCalendar({
 
           {todayISO && selectedSlot && (
             <div ref={resumeRef} className={`border rounded-custom p-4 ${resumeBg}`}>
-              <div className={`text-sm uppercase tracking-wide mb-3 ${resumeLabel}`}>Resumo</div>
-              <div className="space-y-2 text-xs mb-4">
-                <div className="flex justify-between">
-                  <span className={resumeLabel}>PROFISSIONAL</span>
-                  <span className={`${resumeValue} uppercase`}>
-                    {profissional?.nome}
-                  </span>
+              <div className={`text-xs uppercase tracking-wide mb-3 ${resumeLabel}`}>Resumo</div>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="min-w-0">
+                  <div className={`text-xs mb-1 ${resumeLabel}`}>DATA</div>
+                  <div className={`text-sm ${resumeValue}`}>{formatBR(selectedDay)}</div>
                 </div>
-                <div className="flex justify-between">
-                  <span className={resumeLabel}>DATA</span>
-                  <span className={resumeValue}>{formatBR(selectedDay)}</span>
-                </div>
-                <div className="flex justify-between">
+                <div className="min-w-0 flex flex-col gap-1 text-xs">
                   <span className={resumeLabel}>HORÁRIO</span>
-                  <span className="text-vprimary font-normal">{selectedSlot.hora}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className={resumeLabel}>VALOR</span>
-                  <span style={{ color: 'var(--vpromo-text)' }}>R$ {valorExibido}</span>
+                  <div className="text-sm text-vprimary font-normal">{selectedSlot.hora}</div>
                 </div>
               </div>
 
