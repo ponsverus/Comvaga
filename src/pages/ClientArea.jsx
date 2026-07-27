@@ -286,28 +286,46 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const agendamentosPageRef = useRef(agendamentosPage);
   useEffect(() => { agendamentosPageRef.current = agendamentosPage; }, [agendamentosPage]);
 
+  const realtimeRefreshTimerRef = useRef(null);
+
   useEffect(() => {
     if (!clienteId) return;
+    const scheduleRefresh = () => {
+      if (realtimeRefreshTimerRef.current) {
+        window.clearTimeout(realtimeRefreshTimerRef.current);
+      }
+
+      realtimeRefreshTimerRef.current = window.setTimeout(async () => {
+        try {
+          const limit = (agendamentosPageRef.current + 1) * PAGE_SIZE;
+          const rows = await fetchAgendamentosRef.current({ limit: limit + 1 });
+          const visibleRows = getVisiblePageRows(rows, limit);
+          setAgendamentos(visibleRows);
+          await syncAvaliacoesConcluidas(visibleRows);
+          setAgendamentosHasMore(getHasMoreRows(rows, limit));
+        } catch (error) {
+          console.warn('Falha ao atualizar agendamentos em tempo real.', error);
+        } finally {
+          realtimeRefreshTimerRef.current = null;
+        }
+      }, 1200);
+    };
+
     const channel = supabase
       .channel(`agendamentos_cliente:${clienteId}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'agendamentos', filter: `cliente_id=eq.${clienteId}` },
-        async () => {
-          try {
-            const limit = (agendamentosPageRef.current + 1) * PAGE_SIZE;
-            const rows = await fetchAgendamentosRef.current({ limit: limit + 1 });
-            const visibleRows = getVisiblePageRows(rows, limit);
-            setAgendamentos(visibleRows);
-            await syncAvaliacoesConcluidas(visibleRows);
-            setAgendamentosHasMore(getHasMoreRows(rows, limit));
-          } catch (error) {
-            console.warn('Falha ao atualizar agendamentos em tempo real.', error);
-          }
-        }
+        scheduleRefresh
       )
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      if (realtimeRefreshTimerRef.current) {
+        window.clearTimeout(realtimeRefreshTimerRef.current);
+        realtimeRefreshTimerRef.current = null;
+      }
+      supabase.removeChannel(channel);
+    };
   }, [clienteId, getHasMoreRows, getVisiblePageRows, syncAvaliacoesConcluidas]);
 
   const openFilePicker = () => fileInputRef.current?.click();
