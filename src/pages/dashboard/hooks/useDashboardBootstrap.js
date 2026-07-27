@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   fetchAgendamentosNegocio,
+  fetchEntregasFirstPages,
   fetchEntregasPage,
   fetchGaleria,
   fetchNegocioById,
@@ -16,6 +17,36 @@ import { flattenEntregaPages } from '../../../utils/entregas';
 const AGENDAMENTOS_PAGE_SIZE = 50;
 const GALERIA_PAGE_SIZE = 12;
 const ENTREGAS_PAGE_SIZE = 6;
+
+function buildEntregaPagesByProf(rows, profissionalIds, current = {}) {
+  const next = {};
+  const grouped = new Map();
+
+  for (const row of rows || []) {
+    if (!row?.profissional_id) continue;
+    if (!grouped.has(row.profissional_id)) grouped.set(row.profissional_id, []);
+    grouped.get(row.profissional_id).push(row);
+  }
+
+  for (const profissionalId of profissionalIds || []) {
+    const previous = current[profissionalId] || { pages: {}, totalCount: 0, version: 0 };
+    const pageRows = grouped.get(profissionalId) || [];
+    next[profissionalId] = {
+      pages: {
+        0: pageRows.map((row) => {
+          const normalized = { ...row };
+          delete normalized.total_count;
+          return normalized;
+        }),
+      },
+      totalCount: Number(pageRows[0]?.total_count || 0),
+      loadingPage: null,
+      version: previous.version + 1,
+    };
+  }
+
+  return next;
+}
 
 function getLastPartnerNegocioId(userId) {
   if (!userId) return null;
@@ -161,30 +192,28 @@ export function useDashboardBootstrap({
       setEntregaPagesByProf({});
       return [];
     }
-    const pages = await Promise.all(ids.map(async (profissionalId) => {
-      const page = await fetchEntregasPage({
-        negocioId: id,
-        profissionalId,
-        limit: ENTREGAS_PAGE_SIZE,
-        offset: 0,
-      });
-      return [profissionalId, page];
-    }));
+    const rows = await fetchEntregasFirstPages({
+      negocioId: id,
+      profissionalIds: ids,
+      limit: ENTREGAS_PAGE_SIZE,
+    });
     setEntregaPagesByProf((current) => {
-      const next = { ...current };
-      pages.forEach(([profissionalId, page]) => {
-        const previous = current[profissionalId] || { pages: {}, totalCount: 0, version: 0 };
-        next[profissionalId] = {
-          pages: { 0: page.rows },
-          totalCount: page.totalCount,
-          loadingPage: null,
-          version: previous.version + 1,
-        };
-      });
+      const next = { ...current, ...buildEntregaPagesByProf(rows, ids, current) };
       return next;
     });
-    return pages.flatMap(([, page]) => page.rows);
+    return rows.map((row) => {
+      const normalized = { ...row };
+      delete normalized.total_count;
+      return normalized;
+    });
   }, [negocio?.id, profissionais]);
+
+  const applyEntregaFirstPages = useCallback((rows, profissionalIds) => {
+    setEntregaPagesByProf((current) => {
+      const next = buildEntregaPagesByProf(rows, profissionalIds, current);
+      return next;
+    });
+  }, []);
 
   const reloadAgendamentos = useCallback(async (negocioId, profissionalIds, dataHoje) => {
     const id = negocioId || negocio?.id;
@@ -378,16 +407,12 @@ export function useDashboardBootstrap({
 
       const ids = scopedProfs.map((item) => item.id);
       const dataHoje = (typeof dataRef === 'string' && dataRef) ? dataRef : hojeRef.current;
-      const [entregaPages, agendamentoRows] = await Promise.all([
-        Promise.all(ids.map(async (profissionalId) => {
-          const page = await fetchEntregasPage({
-            negocioId: negocioData.id,
-            profissionalId,
-            limit: ENTREGAS_PAGE_SIZE,
-            offset: 0,
-          });
-          return [profissionalId, page];
-        })),
+      const [entregaRows, agendamentoRows] = await Promise.all([
+        fetchEntregasFirstPages({
+          negocioId: negocioData.id,
+          profissionalIds: ids,
+          limit: ENTREGAS_PAGE_SIZE,
+        }),
         dataHoje ? fetchAgendamentosNegocio({
           negocioId: negocioData.id,
           profissionalIds: ids,
@@ -398,15 +423,7 @@ export function useDashboardBootstrap({
       ]);
 
       if (!isCurrentRun()) return;
-      setEntregaPagesByProf(Object.fromEntries(entregaPages.map(([profissionalId, page]) => [
-        profissionalId,
-        {
-          pages: { 0: page.rows },
-          totalCount: page.totalCount,
-          loadingPage: null,
-          version: 0,
-        },
-      ])));
+      applyEntregaFirstPages(entregaRows, ids);
       setAgendamentos(agendamentoRows.slice(0, AGENDAMENTOS_PAGE_SIZE));
       setAgendamentosHasMore(agendamentoRows.length > AGENDAMENTOS_PAGE_SIZE);
       setBootstrapState('ready');
@@ -425,7 +442,7 @@ export function useDashboardBootstrap({
       }
       setBootstrapState('error');
     }
-  }, [applyGaleriaPage, locationNegocioId, navigate, scopeProfissionais, uiAlert, userId]);
+  }, [applyEntregaFirstPages, applyGaleriaPage, locationNegocioId, navigate, scopeProfissionais, uiAlert, userId]);
 
   const reloadFull = useCallback(async () => {
     try {

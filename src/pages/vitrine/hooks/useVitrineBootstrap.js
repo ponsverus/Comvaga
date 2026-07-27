@@ -3,6 +3,7 @@ import {
   fetchBusinessBookingAvailability,
   fetchOfficialDate,
   fetchVitrineDepoimentos,
+  fetchVitrineEntregasFirstPages,
   fetchVitrineEntregasPage,
   fetchVitrineGaleria,
   fetchVitrineNegocioBySlug,
@@ -15,6 +16,36 @@ const EMPTY_NOW = { ts: null, dow: 0, date: '', source: 'db', minutes: 0 };
 const GALERIA_PAGE_SIZE = 12;
 const DEPOIMENTOS_PAGE_SIZE = 12;
 const ENTREGAS_PAGE_SIZE = 4;
+
+function buildEntregaPagesByProf(rows, profissionalIds, current = {}) {
+  const next = {};
+  const grouped = new Map();
+
+  for (const row of rows || []) {
+    if (!row?.profissional_id) continue;
+    if (!grouped.has(row.profissional_id)) grouped.set(row.profissional_id, []);
+    grouped.get(row.profissional_id).push(row);
+  }
+
+  for (const profissionalId of profissionalIds || []) {
+    const previous = current[profissionalId] || { pages: {}, totalCount: 0, version: 0 };
+    const pageRows = grouped.get(profissionalId) || [];
+    next[profissionalId] = {
+      pages: {
+        0: pageRows.map((row) => {
+          const normalized = { ...row };
+          delete normalized.total_count;
+          return normalized;
+        }),
+      },
+      totalCount: Number(pageRows[0]?.total_count || 0),
+      loadingPage: null,
+      version: previous.version + 1,
+    };
+  }
+
+  return next;
+}
 
 export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = null }) {
   const [negocio, setNegocio] = useState(null);
@@ -130,6 +161,10 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
     setGaleriaItems(visibleRows);
   }, []);
 
+  const applyEntregaFirstPages = useCallback((rows, profissionalIds) => {
+    setEntregaPagesByProf((current) => buildEntregaPagesByProf(rows, profissionalIds, current));
+  }, []);
+
   const loadMoreGaleria = useCallback(async () => {
     if (!negocio?.id || galeriaLoadingMore || !galeriaHasMore) return;
 
@@ -210,28 +245,16 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
       setProfissionais(profs);
 
       const profissionalIds = profs.map((p) => p.id).filter(Boolean);
-      const [entregasPages, galeriaData, deps] = await Promise.all([
-        Promise.all(profissionalIds.map(async (profissionalId) => {
-          const page = await fetchVitrineEntregasPage(profissionalId, {
-            limit: ENTREGAS_PAGE_SIZE,
-            offset: 0,
-          });
-          return [profissionalId, page];
-        })),
+      const [entregaRows, galeriaData, deps] = await Promise.all([
+        fetchVitrineEntregasFirstPages(negocioData.id, profissionalIds, {
+          limit: ENTREGAS_PAGE_SIZE,
+        }),
         fetchVitrineGaleria(negocioData.id, { limit: GALERIA_PAGE_SIZE + 1, offset: 0 }),
         fetchVitrineDepoimentos(negocioData.id, { limit: DEPOIMENTOS_PAGE_SIZE + 1, offset: 0 }),
       ]);
       if (loadRunRef.current !== runId) return;
 
-      setEntregaPagesByProf(Object.fromEntries(entregasPages.map(([profissionalId, page]) => [
-        profissionalId,
-        {
-          pages: { 0: page.rows },
-          totalCount: page.totalCount,
-          loadingPage: null,
-          version: 0,
-        },
-      ])));
+      applyEntregaFirstPages(entregaRows, profissionalIds);
       applyGaleriaPage(galeriaData);
       applyDepoimentosPage(deps);
     } catch (e) {
@@ -259,7 +282,7 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
         setLoading(false);
       }
     }
-  }, [applyDepoimentosPage, applyGaleriaPage, authUserId, fetchNowFromDb, getMsg, slug]);
+  }, [applyDepoimentosPage, applyEntregaFirstPages, applyGaleriaPage, authUserId, fetchNowFromDb, getMsg, slug]);
 
   useEffect(() => {
     loadVitrine();
@@ -267,8 +290,10 @@ export function useVitrineBootstrap({ slug, rpcSequence, getMsg, authUserId = nu
 
   useEffect(() => {
     const timer = setInterval(() => {
-      fetchNowFromDb().catch(() => {});
-    }, 60000);
+      if (document.visibilityState === 'visible') {
+        fetchNowFromDb().catch(() => {});
+      }
+    }, 300000);
     return () => clearInterval(timer);
   }, [fetchNowFromDb]);
 
