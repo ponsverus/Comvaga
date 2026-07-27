@@ -380,6 +380,36 @@ export async function fetchEntregasPage({
   };
 }
 
+export async function fetchEntregasFirstPages({
+  negocioId,
+  profissionalIds,
+  limit = 6,
+}) {
+  const ids = Array.isArray(profissionalIds) ? profissionalIds.filter(Boolean) : [];
+  if (!negocioId || !ids.length) return [];
+
+  const { data, error } = await withTimeout(
+    supabase.rpc('get_entregas_dashboard_primeiras_paginas', {
+      p_negocio_id: negocioId,
+      p_profissional_ids: ids,
+      p_limit: Math.max(1, Number(limit) || 1),
+    }),
+    7000,
+    'entregas-dashboard-first-pages'
+  );
+
+  if (error) throw error;
+  return (data || []).map((item) => {
+    const { prof_id: profId, prof_nome: profNome, ...row } = item;
+    delete row.total_count;
+    return {
+      ...row,
+      profissionais: { id: profId, nome: profNome },
+      total_count: item.total_count,
+    };
+  });
+}
+
 export async function fetchAgendamentosNegocio({
   negocioId,
   profissionalIds,
