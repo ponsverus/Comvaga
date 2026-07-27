@@ -102,6 +102,23 @@ export async function fetchVitrineEntregasPage(profissionalId, { limit = 4, offs
   };
 }
 
+export async function fetchVitrineEntregasFirstPages(negocioId, profissionalIds, { limit = 4 } = {}) {
+  const ids = Array.isArray(profissionalIds) ? profissionalIds.filter(Boolean) : [];
+  if (!negocioId || !ids.length) return [];
+
+  const { data, error } = await withTimeout(
+    supabase.rpc('get_entregas_vitrine_primeiras_paginas', {
+      p_negocio_id: negocioId,
+      p_profissional_ids: ids,
+      p_limit: Math.max(1, Number(limit) || 1),
+    }),
+    7000,
+    'entregas-vitrine-first-pages'
+  );
+  if (error) throw error;
+  return data || [];
+}
+
 export async function fetchVitrineEntregaById({ entregaId, profissionalId }) {
   if (!entregaId || !profissionalId) return null;
   const { data, error } = await withTimeout(
