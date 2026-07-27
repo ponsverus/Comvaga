@@ -37,7 +37,7 @@ export function useDashboardMutations({
   reloadEntregas,
   reloadAgendamentos,
   reloadGaleria,
-  loadHoje,
+  loadOverview,
   navigate,
   checarPermissao,
   uiAlert,
@@ -666,7 +666,7 @@ export function useDashboardMutations({
       await concluirAgendamentoProfissional(a.id);
       await uiAlert('dashboard.booking_confirmed', 'success');
       await reloadAgendamentos();
-      loadHoje(negocio.id, parceiroProfissional?.id ?? null);
+      await loadOverview(negocio.id, undefined, undefined, undefined, parceiroProfissional?.id ?? null, { silent: true });
     } catch (error) {
       const requestKey = getRequestErrorKey(error);
       if (requestKey) await uiAlert(requestKey, 'warning');
@@ -692,7 +692,7 @@ export function useDashboardMutations({
       await cancelarAgendamentoProfissional(a.id);
       await uiAlert('dashboard.booking_canceled', 'error');
       await reloadAgendamentos();
-      loadHoje(negocio.id, parceiroProfissional?.id ?? null);
+      await loadOverview(negocio.id, undefined, undefined, undefined, parceiroProfissional?.id ?? null, { silent: true });
     } catch (error) {
       const requestKey = getRequestErrorKey(error);
       if (requestKey) await uiAlert(requestKey, 'warning');
