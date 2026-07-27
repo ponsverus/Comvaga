@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { supabase } from './supabase';
 import { isPasswordRecoveryUrl } from './utils/auth';
@@ -19,16 +19,56 @@ import About                  from './pages/About';
 import PrivacyPolicy          from './pages/PrivacyPolicy';
 import TermsOfUse             from './pages/TermsOfUse';
 
-const Dashboard                 = lazy(() => import('./pages/Dashboard'));
-const Vitrine                   = lazy(() => import('./pages/Vitrine'));
-const ClientArea                = lazy(() => import('./pages/ClientArea'));
-const CriarNegocio              = lazy(() => import('./pages/CriarNegocio'));
-const ProfessionalAccount       = lazy(() => import('./pages/ProfessionalAccount'));
-const SelecionarNegocio         = lazy(() => import('./pages/SelecionarNegocio'));
-const SelecionarNegocioParceiro = lazy(() => import('./pages/SelecionarNegocioParceiro'));
-const SignupProfessionalResume  = lazy(() => import('./pages/SignupProfessionalResume'));
-
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const LAZY_RELOAD_STORAGE_KEY = 'comvaga:lazy-route-reload:v1';
+
+function isRecoverableLazyLoadError(error) {
+  const text = `${error?.name || ''} ${error?.message || ''}`.toLowerCase();
+  return text.includes('failed to fetch dynamically imported module')
+    || text.includes('importing a module script failed')
+    || text.includes('error loading dynamically imported module')
+    || text.includes('loading chunk')
+    || text.includes('chunkloaderror')
+    || text.includes('did not return a default export');
+}
+
+function reloadOnceForLazyRoute(pageName) {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    const key = `${LAZY_RELOAD_STORAGE_KEY}:${window.location.pathname}:${pageName}`;
+    if (window.sessionStorage?.getItem(key) === '1') return false;
+    window.sessionStorage?.setItem(key, '1');
+    window.location.reload();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function lazyRoute(loader, pageName) {
+  return lazy(async () => {
+    try {
+      const mod = await loader();
+      if (mod?.default) return mod;
+      throw new TypeError(`Lazy route "${pageName}" did not return a default export.`);
+    } catch (error) {
+      if (isRecoverableLazyLoadError(error) && reloadOnceForLazyRoute(pageName)) {
+        return new Promise(() => {});
+      }
+      throw error;
+    }
+  });
+}
+
+const Dashboard                 = lazyRoute(() => import('./pages/Dashboard'), 'Dashboard');
+const Vitrine                   = lazyRoute(() => import('./pages/Vitrine'), 'Vitrine');
+const ClientArea                = lazyRoute(() => import('./pages/ClientArea'), 'ClientArea');
+const CriarNegocio              = lazyRoute(() => import('./pages/CriarNegocio'), 'CriarNegocio');
+const ProfessionalAccount       = lazyRoute(() => import('./pages/ProfessionalAccount'), 'ProfessionalAccount');
+const SelecionarNegocio         = lazyRoute(() => import('./pages/SelecionarNegocio'), 'SelecionarNegocio');
+const SelecionarNegocioParceiro = lazyRoute(() => import('./pages/SelecionarNegocioParceiro'), 'SelecionarNegocioParceiro');
+const SignupProfessionalResume  = lazyRoute(() => import('./pages/SignupProfessionalResume'), 'SignupProfessionalResume');
 
 function isAuthJwtError(error) {
   const text = `${error?.message || ''} ${error?.details || ''} ${error?.hint || ''} ${error?.code || ''}`.toLowerCase();
@@ -61,6 +101,39 @@ function FullScreenError({ message, onRetry }) {
       </div>
     </div>
   );
+}
+
+class RouteErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+
+  componentDidCatch(error) {
+    console.error('Route render error:', error);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <FullScreenError
+          message="Falha ao carregar esta tela. Recarregue para buscar a versao mais recente."
+          onRetry={() => window.location.reload()}
+        />
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+function RouteErrorGuard({ children }) {
+  const { pathname } = useLocation();
+  return <RouteErrorBoundary key={pathname}>{children}</RouteErrorBoundary>;
 }
 
 async function getUserProfileRobust(authUser) {
@@ -423,8 +496,9 @@ export default function App() {
         <LogoutRedirectResetter redirectPath={postLogoutRedirect} onClear={() => setPostLogoutRedirect(null)} />
         <ScrollToTopOnRouteChange />
 
-        <Suspense fallback={<FullScreenLoading />}>
-          <Routes>
+        <RouteErrorGuard>
+          <Suspense fallback={<FullScreenLoading />}>
+            <Routes>
             <Route path="/" element={<Home user={isLoggedIn ? user : null} userType={isLoggedIn ? userType : null} professionalRole={isLoggedIn ? professionalRole : null} onLogout={handleLogout} />} />
 
             <Route path="/privacidade" element={<PrivacyPolicy />} />
@@ -557,8 +631,9 @@ export default function App() {
             } />
 
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+            </Routes>
+          </Suspense>
+        </RouteErrorGuard>
       </FeedbackProvider>
     </Router>
   );
