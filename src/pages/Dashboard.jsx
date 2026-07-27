@@ -320,7 +320,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     canceladosHojeLoading,
     canceladosHojeLoadingMore,
     loadOverview,
-    loadHoje,
     loadCanceladosHoje,
     loadMoreCanceladosHoje,
   } = useDashboardMetrics({
@@ -493,7 +492,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
       reloadEntregas,
       reloadAgendamentos,
       reloadGaleria,
-      loadHoje,
+      loadOverview,
       navigate,
       checarPermissao,
       uiAlert,
