@@ -426,66 +426,38 @@ export async function fetchClientesDashboard({
   return data || [];
 }
 
-export async function fetchDashboardToday(negocioId, profissionalId = null) {
-  const params = { p_negocio_id: negocioId };
+export async function fetchDashboardOverview({
+  negocioId,
+  refDateISO,
+  faturamentoDateISO,
+  periodo = '7d',
+  profissionalId = null,
+}) {
+  const params = {
+    p_negocio_id: negocioId,
+    p_ref_date: refDateISO,
+    p_faturamento_date: faturamentoDateISO || refDateISO,
+    p_periodo: periodo || '7d',
+  };
   if (profissionalId) params.p_profissional_id = profissionalId;
-  const { data, error } = await withTimeout(supabase.rpc('get_dashboard_today', params), 7000, 'dashboard-today');
-  if (error) throw error;
-  return data;
-}
 
-export async function fetchDashboardTopCards(negocioId, profissionalId = null) {
-  const params = { p_negocio_id: negocioId };
-  if (profissionalId) params.p_profissional_id = profissionalId;
-  const { data, error } = await withTimeout(supabase.rpc('get_dashboard_top_cards', params), 7000, 'dashboard-top-cards');
-  if (error) throw error;
-  if (data?.error) throw new Error(String(data.error));
-  return data?.top_cards || data || null;
-}
-
-export async function fetchDashboardDay(negocioId, dateISO, profissionalId = null) {
-  const params = { p_negocio_id: negocioId, p_date: dateISO };
-  if (profissionalId) params.p_profissional_id = profissionalId;
-  const { data, error } = await withTimeout(supabase.rpc('get_dashboard_day', params), 7000, 'dashboard-day');
-  if (error) throw error;
-  return data;
-}
-
-export async function fetchDashboardPeriod(negocioId, refDateISO, periodo, profissionalId = null) {
-  const params = { p_negocio_id: negocioId, p_ref_date: refDateISO, p_periodo: periodo };
-  if (profissionalId) params.p_profissional_id = profissionalId;
-  const { data, error } = await withTimeout(supabase.rpc('get_dashboard_period', params), 7000, 'dashboard-period');
-  if (error) throw error;
-  return data;
-}
-
-export async function fetchDashboardUtilizacao(negocioId, refDateISO, profissionalId = null) {
-  const params = { p_negocio_id: negocioId, p_ref_date: refDateISO, p_periodo: 'amanha' };
-  if (profissionalId) params.p_profissional_id = profissionalId;
-  const { data, error } = await withTimeout(supabase.rpc('get_dashboard_utilizacao', params), 7000, 'dashboard-utilizacao');
-  if (error) throw error;
-  return data;
-}
-
-export async function fetchDashboardFutureBookings(negocioId, refDateISO, profissionalId = null) {
-  const params = { p_negocio_id: negocioId, p_ref_date: refDateISO, p_periodo: 'amanha' };
-  if (profissionalId) params.p_profissional_id = profissionalId;
-  const { data, error } = await withTimeout(supabase.rpc('get_dashboard_future_bookings', params), 7000, 'dashboard-future-bookings');
-  if (error) throw error;
-  return data;
-}
-
-export async function fetchDashboardProximoAgendamento(negocioId, profissionalId = null) {
-  const params = { p_negocio_id: negocioId };
-  if (profissionalId) params.p_profissional_id = profissionalId;
   const { data, error } = await withTimeout(
-    supabase.rpc('get_dashboard_proximo_agendamento', params),
+    supabase.rpc('get_dashboard_overview', params),
     7000,
-    'dashboard-proximo-agendamento'
+    'dashboard-overview'
   );
   if (error) throw error;
-  const row = Array.isArray(data) ? data[0] : data;
-  return row ? normalizeAgRow(row) : null;
+  if (data?.error) throw new Error(String(data.error));
+
+  return {
+    metricsHoje: { today: data?.today || null },
+    metricsTopCards: data?.top_cards || null,
+    metricsDia: { selected_day: data?.selected_day || null },
+    metricsPeriodoData: { period: data?.period || null },
+    metricsUtilizacao: { utilizacao: data?.utilizacao || null },
+    metricsFutureBookings: { future_bookings: data?.future_bookings || null },
+    proximoAgendamento: data?.proximo_agendamento ? normalizeAgRow(data.proximo_agendamento) : null,
+  };
 }
 
 export async function fetchDashboardCanceladosHoje({
