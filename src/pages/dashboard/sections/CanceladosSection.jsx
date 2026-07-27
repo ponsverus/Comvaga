@@ -1,9 +1,14 @@
 import { compareAgendamentoDateTimeDesc, formatDateBRFromISO, getAgDate, getAgInicio, getValorAgendamento } from '../utils';
 
-export default function CanceladosSection({ hojeCancelados }) {
+export default function CanceladosSection({
+  hojeCancelados,
+  hasMore = false,
+  loadingMore = false,
+  onLoadMore,
+}) {
   return (
     <div>
-      <h2 className="text-2xl font-normal mb-6">CANCELADOS HOJE</h2>
+      <h2 className="text-2xl font-normal mb-6">CANCELADOS</h2>
       {hojeCancelados.length > 0 ? (
         <div className="space-y-4">
           {hojeCancelados.slice().sort(compareAgendamentoDateTimeDesc).map(a => {
@@ -21,6 +26,16 @@ export default function CanceladosSection({ hojeCancelados }) {
               </div>
             );
           })}
+          {hasMore ? (
+            <button
+              type="button"
+              onClick={onLoadMore}
+              disabled={loadingMore}
+              className="mt-2 w-full py-3 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm transition-all uppercase disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loadingMore ? 'CARREGANDO...' : 'CARREGAR MAIS'}
+            </button>
+          ) : null}
         </div>
       ) : <p className="text-green-500 text-center py-12">:)</p>}
     </div>

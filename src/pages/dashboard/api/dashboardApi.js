@@ -47,19 +47,24 @@ export function getPublicUrl(bucket, path) {
 }
 
 export function normalizeAgRow(a) {
+  const profId = a?.prof_id ?? a?.profissional_id ?? null;
+  const profNome = a?.prof_nome ?? a?.profissional_nome ?? null;
+  const precoFinal = a?.preco_final ?? a?.valor ?? null;
+
   return {
     ...a,
     data: a?.data ?? null,
     horario_inicio: a?.horario_inicio ?? null,
     horario_fim: a?.horario_fim ?? null,
+    preco_final: precoFinal,
     entregas: {
       nome: a?.entrega_nome ?? null,
       preco: a?.entrega_preco ?? null,
       preco_promocional: a?.entrega_promo ?? null,
     },
     profissionais: {
-      id: a?.prof_id ?? null,
-      nome: a?.prof_nome ?? null,
+      id: profId,
+      nome: profNome,
     },
     cliente: {
       id: a?.cliente_id ?? null,
@@ -468,6 +473,40 @@ export async function fetchDashboardFutureBookings(negocioId, refDateISO, profis
   const { data, error } = await withTimeout(supabase.rpc('get_dashboard_future_bookings', params), 7000, 'dashboard-future-bookings');
   if (error) throw error;
   return data;
+}
+
+export async function fetchDashboardProximoAgendamento(negocioId, profissionalId = null) {
+  const params = { p_negocio_id: negocioId };
+  if (profissionalId) params.p_profissional_id = profissionalId;
+  const { data, error } = await withTimeout(
+    supabase.rpc('get_dashboard_proximo_agendamento', params),
+    7000,
+    'dashboard-proximo-agendamento'
+  );
+  if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : data;
+  return row ? normalizeAgRow(row) : null;
+}
+
+export async function fetchDashboardCanceladosHoje({
+  negocioId,
+  profissionalId = null,
+  limit = 50,
+  offset = 0,
+}) {
+  const params = {
+    p_negocio_id: negocioId,
+    p_limit: limit,
+    p_offset: offset,
+  };
+  if (profissionalId) params.p_profissional_id = profissionalId;
+  const { data, error } = await withTimeout(
+    supabase.rpc('get_dashboard_cancelados_hoje', params),
+    7000,
+    'dashboard-cancelados-hoje'
+  );
+  if (error) throw error;
+  return (data || []).map(normalizeAgRow);
 }
 
 export async function fetchUserNome(userId) {
