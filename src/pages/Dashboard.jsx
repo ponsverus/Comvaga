@@ -10,7 +10,6 @@ import EntregaModal from './dashboard/components/EntregaModal';
 import ProfissionalModal from './dashboard/components/ProfissionalModal';
 import VisaoGeralSection from './dashboard/sections/VisaoGeralSection';
 import AgendamentosSection from './dashboard/sections/AgendamentosSection';
-import CanceladosSection from './dashboard/sections/CanceladosSection';
 import HistoricoSection from './dashboard/sections/HistoricoSection';
 import ClientesSection from './dashboard/sections/ClientesSection';
 import EntregasSection from './dashboard/sections/EntregasSection';
@@ -24,7 +23,6 @@ import {
   WEEKDAYS,
   compareAgendamentoDateTimeDesc,
   getBizLabel,
-  isCancelStatus,
   isCancellationScheduled,
   normalizeStatus,
 } from './dashboard/utils';
@@ -181,22 +179,6 @@ function DashboardTopCard({ icon, label, value, children, highlight = false }) {
   );
 }
 
-function didTransitionToCancelStatus(payload, knownStatuses) {
-  const novo = payload?.new;
-  if (!novo?.id || !isCancelStatus(novo.status)) return false;
-
-  const oldStatus = payload?.old?.status;
-  if (oldStatus !== undefined && oldStatus !== null) {
-    return !isCancelStatus(oldStatus);
-  }
-
-  if (knownStatuses.has(novo.id)) {
-    return !isCancelStatus(knownStatuses.get(novo.id));
-  }
-
-  return false;
-}
-
 export default function Dashboard({ user, onLogout, userType = 'professional', professionalRole = null }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -310,25 +292,18 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     metricsUtilizacao,
     metricsFutureBookings,
     proximoAgendamento,
-    canceladosHoje,
-    canceladosHojeHasMore,
     metricsTopCardsLoading,
     metricsDiaLoading,
     metricsPeriodoLoading,
     metricsUtilizacaoLoading,
     metricsFutureBookingsLoading,
-    canceladosHojeLoading,
-    canceladosHojeLoadingMore,
     loadOverview,
-    loadCanceladosHoje,
-    loadMoreCanceladosHoje,
   } = useDashboardMetrics({
     negocioId: negocio?.id,
     hoje,
     faturamentoData,
     faturamentoPeriodo,
     parceiroProfissionalId,
-    shouldLoadCancelados: activeTab === 'cancelados',
   });
 
   const [showNovaEntrega, setShowNovaEntrega]       = useState(false);
@@ -353,7 +328,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
   });
 
   const [notifAgendamentos, setNotifAgendamentos] = useState(0);
-  const [notifCancelados, setNotifCancelados]     = useState(0);
 
   const [showEditProfissional, setShowEditProfissional]       = useState(false);
   const [editingProfissionalId, setEditingProfissionalId]     = useState(null);
@@ -398,9 +372,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
 
   const loadOverviewRef = useRef(loadOverview);
   useEffect(() => { loadOverviewRef.current = loadOverview; }, [loadOverview]);
-
-  const loadCanceladosHojeRef = useRef(loadCanceladosHoje);
-  useEffect(() => { loadCanceladosHojeRef.current = loadCanceladosHoje; }, [loadCanceladosHoje]);
 
   const realtimeRefreshTimerRef = useRef(null);
   const realtimeDashboardContextRef = useRef({
@@ -539,10 +510,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
           { silent: true }
         )).catch(() => {});
 
-        if (ctx.activeTab === 'cancelados') {
-          Promise.resolve(loadCanceladosHojeRef.current(ctx.negocioId, ctx.parceiroProfissionalId, { silent: true })).catch(() => {});
-        }
-
         realtimeRefreshTimerRef.current = null;
       }, 1200);
     };
@@ -562,9 +529,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
           setNotifAgendamentos(prev => prev + 1);
         }
         if (ev === 'UPDATE') {
-          if (didTransitionToCancelStatus(payload, agendamentosStatusRef.current)) {
-            setNotifCancelados(prev => prev + 1);
-          }
           if (novo?.id) agendamentosStatusRef.current.set(novo.id, normalizeStatus(novo.status));
         }
         scheduleDashboardRefresh();
@@ -615,13 +579,13 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
 
   const tabs = useMemo(() => (
     parceiroProfissional
-      ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais']
+      ? ['visao-geral', 'agendamentos', 'historico', 'clientes', 'entregas', 'profissionais']
       : souDono
-        ? ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais', 'info-negocio', 'planos']
-        : ['visao-geral', 'agendamentos', 'cancelados', 'historico', 'clientes', 'entregas', 'profissionais']
+        ? ['visao-geral', 'agendamentos', 'historico', 'clientes', 'entregas', 'profissionais', 'info-negocio', 'planos']
+        : ['visao-geral', 'agendamentos', 'historico', 'clientes', 'entregas', 'profissionais']
   ), [parceiroProfissional, souDono]);
 
-  const TAB_LABELS = { 'visao-geral': 'GERAL', 'agendamentos': 'AGENDAMENTOS', 'cancelados': 'CANCELADOS', 'historico': 'HISTÓRICO', 'clientes': 'CLIENTES', 'entregas': tabEntregasLabel, 'profissionais': 'PROFISSIONAIS', 'dados': 'DADOS', 'info-negocio': 'INFO DO NEGÓCIO', 'planos': 'PLANOS' };
+  const TAB_LABELS = { 'visao-geral': 'GERAL', 'agendamentos': 'AGENDAMENTOS', 'historico': 'HISTÓRICO', 'clientes': 'CLIENTES', 'entregas': tabEntregasLabel, 'profissionais': 'PROFISSIONAIS', 'dados': 'DADOS', 'info-negocio': 'INFO DO NEGÓCIO', 'planos': 'PLANOS' };
   useEffect(() => {
     const searchParams = new URLSearchParams(location?.search || '');
     const queryTab = searchParams.get('tab');
@@ -813,10 +777,10 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
         <div className="bg-dark-100 border border-gray-800 rounded-custom overflow-hidden">
           <div className="flex overflow-x-auto border-b border-gray-800">
             {tabs.map(tab => {
-              const notif = tab === 'agendamentos' ? notifAgendamentos : tab === 'cancelados' ? notifCancelados : 0;
+              const notif = tab === 'agendamentos' ? notifAgendamentos : 0;
               return (
                 <button key={tab}
-                  onClick={() => { setActiveTab(tab); if (tab === 'agendamentos') setNotifAgendamentos(0); if (tab === 'cancelados') setNotifCancelados(0); }}
+                  onClick={() => { setActiveTab(tab); if (tab === 'agendamentos') setNotifAgendamentos(0); }}
                   className={`relative flex-shrink-0 px-6 py-4 text-sm transition-all uppercase font-normal ${activeTab === tab ? 'bg-primary/20 text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}>
                   {TAB_LABELS[tab]}
                   {notif > 0 && (<span className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-black text-[10px] font-bold flex items-center justify-center leading-none">{notif > 99 ? '99+' : notif}</span>)}
@@ -861,16 +825,6 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
                 hasMore={agendamentosHasMore}
                 loadingMore={agendamentosLoadingMore}
                 onLoadMore={loadMoreAgendamentos}
-              />
-            )}
-
-            {activeTab === 'cancelados' && (
-              <CanceladosSection
-                hojeCancelados={canceladosHoje}
-                loading={canceladosHojeLoading}
-                hasMore={canceladosHojeHasMore}
-                loadingMore={canceladosHojeLoadingMore}
-                onLoadMore={loadMoreCanceladosHoje}
               />
             )}
 
