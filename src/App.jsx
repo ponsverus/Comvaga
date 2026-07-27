@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { supabase } from './supabase';
 import { isPasswordRecoveryUrl } from './utils/auth';
 import { fetchUserAccessProfile, isValidProfessionalRole, isValidType, normalizeOnboardingStatus } from './utils/profileAccess';
+import { ptBR } from './feedback/messages/ptBR.js';
 
 import FeedbackProvider from './feedback/FeedbackProvider';
 
@@ -121,7 +122,7 @@ class RouteErrorBoundary extends Component {
     if (this.state.error) {
       return (
         <FullScreenError
-          message="Falha ao carregar esta tela. Recarregue para buscar a versao mais recente."
+          message={ptBR.alerts.route_load_failed.body}
           onRetry={() => window.location.reload()}
         />
       );
