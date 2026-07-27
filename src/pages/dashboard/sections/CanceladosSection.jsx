@@ -2,6 +2,7 @@ import { compareAgendamentoDateTimeDesc, formatDateBRFromISO, getAgDate, getAgIn
 
 export default function CanceladosSection({
   hojeCancelados,
+  loading = false,
   hasMore = false,
   loadingMore = false,
   onLoadMore,
@@ -9,7 +10,9 @@ export default function CanceladosSection({
   return (
     <div>
       <h2 className="text-2xl font-normal mb-6">CANCELADOS</h2>
-      {hojeCancelados.length > 0 ? (
+      {loading ? (
+        <p className="text-primary text-center py-12">CARREGANDO...</p>
+      ) : hojeCancelados.length > 0 ? (
         <div className="space-y-4">
           {hojeCancelados.slice().sort(compareAgendamentoDateTimeDesc).map(a => {
             const valorReal = getValorAgendamento(a);
