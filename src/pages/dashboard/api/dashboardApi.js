@@ -490,27 +490,6 @@ export async function fetchDashboardOverview({
   };
 }
 
-export async function fetchDashboardCanceladosHoje({
-  negocioId,
-  profissionalId = null,
-  limit = 50,
-  offset = 0,
-}) {
-  const params = {
-    p_negocio_id: negocioId,
-    p_limit: limit,
-    p_offset: offset,
-  };
-  if (profissionalId) params.p_profissional_id = profissionalId;
-  const { data, error } = await withTimeout(
-    supabase.rpc('get_dashboard_cancelados_hoje', params),
-    7000,
-    'dashboard-cancelados-hoje'
-  );
-  if (error) throw error;
-  return (data || []).map(normalizeAgRow);
-}
-
 export async function fetchUserNome(userId) {
   const { data, error } = await withTimeout(
     supabase
