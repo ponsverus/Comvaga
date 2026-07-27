@@ -23,14 +23,10 @@ import {
   SUPORTE_HREF,
   WEEKDAYS,
   compareAgendamentoDateTimeDesc,
-  getAgDate,
-  getAgInicio,
   getBizLabel,
   isCancelStatus,
   isCancellationScheduled,
   normalizeStatus,
-  sameDay,
-  timeToMinutes,
 } from './dashboard/utils';
 import { fetchBusinessBillingStatus, getPublicUrl } from './dashboard/api/dashboardApi';
 import { useDashboardBootstrap } from './dashboard/hooks/useDashboardBootstrap';
@@ -313,15 +309,22 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     metricsPeriodoData,
     metricsUtilizacao,
     metricsFutureBookings,
+    proximoAgendamento,
+    canceladosHoje,
+    canceladosHojeHasMore,
     metricsTopCardsLoading,
     metricsDiaLoading,
     metricsPeriodoLoading,
     metricsUtilizacaoLoading,
     metricsFutureBookingsLoading,
+    canceladosHojeLoadingMore,
     loadHoje,
     loadTopCards,
     loadUtilizacao,
     loadFutureBookings,
+    loadProximoAgendamento,
+    loadCanceladosHoje,
+    loadMoreCanceladosHoje,
   } = useDashboardMetrics({
     negocioId: negocio?.id,
     hoje,
@@ -518,24 +521,12 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
         loadTopCards(negocio.id, parceiroProfissionalId, { silent: true });
         loadUtilizacao(negocio.id, hoje, parceiroProfissionalId);
         loadFutureBookings(negocio.id, hoje, parceiroProfissionalId);
+        loadProximoAgendamento(negocio.id, parceiroProfissionalId, { silent: true });
+        loadCanceladosHoje(negocio.id, parceiroProfissionalId, { silent: true });
       }).subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [negocio?.id, agProfIdsKey, hoje, parceiroProfissionalId, loadHoje, loadTopCards, loadUtilizacao, loadFutureBookings]);
+  }, [negocio?.id, agProfIdsKey, hoje, parceiroProfissionalId, loadHoje, loadTopCards, loadUtilizacao, loadFutureBookings, loadProximoAgendamento, loadCanceladosHoje]);
 
-
-  const agendamentosHoje = useMemo(() => {
-    const base = agendamentos.filter(a => sameDay(getAgDate(a), hoje));
-    if (!parceiroProfissionalId) return base;
-    return base.filter(a => a.profissional_id === parceiroProfissionalId);
-  }, [agendamentos, hoje, parceiroProfissionalId]);
-
-  const hojeValidos    = useMemo(() => agendamentosHoje.filter(a => !isCancelStatus(a.status)), [agendamentosHoje]);
-  const hojeCancelados = useMemo(() => agendamentosHoje.filter(a => isCancelStatus(a.status)), [agendamentosHoje]);
-
-  const proximoAgendamento = useMemo(() => {
-    const nowMin = Number(serverNow?.minutes || 0);
-    return hojeValidos.filter(a => timeToMinutes(getAgInicio(a) || '00:00') >= nowMin).sort((a, b) => String(getAgInicio(a)).localeCompare(String(getAgInicio(b))))[0] || null;
-  }, [hojeValidos, serverNow?.minutes]);
 
   const agendamentosAgrupadosPorProfissional = useMemo(() => {
     const fonte = parceiroProfissionalId
@@ -823,7 +814,12 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
             )}
 
             {activeTab === 'cancelados' && (
-              <CanceladosSection hojeCancelados={hojeCancelados} />
+              <CanceladosSection
+                hojeCancelados={canceladosHoje}
+                hasMore={canceladosHojeHasMore}
+                loadingMore={canceladosHojeLoadingMore}
+                onLoadMore={loadMoreCanceladosHoje}
+              />
             )}
 
             {activeTab === 'historico' && (
