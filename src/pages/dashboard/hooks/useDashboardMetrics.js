@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   fetchDashboardCanceladosHoje,
-  fetchDashboardDay,
-  fetchDashboardFutureBookings,
-  fetchDashboardPeriod,
-  fetchDashboardProximoAgendamento,
-  fetchDashboardToday,
-  fetchDashboardTopCards,
-  fetchDashboardUtilizacao,
+  fetchDashboardOverview,
 } from '../api/dashboardApi';
 
 const CANCELADOS_HOJE_PAGE_SIZE = 50;
@@ -18,6 +12,7 @@ export function useDashboardMetrics({
   faturamentoData,
   faturamentoPeriodo,
   parceiroProfissionalId,
+  shouldLoadCancelados = false,
 }) {
   const [metricsHoje, setMetricsHoje] = useState(null);
   const [metricsTopCards, setMetricsTopCards] = useState(null);
@@ -38,91 +33,79 @@ export function useDashboardMetrics({
   const [canceladosHojeLoading, setCanceladosHojeLoading] = useState(false);
   const [canceladosHojeLoadingMore, setCanceladosHojeLoadingMore] = useState(false);
 
-  const loadHoje = useCallback(async (id = negocioId, profId = parceiroProfissionalId) => {
-    if (!id) return;
-    try {
-      setMetricsHojeLoading(true);
-      setMetricsHoje(await fetchDashboardToday(id, profId));
-    } catch {
-      setMetricsHoje(null);
-    } finally {
-      setMetricsHojeLoading(false);
-    }
-  }, [negocioId, parceiroProfissionalId]);
+  const setOverviewLoading = useCallback((loading) => {
+    setMetricsHojeLoading(loading);
+    setMetricsTopCardsLoading(loading);
+    setMetricsDiaLoading(loading);
+    setMetricsPeriodoLoading(loading);
+    setMetricsUtilizacaoLoading(loading);
+    setMetricsFutureBookingsLoading(loading);
+    setProximoAgendamentoLoading(loading);
+  }, []);
 
-  const loadTopCards = useCallback(async (id = negocioId, profId = parceiroProfissionalId, options = {}) => {
-    if (!id) return;
+  const clearOverview = useCallback(() => {
+    setMetricsHoje(null);
+    setMetricsTopCards(null);
+    setMetricsDia(null);
+    setMetricsPeriodoData(null);
+    setMetricsUtilizacao(null);
+    setMetricsFutureBookings(null);
+    setProximoAgendamento(null);
+  }, []);
+
+  const loadOverview = useCallback(async (
+    id = negocioId,
+    refDateISO = hoje,
+    selectedDateISO = faturamentoData || hoje,
+    periodo = faturamentoPeriodo,
+    profId = parceiroProfissionalId,
+    options = {}
+  ) => {
+    if (!id || !refDateISO || !selectedDateISO) return;
     const silent = !!options?.silent;
-    try {
-      if (!silent) setMetricsTopCardsLoading(true);
-      setMetricsTopCards(await fetchDashboardTopCards(id, profId));
-    } catch {
-      setMetricsTopCards(null);
-    } finally {
-      if (!silent) setMetricsTopCardsLoading(false);
-    }
-  }, [negocioId, parceiroProfissionalId]);
 
-  const loadDia = useCallback(async (id = negocioId, dateISO = faturamentoData || hoje, profId = parceiroProfissionalId) => {
-    if (!id || !dateISO) return;
     try {
-      setMetricsDiaLoading(true);
-      setMetricsDia(await fetchDashboardDay(id, String(dateISO), profId));
+      if (!silent) setOverviewLoading(true);
+      const overview = await fetchDashboardOverview({
+        negocioId: id,
+        refDateISO: String(refDateISO),
+        faturamentoDateISO: String(selectedDateISO),
+        periodo: String(periodo || '7d'),
+        profissionalId: profId,
+      });
+      setMetricsHoje(overview.metricsHoje);
+      setMetricsTopCards(overview.metricsTopCards);
+      setMetricsDia(overview.metricsDia);
+      setMetricsPeriodoData(overview.metricsPeriodoData);
+      setMetricsUtilizacao(overview.metricsUtilizacao);
+      setMetricsFutureBookings(overview.metricsFutureBookings);
+      setProximoAgendamento(overview.proximoAgendamento);
     } catch {
-      setMetricsDia(null);
+      clearOverview();
     } finally {
-      setMetricsDiaLoading(false);
+      if (!silent) setOverviewLoading(false);
     }
-  }, [faturamentoData, hoje, negocioId, parceiroProfissionalId]);
+  }, [
+    clearOverview,
+    faturamentoData,
+    faturamentoPeriodo,
+    hoje,
+    negocioId,
+    parceiroProfissionalId,
+    setOverviewLoading,
+  ]);
 
-  const loadPeriodo = useCallback(async (id = negocioId, refDateISO = hoje, periodo = faturamentoPeriodo, profId = parceiroProfissionalId) => {
-    if (!id || !refDateISO) return;
-    try {
-      setMetricsPeriodoLoading(true);
-      setMetricsPeriodoData(await fetchDashboardPeriod(id, String(refDateISO), String(periodo || '7d'), profId));
-    } catch {
-      setMetricsPeriodoData(null);
-    } finally {
-      setMetricsPeriodoLoading(false);
-    }
-  }, [faturamentoPeriodo, hoje, negocioId, parceiroProfissionalId]);
+  const loadHoje = useCallback((id = negocioId, profId = parceiroProfissionalId, options = {}) => (
+    loadOverview(id, hoje, faturamentoData || hoje, faturamentoPeriodo, profId, options)
+  ), [faturamentoData, faturamentoPeriodo, hoje, loadOverview, negocioId, parceiroProfissionalId]);
 
-  const loadUtilizacao = useCallback(async (id = negocioId, refDateISO = hoje, profId = parceiroProfissionalId) => {
-    if (!id || !refDateISO) return;
-    try {
-      setMetricsUtilizacaoLoading(true);
-      setMetricsUtilizacao(await fetchDashboardUtilizacao(id, String(refDateISO), profId));
-    } catch {
-      setMetricsUtilizacao(null);
-    } finally {
-      setMetricsUtilizacaoLoading(false);
-    }
-  }, [hoje, negocioId, parceiroProfissionalId]);
+  const loadDia = useCallback((id = negocioId, dateISO = faturamentoData || hoje, profId = parceiroProfissionalId, options = {}) => (
+    loadOverview(id, hoje, dateISO, faturamentoPeriodo, profId, options)
+  ), [faturamentoData, faturamentoPeriodo, hoje, loadOverview, negocioId, parceiroProfissionalId]);
 
-  const loadFutureBookings = useCallback(async (id = negocioId, refDateISO = hoje, profId = parceiroProfissionalId) => {
-    if (!id || !refDateISO) return;
-    try {
-      setMetricsFutureBookingsLoading(true);
-      setMetricsFutureBookings(await fetchDashboardFutureBookings(id, String(refDateISO), profId));
-    } catch {
-      setMetricsFutureBookings(null);
-    } finally {
-      setMetricsFutureBookingsLoading(false);
-    }
-  }, [hoje, negocioId, parceiroProfissionalId]);
-
-  const loadProximoAgendamento = useCallback(async (id = negocioId, profId = parceiroProfissionalId, options = {}) => {
-    if (!id) return;
-    const silent = !!options?.silent;
-    try {
-      if (!silent) setProximoAgendamentoLoading(true);
-      setProximoAgendamento(await fetchDashboardProximoAgendamento(id, profId));
-    } catch {
-      setProximoAgendamento(null);
-    } finally {
-      if (!silent) setProximoAgendamentoLoading(false);
-    }
-  }, [negocioId, parceiroProfissionalId]);
+  const loadPeriodo = useCallback((id = negocioId, refDateISO = hoje, periodo = faturamentoPeriodo, profId = parceiroProfissionalId, options = {}) => (
+    loadOverview(id, refDateISO, faturamentoData || refDateISO, periodo, profId, options)
+  ), [faturamentoData, faturamentoPeriodo, hoje, loadOverview, negocioId, parceiroProfissionalId]);
 
   const loadCanceladosHoje = useCallback(async (id = negocioId, profId = parceiroProfissionalId, options = {}) => {
     if (!id) return;
@@ -174,44 +157,19 @@ export function useDashboardMetrics({
   ]);
 
   useEffect(() => {
-    if (!negocioId || !hoje) return;
-    loadHoje(negocioId, parceiroProfissionalId);
-  }, [negocioId, hoje, parceiroProfissionalId, loadHoje]);
+    if (!negocioId || !hoje || !faturamentoData) return;
+    loadOverview(negocioId, hoje, faturamentoData, faturamentoPeriodo, parceiroProfissionalId);
+  }, [negocioId, hoje, faturamentoData, faturamentoPeriodo, parceiroProfissionalId, loadOverview]);
 
   useEffect(() => {
-    if (!negocioId || !hoje) return;
-    loadTopCards(negocioId, parceiroProfissionalId);
-  }, [negocioId, hoje, parceiroProfissionalId, loadTopCards]);
+    setCanceladosHoje([]);
+    setCanceladosHojeHasMore(false);
+  }, [negocioId, hoje, parceiroProfissionalId]);
 
   useEffect(() => {
-    if (!negocioId || !faturamentoData) return;
-    loadDia(negocioId, faturamentoData, parceiroProfissionalId);
-  }, [negocioId, faturamentoData, parceiroProfissionalId, loadDia]);
-
-  useEffect(() => {
-    if (!negocioId || !hoje) return;
-    loadPeriodo(negocioId, hoje, faturamentoPeriodo, parceiroProfissionalId);
-  }, [negocioId, hoje, faturamentoPeriodo, parceiroProfissionalId, loadPeriodo]);
-
-  useEffect(() => {
-    if (!negocioId || !hoje) return;
-    loadUtilizacao(negocioId, hoje, parceiroProfissionalId);
-  }, [negocioId, hoje, parceiroProfissionalId, loadUtilizacao]);
-
-  useEffect(() => {
-    if (!negocioId || !hoje) return;
-    loadFutureBookings(negocioId, hoje, parceiroProfissionalId);
-  }, [negocioId, hoje, parceiroProfissionalId, loadFutureBookings]);
-
-  useEffect(() => {
-    if (!negocioId || !hoje) return;
-    loadProximoAgendamento(negocioId, parceiroProfissionalId);
-  }, [negocioId, hoje, parceiroProfissionalId, loadProximoAgendamento]);
-
-  useEffect(() => {
-    if (!negocioId || !hoje) return;
+    if (!shouldLoadCancelados || !negocioId || !hoje) return;
     loadCanceladosHoje(negocioId, parceiroProfissionalId);
-  }, [negocioId, hoje, parceiroProfissionalId, loadCanceladosHoje]);
+  }, [shouldLoadCancelados, negocioId, hoje, parceiroProfissionalId, loadCanceladosHoje]);
 
   return {
     metricsHoje,
@@ -232,13 +190,10 @@ export function useDashboardMetrics({
     proximoAgendamentoLoading,
     canceladosHojeLoading,
     canceladosHojeLoadingMore,
+    loadOverview,
     loadHoje,
-    loadTopCards,
     loadDia,
     loadPeriodo,
-    loadUtilizacao,
-    loadFutureBookings,
-    loadProximoAgendamento,
     loadCanceladosHoje,
     loadMoreCanceladosHoje,
   };

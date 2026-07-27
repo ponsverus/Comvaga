@@ -317,12 +317,10 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     metricsPeriodoLoading,
     metricsUtilizacaoLoading,
     metricsFutureBookingsLoading,
+    canceladosHojeLoading,
     canceladosHojeLoadingMore,
+    loadOverview,
     loadHoje,
-    loadTopCards,
-    loadUtilizacao,
-    loadFutureBookings,
-    loadProximoAgendamento,
     loadCanceladosHoje,
     loadMoreCanceladosHoje,
   } = useDashboardMetrics({
@@ -331,6 +329,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     faturamentoData,
     faturamentoPeriodo,
     parceiroProfissionalId,
+    shouldLoadCancelados: activeTab === 'cancelados',
   });
 
   const [showNovaEntrega, setShowNovaEntrega]       = useState(false);
@@ -397,6 +396,32 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
 
   const reloadAgendamentosRef = useRef(reloadAgendamentos);
   useEffect(() => { reloadAgendamentosRef.current = reloadAgendamentos; }, [reloadAgendamentos]);
+
+  const loadOverviewRef = useRef(loadOverview);
+  useEffect(() => { loadOverviewRef.current = loadOverview; }, [loadOverview]);
+
+  const loadCanceladosHojeRef = useRef(loadCanceladosHoje);
+  useEffect(() => { loadCanceladosHojeRef.current = loadCanceladosHoje; }, [loadCanceladosHoje]);
+
+  const realtimeRefreshTimerRef = useRef(null);
+  const realtimeDashboardContextRef = useRef({
+    activeTab,
+    faturamentoData,
+    faturamentoPeriodo,
+    hoje,
+    negocioId: negocio?.id || null,
+    parceiroProfissionalId,
+  });
+  useEffect(() => {
+    realtimeDashboardContextRef.current = {
+      activeTab,
+      faturamentoData,
+      faturamentoPeriodo,
+      hoje,
+      negocioId: negocio?.id || null,
+      parceiroProfissionalId,
+    };
+  }, [activeTab, faturamentoData, faturamentoPeriodo, hoje, negocio?.id, parceiroProfissionalId]);
 
   const agendamentosStatusRef = useRef(new Map());
   useEffect(() => {
@@ -496,6 +521,33 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
 
   useEffect(() => {
     if (!negocio?.id || !agProfIdsKey || !hoje) return;
+    const scheduleDashboardRefresh = () => {
+      if (realtimeRefreshTimerRef.current) {
+        window.clearTimeout(realtimeRefreshTimerRef.current);
+      }
+
+      realtimeRefreshTimerRef.current = window.setTimeout(() => {
+        const ctx = realtimeDashboardContextRef.current;
+        if (!ctx.negocioId || !ctx.hoje) return;
+
+        Promise.resolve(reloadAgendamentosRef.current()).catch(() => {});
+        Promise.resolve(loadOverviewRef.current(
+          ctx.negocioId,
+          ctx.hoje,
+          ctx.faturamentoData || ctx.hoje,
+          ctx.faturamentoPeriodo,
+          ctx.parceiroProfissionalId,
+          { silent: true }
+        )).catch(() => {});
+
+        if (ctx.activeTab === 'cancelados') {
+          Promise.resolve(loadCanceladosHojeRef.current(ctx.negocioId, ctx.parceiroProfissionalId, { silent: true })).catch(() => {});
+        }
+
+        realtimeRefreshTimerRef.current = null;
+      }, 1200);
+    };
+
     const channelName = parceiroProfissionalId
       ? `agendamentos:${negocio.id}:${parceiroProfissionalId}`
       : `agendamentos:${negocio.id}`;
@@ -516,16 +568,16 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
           }
           if (novo?.id) agendamentosStatusRef.current.set(novo.id, normalizeStatus(novo.status));
         }
-        reloadAgendamentosRef.current();
-        loadHoje(negocio.id, parceiroProfissionalId);
-        loadTopCards(negocio.id, parceiroProfissionalId, { silent: true });
-        loadUtilizacao(negocio.id, hoje, parceiroProfissionalId);
-        loadFutureBookings(negocio.id, hoje, parceiroProfissionalId);
-        loadProximoAgendamento(negocio.id, parceiroProfissionalId, { silent: true });
-        loadCanceladosHoje(negocio.id, parceiroProfissionalId, { silent: true });
+        scheduleDashboardRefresh();
       }).subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [negocio?.id, agProfIdsKey, hoje, parceiroProfissionalId, loadHoje, loadTopCards, loadUtilizacao, loadFutureBookings, loadProximoAgendamento, loadCanceladosHoje]);
+    return () => {
+      if (realtimeRefreshTimerRef.current) {
+        window.clearTimeout(realtimeRefreshTimerRef.current);
+        realtimeRefreshTimerRef.current = null;
+      }
+      supabase.removeChannel(channel);
+    };
+  }, [negocio?.id, agProfIdsKey, hoje, parceiroProfissionalId]);
 
 
   const agendamentosAgrupadosPorProfissional = useMemo(() => {
@@ -816,6 +868,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
             {activeTab === 'cancelados' && (
               <CanceladosSection
                 hojeCancelados={canceladosHoje}
+                loading={canceladosHojeLoading}
                 hasMore={canceladosHojeHasMore}
                 loadingMore={canceladosHojeLoadingMore}
                 onLoadMore={loadMoreCanceladosHoje}
