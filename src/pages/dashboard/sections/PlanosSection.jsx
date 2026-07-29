@@ -193,7 +193,7 @@ const PLAN_CONTENT = {
     badgeClass: 'text-gray-400 bg-gray-800',
     price: (
       <>
-        R$ 39<span className="text-base font-normal text-gray-500">,99/mês</span>
+        R$ 69<span className="text-base font-normal text-gray-500">,99/mês</span>
       </>
     ),
     items: [
@@ -220,7 +220,7 @@ const PLAN_CONTENT = {
     badgeClass: 'text-primary bg-primary/15',
     price: (
       <>
-        R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
+        R$ <span className="text-green-600">69</span><span className="text-base font-normal text-green-600">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
       </>
     ),
     items: [
@@ -243,7 +243,7 @@ const PLAN_CONTENT = {
     badgeClass: 'text-gray-400 bg-gray-800',
     price: (
       <>
-        R$ 69<span className="text-base font-normal text-gray-500">,99/mês</span>
+        R$ 129<span className="text-base font-normal text-gray-500">,99/mês</span>
       </>
     ),
     items: [
