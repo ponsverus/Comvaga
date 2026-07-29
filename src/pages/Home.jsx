@@ -514,7 +514,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 Essencial
               </span>
               <p className="text-2xl font-normal text-white mb-1">
-                R$ 39<span className="text-base font-normal text-gray-500">,99/mês</span>
+                R$ 69<span className="text-base font-normal text-gray-500">,99/mês</span>
               </p>
               <p className="text-sm text-gray-500 leading-relaxed">
                 Para autônomos que buscam organizar sua agenda.
@@ -565,9 +565,14 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
                 Profissional
               </span>
-              <p className="text-2xl font-normal text-white mb-1">
-                R$ <span className="text-green-400">39</span><span className="text-base font-normal text-green-400">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
-              </p>
+              <div className="mb-1 flex flex-wrap items-end gap-x-3 gap-y-1">
+                <span className="text-3xl font-normal text-red-500 line-through decoration-red-500 decoration-2">
+                  R$ 99,99
+                </span>
+                <span className="text-xl font-normal text-green-400">
+                  R$ 69,99<span className="text-base font-normal text-gray-400">/mês</span>
+                </span>
+              </div>
               <p className="text-sm text-gray-400 leading-relaxed">
                 Para negócios em crescimento que precisam ampliar sua equipe.
               </p>
@@ -612,7 +617,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 Premium Real
               </span>
               <p className="text-2xl font-normal text-white mb-1">
-                R$ 69<span className="text-base font-normal text-gray-500">,99/mês</span>
+                R$ 129<span className="text-base font-normal text-gray-500">,99/mês</span>
               </p>
               <p className="text-sm text-gray-500 leading-relaxed">
                 Para negócios que querem crescer sem limites e aproveitar primeiro as novas possibilidades.
