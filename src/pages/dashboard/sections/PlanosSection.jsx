@@ -201,6 +201,7 @@ const PLAN_CONTENT = {
       'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
       'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
       'Indicadores de agendamentos e receita, com comparativo ao dia anterior, além de indicadores de receita por período.',
+      'Métricas de faturamento e desempenho operacional por data ou período',
       'Montagem de ofertas nos trabalhos oferecidos',
       'Comprometimento da agenda e receita futura projetada',
       'Agendamento assistido pelo profissional',
@@ -219,9 +220,14 @@ const PLAN_CONTENT = {
     description: 'Para negócios em crescimento que precisam ampliar sua equipe.',
     badgeClass: 'text-primary bg-primary/15',
     price: (
-      <>
-        R$ <span className="text-green-600">69</span><span className="text-base font-normal text-green-600">,99</span><span className="text-base font-normal text-gray-400">/mês</span>
-      </>
+      <span className="inline-flex flex-wrap items-end gap-x-3 gap-y-1">
+        <span className="text-3xl font-normal text-red-500 line-through decoration-red-500 decoration-2">
+          R$ 99,99
+        </span>
+        <span className="text-xl font-normal text-green-400">
+          R$ 69,99<span className="text-base font-normal text-gray-400">/mês</span>
+        </span>
+      </span>
     ),
     items: [
       'Tudo do plano ESSENCIAL',
