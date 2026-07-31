@@ -31,6 +31,13 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    route_load_failed: {
+      title: 'Algo deu errado',
+      body: 'O carregamento da tela falhou. Por favor, atualize a pagina e tente novamente.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'TENTAR NOVAMENTE',
+    },
   },
 
   dashboard: {
