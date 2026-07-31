@@ -65,6 +65,15 @@ function getLastPartnerNegocioId(userId) {
   }
 }
 
+function clearLastPartnerNegocioId(userId) {
+  if (!userId) return;
+  try {
+    window.localStorage?.removeItem(`comvaga:last-partner-negocio:${userId}`);
+  } catch {
+    return;
+  }
+}
+
 function isValidPartnerNegocioId(negocioId, negocioIds) {
   return !!negocioId && negocioIds.includes(negocioId);
 }
@@ -357,6 +366,7 @@ export function useDashboardBootstrap({
 
         if (selectedNegocioId) return fetchNegocioById(selectedNegocioId);
         if (professionalRole === 'partner') {
+          clearLastPartnerNegocioId(userId);
           setError(PARTNER_DASHBOARD_ACCESS_ERROR);
           setBootstrapState('error');
           return '__redirect__';
@@ -375,7 +385,12 @@ export function useDashboardBootstrap({
 
       if (!isCurrentRun()) return;
       if (!negocioData) {
-        setError('Nenhum negocio cadastrado.');
+        if (professionalRole === 'partner') {
+          clearLastPartnerNegocioId(userId);
+          setError(PARTNER_DASHBOARD_ACCESS_ERROR);
+        } else {
+          setError('Nenhum negocio cadastrado.');
+        }
         setBootstrapState('error');
         return;
       }
@@ -395,6 +410,7 @@ export function useDashboardBootstrap({
         setGaleriaItems([]);
         setGaleriaHasMore(false);
         setGaleriaLoadingMore(false);
+        clearLastPartnerNegocioId(userId);
         setError(professionalRole === 'partner' ? PARTNER_DASHBOARD_ACCESS_ERROR : 'Você não tem acesso a este negócio.');
         setBootstrapState('error');
         return;
