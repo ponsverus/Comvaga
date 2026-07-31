@@ -13,10 +13,18 @@ import {
 } from '../api/dashboardApi';
 import { getRequestErrorKey } from '../../../utils/requestError';
 import { flattenEntregaPages } from '../../../utils/entregas';
+import { ptBR } from '../../../feedback/messages/ptBR';
 
 const AGENDAMENTOS_PAGE_SIZE = 50;
 const GALERIA_PAGE_SIZE = 12;
 const ENTREGAS_PAGE_SIZE = 6;
+const PARTNER_DASHBOARD_ACCESS_ERROR = {
+  type: 'partner_dashboard_access_inactive',
+  title: ptBR.dashboard.partner_dashboard_access_inactive.title,
+  body: ptBR.dashboard.partner_dashboard_access_inactive.body,
+  primaryLabel: ptBR.dashboard.partner_dashboard_access_inactive.buttonText,
+  primaryAction: 'partner-business-center',
+};
 
 function buildEntregaPagesByProf(rows, profissionalIds, current = {}) {
   const next = {};
@@ -67,6 +75,7 @@ function isActivePartnerProfessional(profissional) {
 
 export function useDashboardBootstrap({
   userId,
+  professionalRole,
   locationNegocioId,
   navigate,
   rpcSequence,
@@ -347,6 +356,11 @@ export function useDashboardBootstrap({
             : negocioIds[0];
 
         if (selectedNegocioId) return fetchNegocioById(selectedNegocioId);
+        if (professionalRole === 'partner') {
+          setError(PARTNER_DASHBOARD_ACCESS_ERROR);
+          setBootstrapState('error');
+          return '__redirect__';
+        }
         navigate('/conta-profissional', { replace: true });
         return '__redirect__';
       };
@@ -381,7 +395,7 @@ export function useDashboardBootstrap({
         setGaleriaItems([]);
         setGaleriaHasMore(false);
         setGaleriaLoadingMore(false);
-        setError('Você não tem acesso a este negócio.');
+        setError(professionalRole === 'partner' ? PARTNER_DASHBOARD_ACCESS_ERROR : 'Você não tem acesso a este negócio.');
         setBootstrapState('error');
         return;
       }
@@ -442,7 +456,7 @@ export function useDashboardBootstrap({
       }
       setBootstrapState('error');
     }
-  }, [applyEntregaFirstPages, applyGaleriaPage, locationNegocioId, navigate, scopeProfissionais, uiAlert, userId]);
+  }, [applyEntregaFirstPages, applyGaleriaPage, locationNegocioId, navigate, professionalRole, scopeProfissionais, uiAlert, userId]);
 
   const reloadFull = useCallback(async () => {
     try {
