@@ -217,6 +217,7 @@ export default function CriarNegocio({ user }) {
                 type="tel"
                 value={formData.telefone}
                 onChange={(e) => setFormData(prev => ({ ...prev, telefone: e.target.value }))}
+                placeholder="WHATSAPP"
                 className={fieldInputClass}
                 required
               />
@@ -318,6 +319,7 @@ export default function CriarNegocio({ user }) {
                   type="text"
                   value={formData.estado}
                   onChange={(e) => setFormData(prev => ({ ...prev, estado: e.target.value }))}
+                  placeholder="EX: MG"
                   className={fieldInputClass}
                   required
                 />
