@@ -1015,6 +1015,20 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    phone_updated: {
+      title: 'WhatsApp atualizado',
+      body: 'Seu WhatsApp foi atualizado com sucesso.',
+      variant: 'success',
+      screen: 'light',
+      buttonText: 'OK',
+    },
+    phone_update_error: {
+      title: 'Erro ao salvar WhatsApp',
+      body: 'Erro ao salvar seu WhatsApp agora. Tente novamente.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
     account_email_invalid: {
       title: 'E-mail inválido',
       body: 'Digite um e-mail válido para continuar.',
