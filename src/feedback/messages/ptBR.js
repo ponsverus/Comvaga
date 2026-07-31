@@ -800,6 +800,11 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'ENTENDI',
     },
+    partner_dashboard_access_inactive: {
+      title: 'Acesso ao negócio indisponível',
+      body: 'Seu acesso a este negócio encontra-se inativo no momento. O vínculo pode ter sido inativado pelo administrador. Volte à lista de negócios para consultar seus vínculos disponíveis.',
+      buttonText: 'SELECIONAR NEGÓCIO',
+    },
     professional_approved: {
       title: 'Parceiro aprovado',
       body: 'O acesso do profissional foi liberado com sucesso.',
