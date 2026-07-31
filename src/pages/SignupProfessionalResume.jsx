@@ -382,6 +382,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 type="tel"
                 value={formData.telefone}
                 onChange={(e) => setFormData((prev) => ({ ...prev, telefone: e.target.value }))}
+                placeholder="WHATSAPP"
                 className={fieldInputClass}
                 required
               />
@@ -482,6 +483,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                   type="text"
                   value={formData.estado}
                   onChange={(e) => setFormData((prev) => ({ ...prev, estado: e.target.value }))}
+                  placeholder="EX: MG"
                   className={fieldInputClass}
                   required
                 />
