@@ -5,7 +5,7 @@ export async function fetchClientePerfil(userId) {
   const { data, error } = await withTimeout(
     supabase
       .from('clientes')
-      .select('nome, avatar_path')
+      .select('nome, avatar_path, telefone')
       .eq('user_id', userId)
       .eq('status', 'ativo')
       .maybeSingle(),
@@ -14,7 +14,11 @@ export async function fetchClientePerfil(userId) {
   );
 
   if (error) throw error;
-  return { nome: String(data?.nome || '').trim(), avatarPath: data?.avatar_path || null };
+  return {
+    nome: String(data?.nome || '').trim(),
+    avatarPath: data?.avatar_path || null,
+    telefone: String(data?.telefone || '').trim(),
+  };
 }
 
 export async function fetchCurrentClienteId() {
