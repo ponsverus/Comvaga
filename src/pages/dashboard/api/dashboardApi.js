@@ -5,6 +5,15 @@ function isAdminRemovedProfessional(row) {
   return row?.status === 'excluido';
 }
 
+function getClienteTelefone(row) {
+  return String(
+    row?.cliente_telefone
+      ?? row?.telefone_cliente
+      ?? row?.cliente?.telefone
+      ?? ''
+  ).trim();
+}
+
 async function normalizeFunctionError(error) {
   if (!error) return error;
 
@@ -69,6 +78,7 @@ export function normalizeAgRow(a) {
     cliente: {
       id: a?.cliente_id ?? null,
       nome: a?.cliente_nome ?? null,
+      telefone: getClienteTelefone(a),
       avatar_path: a?.cliente_avatar ?? null,
       type: a?.cliente_type ?? null,
     },
