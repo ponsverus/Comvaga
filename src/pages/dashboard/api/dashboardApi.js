@@ -6,12 +6,7 @@ function isAdminRemovedProfessional(row) {
 }
 
 function getClienteTelefone(row) {
-  return String(
-    row?.cliente_telefone
-      ?? row?.telefone_cliente
-      ?? row?.cliente?.telefone
-      ?? ''
-  ).trim();
+  return String(row?.cliente_telefone ?? '').trim();
 }
 
 async function normalizeFunctionError(error) {
