@@ -74,6 +74,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const [savingPerfil, setSavingPerfil] = useState(false);
 
   const [novoEmail,      setNovoEmail]      = useState(user?.email || '');
+  const [telefoneCliente, setTelefoneCliente] = useState('');
   const [novaSenha,      setNovaSenha]      = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [savingDados,    setSavingDados]    = useState(false);
@@ -208,6 +209,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       const visibleFavoritos = getVisiblePageRows(favoritosRows);
       setNomePerfil(perfil.nome);
       setAvatarPath(perfil.avatarPath);
+      setTelefoneCliente(perfil.telefone || '');
       setAgendamentos(visibleAgendamentos);
       setFavoritos(visibleFavoritos);
       await syncAvaliacoesConcluidas(visibleAgendamentos);
@@ -429,6 +431,28 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   const salvarEmailVisivel = async () => {
     await salvarEmail();
     setEmailVisivel(false);
+  };
+
+  const salvarTelefone = async () => {
+    const telefone = String(telefoneCliente || '').trim();
+    try {
+      setSavingDados(true);
+      const { error } = await withTimeout(
+        supabase
+          .from('clientes')
+          .update({ telefone: telefone || null })
+          .eq('user_id', user.id)
+          .eq('status', 'ativo'),
+        6000,
+        'cliente-telefone-update'
+      );
+      if (error) throw error;
+      uiAlert('clientArea.phone_updated', 'success');
+    } catch {
+      uiAlert('clientArea.phone_update_error', 'error');
+    } finally {
+      setSavingDados(false);
+    }
   };
 
   const salvarSenha = async () => {
@@ -884,6 +908,27 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                       VER E-MAIL
                     </button>
                   )}
+                </div>
+
+                <div className="flex items-start gap-3 border-b border-gray-800 px-4 py-3 sm:px-6">
+                  <span className="w-[74px] shrink-0 py-2 text-[14px] leading-5 text-gray-500">TELEFONE</span>
+                  <div className="min-w-0 flex-1">
+                    <input
+                      type="tel"
+                      value={telefoneCliente}
+                      onChange={(e) => setTelefoneCliente(e.target.value)}
+                      className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase placeholder-gray-600 outline-none focus:text-white"
+                      placeholder="WHATSAPP"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={salvarTelefone}
+                    disabled={savingDados}
+                    className="shrink-0 rounded-full border border-primary/30 px-3 py-1 text-[12px] font-normal uppercase text-primary disabled:opacity-50"
+                  >
+                    {savingDados ? 'SALVANDO' : 'SALVAR'}
+                  </button>
                 </div>
 
                 <div className="px-4 py-3 sm:px-6">

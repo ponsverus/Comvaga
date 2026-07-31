@@ -1,3 +1,4 @@
+import { MessageCircle } from 'lucide-react';
 import {
   computeStatusFromDb,
   formatDateBRFromISO,
@@ -6,11 +7,38 @@ import {
   getValorAgendamento,
   isCancelStatus,
   isDoneStatus,
+  timeToMinutes,
 } from '../utils';
+
+function normalizeBrazilPhone(value) {
+  const digits = String(value || '').replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.startsWith('55') && digits.length >= 12) return digits;
+  if (digits.length === 10 || digits.length === 11) return `55${digits}`;
+  return digits;
+}
+
+function buildReminderHref(agendamento, negocioNome) {
+  const phone = normalizeBrazilPhone(agendamento?.cliente?.telefone);
+  if (!phone) return '';
+
+  const clienteNome = agendamento?.cliente?.nome || '';
+  const horario = getAgInicio(agendamento) || 'o horário marcado';
+  const profissionalNome = agendamento?.profissionais?.nome || 'nosso profissional';
+  const servicoNome = agendamento?.entregas?.nome || 'seu serviço';
+  const prefix = negocioNome ? `Aqui é da ${negocioNome}. ` : '';
+  const saudacao = clienteNome ? `Olá, ${clienteNome}! ` : 'Olá! ';
+  const message = `${saudacao}${prefix}Passando para lembrar seu agendamento de hoje às ${horario}, com ${profissionalNome}, para ${servicoNome}.`;
+
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
 
 export default function AgendamentosSection({
   agendamentosAgrupadosPorProfissional,
   hoje,
+  nowMinutes,
+  canSendReminder = false,
+  negocioNome = '',
   confirmarAtendimento,
   cancelarAgendamento,
   hasMore,
@@ -36,6 +64,10 @@ export default function AgendamentosSection({
                   const isCancel = isCancelStatus(st);
                   const isDone = isDoneStatus(st);
                   const valorReal = getValorAgendamento(a);
+                  const inicioMinutes = timeToMinutes(getAgInicio(a));
+                  const hasStarted = Number.isFinite(Number(nowMinutes)) && inicioMinutes <= Number(nowMinutes);
+                  const canShowReminder = canSendReminder && isHoje && !isCancel && !isDone && !hasStarted;
+                  const reminderHref = canShowReminder ? buildReminderHref(a, negocioNome) : '';
                   return (
                     <div key={a.id} className="bg-dark-200 border border-gray-800 rounded-custom p-4">
                       <div className="flex items-start justify-between gap-2 mb-1">
@@ -56,8 +88,30 @@ export default function AgendamentosSection({
                       </div>
                       {!isDone && !isCancel && (
                         isHoje ? (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div className={`grid grid-cols-1 ${canShowReminder ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-2`}>
                             <button onClick={() => confirmarAtendimento(a)} className="w-full py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 rounded-button text-sm font-normal uppercase">CONFIRMAR ATENDIMENTO</button>
+                            {canShowReminder ? (
+                              reminderHref ? (
+                                <a
+                                  href={reminderHref}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex w-full items-center justify-center gap-2 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase"
+                                >
+                                  <MessageCircle size={16} aria-hidden="true" />
+                                  LEMBRETE
+                                </a>
+                              ) : (
+                                <button
+                                  type="button"
+                                  disabled
+                                  className="inline-flex w-full items-center justify-center gap-2 py-2 bg-gray-700/20 border border-gray-700 text-gray-500 rounded-button text-sm font-normal uppercase cursor-not-allowed"
+                                >
+                                  <MessageCircle size={16} aria-hidden="true" />
+                                  SEM WHATSAPP
+                                </button>
+                              )
+                            ) : null}
                             <button onClick={() => cancelarAgendamento(a)} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 rounded-button text-sm font-normal uppercase">CANCELAR</button>
                           </div>
                         ) : (
