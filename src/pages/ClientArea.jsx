@@ -337,38 +337,43 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
     const maxMb   = 3;
     if (!isImageFile(file)) { uiAlert('clientArea.avatar_invalid_format', 'error'); return; }
     if (file.size > maxMb * 1024 * 1024) { uiAlert('clientArea.avatar_too_large', 'error', { maxMb }); return; }
+    let uploadedPath = null;
     try {
       setUploadingAvatar(true);
       const convertedFile = await convertImageToWebp(file);
-      const oldPath = avatarPath || null;
-      const path = `${user.id}/avatar.webp`;
+      const path = `${user.id}/avatar-${Date.now()}.webp`;
       const { error: upErr } = await withTimeout(
-        supabase.storage.from('avatars').upload(path, convertedFile, { upsert: true, contentType: convertedFile.type }),
+        supabase.storage.from('avatars').upload(path, convertedFile, { upsert: false, contentType: convertedFile.type }),
         10000,
         'avatar-upload'
       );
       if (upErr) throw upErr;
+      uploadedPath = path;
       const { error: updErr } = await withTimeout(
-        supabase.from('users').update({ avatar_path: path }).eq('id', user.id),
+        supabase
+          .from('clientes')
+          .update({ avatar_path: path })
+          .eq('user_id', user.id)
+          .eq('status', 'ativo'),
         6000,
         'avatar-path-update'
       );
       if (updErr) throw updErr;
-      const normalizedOldPath = oldPath ? String(oldPath).replace(/^avatars\//, '') : null;
-      if (normalizedOldPath && normalizedOldPath !== path) {
-        try {
-          await withTimeout(
-            supabase.storage.from('avatars').remove([normalizedOldPath]),
-            6000,
-            'avatar-remove-old'
-          );
-        } catch (removeError) {
-          console.warn('Falha ao remover avatar antigo imediatamente; limpeza ja foi enfileirada pelo banco.', removeError);
-        }
-      }
+      uploadedPath = null;
       setAvatarPath(path);
       uiAlert('clientArea.avatar_updated', 'success');
     } catch {
+      if (uploadedPath) {
+        try {
+          await withTimeout(
+            supabase.storage.from('avatars').remove([uploadedPath]),
+            6000,
+            'avatar-remove-failed-upload'
+          );
+        } catch {
+          Remove apenas upload novo pendente de salvamento no perfil.
+        }
+      }
       uiAlert('clientArea.avatar_update_error', 'error');
     } finally {
       setUploadingAvatar(false);
