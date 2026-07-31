@@ -837,6 +837,9 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
               <AgendamentosSection
                 agendamentosAgrupadosPorProfissional={agendamentosAgrupadosPorProfissional}
                 hoje={hoje}
+                nowMinutes={serverNow?.minutes}
+                canSendReminder={souDono}
+                negocioNome={negocio?.nome || ''}
                 confirmarAtendimento={confirmarAtendimento}
                 cancelarAgendamento={cancelarAgendamento}
                 hasMore={agendamentosHasMore}
