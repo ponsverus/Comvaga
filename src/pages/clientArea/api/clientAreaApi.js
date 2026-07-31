@@ -4,9 +4,10 @@ import { withTimeout } from '../../../utils/withTimeout';
 export async function fetchClientePerfil(userId) {
   const { data, error } = await withTimeout(
     supabase
-      .from('users')
+      .from('clientes')
       .select('nome, avatar_path')
-      .eq('id', userId)
+      .eq('user_id', userId)
+      .eq('status', 'ativo')
       .maybeSingle(),
     6000,
     'cliente-perfil'
