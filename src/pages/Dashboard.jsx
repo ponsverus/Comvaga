@@ -225,6 +225,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     reloadFull,
   } = useDashboardBootstrap({
     userId: user?.id,
+    professionalRole,
     locationNegocioId: location?.state?.negocioId || null,
     navigate,
     rpcSequence: NOW_RPC_SEQUENCE,
@@ -628,7 +629,19 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
       },
     });
   }, [navigate, negocio?.id, negocio?.slug]);
-  const handleDashboardLogout = useCallback(() => onLogout(parceiroProfissional ? '/login/parceiro' : '/login'), [onLogout, parceiroProfissional]);
+  const handleDashboardLogout = useCallback(() => {
+    onLogout(parceiroProfissional || professionalRole === 'partner' ? '/login/parceiro' : '/login');
+  }, [onLogout, parceiroProfissional, professionalRole]);
+  const dashboardError = typeof error === 'string'
+    ? { title: 'Erro ao carregar', body: error, primaryLabel: 'TENTAR NOVAMENTE', primaryAction: 'retry' }
+    : error;
+  const handleDashboardErrorPrimaryAction = useCallback(() => {
+    if (dashboardError?.primaryAction === 'partner-business-center') {
+      navigate('/selecionar-negocio-parceiro', { replace: true });
+      return;
+    }
+    reloadFull();
+  }, [dashboardError?.primaryAction, navigate, reloadFull]);
 
   if (bootstrapState === 'loading') return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -643,9 +656,9 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-dark-100 border border-red-500/50 rounded-custom p-8 text-center">
         <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-        <h1 className="text-2xl font-normal text-white mb-2">Erro ao carregar</h1>
-        <p className="text-gray-400 mb-6">{error}</p>
-        <button onClick={reloadFull} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button mb-3 font-normal uppercase">TENTAR NOVAMENTE</button>
+        <h1 className="text-2xl font-normal text-white mb-2">{dashboardError?.title || 'Erro ao carregar'}</h1>
+        <p className="text-gray-400 mb-6">{dashboardError?.body || 'Erro inesperado.'}</p>
+        <button onClick={handleDashboardErrorPrimaryAction} className="w-full px-6 py-3 bg-primary/20 border border-primary/50 text-primary rounded-button mb-3 font-normal uppercase">{dashboardError?.primaryLabel || 'TENTAR NOVAMENTE'}</button>
         <button onClick={handleDashboardLogout} className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-button font-normal uppercase">SAIR</button>
       </div>
     </div>
