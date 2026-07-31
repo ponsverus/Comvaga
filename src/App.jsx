@@ -104,6 +104,10 @@ function FullScreenError({ message, onRetry }) {
   );
 }
 
+const ROUTE_LOAD_FAILED_MESSAGE =
+  ptBR.alerts?.route_load_failed?.body ||
+  'O carregamento da tela falhou. Por favor, atualize a pagina e tente novamente.';
+
 class RouteErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -122,7 +126,7 @@ class RouteErrorBoundary extends Component {
     if (this.state.error) {
       return (
         <FullScreenError
-          message={ptBR.alerts.route_load_failed.body}
+          message={ROUTE_LOAD_FAILED_MESSAGE}
           onRetry={() => window.location.reload()}
         />
       );
