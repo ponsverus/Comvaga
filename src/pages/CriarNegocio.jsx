@@ -217,7 +217,7 @@ export default function CriarNegocio({ user }) {
                 type="tel"
                 value={formData.telefone}
                 onChange={(e) => setFormData(prev => ({ ...prev, telefone: e.target.value }))}
-                placeholder="WHATSAPP"
+                placeholder="DDD + NÚMERO"
                 className={fieldInputClass}
                 required
               />
