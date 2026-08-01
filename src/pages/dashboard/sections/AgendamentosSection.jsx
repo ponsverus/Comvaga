@@ -28,7 +28,7 @@ function buildReminderHref(agendamento, negocioNome) {
   const servicoNome = agendamento?.entregas?.nome || 'seu serviço';
   const prefix = negocioNome ? `Aqui é da ${negocioNome}. ` : '';
   const saudacao = clienteNome ? `Olá, ${clienteNome}! ` : 'Olá! ';
-  const message = `${saudacao}${prefix}Passando para lembrar seu agendamento de hoje às ${horario}, com ${profissionalNome}, ${servicoNome}.`;
+  const message = `${saudacao}${prefix}Passando para lembrar seu agendamento de hoje às ${horario}, com ${profissionalNome}.`;
 
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
