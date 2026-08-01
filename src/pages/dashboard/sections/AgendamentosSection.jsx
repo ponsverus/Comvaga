@@ -18,17 +18,24 @@ function normalizeBrazilPhone(value) {
   return digits;
 }
 
+function formatReminderTime(value) {
+  const [hourRaw, minuteRaw] = String(value || '').split(':');
+  const hour = Number(hourRaw);
+  const minute = Number(minuteRaw);
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return value || 'o horário marcado';
+  return `${hour}h${String(minute).padStart(2, '0')}`;
+}
+
 function buildReminderHref(agendamento, negocioNome) {
   const phone = normalizeBrazilPhone(agendamento?.cliente?.telefone);
   if (!phone) return '';
 
   const clienteNome = agendamento?.cliente?.nome || '';
-  const horario = getAgInicio(agendamento) || 'o horário marcado';
+  const horario = formatReminderTime(getAgInicio(agendamento));
   const profissionalNome = agendamento?.profissionais?.nome || 'nosso profissional';
-  const servicoNome = agendamento?.entregas?.nome || 'seu serviço';
   const prefix = negocioNome ? `Aqui é da ${negocioNome}. ` : '';
   const saudacao = clienteNome ? `Olá, ${clienteNome}! ` : 'Olá! ';
-  const message = `${saudacao}${prefix}Passando para lembrar seu agendamento de hoje às ${horario}, com ${profissionalNome}.`;
+  const message = `${saudacao}${prefix}Estamos passando para lembrar que seu agendamento é hoje, às ${horario}, com ${profissionalNome}.`;
 
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
@@ -99,7 +106,7 @@ export default function AgendamentosSection({
                                   className="inline-flex w-full items-center justify-center gap-2 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase"
                                 >
                                   <MessageCircle size={16} aria-hidden="true" />
-                                  LEMBRAR CLIENTE
+                                  LEMBRETE CLIENTE
                                 </a>
                               ) : (
                                 <button
