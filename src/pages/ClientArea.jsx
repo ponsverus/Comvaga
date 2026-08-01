@@ -918,7 +918,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                       value={telefoneCliente}
                       onChange={(e) => setTelefoneCliente(e.target.value)}
                       className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase placeholder-gray-600 outline-none focus:text-white"
-                      placeholder="WHATSAPP"
+                      placeholder="DDD + NÚMERO"
                     />
                   </div>
                   <button
