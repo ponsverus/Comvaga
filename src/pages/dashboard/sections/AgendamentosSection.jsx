@@ -1,4 +1,5 @@
 import { MessageCircle } from 'lucide-react';
+import { normalizeBrazilWhatsApp } from '../../../utils/phone';
 import {
   computeStatusFromDb,
   formatDateBRFromISO,
@@ -10,14 +11,6 @@ import {
   timeToMinutes,
 } from '../utils';
 
-function normalizeBrazilPhone(value) {
-  const digits = String(value || '').replace(/\D/g, '');
-  if (!digits) return '';
-  if (digits.startsWith('55') && digits.length >= 12) return digits;
-  if (digits.length === 10 || digits.length === 11) return `55${digits}`;
-  return digits;
-}
-
 function formatReminderTime(value) {
   const [hourRaw, minuteRaw] = String(value || '').split(':');
   const hour = Number(hourRaw);
@@ -27,7 +20,7 @@ function formatReminderTime(value) {
 }
 
 function buildReminderHref(agendamento, negocioNome) {
-  const phone = normalizeBrazilPhone(agendamento?.cliente?.telefone);
+  const phone = normalizeBrazilWhatsApp(agendamento?.cliente?.telefone);
   if (!phone) return '';
 
   const clienteNome = agendamento?.cliente?.nome || '';
