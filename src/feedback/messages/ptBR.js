@@ -220,6 +220,13 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    business_phone_invalid: {
+      title: 'WhatsApp inválido',
+      body: 'Informe um WhatsApp válido para continuar.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
 
     gallery_invalid_format: {
       title: 'Formato inválido',
@@ -1029,6 +1036,13 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    phone_invalid: {
+      title: 'WhatsApp inválido',
+      body: 'Informe um WhatsApp válido para continuar.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
     account_email_invalid: {
       title: 'E-mail inválido',
       body: 'Digite um e-mail válido para continuar.',
@@ -1383,6 +1397,13 @@ export const ptBR = {
     phone_required: {
       title: 'Telefone obrigatório',
       body: 'Informe seu WhatsApp para continuar.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
+    phone_invalid: {
+      title: 'WhatsApp inválido',
+      body: 'Informe um WhatsApp válido para continuar.',
       variant: 'danger',
       screen: 'dark',
       buttonText: 'OK',
