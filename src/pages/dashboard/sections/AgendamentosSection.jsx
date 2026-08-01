@@ -28,7 +28,7 @@ function buildReminderHref(agendamento, negocioNome) {
   const servicoNome = agendamento?.entregas?.nome || 'seu serviço';
   const prefix = negocioNome ? `Aqui é da ${negocioNome}. ` : '';
   const saudacao = clienteNome ? `Olá, ${clienteNome}! ` : 'Olá! ';
-  const message = `${saudacao}${prefix}Passando para lembrar seu agendamento de hoje às ${horario}, com ${profissionalNome}, para ${servicoNome}.`;
+  const message = `${saudacao}${prefix}Passando para lembrar seu agendamento de hoje às ${horario}, com ${profissionalNome}, ${servicoNome}.`;
 
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
@@ -99,7 +99,7 @@ export default function AgendamentosSection({
                                   className="inline-flex w-full items-center justify-center gap-2 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary rounded-button text-sm font-normal uppercase"
                                 >
                                   <MessageCircle size={16} aria-hidden="true" />
-                                  LEMBRETE
+                                  LEMBRAR CLIENTE
                                 </a>
                               ) : (
                                 <button
