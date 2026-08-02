@@ -5,6 +5,7 @@ import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { ProfessionalIcon } from '../components/icons';
 import { DEFAULT_PLAN_CODE, clearSelectedPlanIntent, getSelectedPlanIntent, normalizePlanCode } from '../utils/plans';
+import { normalizeBrazilPhone } from '../utils/phone';
 import { withTimeout } from '../utils/withTimeout';
 
 function onlyTrim(v) {
@@ -201,11 +202,13 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       const nomeNegocio = onlyTrim(formData.nomeNegocio);
       const slug = onlyTrim(formData.urlNegocio);
       const tipoNegocio = onlyTrim(formData.tipoNegocio);
-      const telefone = onlyTrim(formData.telefone);
+      const telefoneRaw = onlyTrim(formData.telefone);
+      const telefone = normalizeBrazilPhone(telefoneRaw);
       const isWaitingRoom = !resumeContexts.length;
 
       if (!nome) { showMessage('signupProfessional.name_required'); return; }
-      if (!telefone) { showMessage('signupProfessional.phone_required'); return; }
+      if (!telefoneRaw) { showMessage('signupProfessional.phone_required'); return; }
+      if (telefone === null) { showMessage('signupProfessional.phone_invalid'); return; }
       if (!nomeNegocio) { showMessage('signupProfessional.business_name_required'); return; }
       if (!slug || slug.length < 3) { showMessage('signupProfessional.business_slug_invalid'); return; }
       if (!tipoNegocio) { showMessage('signupProfessional.business_type_required'); return; }
@@ -382,7 +385,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
                 type="tel"
                 value={formData.telefone}
                 onChange={(e) => setFormData((prev) => ({ ...prev, telefone: e.target.value }))}
-                placeholder="DDD + NÚMERO"
+                placeholder="WHATSAPP"
                 className={fieldInputClass}
                 required
               />
