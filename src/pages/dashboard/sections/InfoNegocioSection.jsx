@@ -143,7 +143,7 @@ export default function InfoNegocioSection({
           value={formInfo.telefone}
           onChange={(e) => setFormInfo((prev) => ({ ...prev, telefone: e.target.value }))}
           className={inputClass}
-          placeholder="DDD + NÚMERO"
+          placeholder="WHATSAPP"
         />
       </InfoRow>
 

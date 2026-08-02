@@ -6,6 +6,7 @@ import AppFooter from '../components/AppFooter';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { convertImageToWebp, isImageFile } from '../utils/media';
+import { normalizeBrazilPhone } from '../utils/phone';
 import { getRequestErrorKey } from '../utils/requestError';
 import { searchHome } from '../utils/searchHome';
 import { withTimeout } from '../utils/withTimeout';
@@ -434,7 +435,12 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
   };
 
   const salvarTelefone = async () => {
-    const telefone = String(telefoneCliente || '').trim();
+    const telefone = normalizeBrazilPhone(telefoneCliente);
+    if (telefone === null) {
+      uiAlert('clientArea.phone_invalid', 'error');
+      return;
+    }
+
     try {
       setSavingDados(true);
       const { error } = await withTimeout(
@@ -918,7 +924,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
                       value={telefoneCliente}
                       onChange={(e) => setTelefoneCliente(e.target.value)}
                       className="w-full bg-transparent px-0 py-2 text-[14px] text-white uppercase placeholder-gray-600 outline-none focus:text-white"
-                      placeholder="DDD + NÚMERO"
+                      placeholder="WHATSAPP"
                     />
                   </div>
                   <button

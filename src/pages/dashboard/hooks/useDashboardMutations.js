@@ -24,6 +24,7 @@ import {
   fetchUserNome,
 } from '../api/dashboardApi';
 import { convertImageToWebp, isImageFile } from '../../../utils/media';
+import { normalizeBrazilPhone } from '../../../utils/phone';
 import { getRequestErrorKey } from '../../../utils/requestError';
 import { withTimeout } from '../../../utils/withTimeout';
 
@@ -172,10 +173,15 @@ export function useDashboardMutations({
     if (!(await ensureOwnerAction())) return;
     try {
       setInfoSaving(true);
+      const telefone = normalizeBrazilPhone(formInfo.telefone);
+      if (telefone === null) {
+        await uiAlert('dashboard.business_phone_invalid', 'error');
+        return;
+      }
       const payload = {
         nome: toUpperClean(formInfo.nome),
         descricao: String(formInfo.descricao || '').trim(),
-        telefone: String(formInfo.telefone || '').trim(),
+        telefone: telefone || null,
         endereco_cep: onlyDigits(formInfo.endereco_cep) || null,
         endereco_rua: cleanText(formInfo.endereco_rua) || null,
         endereco_numero: cleanText(formInfo.endereco_numero) || null,

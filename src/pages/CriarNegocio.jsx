@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
+import { normalizeBrazilPhone } from '../utils/phone';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -108,12 +109,14 @@ export default function CriarNegocio({ user }) {
     const nomeNegocio = onlyTrim(formData.nomeNegocio);
     const slug = onlyTrim(formData.urlNegocio);
     const tipoNegocio = onlyTrim(formData.tipoNegocio);
-    const telefone = onlyTrim(formData.telefone);
+    const telefoneRaw = onlyTrim(formData.telefone);
+    const telefone = normalizeBrazilPhone(telefoneRaw);
 
     if (!nomeNegocio) { showMessage('signupProfessional.business_name_required'); return; }
     if (!slug || slug.length < 3) { showMessage('signupProfessional.business_slug_invalid'); return; }
     if (!tipoNegocio) { showMessage('signupProfessional.business_type_required'); return; }
-    if (!telefone) { showMessage('signupProfessional.phone_required'); return; }
+    if (!telefoneRaw) { showMessage('signupProfessional.phone_required'); return; }
+    if (telefone === null) { showMessage('signupProfessional.phone_invalid'); return; }
 
     const enderecoKey = validarEndereco();
     if (enderecoKey) { showMessage(enderecoKey); return; }
@@ -217,7 +220,7 @@ export default function CriarNegocio({ user }) {
                 type="tel"
                 value={formData.telefone}
                 onChange={(e) => setFormData(prev => ({ ...prev, telefone: e.target.value }))}
-                placeholder="DDD + NÚMERO"
+                placeholder="WHATSAPP"
                 className={fieldInputClass}
                 required
               />
