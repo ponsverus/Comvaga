@@ -8,7 +8,7 @@ import { useFeedback } from '../feedback/useFeedback';
 import { useBusinessGroup } from '../businessTerms';
 import EntregaModal from './dashboard/components/EntregaModal';
 import ProfissionalModal from './dashboard/components/ProfissionalModal';
-import VisaoGeralSection from './dashboard/sections/VisaoGeralSection';
+import GeralSection from './dashboard/sections/GeralSection';
 import AgendamentosSection from './dashboard/sections/AgendamentosSection';
 import HistoricoSection from './dashboard/sections/HistoricoSection';
 import ClientesSection from './dashboard/sections/ClientesSection';
@@ -809,7 +809,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
           <div className="p-6">
 
             {activeTab === 'visao-geral' && (
-              <VisaoGeralSection
+              <GeralSection
                 metricsHoje={metricsHoje}
                 proximoAgendamento={proximoAgendamento}
                 souDono={souDono}
