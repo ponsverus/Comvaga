@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
 
 function formatDurationFromMinutes(value) {
   const totalMinutes = Math.max(Number(value || 0), 0);
@@ -74,30 +73,25 @@ export default function AgendaUtilizacaoBlock({
     () => (Array.isArray(data?.por_profissional) ? data.por_profissional : []),
     [data?.por_profissional]
   );
-  const [cardsPerPage, setCardsPerPage] = useState(3);
-  const [page, setPage] = useState(0);
+  const scrollerRef = useRef(null);
+  const [activePage, setActivePage] = useState(0);
+  const desktopPageCount = Math.max(1, Math.ceil(porProfissional.length / 3));
 
-  useEffect(() => {
-    const updateCardsPerPage = () => {
-      setCardsPerPage(window.innerWidth < 768 ? 1 : 3);
-    };
+  function updateActivePage() {
+    const node = scrollerRef.current;
+    if (!node) return;
 
-    updateCardsPerPage();
-    window.addEventListener('resize', updateCardsPerPage);
-    return () => window.removeEventListener('resize', updateCardsPerPage);
-  }, []);
+    const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+    const pageCount = isDesktop ? desktopPageCount : porProfissional.length;
+    const maxScrollLeft = node.scrollWidth - node.clientWidth;
+    const nextPage = maxScrollLeft > 1
+      ? Math.round((node.scrollLeft / maxScrollLeft) * (pageCount - 1))
+      : 0;
+    setActivePage(Math.max(0, Math.min(pageCount - 1, nextPage)));
+  }
 
-  const pageCount = Math.max(1, Math.ceil(porProfissional.length / cardsPerPage));
-  const currentPage = Math.min(page, pageCount - 1);
-
-  useEffect(() => {
-    setPage((prev) => Math.min(prev, pageCount - 1));
-  }, [pageCount]);
-
-  const visibleProfissionais = useMemo(() => {
-    const start = currentPage * cardsPerPage;
-    return porProfissional.slice(start, start + cardsPerPage);
-  }, [cardsPerPage, currentPage, porProfissional]);
+  const mobileActivePage = Math.min(activePage, porProfissional.length - 1);
+  const desktopActivePage = Math.min(activePage, desktopPageCount - 1);
 
   return (
     <div className="bg-dark-200 border border-gray-800 rounded-custom p-5">
@@ -143,31 +137,14 @@ export default function AgendaUtilizacaoBlock({
       </div>
 
       {souDono && porProfissional.length > 0 ? (
-        <div className="mt-4 relative md:px-16">
-          {pageCount > 1 ? (
-            <>
-              <button
-                type="button"
-                onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-                disabled={currentPage === 0}
-                className="hidden md:inline-flex absolute left-3 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setPage((prev) => Math.min(prev + 1, pageCount - 1))}
-                disabled={currentPage === pageCount - 1}
-                className="hidden md:inline-flex absolute right-3 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full border border-gray-700 bg-dark-100 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors z-10"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </>
-          ) : null}
-
-          <div className="grid md:grid-cols-3 gap-3 items-start">
-            {visibleProfissionais.map((item) => (
-              <div key={String(item?.profissional_id || item?.nome)} className="bg-dark-100 border border-gray-800 rounded-custom p-4">
+        <div className="mt-4">
+          <div
+            ref={scrollerRef}
+            onScroll={updateActivePage}
+            className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {porProfissional.map((item) => (
+              <div key={String(item?.profissional_id || item?.nome)} className="shrink-0 basis-full snap-start bg-dark-100 border border-gray-800 rounded-custom p-4 md:basis-[calc((100%-1.5rem)/3)]">
                 {(() => {
                   const validos = Number(item?.agendamentos_validos || 0);
                   const cancelados = Number(item?.cancelados || 0);
@@ -204,37 +181,19 @@ export default function AgendaUtilizacaoBlock({
             ))}
           </div>
 
-          {pageCount > 1 ? (
-            <div className="flex items-center justify-between md:justify-center gap-4 mt-4">
-              <button
-                type="button"
-                onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-                disabled={currentPage === 0}
-                className="inline-flex md:hidden items-center justify-center w-10 h-10 rounded-full border border-gray-700 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
+          {porProfissional.length > 1 ? (
+            <div className="mt-3 flex justify-center gap-1.5 md:hidden" aria-hidden="true">
+              {porProfissional.map((item, index) => (
+                <span key={`${String(item?.profissional_id || item?.nome)}-${index}`} className={`h-1.5 rounded-full transition-all ${index === mobileActivePage ? 'w-4 bg-primary' : 'w-1.5 bg-gray-600'}`} />
+              ))}
+            </div>
+          ) : null}
 
-              <div className="flex items-center gap-2">
-                {Array.from({ length: pageCount }).map((_, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => setPage(index)}
-                    className={`w-2.5 h-2.5 rounded-full transition-colors ${index === currentPage ? 'bg-primary' : 'bg-gray-600 hover:bg-gray-400'}`}
-                    aria-label={`Ir para página ${index + 1}`}
-                  />
-                ))}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setPage((prev) => Math.min(prev + 1, pageCount - 1))}
-                disabled={currentPage === pageCount - 1}
-                className="inline-flex md:hidden items-center justify-center w-10 h-10 rounded-full border border-gray-700 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-primary hover:text-primary transition-colors"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+          {porProfissional.length > 3 ? (
+            <div className="mt-3 hidden justify-center gap-1.5 md:flex" aria-hidden="true">
+              {Array.from({ length: desktopPageCount }).map((_, index) => (
+                <span key={index} className={`h-1.5 rounded-full transition-all ${index === desktopActivePage ? 'w-4 bg-primary' : 'w-1.5 bg-gray-600'}`} />
+              ))}
             </div>
           ) : null}
         </div>
