@@ -9,7 +9,7 @@ export function useDashboardHistorico({
   parceiroProfissionalId,
 }) {
   const [historicoAgendamentos, setHistoricoAgendamentos] = useState([]);
-  const [historicoPage, setHistoricoPage] = useState(0);
+  const [historicoCursor, setHistoricoCursor] = useState(null);
   const [historicoHasMore, setHistoricoHasMore] = useState(false);
   const [historicoLoadingMore, setHistoricoLoadingMore] = useState(false);
   const [historicoData, setHistoricoData] = useState('');
@@ -24,14 +24,14 @@ export function useDashboardHistorico({
     [parceiroProfissionalId]
   );
 
-  const fetchHistoricoPage = useCallback(async ({ profIds, date, page, append }) => {
+  const fetchHistoricoPage = useCallback(async ({ profIds, date, cursor, append }) => {
     const rows = await fetchAgendamentosNegocio({
       negocioId,
       profissionalIds: profIds,
       dataInicio: date,
       dataFim: date,
       limit: AG_PAGE_SIZE + 1,
-      offset: page * AG_PAGE_SIZE,
+      cursor,
     });
     const visibleRows = rows.slice(0, AG_PAGE_SIZE);
 
@@ -43,16 +43,17 @@ export function useDashboardHistorico({
         .sort(compareAgendamentoDateTimeDesc);
     });
     setHistoricoHasMore(rows.length > AG_PAGE_SIZE);
+    setHistoricoCursor(visibleRows.length ? visibleRows[visibleRows.length - 1] : cursor);
     setHistoricoError('');
   }, [negocioId]);
 
   useEffect(() => {
     if (!historicoData || !negocioId) return;
-    setHistoricoPage(0);
+    setHistoricoCursor(null);
     setHistoricoHasMore(false);
     setHistoricoAgendamentos([]);
     setHistoricoError('');
-    fetchHistoricoPage({ profIds: historicoProfIds, date: historicoData, page: 0, append: false })
+    fetchHistoricoPage({ profIds: historicoProfIds, date: historicoData, cursor: null, append: false })
       .catch((error) => {
         const requestKey = getRequestErrorKey(error);
         setHistoricoAgendamentos([]);
@@ -69,9 +70,7 @@ export function useDashboardHistorico({
     if (historicoLoadingMore || !historicoHasMore || !negocioId) return;
     try {
       setHistoricoLoadingMore(true);
-      const nextPage = historicoPage + 1;
-      await fetchHistoricoPage({ profIds: historicoProfIds, date: historicoData, page: nextPage, append: true });
-      setHistoricoPage(nextPage);
+      await fetchHistoricoPage({ profIds: historicoProfIds, date: historicoData, cursor: historicoCursor, append: true });
     } catch (error) {
       console.warn('Falha ao carregar mais histórico.', error);
       setHistoricoError('dashboard.history_load_error');
@@ -80,10 +79,10 @@ export function useDashboardHistorico({
     }
   }, [
     fetchHistoricoPage,
+    historicoCursor,
     historicoData,
     historicoHasMore,
     historicoLoadingMore,
-    historicoPage,
     historicoProfIds,
     negocioId,
   ]);
