@@ -421,7 +421,7 @@ export async function fetchAgendamentosNegocio({
   dataInicio,
   dataFim = null,
   limit = null,
-  offset = 0,
+  cursor = null,
 }) {
   const { data, error } = await withTimeout(
     supabase.rpc('get_agendamentos_negocio', {
@@ -430,7 +430,9 @@ export async function fetchAgendamentosNegocio({
       p_data_inicio: dataInicio,
       p_data_fim: dataFim,
       p_limit: limit,
-      p_offset: offset,
+      p_cursor_data: cursor?.data ?? null,
+      p_cursor_horario: cursor?.horario_inicio ?? null,
+      p_cursor_id: cursor?.id ?? null,
     }),
     7000,
     'agendamentos-negocio'
