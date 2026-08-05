@@ -243,7 +243,7 @@ export function useDashboardBootstrap({
       profissionalIds: ids,
       dataInicio: dataBase,
       limit: AGENDAMENTOS_PAGE_SIZE + 1,
-      offset: 0,
+      cursor: null,
     });
     const visibleRows = rows.slice(0, AGENDAMENTOS_PAGE_SIZE);
     setAgendamentos(visibleRows);
@@ -259,12 +259,13 @@ export function useDashboardBootstrap({
 
     try {
       setAgendamentosLoadingMore(true);
+      const cursor = agendamentos.length ? agendamentos[agendamentos.length - 1] : null;
       const rows = await fetchAgendamentosNegocio({
         negocioId: id,
         profissionalIds: ids,
         dataInicio: dataBase,
         limit: AGENDAMENTOS_PAGE_SIZE + 1,
-        offset: agendamentos.length,
+        cursor,
       });
       const visibleRows = rows.slice(0, AGENDAMENTOS_PAGE_SIZE);
       setAgendamentos((current) => {
@@ -275,7 +276,7 @@ export function useDashboardBootstrap({
     } finally {
       setAgendamentosLoadingMore(false);
     }
-  }, [agendamentos.length, agendamentosHasMore, agendamentosLoadingMore, negocio?.id, profissionais]);
+  }, [agendamentos, agendamentosHasMore, agendamentosLoadingMore, negocio?.id, profissionais]);
 
   const applyGaleriaPage = useCallback((rows, mode = 'replace') => {
     const safeRows = rows || [];
@@ -448,7 +449,7 @@ export function useDashboardBootstrap({
           profissionalIds: ids,
           dataInicio: dataHoje,
           limit: AGENDAMENTOS_PAGE_SIZE + 1,
-          offset: 0,
+          cursor: null,
         }) : Promise.resolve([]),
       ]);
 
