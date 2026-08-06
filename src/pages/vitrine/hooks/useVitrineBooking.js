@@ -246,7 +246,6 @@ export function useVitrineBooking({
     }
     if (calendarPlatformMode === 'ics') {
       return {
-        hint: 'Baixar evento compatível com Calendário do iPhone, Mac e Outlook.',
         primaryLabel: 'BAIXAR EVENTO DO CALENDÁRIO',
         primaryAction: baixarEventoICS,
         secondaryLabel: '',
@@ -254,7 +253,6 @@ export function useVitrineBooking({
       };
     }
     return {
-      hint: 'Baixar evento compatível com os principais aplicativos de calendário.',
       primaryLabel: 'BAIXAR EVENTO DO CALENDÁRIO',
       primaryAction: baixarEventoICS,
       secondaryLabel: '',
