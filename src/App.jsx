@@ -30,7 +30,8 @@ function isRecoverableLazyLoadError(error) {
     || text.includes('error loading dynamically imported module')
     || text.includes('loading chunk')
     || text.includes('chunkloaderror')
-    || text.includes('did not return a default export');
+    || text.includes('did not return a default export')
+    || text.includes("cannot read properties of undefined (reading 'default')");
 }
 
 function reloadOnceForLazyRoute(pageName) {
