@@ -227,6 +227,13 @@ export const ptBR = {
       screen: 'dark',
       buttonText: 'OK',
     },
+    business_description_too_long: {
+      title: 'Muito longo',
+      body: 'O texto do campo "Sobre" ultrapassou o limite de 150 caracteres. Reduza o texto e tente novamente.',
+      variant: 'danger',
+      screen: 'dark',
+      buttonText: 'OK',
+    },
 
     gallery_invalid_format: {
       title: 'Formato inválido',
