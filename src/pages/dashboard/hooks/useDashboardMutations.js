@@ -178,9 +178,14 @@ export function useDashboardMutations({
         await uiAlert('dashboard.business_phone_invalid', 'error');
         return;
       }
+      const descricao = String(formInfo.descricao || '').trim();
+      if (descricao.length > 150) {
+        await uiAlert('dashboard.business_description_too_long', 'error');
+        return;
+      }
       const payload = {
         nome: toUpperClean(formInfo.nome),
-        descricao: String(formInfo.descricao || '').trim(),
+        descricao,
         telefone: telefone || null,
         endereco_cep: onlyDigits(formInfo.endereco_cep) || null,
         endereco_rua: cleanText(formInfo.endereco_rua) || null,
