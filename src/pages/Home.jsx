@@ -511,28 +511,78 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             <h3 className="text-3xl md:text-4xl font-black text-white mb-2">TODOS OS RECURSOS</h3>
             <p className="text-gray-400 mb-8">A mesma inteligência em todos os planos.</p>
 
-            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
-              {[
-                'Reabertura automática de horários cancelados na agenda',
-                'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
-                'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
-                'Indicadores de agendamentos e receita, com comparativo ao dia anterior, além de indicadores de receita por período.',
-                'Métricas de faturamento e desempenho operacional por data ou período',
-                'Montagem de ofertas nos trabalhos oferecidos',
-                'Comprometimento da agenda e receita futura projetada',
-                'Agendamento assistido pelo profissional',
-                'Reagendamento inteligente em um clique pela área exclusiva do cliente',
-                'Alertas por e-mail em tempo real',
-                'Lembrete automático 30 min antes',
-                'Sincronia total com o Google Agenda',
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-2.5">
-                  <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span className="text-sm text-gray-300 leading-snug">{item}</span>
-                </div>
-              ))}
+            <div className="mb-10">
+              <span className="block text-[10px] font-normal uppercase tracking-widest text-primary mb-4">
+                O que você ganha
+              </span>
+              <div className="flex flex-wrap gap-x-6 gap-y-2.5">
+                {[
+                  'Menos horários ociosos',
+                  'Mais aproveitamento da agenda',
+                  'Mais previsibilidade',
+                  'Menos trabalho manual',
+                  'Mais autonomia para o cliente',
+                  'Mais controle sobre a operação',
+                ].map((item) => (
+                  <span key={item} className="text-sm text-gray-300">{item}</span>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <span className="block text-[10px] font-normal uppercase tracking-widest text-gray-400 mb-5">
+                Como a Comvaga faz isso
+              </span>
+              <div className="flex flex-col gap-5">
+                {[
+                  {
+                    title: 'Reabertura automática de horários cancelados na agenda',
+                    text: 'Horários liberados por cancelamentos voltam automaticamente à disponibilidade, via particionamento dinâmico da agenda.',
+                  },
+                  {
+                    title: 'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
+                    text: 'O sistema organiza e reserva vários atendimentos em sequência dentro do mesmo período disponível.',
+                  },
+                  {
+                    title: 'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
+                    text: 'Novas reservas são direcionadas para as zonas de calor, os horários mais próximos dos atendimentos já confirmados, compactando a agenda.',
+                  },
+                  {
+                    title: 'Comprometimento da agenda e receita futura projetada',
+                    text: 'Acompanhe quanto da agenda já está preenchido e quanto já está projetado de receita para os próximos dias.',
+                  },
+                  {
+                    title: 'Agendamento assistido pelo profissional',
+                    text: 'O profissional registra o agendamento diretamente na agenda, sem depender de o cliente concluir a reserva sozinho.',
+                  },
+                  {
+                    title: 'Reagendamento inteligente em um clique pela área exclusiva do cliente',
+                    text: 'O cliente reagenda sozinho pela própria área, sem precisar entrar em contato com o profissional.',
+                  },
+                  {
+                    title: 'Alertas por e-mail em tempo real',
+                    text: 'Você é avisado assim que um novo agendamento, cancelamento ou alteração acontece.',
+                  },
+                  {
+                    title: 'Lembrete automático 30 min antes',
+                    text: 'O cliente recebe um lembrete automático antes do horário marcado, reduzindo faltas.',
+                  },
+                  {
+                    title: 'Sincronia total com o Google Agenda',
+                    text: 'Seus agendamentos da Comvaga aparecem automaticamente no Google Agenda, sem trabalho manual.',
+                  },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-2.5">
+                    <svg className="w-4 h-4 text-primary shrink-0 mt-1" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-medium text-gray-200 leading-snug">{item.title}</p>
+                      <p className="text-sm text-gray-500 leading-snug mt-0.5">{item.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
