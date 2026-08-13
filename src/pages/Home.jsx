@@ -496,32 +496,22 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           </h2>
           <p className="text-xl text-gray-400">Teste grátis por 30 dias o plano escolhido. Sem compromisso e sem burocracia ;)</p>
         </div>
-       
+
         <div className="
-          w-full bg-gray-800 border-t border-gray-800
-          flex sm:grid sm:grid-cols-3 gap-px
-          overflow-x-auto sm:overflow-visible
-          pb-0 sm:pb-0
+          w-full bg-gray-800 border-y border-gray-800
+          flex md:grid md:grid-cols-2 gap-px
+          overflow-x-auto md:overflow-visible
+          snap-x snap-mandatory md:snap-none
           [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
         ">
+          <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-100 px-4 sm:px-8 md:px-12 lg:px-16 py-12 md:py-16">
+            <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
+              Todos os planos incluem
+            </span>
+            <h3 className="text-3xl md:text-4xl font-black text-white mb-2">TODOS OS RECURSOS</h3>
+            <p className="text-gray-400 mb-8">A mesma inteligência em todos os planos.</p>
 
-          <div className="
-            shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
-            bg-dark-100 p-8 sm:p-10 flex flex-col px-4 sm:px-8 md:px-12
-          ">
-            <div className="mb-5">
-              <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-                Essencial
-              </span>
-              <p className="text-2xl font-normal text-white mb-1">
-                R$ 69<span className="text-base font-normal text-gray-500">,99/mês</span>
-              </p>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Para autônomos que buscam organizar sua agenda.
-              </p>
-            </div>
-
-            <div className="pt-5 flex flex-col gap-3 flex-grow">
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
               {[
                 'Reabertura automática de horários cancelados na agenda',
                 'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
@@ -537,53 +527,6 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 'Sincronia total com o Google Agenda',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2.5">
-                  <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span className="text-sm text-gray-400 leading-snug">{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <Link
-              to={planSignupTo('essencial')}
-              onClick={() => saveSelectedPlanIntent('essencial')}
-              className="mt-8 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
-            >
-              Testar Essencial
-            </Link>
-          </div>
-
-          <div className="
-            shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
-            bg-primary/5 p-8 sm:p-10 relative flex flex-col px-4 sm:px-8 md:px-12
-          ">
-            <span className="absolute right-4 top-8 inline-flex rounded-full bg-green-400 px-3 py-1 text-[10px] font-normal uppercase tracking-widest text-white sm:right-8 sm:top-10 md:right-12">
-              OFERTA
-            </span>
-            <div className="mb-5">
-              <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
-                Profissional
-              </span>
-              <div className="mb-1 flex flex-wrap items-end gap-x-3 gap-y-1">
-                <span className="text-3xl font-normal text-red-500 line-through decoration-red-500 decoration-2">
-                  R$ 99,99
-                </span>
-                <span className="text-xl font-normal text-green-400">
-                  R$ 69,99<span className="text-base font-normal text-gray-400">/mês</span>
-                </span>
-              </div>
-              <p className="text-sm text-gray-400 leading-relaxed">
-                Para negócios em crescimento que precisam ampliar sua equipe.
-              </p>
-            </div>
-
-            <div className="pt-5 flex flex-col gap-3 flex-grow">
-              {[
-                'Tudo do plano ESSENCIAL',
-                'Até 3 profissionais cadastrados',
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-2.5">
                   <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
                     <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -591,60 +534,80 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 </div>
               ))}
             </div>
-
-            <div className="mt-8 flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
-              <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
-              <span className="text-xs font-normal text-primary uppercase tracking-wide">
-                PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM ATÉ 3 PROFISSIONAIS.
-              </span>
-            </div>
-
-            <Link
-              to={planSignupTo('profissional')}
-              onClick={() => saveSelectedPlanIntent('profissional')}
-              className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm uppercase rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
-            >
-              TESTAR AGORA <ZapIcon className="w-3.5 h-3.5" />
-            </Link>
           </div>
 
-          <div className="
-            shrink-0 w-[85vw] sm:w-auto [scroll-snap-align:center]
-            bg-dark-100 p-8 sm:p-10 flex flex-col px-4 sm:px-8 md:px-12
-          ">
-            <div className="mb-5">
-              <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-                Premium Real
+          <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-200 flex flex-col divide-y divide-gray-800">
+            <div className="px-4 sm:px-8 md:px-12 lg:px-16 pt-12 md:pt-16 pb-6">
+              <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
+                Escolha a capacidade
               </span>
-              <p className="text-2xl font-normal text-white mb-1">
-                R$ 129<span className="text-base font-normal text-gray-500">,99/mês</span>
-              </p>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Para negócios que querem crescer sem limites e aproveitar primeiro as novas possibilidades.
-              </p>
+              <h3 className="text-3xl md:text-4xl font-black text-white mb-2">QUANTOS PROFISSIONAIS?</h3>
+              <p className="text-gray-400">Mesmo sistema. A capacidade acompanha o tamanho da sua equipe.</p>
             </div>
 
-            <div className="pt-5 flex flex-col gap-3 flex-grow">
-              {[
-                'Profissionais ilimitados',                 
-                'Acesso antecipado a novos recursos',
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-2.5">
-                  <svg className="w-4 h-4 text-gray-600 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span className="text-sm text-gray-400 leading-snug">{item}</span>
+            {[
+              {
+                code: 'essencial',
+                name: 'Essencial',
+                capacity: '1 profissional',
+                oldPrice: null,
+                price: 'R$ 69,99',
+                badge: null,
+              },
+              {
+                code: 'profissional',
+                name: 'Profissional',
+                capacity: 'Até 3 profissionais',
+                oldPrice: 'R$ 99,99',
+                price: 'R$ 69,99',
+                badge: 'OFERTA',
+              },
+              {
+                code: 'premium',
+                name: 'Premium',
+                capacity: 'Profissionais ilimitados',
+                oldPrice: null,
+                price: 'R$ 129,99',
+                badge: null,
+              },
+            ].map((plan) => (
+              <div
+                key={plan.code}
+                className="px-4 sm:px-8 md:px-12 lg:px-16 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6"
+              >
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-[10px] font-normal uppercase tracking-widest text-gray-400">
+                      {plan.name}
+                    </span>
+                    {plan.badge && (
+                      <span className="inline-flex items-center rounded-full bg-green-400 px-2.5 py-0.5 text-[9px] font-normal uppercase tracking-widest text-white">
+                        {plan.badge}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-2xl md:text-3xl font-black text-primary mb-2">{plan.capacity}</p>
+                  <div className="flex items-end gap-x-3 gap-y-1 flex-wrap">
+                    {plan.oldPrice && (
+                      <span className="text-base font-normal text-red-500 line-through decoration-red-500 decoration-2">
+                        {plan.oldPrice}
+                      </span>
+                    )}
+                    <span className="text-xl font-normal text-white">
+                      {plan.price}<span className="text-sm font-normal text-gray-500">/mês</span>
+                    </span>
+                  </div>
                 </div>
-              ))}
-            </div>
 
-            <Link
-              to={planSignupTo('premium')}
-              onClick={() => saveSelectedPlanIntent('premium')}
-              className="mt-8 flex items-center justify-center px-5 py-2.5 bg-transparent border border-primary text-primary text-xs font-normal uppercase tracking-wider rounded-full hover:bg-primary/10 transition-all"
-            >
-              Testar Premium
-            </Link>
+                <Link
+                  to={planSignupTo(plan.code)}
+                  onClick={() => saveSelectedPlanIntent(plan.code)}
+                  className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
+                >
+                  Começar com {plan.name} <ZapIcon className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
