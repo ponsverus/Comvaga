@@ -511,28 +511,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             <h3 className="text-3xl md:text-4xl font-black text-white mb-2">TODOS OS RECURSOS</h3>
             <p className="text-gray-400 mb-8">A mesma inteligência em todos os planos.</p>
 
-            <div className="mb-10">
-              <span className="block text-[10px] font-normal uppercase tracking-widest text-primary mb-4">
-                O que você ganha
-              </span>
-              <div className="flex flex-wrap gap-x-6 gap-y-2.5">
-                {[
-                  'Menos horários ociosos',
-                  'Mais aproveitamento da agenda',
-                  'Mais previsibilidade',
-                  'Menos trabalho manual',
-                  'Mais autonomia para o cliente',
-                  'Mais controle sobre a operação',
-                ].map((item) => (
-                  <span key={item} className="text-sm text-gray-300">{item}</span>
-                ))}
-              </div>
-            </div>
-
             <div>
-              <span className="block text-[10px] font-normal uppercase tracking-widest text-gray-400 mb-5">
-                Como a Comvaga faz isso
-              </span>
               <div className="flex flex-col gap-5">
                 {[
                   {
@@ -549,15 +528,15 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   },
                   {
                     title: 'Comprometimento da agenda e receita futura projetada',
-                    text: 'Acompanhe quanto da agenda já está preenchido e quanto já está projetado de receita para os próximos dias.',
+                    text: 'Acompanhe quanto da agenda já está preenchido e quanto já está projetado de receita para o dia seguinte.',
                   },
                   {
                     title: 'Agendamento assistido pelo profissional',
-                    text: 'O profissional registra o agendamento diretamente na agenda, sem depender de o cliente concluir a reserva sozinho.',
+                    text: 'O profissional registra o agendamento diretamente na agenda, sem depender de o cliente concluir a reserva sozinho, mas o cliente ainda precisa confirmar o interesse para o agendamento ser efetivado.',
                   },
                   {
                     title: 'Reagendamento inteligente em um clique pela área exclusiva do cliente',
-                    text: 'O cliente reagenda sozinho pela própria área, sem precisar entrar em contato com o profissional.',
+                    text: 'O caminho do agendamento já fica salvo, então o cliente conclui o reagendamento com um clique, sem precisar selecionar novamente o profissional ou o serviço.',
                   },
                   {
                     title: 'Alertas por e-mail em tempo real',
@@ -568,8 +547,8 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                     text: 'O cliente recebe um lembrete automático antes do horário marcado, reduzindo faltas.',
                   },
                   {
-                    title: 'Sincronia total com o Google Agenda',
-                    text: 'Seus agendamentos da Comvaga aparecem automaticamente no Google Agenda, sem trabalho manual.',
+                    title: 'Sincronia com o Google Agenda',
+                    text: 'O cliente confirma se quer manter ou criar o agendamento no Google Agenda, sem precisar fazer isso manualmente depois.',
                   },
                 ].map((item) => (
                   <div key={item.title} className="flex items-start gap-2.5">
