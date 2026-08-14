@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { CheckDoubleIcon, ZapIcon, SearchIcon, ProfessionalIcon } from '../components/icons';
+import { CheckDoubleIcon, ZapIcon, SearchIcon, ProfessionalIcon, CheckIcon } from '../components/icons';
 import { getSupportHref } from '../support';
 import { saveSelectedPlanIntent } from '../utils/plans';
 import { searchHome } from '../utils/searchHome';
@@ -519,11 +519,11 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                     text: 'Horários liberados por cancelamentos voltam automaticamente à disponibilidade, via particionamento dinâmico da agenda.',
                   },
                   {
-                    title: 'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
+                    title: 'Reserva em lote de múltiplos trabalhos',
                     text: 'O sistema organiza e reserva vários atendimentos em sequência dentro do mesmo período disponível.',
                   },
                   {
-                    title: 'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
+                    title: 'Direcionamento inteligente de novos agendamentos',
                     text: 'Novas reservas seguem para as zonas de calor, os horários mais próximos dos atendimentos já confirmados, compactando a agenda.',
                   },
                   {
@@ -552,9 +552,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   },
                 ].map((item) => (
                   <div key={item.title} className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-1" viewBox="0 0 16 16" fill="none">
-                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <CheckIcon className="w-4 h-4 text-primary shrink-0 mt-1" />
                     <div>
                       <p className="text-sm font-medium text-gray-200 leading-snug">{item.title}</p>
                       <p className="text-sm text-gray-500 leading-snug mt-0.5">{item.text}</p>
@@ -615,7 +613,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                       </span>
                     )}
                   </div>
-                  <p className="text-2xl md:text-3xl font-black text-primary mb-2">{plan.capacity}</p>
+                  <p className="text-2xl md:text-3xl font-normal uppercase text-primary mb-2">{plan.capacity}</p>
                   <div className="flex items-end gap-x-3 gap-y-1 flex-wrap">
                     {plan.oldPrice && (
                       <span className="text-base font-normal text-red-500 line-through decoration-red-500 decoration-2">
