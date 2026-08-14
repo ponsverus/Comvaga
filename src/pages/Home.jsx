@@ -516,30 +516,39 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 {[
                   {
                     title: 'Reabertura automática de horários cancelados na agenda',
+                    text: 'Horários liberados por cancelamentos voltam automaticamente à disponibilidade, via particionamento dinâmico da agenda.',
                   },
                   {
                     title: 'Reserva em lote de múltiplos trabalhos em sequência para o mesmo dia',
+                    text: 'O sistema organiza e reserva vários atendimentos em sequência dentro do mesmo período disponível.',
                   },
                   {
                     title: 'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
+                    text: 'Novas reservas seguem para as zonas de calor, os horários mais próximos dos atendimentos já confirmados, compactando a agenda.',
                   },
                   {
                     title: 'Comprometimento da agenda e receita futura projetada',
+                    text: 'Acompanhe quanto da agenda já está preenchido e quanto já está projetado de receita para o dia seguinte.',
                   },
                   {
                     title: 'Agendamento assistido pelo profissional',
+                    text: 'O profissional registra o agendamento pela agenda quando o cliente precisa de ajuda para concluir a reserva.',
                   },
                   {
-                    title: 'Reagendamento inteligente em um clique pela área exclusiva do cliente',
+                    title: 'Reagendamento inteligente pela área exclusiva do cliente',
+                    text: 'Um novo horário pode ser escolhido sem repetir as etapas da reserva.',
                   },
                   {
                     title: 'Alertas por e-mail em tempo real',
+                    text: 'Sem precisar checar manualmente, o sistema avisa você e seu cliente instantaneamente sobre qualquer novo agendamento ou cancelamento.',
                   },
                   {
                     title: 'Lembrete automático 30 min antes',
+                    text: 'O cliente recebe um lembrete automático antes do horário marcado, reduzindo faltas.',
                   },
                   {
                     title: 'Sincronia com o Google Agenda',
+                    text: 'O cliente confirma se quer manter ou criar o agendamento no Google Agenda, sem precisar fazer isso manualmente depois.',
                   },
                 ].map((item) => (
                   <div key={item.title} className="flex items-start gap-2.5">
