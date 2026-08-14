@@ -511,8 +511,8 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             <h3 className="text-3xl md:text-4xl font-black text-white mb-2">TODOS OS RECURSOS</h3>
             <p className="text-gray-400 mb-8">A mesma inteligência em todos os planos.</p>
 
-            <div>   
-              <div className="flex flex-col gap-6">
+            <div>
+              <div className="flex flex-col gap-5">
                 {[
                   {
                     title: 'Reabertura automática de horários cancelados na agenda',
@@ -524,42 +524,38 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                     title: 'Direcionamento inteligente de novos agendamentos para horários colados aos já existentes',
                   },
                   {
-                    title: 'Comprometimento da agenda e projeção da receita futura',
+                    title: 'Comprometimento da agenda e receita futura projetada',
+                    text: 'Acompanhe quanto da agenda já está preenchido e quanto já está projetado de receita para o dia seguinte.',
                   },
                   {
-                    title: 'Agendamento assistido pelo profissional diretamente na agenda',
+                    title: 'Agendamento assistido pelo profissional',
+                    text: 'O profissional registra o agendamento diretamente na agenda, sem depender de o cliente concluir a reserva sozinho, mas o cliente ainda precisa confirmar o interesse para o agendamento ser efetivado.',
                   },
                   {
                     title: 'Reagendamento inteligente em um clique pela área exclusiva do cliente',
+                    text: 'Facilite a rotina do seu cliente com o reagendamento em um clique que reaproveita o histórico da reserva sem que ele precise preencher tudo do zero.',
                   },
                   {
-                    title: 'Alertas por e-mail em tempo real sobre novos agendamentos, cancelamentos e alterações',
+                    title: 'Alertas por e-mail em tempo real',
+                    text: 'Sem precisar checar manualmente, o sistema avisa você e seu cliente instantaneamente sobre qualquer novo agendamento ou cancelamento.',
                   },
                   {
-                    title: 'Lembrete automático ao cliente 30 minutos antes do atendimento',
+                    title: 'Lembrete automático 30 min antes',
+                    text: 'O cliente recebe um lembrete automático antes do horário marcado, reduzindo faltas.',
                   },
                   {
-                    title: 'Sincronia automática com o Google Agenda após a confirmação do agendamento',
+                    title: 'Sincronia com o Google Agenda',
+                    text: 'O cliente confirma se quer manter ou criar o agendamento no Google Agenda, sem precisar fazer isso manualmente depois.',
                   },
                 ].map((item) => (
-                  <div key={item.title} className="flex items-start gap-3">
-                    <svg
-                      className="w-5 h-5 text-primary shrink-0 mt-1"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                    >
-                      <path
-                        d="M3 8l3.5 3.5L13 4"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                  <div key={item.title} className="flex items-start gap-2.5">
+                    <svg className="w-4 h-4 text-primary shrink-0 mt-1" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-
-                    <p className="text-base md:text-lg font-medium text-gray-200 leading-snug">
-                      {item.title}
-                    </p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-200 leading-snug">{item.title}</p>
+                      <p className="text-sm text-gray-500 leading-snug mt-0.5">{item.text}</p>
+                    </div>
                   </div>
                 ))}
               </div>
