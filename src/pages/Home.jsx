@@ -525,11 +525,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   },
                   {
                     title: 'Comprometimento da agenda e receita futura projetada',
-                    text: 'Acompanhe quanto da agenda já está preenchido e quanto já está projetado de receita para o dia seguinte.',
                   },
                   {
                     title: 'Agendamento assistido pelo profissional',
-                    text: 'O profissional registra o agendamento diretamente na agenda, sem depender de o cliente concluir a reserva sozinho, mas o cliente ainda precisa confirmar o interesse para o agendamento ser efetivado.',
                   },
                   {
                     title: 'Reagendamento inteligente em um clique pela área exclusiva do cliente',
