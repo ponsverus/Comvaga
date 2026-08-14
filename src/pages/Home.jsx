@@ -531,19 +531,15 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   },
                   {
                     title: 'Reagendamento inteligente em um clique pela área exclusiva do cliente',
-                    text: 'Facilite a rotina do seu cliente com o reagendamento em um clique que reaproveita o histórico da reserva sem que ele precise preencher tudo do zero.',
                   },
                   {
                     title: 'Alertas por e-mail em tempo real',
-                    text: 'Sem precisar checar manualmente, o sistema avisa você e seu cliente instantaneamente sobre qualquer novo agendamento ou cancelamento.',
                   },
                   {
                     title: 'Lembrete automático 30 min antes',
-                    text: 'O cliente recebe um lembrete automático antes do horário marcado, reduzindo faltas.',
                   },
                   {
                     title: 'Sincronia com o Google Agenda',
-                    text: 'O cliente confirma se quer manter ou criar o agendamento no Google Agenda, sem precisar fazer isso manualmente depois.',
                   },
                 ].map((item) => (
                   <div key={item.title} className="flex items-start gap-2.5">
