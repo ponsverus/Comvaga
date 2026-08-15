@@ -670,7 +670,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             </div>
 
             <div>
-              <h4 className="text-white font-normal mb-4">PARA VOCÊ</h4>
+              <h3 className="text-white font-normal mb-4">PARA VOCÊ</h3>
               <ul className="space-y-2">
                 {isLogged ? (
                   <>
@@ -730,7 +730,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             </div>
 
             <div>
-              <h4 className="text-white font-normal mb-4">EMPRESA</h4>
+              <h3 className="text-white font-normal mb-4">EMPRESA</h3>
               <ul className="space-y-2">
                 <li>
                   <Link to="/sobre" className="text-gray-400 hover:text-primary transition-colors text-sm">
@@ -746,7 +746,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             </div>
 
             <div>
-              <h4 className="text-white font-normal mb-4">LEGAL</h4>
+              <h3 className="text-white font-normal mb-4">LEGAL</h3>
               <ul className="space-y-2">
                 <li>
                   <Link to="/privacidade" className="text-gray-500 hover:text-primary transition-colors text-sm">
