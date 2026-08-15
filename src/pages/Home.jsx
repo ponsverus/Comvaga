@@ -543,8 +543,8 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                     text: 'Sem precisar checar manualmente, o sistema avisa você e seu cliente instantaneamente sobre qualquer novo agendamento ou cancelamento.',
                   },
                   {
-                    title: 'Lembrete automático 30 min antes',
-                    text: 'O cliente recebe um lembrete automático antes do horário marcado, reduzindo faltas.',
+                    title: 'Lembrete automático + WhatsApp',
+                    text: 'Um lembrete automático avisa o cliente 30 minutos antes, e você pode complementar enviando uma mensagem direto pro WhatsApp dele quando quiser.',
                   },
                   {
                     title: 'Sincronia com o Google Agenda',
