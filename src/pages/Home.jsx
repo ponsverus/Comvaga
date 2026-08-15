@@ -635,6 +635,19 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 </Link>
               </div>
             ))}
+
+            <div className="flex-1 flex flex-col justify-center gap-3 px-4 sm:px-8 md:px-12 lg:px-16 py-10">
+              {[
+                'Teste grátis por 30 dias',
+                'Troque de plano a qualquer momento',
+                'Sem dados de pagamento',
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-2.5">
+                  <CheckIcon className="w-4 h-4 text-primary shrink-0" />
+                  <span className="text-sm text-gray-400">{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
