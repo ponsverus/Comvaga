@@ -600,39 +600,50 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             ].map((plan) => (
               <div
                 key={plan.code}
-                className="px-4 sm:px-8 md:px-12 lg:px-16 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6"
+                className="px-4 sm:px-8 md:px-12 lg:px-16 py-8 flex flex-col gap-6"
               >
-                <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[10px] font-normal uppercase tracking-widest text-gray-400">
-                      {plan.name}
-                    </span>
-                    {plan.badge && (
-                      <span className="inline-flex items-center rounded-full bg-green-400 px-2.5 py-0.5 text-[9px] font-normal uppercase tracking-widest text-white">
-                        {plan.badge}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                  <div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-[10px] font-normal uppercase tracking-widest text-gray-400">
+                        {plan.name}
                       </span>
-                    )}
-                  </div>
-                  <p className="text-lg md:text-xl font-normal uppercase text-primary mb-2">{plan.capacity}</p>
-                  <div className="flex items-end gap-x-3 gap-y-1 flex-wrap">
-                    {plan.oldPrice && (
-                      <span className="text-base font-normal text-red-500 line-through decoration-red-500 decoration-2">
-                        {plan.oldPrice}
+                      {plan.badge && (
+                        <span className="inline-flex items-center rounded-full bg-green-400 px-2.5 py-0.5 text-[9px] font-normal uppercase tracking-widest text-white">
+                          {plan.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-lg md:text-xl font-normal uppercase text-primary mb-2">{plan.capacity}</p>
+                    <div className="flex items-end gap-x-3 gap-y-1 flex-wrap">
+                      {plan.oldPrice && (
+                        <span className="text-base font-normal text-red-500 line-through decoration-red-500 decoration-2">
+                          {plan.oldPrice}
+                        </span>
+                      )}
+                      <span className="text-xl font-normal text-white">
+                        {plan.price}<span className="text-sm font-normal text-gray-500">/mês</span>
                       </span>
-                    )}
-                    <span className="text-xl font-normal text-white">
-                      {plan.price}<span className="text-sm font-normal text-gray-500">/mês</span>
-                    </span>
+                    </div>
                   </div>
+
+                  <Link
+                    to={planSignupTo(plan.code)}
+                    onClick={() => saveSelectedPlanIntent(plan.code)}
+                    className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
+                  >
+                     Escolho o {plan.name} <ZapIcon className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
 
-                <Link
-                  to={planSignupTo(plan.code)}
-                  onClick={() => saveSelectedPlanIntent(plan.code)}
-                  className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
-                >
-                   Escolho o {plan.name} <ZapIcon className="w-3.5 h-3.5" />
-                </Link>
+                {plan.code === 'profissional' && (
+                  <div className="flex items-center justify-center gap-2.5 bg-primary/10 border border-primary/20 rounded-full px-4 py-3">
+                    <StarGlyph sizeClass="h-4 w-4 text-[18px]" className="shrink-0" />
+                    <span className="text-xs font-normal text-primary uppercase tracking-wide">
+                      PLANO PROFISSIONAL PELO MESMO <strong className="font-bold">VALOR</strong> DO ESSENCIAL, COM ATÉ 3 PROFISSIONAIS.
+                    </span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
