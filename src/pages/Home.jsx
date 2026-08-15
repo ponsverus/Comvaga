@@ -563,93 +563,90 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             </div>
           </div>
 
-          <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-200 flex flex-col">
-            <div className="divide-y divide-gray-800">
-              <div className="px-4 sm:px-8 md:px-12 lg:px-16 pt-12 md:pt-16 pb-6">
-                <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
-                  Escolha a capacidade
-                </span>
-                <h3 className="text-3xl md:text-4xl font-black text-white mb-2">QUANTOS PROFISSIONAIS?</h3>
-                <p className="text-gray-400">Mesmo sistema. A capacidade acompanha o tamanho da sua equipe.</p>
-              </div>
-
-              {[
-                {
-                  code: 'essencial',
-                  name: 'Essencial',
-                  capacity: '1 profissional',
-                  oldPrice: null,
-                  price: 'R$ 69,99',
-                  badge: null,
-                },
-                {
-                  code: 'profissional',
-                  name: 'Profissional',
-                  capacity: 'Até 3 profissionais',
-                  oldPrice: 'R$ 99,99',
-                  price: 'R$ 69,99',
-                  badge: 'OFERTA',
-                },
-                {
-                  code: 'premium',
-                  name: 'Premium',
-                  capacity: 'Profissionais ilimitados',
-                  oldPrice: null,
-                  price: 'R$ 129,99',
-                  badge: null,
-                },
-              ].map((plan) => (
-                <div
-                  key={plan.code}
-                  className="px-4 sm:px-8 md:px-12 lg:px-16 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6"
-                >
-                  <div>
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-[10px] font-normal uppercase tracking-widest text-gray-400">
-                        {plan.name}
-                      </span>
-                      {plan.badge && (
-                        <span className="inline-flex items-center rounded-full bg-green-400 px-2.5 py-0.5 text-[9px] font-normal uppercase tracking-widest text-white">
-                          {plan.badge}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-lg md:text-xl font-normal uppercase text-primary mb-2">{plan.capacity}</p>
-                    <div className="flex items-end gap-x-3 gap-y-1 flex-wrap">
-                      {plan.oldPrice && (
-                        <span className="text-base font-normal text-red-500 line-through decoration-red-500 decoration-2">
-                          {plan.oldPrice}
-                        </span>
-                      )}
-                      <span className="text-xl font-normal text-white">
-                        {plan.price}<span className="text-sm font-normal text-gray-500">/mês</span>
-                      </span>
-                    </div>
-                  </div>
-
-                  <Link
-                    to={planSignupTo(plan.code)}
-                    onClick={() => saveSelectedPlanIntent(plan.code)}
-                    className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
-                  >
-                     Escolho o {plan.name} <ZapIcon className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              ))}
+          <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-200 flex flex-col divide-y divide-gray-800">
+            <div className="px-4 sm:px-8 md:px-12 lg:px-16 pt-12 md:pt-16 pb-6">
+              <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
+                Escolha a capacidade
+              </span>
+              <h3 className="text-3xl md:text-4xl font-black text-white mb-2">QUANTOS PROFISSIONAIS?</h3>
+              <p className="text-gray-400">Mesmo sistema. A capacidade acompanha o tamanho da sua equipe.</p>
             </div>
 
-            <div className="mt-auto px-4 sm:px-8 md:px-12 lg:px-16 py-10">
-              <div className="rounded-2xl border border-gray-800 bg-dark-100/60 px-6 py-6 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                  <ZapIcon className="w-5 h-5 text-primary" />
-                </div>
+            {[
+              {
+                code: 'essencial',
+                name: 'Essencial',
+                capacity: '1 profissional',
+                oldPrice: null,
+                price: 'R$ 69,99',
+                badge: null,
+              },
+              {
+                code: 'profissional',
+                name: 'Profissional',
+                capacity: 'Até 3 profissionais',
+                oldPrice: 'R$ 99,99',
+                price: 'R$ 69,99',
+                badge: 'OFERTA',
+              },
+              {
+                code: 'premium',
+                name: 'Premium',
+                capacity: 'Profissionais ilimitados',
+                oldPrice: null,
+                price: 'R$ 129,99',
+                badge: null,
+              },
+            ].map((plan) => (
+              <div
+                key={plan.code}
+                className="px-4 sm:px-8 md:px-12 lg:px-16 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6"
+              >
                 <div>
-                  <p className="text-sm font-medium text-white mb-1">Não sabe por onde começar?</p>
-                  <p className="text-sm text-gray-400 leading-relaxed">
-                    Comece pelo Essencial e evolua o plano assim que sua equipe crescer, sem perder nenhum recurso.
-                  </p>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-[10px] font-normal uppercase tracking-widest text-gray-400">
+                      {plan.name}
+                    </span>
+                    {plan.badge && (
+                      <span className="inline-flex items-center rounded-full bg-green-400 px-2.5 py-0.5 text-[9px] font-normal uppercase tracking-widest text-white">
+                        {plan.badge}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-lg md:text-xl font-normal uppercase text-primary mb-2">{plan.capacity}</p>
+                  <div className="flex items-end gap-x-3 gap-y-1 flex-wrap">
+                    {plan.oldPrice && (
+                      <span className="text-base font-normal text-red-500 line-through decoration-red-500 decoration-2">
+                        {plan.oldPrice}
+                      </span>
+                    )}
+                    <span className="text-xl font-normal text-white">
+                      {plan.price}<span className="text-sm font-normal text-gray-500">/mês</span>
+                    </span>
+                  </div>
                 </div>
+
+                <Link
+                  to={planSignupTo(plan.code)}
+                  onClick={() => saveSelectedPlanIntent(plan.code)}
+                  className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
+                >
+                   Escolho o {plan.name} <ZapIcon className="w-3.5 h-3.5" />
+                </Link>
               </div>
+            ))}
+
+            <div className="flex-1 flex flex-col justify-center gap-3 px-4 sm:px-8 md:px-12 lg:px-16 py-10">
+              {[
+                'Teste grátis por 30 dias',
+                'Troque de plano a qualquer momento',
+                'Sem dados de pagamento',
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-2.5">
+                  <CheckIcon className="w-4 h-4 text-primary shrink-0" />
+                  <span className="text-sm text-gray-400">{item}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
