@@ -613,7 +613,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                       </span>
                     )}
                   </div>
-                  <p className="text-2xl md:text-3xl font-normal uppercase text-primary mb-2">{plan.capacity}</p>
+                  <p className="text-lg md:text-xl font-normal uppercase text-primary mb-2">{plan.capacity}</p>
                   <div className="flex items-end gap-x-3 gap-y-1 flex-wrap">
                     {plan.oldPrice && (
                       <span className="text-base font-normal text-red-500 line-through decoration-red-500 decoration-2">
@@ -631,7 +631,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   onClick={() => saveSelectedPlanIntent(plan.code)}
                   className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
                 >
-                  Começar com {plan.name} <ZapIcon className="w-3.5 h-3.5" />
+                   Escolho o {plan.name} <ZapIcon className="w-3.5 h-3.5" />
                 </Link>
               </div>
             ))}
