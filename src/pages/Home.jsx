@@ -631,10 +631,52 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   onClick={() => saveSelectedPlanIntent(plan.code)}
                   className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
                 >
-                   Escolho o {plan.name} <ZapIcon className="w-3.5 h-3.5" />
+                  Escolho o {plan.name} <ZapIcon className="w-3.5 h-3.5" />
                 </Link>
               </div>
             ))}
+
+            <div className="px-4 sm:px-8 md:px-12 lg:px-16 py-8 bg-dark-100/40">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                  <ProfessionalIcon className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black uppercase tracking-wide text-white mb-2">COMO A CAPACIDADE FUNCIONA</h4>
+                  <p className="text-sm text-gray-400 leading-relaxed">
+                    O limite considera apenas os profissionais cadastrados no negócio. A conta administrativa não ocupa uma vaga quando o administrador não atua como profissional.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-4 sm:px-8 md:px-12 lg:px-16 py-8">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                  <CheckDoubleIcon className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black uppercase tracking-wide text-white mb-2">CADA PROFISSIONAL, SUA PRÓPRIA AGENDA</h4>
+                  <p className="text-sm text-gray-400 leading-relaxed">
+                    Todos fazem parte do mesmo negócio, mas cada profissional possui seu próprio ambiente, configurações e disponibilidade de dias e horários.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-4 sm:px-8 md:px-12 lg:px-16 py-8 bg-dark-100/40">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                  <ZapIcon className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black uppercase tracking-wide text-white mb-2">30 DIAS PARA TESTAR</h4>
+                  <p className="text-sm text-gray-400 leading-relaxed">
+                    Escolha o plano que faz sentido para o seu momento, teste por 30 dias e comece sem pagamento. Sem compromisso.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
