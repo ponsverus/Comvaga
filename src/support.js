@@ -6,12 +6,18 @@ export const SUPPORT_MESSAGES = {
   public: 'Olá, gostaria de tirar uma dúvida sobre a Comvaga. Pode me ajudar?',
 };
 
+export const CUSTOM_PLAN_MESSAGE = 'Olá, busco um plano personalizado na Comvaga para atender perfeitamente à estrutura atual do meu negócio.  Podemos conversar a respeito?';
+
 export function buildWhatsAppHref(message) {
   return `https://wa.me/${SUPPORT_PHONE_E164}?text=${encodeURIComponent(message)}`;
 }
 
 export function getSupportHref(userType = null) {
   return buildWhatsAppHref(SUPPORT_MESSAGES[userType] || SUPPORT_MESSAGES.public);
+}
+
+export function getCustomPlanHref() {
+  return buildWhatsAppHref(CUSTOM_PLAN_MESSAGE);
 }
 
 export const SUPPORT_HREF = getSupportHref();
