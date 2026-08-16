@@ -636,15 +636,12 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               </div>
             ))}
 
-            <div className="flex-1 flex flex-col items-center justify-center text-center gap-3 px-4 sm:px-8 md:px-12 lg:px-16 py-10 bg-primary/5">
+            <div className="flex-1 flex flex-col items-start justify-center text-left gap-3 px-4 sm:px-8 md:px-12 lg:px-16 py-10 bg-primary/5">
               <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1">
                 Personalizado
               </span>
               <p className="text-xl md:text-2xl font-normal text-white">
                 PRECISA DE UM PLANO PERSONALIZADO?
-              </p>
-              <p className="text-sm text-gray-400 max-w-sm">
-                Se o seu negócio já passou dos 9 profissionais, fale com a gente e monte um plano sob medida para a sua estrutura.
               </p>
               <a
                 href={getCustomPlanHref()}
