@@ -627,6 +627,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                       {plan.price}<span className="text-sm font-normal text-gray-500">/mês</span>
                     </span>
                   </div>
+                  {plan.tagline && (
+                    <p className="text-xs text-gray-500 mt-2 max-w-xs">{plan.tagline}</p>
+                  )}
                 </div>
 
                 <Link
