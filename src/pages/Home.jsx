@@ -620,7 +620,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                         {plan.oldPrice}
                       </span>
                     )}
-                    <span className="text-xl font-normal text-white">
+                    <span className={`text-xl font-normal ${plan.code === 'profissional' ? 'text-green-400' : 'text-white'}`}>
                       {plan.price}<span className="text-sm font-normal text-gray-500">/mês</span>
                     </span>
                   </div>
@@ -637,19 +637,19 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             ))}
 
             <div className="flex-1 flex flex-col items-start justify-center text-left gap-3 px-4 sm:px-8 md:px-12 lg:px-16 py-10 bg-primary/5">
-              <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1">
+              <span className="text-[10px] font-normal uppercase tracking-widest text-primary">
                 Personalizado
               </span>
               <p className="text-xl md:text-2xl font-black text-white">
                 PRECISA DE UM PLANO PERSONALIZADO?
-              </p>              
+              </p>
               <a
                 href={getCustomPlanHref()}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-2 shrink-0 flex items-center justify-center gap-2 px-10 py-3.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-sm font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
+                className="mt-2 w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
               >
-                Falar com suporte <ZapIcon className="w-3.5 h-3.5" />
+                Falar no WhatsApp <ZapIcon className="w-3.5 h-3.5" />
               </a>
             </div>
           </div>
