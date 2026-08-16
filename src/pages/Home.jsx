@@ -631,16 +631,16 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   onClick={() => saveSelectedPlanIntent(plan.code)}
                   className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
                 >
-                   Escolho o {plan.name} <ZapIcon className="w-3.5 h-3.5" />
+                   Testar o {plan.name} <ZapIcon className="w-3.5 h-3.5" />
                 </Link>
               </div>
             ))}
 
             <div className="flex-1 flex flex-col items-center justify-center text-center gap-3 px-4 sm:px-8 md:px-12 lg:px-16 py-10 bg-primary/5">
               <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1">
-                Estrutura maior?
+                Personalizado
               </span>
-              <p className="text-xl md:text-2xl font-black text-white">
+              <p className="text-xl md:text-2xl font-normal text-white">
                 PRECISA DE UM PLANO PERSONALIZADO?
               </p>
               <p className="text-sm text-gray-400 max-w-sm">
@@ -652,7 +652,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 rel="noreferrer"
                 className="mt-2 shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
               >
-                Falar no WhatsApp <ZapIcon className="w-3.5 h-3.5" />
+                Falar com suporte <ZapIcon className="w-3.5 h-3.5" />
               </a>
             </div>
           </div>
