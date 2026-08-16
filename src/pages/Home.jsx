@@ -640,7 +640,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               <span className="text-[10px] font-normal uppercase tracking-widest text-primary">
                 Personalizado
               </span>
-              <p className="text-xl md:text-2xl font-black text-white">
+              <p className="text-xl md:text-2xl font-normal text-white">
                 PRECISA DE UM PLANO PERSONALIZADO?
               </p>
               <a
@@ -649,7 +649,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 rel="noreferrer"
                 className="mt-2 w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
               >
-                Falar no WhatsApp <ZapIcon className="w-3.5 h-3.5" />
+                Falar com suporte <ZapIcon className="w-3.5 h-3.5" />
               </a>
             </div>
           </div>
