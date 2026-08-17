@@ -641,7 +641,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 Personalizado
               </span>
               <p className="text-xl md:text-2xl font-normal text-white">
-                PRECISA DE UM PLANO PERSONALIZADO?
+                Precisa de um plano personalizado?
               </p>
               <p className="text-sm text-gray-400 max-w-sm">
                 Se o seu negócio já passou dos 9 profissionais, fale com a gente e monte um plano sob medida para a sua estrutura.
