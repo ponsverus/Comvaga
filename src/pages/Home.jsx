@@ -509,7 +509,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               Todos os planos incluem
             </span>
             <h3 className="text-3xl md:text-4xl font-black text-white mb-2">TODOS OS RECURSOS</h3>
-            <p className="text-gray-400 mb-8">A mesma inteligência em todos os planos.</p>
+            <p className="text-gray-400 mb-8">A mesma inteligência em todos os planos. Nenhum recurso fica bloqueado atrás de um plano mais caro.</p>
 
             <div>
               <div className="flex flex-col gap-5">
@@ -569,7 +569,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 Escolha a capacidade
               </span>
               <h3 className="text-3xl md:text-4xl font-black text-white mb-2">QUANTOS PROFISSIONAIS?</h3>
-              <p className="text-gray-400">Mesmo sistema. A capacidade acompanha o tamanho da sua equipe. Teste qualquer plano por 30 dias grátis, sem compromisso.</p>
+              <p className="text-gray-400">Mesmo sistema. A capacidade acompanha o tamanho da sua equipe. Do primeiro profissional até uma estrutura maior.</p>
             </div>
 
             {[
@@ -642,6 +642,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               </span>
               <p className="text-xl md:text-2xl font-normal text-white">
                 PRECISA DE UM PLANO PERSONALIZADO?
+              </p>
+              <p className="text-sm text-gray-400 max-w-sm">
+                Se o seu negócio já passou dos 9 profissionais, fale com a gente e monte um plano sob medida para a sua estrutura.
               </p>
               <a
                 href={getCustomPlanHref()}
