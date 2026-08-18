@@ -315,7 +315,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       }, 1200);
     };
 
-        const unsubscribe = bookingService.subscribeToClientBookings(clienteId, scheduleRefresh);
+    const unsubscribe = bookingService.subscribeToClientBookings(clienteId, scheduleRefresh);
     return () => {
       if (realtimeRefreshTimerRef.current) {
         window.clearTimeout(realtimeRefreshTimerRef.current);
