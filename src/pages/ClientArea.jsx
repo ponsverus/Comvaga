@@ -4,6 +4,7 @@ import { LogOut } from 'lucide-react';
 import { SearchIcon, TimePastIcon, UserIcon } from '../components/icons';
 import AppFooter from '../components/AppFooter';
 import { supabase } from '../supabase';
+import { bookingService, clientService, reviewService } from '../services';
 import { useFeedback } from '../feedback/useFeedback';
 import { convertImageToWebp, isImageFile } from '../utils/media';
 import { normalizeBrazilPhone } from '../utils/phone';
