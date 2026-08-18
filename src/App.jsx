@@ -201,18 +201,15 @@ function SelecionarNegocioRouteGuard({ user, onLogout, professionalRole }) {
       return () => { active = false; };
     }
 
-    supabase
-      .from('negocios')
-      .select('id', { count: 'exact', head: true })
-      .eq('owner_id', user.id)
-      .then(({ count, error }) => {
+    negocioService.countByOwner(user.id)
+      .then((count) => {
         if (!active) return;
-        if (error) {
-          setOwnerBusinessCount(0);
-          setLoading(false);
-          return;
-        }
         setOwnerBusinessCount(Number(count || 0));
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setOwnerBusinessCount(0);
         setLoading(false);
       });
 
