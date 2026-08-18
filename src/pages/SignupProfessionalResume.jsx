@@ -5,7 +5,7 @@ import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { ProfessionalIcon } from '../components/icons';
 import { DEFAULT_PLAN_CODE, clearSelectedPlanIntent, getSelectedPlanIntent, normalizePlanCode } from '../utils/plans';
-import { normalizeBrazilPhone } from '../utils/phone';
+import { formatPhoneForDisplay, normalizeBrazilPhone } from '../utils/phone';
 import { withTimeout } from '../utils/withTimeout';
 
 function onlyTrim(v) {
@@ -121,7 +121,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
           nomeNegocio: onlyTrim(initialContext?.negocio?.nome),
           urlNegocio: onlyTrim(initialContext?.negocio?.slug),
           tipoNegocio: onlyTrim(initialContext?.negocio?.tipo_negocio),
-          telefone: onlyTrim(initialContext?.negocio?.telefone),
+          telefone: formatPhoneForDisplay(initialContext?.negocio?.telefone),
           cep: endereco.cep,
           rua: endereco.rua,
           numero: endereco.numero,
@@ -151,7 +151,7 @@ export default function SignupProfessionalResume({ user, onLogin }) {
       nomeNegocio: onlyTrim(selectedContext.negocio?.nome),
       urlNegocio: onlyTrim(selectedContext.negocio?.slug),
       tipoNegocio: onlyTrim(selectedContext.negocio?.tipo_negocio),
-      telefone: onlyTrim(selectedContext.negocio?.telefone),
+      telefone: formatPhoneForDisplay(selectedContext.negocio?.telefone),
       cep: endereco.cep,
       rua: endereco.rua,
       numero: endereco.numero,
