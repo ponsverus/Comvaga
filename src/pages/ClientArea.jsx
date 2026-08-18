@@ -4,6 +4,7 @@ import { LogOut } from 'lucide-react';
 import { SearchIcon, TimePastIcon, UserIcon } from '../components/icons';
 import AppFooter from '../components/AppFooter';
 import { supabase } from '../supabase';
+import { bookingService, clientService, reviewService } from '../services';
 import { useFeedback } from '../feedback/useFeedback';
 import { convertImageToWebp, isImageFile } from '../utils/media';
 import { normalizeBrazilPhone } from '../utils/phone';
@@ -314,20 +315,13 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       }, 1200);
     };
 
-    const channel = supabase
-      .channel(`agendamentos_cliente:${clienteId}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'agendamentos', filter: `cliente_id=eq.${clienteId}` },
-        scheduleRefresh
-      )
-      .subscribe();
+        const unsubscribe = bookingService.subscribeToClientBookings(clienteId, scheduleRefresh);
     return () => {
       if (realtimeRefreshTimerRef.current) {
         window.clearTimeout(realtimeRefreshTimerRef.current);
         realtimeRefreshTimerRef.current = null;
       }
-      supabase.removeChannel(channel);
+      unsubscribe?.();
     };
   }, [clienteId, getHasMoreRows, getVisiblePageRows, syncAvaliacoesConcluidas]);
 

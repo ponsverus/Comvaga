@@ -1,6 +1,7 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { supabase } from './supabase';
+import { negocioService } from './services';
 import { isPasswordRecoveryUrl } from './utils/auth';
 import { fetchUserAccessProfile, isValidProfessionalRole, isValidType, normalizeOnboardingStatus } from './utils/profileAccess';
 import { ptBR } from './feedback/messages/ptBR.js';
@@ -201,18 +202,15 @@ function SelecionarNegocioRouteGuard({ user, onLogout, professionalRole }) {
       return () => { active = false; };
     }
 
-    supabase
-      .from('negocios')
-      .select('id', { count: 'exact', head: true })
-      .eq('owner_id', user.id)
-      .then(({ count, error }) => {
+    negocioService.countByOwner(user.id)
+      .then((count) => {
         if (!active) return;
-        if (error) {
-          setOwnerBusinessCount(0);
-          setLoading(false);
-          return;
-        }
         setOwnerBusinessCount(Number(count || 0));
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setOwnerBusinessCount(0);
         setLoading(false);
       });
 
