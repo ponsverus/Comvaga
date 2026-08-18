@@ -4,6 +4,7 @@ import { CalendarIcon, ProfessionalIcon, TrendingUpIcon, UsersIcon } from '../co
 import AppFooter from '../components/AppFooter';
 import { Eye, LogOut, AlertCircle } from 'lucide-react';
 import { supabase } from '../supabase';
+import { bookingService } from '../services';
 import { useFeedback } from '../feedback/useFeedback';
 import { useBusinessGroup } from '../businessTerms';
 import EntregaModal from './dashboard/components/EntregaModal';
@@ -494,7 +495,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     setFaturamentoData(prev => prev ? prev : hoje);
   }, [hoje]);
 
-  useEffect(() => {
+    useEffect(() => {
     if (!negocio?.id || !agProfIdsKey || !hoje) return;
     const scheduleDashboardRefresh = () => {
       if (realtimeRefreshTimerRef.current) {
@@ -519,31 +520,27 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
       }, 1200);
     };
 
-    const channelName = parceiroProfissionalId
-      ? `agendamentos:${negocio.id}:${parceiroProfissionalId}`
-      : `agendamentos:${negocio.id}`;
-    const channelFilter = parceiroProfissionalId
-      ? `profissional_id=eq.${parceiroProfissionalId}`
-      : `negocio_id=eq.${negocio.id}`;
-    const channel = supabase.channel(channelName)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'agendamentos', filter: channelFilter }, (payload) => {
-        const ev = payload?.eventType;
-        const novo = payload?.new;
-        if (ev === 'INSERT') {
-          if (novo?.id) agendamentosStatusRef.current.set(novo.id, normalizeStatus(novo.status));
-          setNotifAgendamentos(prev => prev + 1);
-        }
-        if (ev === 'UPDATE') {
-          if (novo?.id) agendamentosStatusRef.current.set(novo.id, normalizeStatus(novo.status));
-        }
-        scheduleDashboardRefresh();
-      }).subscribe();
+    const handleRealtimeChange = (payload) => {
+      const ev = payload?.eventType;
+      const novo = payload?.new;
+      if (ev === 'INSERT') {
+        if (novo?.id) agendamentosStatusRef.current.set(novo.id, normalizeStatus(novo.status));
+        setNotifAgendamentos(prev => prev + 1);
+      }
+      if (ev === 'UPDATE') {
+        if (novo?.id) agendamentosStatusRef.current.set(novo.id, normalizeStatus(novo.status));
+      }
+      scheduleDashboardRefresh();
+    };
+
+    const unsubscribe = bookingService.subscribeToBusinessBookings(negocio.id, handleRealtimeChange);
+
     return () => {
       if (realtimeRefreshTimerRef.current) {
         window.clearTimeout(realtimeRefreshTimerRef.current);
         realtimeRefreshTimerRef.current = null;
       }
-      supabase.removeChannel(channel);
+      unsubscribe?.();
     };
   }, [negocio?.id, agProfIdsKey, hoje, parceiroProfissionalId]);
 
