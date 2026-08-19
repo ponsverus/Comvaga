@@ -2,18 +2,28 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
-import { CheckDoubleIcon, ZapIcon, SearchIcon, ProfessionalIcon, CheckIcon } from '../components/icons';
+import {
+  CheckDoubleIcon,
+  ZapIcon,
+  SearchIcon,
+  ProfessionalIcon,
+  CheckIcon,
+} from '../components/icons';
 import { getSupportHref, getCustomPlanHref } from '../support';
 import { saveSelectedPlanIntent } from '../utils/plans';
 import { searchHome } from '../utils/searchHome';
 
 const planSignupTo = (planCode) => `/cadastro/profissional?plano=${planCode}`;
+
 function getBusinessLogoUrl(path) {
   if (!path) return null;
+
   try {
     if (/^https?:\/\//i.test(path)) return path;
+
     const stripped = path.replace(/^logos\//, '');
     const { data } = supabase.storage.from('logos').getPublicUrl(stripped);
+
     return data?.publicUrl || null;
   } catch {
     return null;
@@ -39,6 +49,7 @@ function SearchBox({
 
   useEffect(() => {
     if (!searchOpen) return;
+
     const handlePointerDown = (event) => {
       if (!wrapRef.current?.contains(event.target)) {
         setSearchOpen(false);
@@ -46,8 +57,12 @@ function SearchBox({
         setResultadosBusca([]);
       }
     };
+
     document.addEventListener('mousedown', handlePointerDown);
-    return () => document.removeEventListener('mousedown', handlePointerDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+    };
   }, [searchOpen, setResultadosBusca, setSearchOpen, setSearchTerm]);
 
   return (
@@ -67,6 +82,7 @@ function SearchBox({
               setSearchOpen(false);
               return;
             }
+
             setSearchOpen(true);
           }}
           className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-300 transition-colors hover:text-primary"
@@ -82,14 +98,14 @@ function SearchBox({
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="BUSQUE UM PROFISSIONAL OU NEGÓCIO :)"
           className={[
-            'bg-transparent pr-4 text-sm text-white uppercase placeholder:text-gray-500 focus:outline-none transition-all duration-300',
+            'bg-transparent pr-4 text-sm uppercase text-white placeholder:text-gray-500 focus:outline-none transition-all duration-300',
             searchOpen ? 'w-full opacity-100' : 'w-0 opacity-0',
           ].join(' ')}
         />
 
         {buscando && searchTerm.trim().length >= 3 && (
           <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
-            <div className="h-4 w-4 rounded-full border border-primary border-t-transparent animate-spin" />
+            <div className="h-4 w-4 animate-spin rounded-full border border-primary border-t-transparent" />
           </div>
         )}
       </div>
@@ -97,8 +113,12 @@ function SearchBox({
       {searchOpen && resultadosBusca.length > 0 && (
         <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[3px] border border-white/10 bg-dark-100/95 shadow-2xl backdrop-blur-xl">
           {resultadosBusca.map((r, i) => {
-            const isNegocio = String(r?.tipo || '').toLowerCase() === 'negocio';
-            const businessLogoUrl = isNegocio ? getBusinessLogoUrl(r.logo_path) : null;
+            const isNegocio =
+              String(r?.tipo || '').toLowerCase() === 'negocio';
+
+            const businessLogoUrl = isNegocio
+              ? getBusinessLogoUrl(r.logo_path)
+              : null;
 
             return (
               <Link
@@ -109,7 +129,7 @@ function SearchBox({
                   setSearchTerm('');
                   setResultadosBusca([]);
                 }}
-                className="block border-b border-white/5 px-5 py-4 transition-colors hover:bg-dark-200/90 last:border-b-0"
+                className="block border-b border-white/5 px-5 py-4 transition-colors last:border-b-0 hover:bg-dark-200/90"
               >
                 {isNegocio ? (
                   <div className="flex items-center gap-3">
@@ -127,18 +147,27 @@ function SearchBox({
                         </div>
                       )}
                     </div>
+
                     <div className="min-w-0 flex-1">
-                      <div className="truncate font-normal text-white uppercase">{r.nome}</div>
+                      <div className="truncate uppercase text-white">
+                        {r.nome}
+                      </div>
+
                       {r.subtitulo && (
-                        <div className="mt-1 truncate text-sm text-gray-400">{r.subtitulo}</div>
+                        <div className="mt-1 truncate text-sm text-gray-400">
+                          {r.subtitulo}
+                        </div>
                       )}
                     </div>
                   </div>
                 ) : (
                   <>
-                    <div className="font-normal text-white uppercase">{r.nome}</div>
+                    <div className="uppercase text-white">{r.nome}</div>
+
                     {r.subtitulo && (
-                      <div className="mt-1 text-sm text-gray-400">{r.subtitulo}</div>
+                      <div className="mt-1 text-sm text-gray-400">
+                        {r.subtitulo}
+                      </div>
                     )}
                   </>
                 )}
@@ -148,24 +177,35 @@ function SearchBox({
         </div>
       )}
 
-      {searchOpen && !buscando && searchTerm.trim().length >= 3 && resultadosBusca.length === 0 && (
-        <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[3px] border border-white/10 bg-dark-100/95 px-5 py-4 text-sm text-gray-400 shadow-2xl backdrop-blur-xl">
-          :(
-        </div>
-      )}
+      {searchOpen &&
+        !buscando &&
+        searchTerm.trim().length >= 3 &&
+        resultadosBusca.length === 0 && (
+          <div className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[3px] border border-white/10 bg-dark-100/95 px-5 py-4 text-sm text-gray-400 shadow-2xl backdrop-blur-xl">
+            :(
+          </div>
+        )}
     </div>
   );
 }
 
-function StarGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
+function StarGlyph({
+  className = '',
+  sizeClass = 'h-8 w-8 text-[32px]',
+}) {
   return (
-    <span className={`inline-flex items-center justify-center font-normal leading-none text-primary ${sizeClass} ${className}`}>
+    <span
+      className={`inline-flex items-center justify-center font-normal leading-none text-primary ${sizeClass} ${className}`}
+    >
       {'\u2606'}
     </span>
   );
 }
 
-function MoneyGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
+function MoneyGlyph({
+  className = '',
+  sizeClass = 'h-8 w-8 text-[32px]',
+}) {
   return (
     <span
       style={{ fontFamily: 'Roboto Condensed, sans-serif' }}
@@ -176,7 +216,10 @@ function MoneyGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
   );
 }
 
-function SmileGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
+function SmileGlyph({
+  className = '',
+  sizeClass = 'h-8 w-8 text-[32px]',
+}) {
   return (
     <span
       style={{ fontFamily: 'Roboto Condensed, sans-serif' }}
@@ -187,21 +230,53 @@ function SmileGlyph({ className = '', sizeClass = 'h-8 w-8 text-[32px]' }) {
   );
 }
 
-export default function Home({ user, userType, professionalRole = null, onLogout }) {
+function AgendaBlock({ occupied = false, highlighted = false }) {
+  return (
+    <div
+      className={[
+        'h-8 rounded-sm border transition-all',
+        occupied
+          ? 'border-primary/30 bg-primary/20'
+          : highlighted
+            ? 'border-primary bg-primary/10'
+            : 'border-white/5 bg-white/[0.025]',
+      ].join(' ')}
+    />
+  );
+}
+
+export default function Home({
+  user,
+  userType,
+  professionalRole = null,
+  onLogout,
+}) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [resultadosBusca, setResultadosBusca] = useState([]);
   const [buscando, setBuscando] = useState(false);
 
   const { showMessage } = useFeedback();
+
   const isLogged = !!user && !!userType;
-  const isPartner = userType === 'professional' && professionalRole === 'partner';
-  const loggedAreaLink = userType === 'professional'
-    ? isPartner ? '/selecionar-negocio-parceiro' : '/dashboard'
-    : '/minha-area';
-  const loggedAreaLabel = userType === 'professional'
-    ? isPartner ? 'SELECIONAR NEGÓCIO' : 'DASHBOARD'
-    : 'MINHA ÁREA';
+
+  const isPartner =
+    userType === 'professional' && professionalRole === 'partner';
+
+  const loggedAreaLink =
+    userType === 'professional'
+      ? isPartner
+        ? '/selecionar-negocio-parceiro'
+        : '/dashboard'
+      : '/minha-area';
+
+  const loggedAreaLabel =
+    userType === 'professional'
+      ? isPartner
+        ? 'SELECIONAR NEGÓCIO'
+        : 'DASHBOARD'
+      : 'MINHA ÁREA';
+
   const supportHref = getSupportHref(userType);
 
   useEffect(() => {
@@ -215,26 +290,35 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           setResultadosBusca([]);
           setBuscando(false);
         }
+
         return;
       }
 
-      if (!cancelled) setBuscando(true);
+      if (!cancelled) {
+        setBuscando(true);
+      }
 
       try {
         const rows = await searchHome(term, { limit: 10 });
+
         if (cancelled) return;
+
         setResultadosBusca(rows);
       } catch (error) {
         if (cancelled) return;
+
         console.error('Erro na busca:', error);
         showMessage('home.search_failed_support');
         setResultadosBusca([]);
       } finally {
-        if (!cancelled) setBuscando(false);
+        if (!cancelled) {
+          setBuscando(false);
+        }
       }
     };
 
     const timer = setTimeout(buscar, 300);
+
     return () => {
       cancelled = true;
       clearTimeout(timer);
@@ -244,22 +328,38 @@ export default function Home({ user, userType, professionalRole = null, onLogout
 
   const handleLogoutClick = () => onLogout?.();
 
+  const scrollTo = (id) => {
+    document.getElementById(id)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-black text-white relative">
-      <div className="relative z-50 w-full bg-yellow-400 border-b border-yellow-300/50 overflow-hidden h-10 flex items-center">
+    <div className="relative min-h-screen bg-black text-white">
+      {/* OFERTA */}
+
+      <div className="relative z-50 flex h-10 w-full items-center overflow-hidden border-b border-yellow-300/50 bg-yellow-400">
         <div className="announcement-bar-wrapper flex">
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="announcement-bar-track flex items-center shrink-0 whitespace-nowrap"
+              className="announcement-bar-track flex shrink-0 items-center whitespace-nowrap"
               aria-hidden={i === 2}
             >
               {[...Array(14)].map((_, index) => (
                 <div key={index} className="flex items-center">
-                  <span className="text-black font-normal text-sm uppercase mx-4">TESTE 30 DIAS GRÁTIS</span>
-                  <span className="text-black mx-4">●</span>
-                  <span className="text-black font-normal text-sm uppercase mx-4">TESTE 30 DIAS GRÁTIS</span>
-                  <span className="text-black mx-4">●</span>
+                  <span className="mx-4 text-sm font-normal uppercase text-black">
+                    TESTE 30 DIAS GRÁTIS
+                  </span>
+
+                  <span className="mx-4 text-black">●</span>
+
+                  <span className="mx-4 text-sm font-normal uppercase text-black">
+                    TESTE 30 DIAS GRÁTIS
+                  </span>
+
+                  <span className="mx-4 text-black">●</span>
                 </div>
               ))}
             </div>
@@ -271,29 +371,45 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
           }
+
           .announcement-bar-wrapper {
             display: flex;
             width: max-content;
             animation: announcement-scroll 50s linear infinite;
           }
-          .announcement-bar-wrapper:hover { animation-play-state: paused; }
+
+          .announcement-bar-wrapper:hover {
+            animation-play-state: paused;
+          }
+
           @media (prefers-reduced-motion: reduce) {
-            .announcement-bar-wrapper { animation: none; }
+            .announcement-bar-wrapper {
+              animation: none;
+            }
           }
         `}</style>
       </div>
 
-      <header className="absolute top-20 left-0 w-full z-40 bg-transparent border-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex items-center justify-center h-16 sm:h-20">
-            <Link to="/" className="flex flex-col items-center justify-center gap-1">
+      {/* HEADER */}
+
+      <header className="absolute left-0 top-20 z-40 w-full border-none bg-transparent">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative flex h-16 items-center justify-center sm:h-20">
+            <Link
+              to="/"
+              className="flex flex-col items-center justify-center gap-1"
+            >
               <img
                 src="/Comvaga Logo.png"
                 alt="Comvaga"
                 className="h-15 w-auto object-contain sm:h-17"
               />
-              <span className="text-2xl sm:text-3xl font-black">COMVAGA</span>
+
+              <span className="text-2xl font-black sm:text-3xl">
+                COMVAGA
+              </span>
             </Link>
+
             <div className="absolute right-0 top-[40%] -translate-y-1/2">
               <SearchBox
                 searchOpen={searchOpen}
@@ -309,404 +425,713 @@ export default function Home({ user, userType, professionalRole = null, onLogout
         </div>
       </header>
 
-      <section className="relative pt-32 pb-12 sm:pt-40 sm:pb-16 lg:pt-48 lg:pb-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-yellow-600/10"></div>
-        <div className="absolute top-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+      {/* HERO */}
 
-        <div className="relative z-10 max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 border border-primary/30 rounded-button mb-8 backdrop-blur-sm">
-            <ZapIcon className="w-4 h-4 text-primary" />
-            <span className="text-primary font-bold text-sm">O FIM DA AGENDA ESBURACADA</span>
+      <section className="relative overflow-hidden px-4 pb-16 pt-32 sm:pt-40 lg:pt-48">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-yellow-600/10" />
+
+        <div className="absolute right-10 top-20 h-96 w-96 animate-pulse rounded-full bg-primary/20 blur-3xl" />
+
+        <div className="relative z-10 mx-auto max-w-7xl text-center">
+          <div className="mb-7 inline-flex items-center gap-2 rounded-button border border-primary/30 bg-primary/20 px-4 py-2 backdrop-blur-sm">
+            <ZapIcon className="h-4 w-4 text-primary" />
+
+            <span className="text-sm font-bold text-primary">
+              O FIM DA AGENDA ESBURACADA
+            </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-tight drop-shadow-lg">
-            SUA AGENDA,<br />
+          <h1 className="mb-6 text-4xl font-black leading-tight drop-shadow-lg sm:text-5xl md:text-7xl">
+            SUA AGENDA,
+            <br />
+
             <span className="bg-gradient-to-r from-primary to-yellow-600 bg-clip-text text-transparent">
               MATEMATICAMENTE PERFEITA
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-3xl mx-auto drop-shadow-md">
-            A Comvaga organiza agenda, vitrine, equipe e clientes em uma experiência só. O sistema <span className="text-primary">ANTECIPA CONFLITOS</span>, respeita o tempo real de cada trabalho e transforma horários livres em oportunidades reais de atendimento.
+          <p className="mx-auto mb-5 max-w-3xl text-lg text-gray-300 drop-shadow-md md:text-xl">
+            Menos espaços vazios. Mais atendimentos dentro do mesmo dia.
+            A Comvaga organiza agenda, vitrine, equipe e clientes em uma
+            única experiência.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-0">
+          <p className="mx-auto mb-8 max-w-2xl text-base text-gray-500">
+            O sistema considera o tempo real de cada trabalho, antecipa
+            conflitos e reaproveita horários que seriam perdidos.
+          </p>
+
+          <div className="mb-5 flex flex-col justify-center gap-4 sm:flex-row">
             <Link
               to="/cadastro"
-              className="px-10 py-5 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-black text-lg hover:shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105 flex items-center justify-center gap-3"
+              className="flex items-center justify-center gap-3 rounded-button bg-gradient-to-r from-primary to-yellow-600 px-10 py-5 text-lg font-black text-black transition-all hover:scale-105 hover:shadow-2xl hover:shadow-primary/50"
             >
-              MAXIMIZAR MEUS GANHOS <ZapIcon className="w-5 h-5" />
+              COMEÇAR MEU TESTE GRÁTIS
+              <ZapIcon className="h-5 w-5" />
             </Link>
+
             <button
               type="button"
-              onClick={() => document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-10 py-5 bg-white/10 border border-white/20 text-white rounded-button font-bold text-lg hover:bg-white/20 backdrop-blur-sm"
+              onClick={() => scrollTo('como-funciona')}
+              className="rounded-button border border-white/20 bg-white/10 px-10 py-5 text-lg font-bold text-white backdrop-blur-sm transition-all hover:bg-white/20"
             >
-              ENTENDER A LÓGICA
+              VER COMO FUNCIONA
+            </button>
+          </div>
+
+          <p className="text-xs uppercase tracking-widest text-gray-600">
+            30 dias grátis · sem compromisso
+          </p>
+        </div>
+      </section>
+
+      {/* PROVA VISUAL */}
+
+      <section className="border-y border-gray-800 bg-dark-100">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-8 md:px-16 lg:px-24">
+          <div className="mb-12 text-center">
+            <span className="mb-4 inline-block rounded-full bg-primary/10 px-3 py-1 text-[10px] uppercase tracking-widest text-primary">
+              O problema que a Comvaga resolve
+            </span>
+
+            <h2 className="text-4xl font-black sm:text-5xl">
+              SEU DIA NÃO PRECISA
+              <br />
+              <span className="text-primary">TER BURACOS.</span>
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-gray-400">
+              A agenda não deveria apenas mostrar horários. Ela deveria
+              ajudar você a aproveitar melhor o tempo que já tem.
+            </p>
+          </div>
+
+          <div className="grid gap-px overflow-hidden border border-gray-800 bg-gray-800 md:grid-cols-2">
+            <div className="bg-black p-6 sm:p-10">
+              <div className="mb-8 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase tracking-widest text-gray-600">
+                    Agenda tradicional
+                  </span>
+
+                  <h3 className="mt-2 text-2xl font-normal text-white">
+                    HORÁRIOS VAZIOS
+                  </h3>
+                </div>
+
+                <span className="rounded-full bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-widest text-red-400">
+                  perda
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <AgendaBlock occupied />
+                <AgendaBlock />
+                <AgendaBlock occupied />
+                <AgendaBlock />
+                <AgendaBlock occupied />
+                <AgendaBlock />
+                <AgendaBlock occupied />
+                <AgendaBlock />
+                <AgendaBlock occupied />
+              </div>
+
+              <p className="mt-6 text-sm leading-relaxed text-gray-500">
+                O horário está livre, mas simplesmente fica esperando alguém
+                aparecer.
+              </p>
+            </div>
+
+            <div className="bg-dark-200 p-6 sm:p-10">
+              <div className="mb-8 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase tracking-widest text-primary">
+                    Comvaga
+                  </span>
+
+                  <h3 className="mt-2 text-2xl font-normal text-white">
+                    AGENDA COMPACTADA
+                  </h3>
+                </div>
+
+                <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] uppercase tracking-widest text-primary">
+                  otimização
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <AgendaBlock occupied />
+                <AgendaBlock highlighted />
+                <AgendaBlock occupied />
+                <AgendaBlock highlighted />
+                <AgendaBlock occupied />
+                <AgendaBlock highlighted />
+                <AgendaBlock occupied />
+                <AgendaBlock highlighted />
+                <AgendaBlock occupied />
+              </div>
+
+              <p className="mt-6 text-sm leading-relaxed text-gray-400">
+                Novos atendimentos são direcionados para os espaços que
+                ajudam a compactar o dia e reduzir intervalos.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-10 text-center">
+            <button
+              type="button"
+              onClick={() => scrollTo('planos')}
+              className="inline-flex items-center gap-2 text-sm uppercase tracking-widest text-primary transition-colors hover:text-white"
+            >
+              Quero aproveitar melhor minha agenda
+              <ZapIcon className="h-4 w-4" />
             </button>
           </div>
         </div>
       </section>
 
-      <section id="como-funciona" className="py-0 bg-dark-100 w-full">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
-          <h2 className="text-5xl font-black mb-4">
+      {/* COMO FUNCIONA */}
+
+      <section id="como-funciona" className="w-full bg-dark-100 py-0">
+        <div className="mx-auto mb-16 max-w-7xl px-4 pt-24 text-center">
+          <span className="mb-4 inline-block text-[10px] uppercase tracking-widest text-primary">
+            Como isso acontece
+          </span>
+
+          <h2 className="mb-4 text-4xl font-black sm:text-5xl">
             A CIÊNCIA <span className="text-primary">POR TRÁS</span>
           </h2>
-          <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
+
+          <p className="text-lg text-gray-400 sm:text-xl">
+            Três decisões simples fazem a agenda trabalhar melhor.
+          </p>
         </div>
 
-        <div className="w-full bg-gray-800 border-y border-gray-800 grid md:grid-cols-3 gap-px">
+        <div className="grid w-full gap-px border-y border-gray-800 bg-gray-800 md:grid-cols-3">
           {[
-            { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
-            { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada evento: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
-            { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
+            {
+              num: 1,
+              title: 'ROTINA REAL',
+              text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda respeita a rotina individual antes de oferecer qualquer horário ao cliente.',
+            },
+            {
+              num: 2,
+              title: 'ENCAIXE INTELIGENTE',
+              text: 'Novos eventos fazem o sistema recalcular a disponibilidade. Cancelamentos, trocas e novas reservas são considerados imediatamente.',
+            },
+            {
+              num: 3,
+              title: 'ACESSO SIMPLIFICADO',
+              text: 'Seu cliente recebe um link exclusivo, encontra os horários realmente disponíveis e agenda sem precisar baixar aplicativo.',
+            },
           ].map(({ num, title, text }) => (
-            <div key={num} className="bg-dark-100 p-8 md:p-12 flex flex-col px-4 sm:px-8 md:px-16 lg:px-24">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 mb-6 shrink-0">
+            <div
+              key={num}
+              className="flex flex-col bg-dark-100 p-8 px-4 sm:px-8 md:p-12 md:px-16 lg:px-24"
+            >
+              <div className="mb-6 flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-yellow-600 text-2xl font-black text-black shadow-lg shadow-primary/50">
                 {num}
               </div>
-              <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-              <p className="text-gray-400 leading-relaxed">{text}</p>
+
+              <h3 className="mb-3 text-2xl font-normal text-white">
+                {title}
+              </h3>
+
+              <p className="leading-relaxed text-gray-400">{text}</p>
             </div>
           ))}
         </div>
 
-        <div className="w-full bg-gray-800 border-b border-gray-800 flex flex-col gap-px">
-          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">Cancelou?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">A maioria dos sistemas exibe todos os horários livres.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">O cliente seleciona mais de um trabalho.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-0 bg-black overflow-hidden border-b border-gray-800">
-        <div className="w-full bg-dark-200 overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
-
-          <div className="bg-gray-800 w-full">
-            <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center justify-center px-4 py-16 text-center sm:px-8 sm:py-20 md:px-16 lg:px-24">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                </span>
-                <span className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">VEJA AO VIVO</span>
-              </div>
-              
-              <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 leading-tight">
-                NÃO APENAS UMA AGENDA, <br/>
-                <span className="text-primary">UMA VITRINE PROFISSIONAL.</span>
-              </h2>
-              
-              <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-3xl">
-                Seu negócio merece mais do que um link de WhatsApp. Permita que seus clientes enxerguem seus trabalhos, depoimentos, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="https://comvaga.com.br/v/vikings"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-8 py-4 bg-primary text-black font-black rounded-button hover:shadow-[0_0_30px_rgba(255,209,26,0.3)] transition-all flex items-center justify-center gap-3 group"
-                >
-                  VER VITRINE EXEMPLO 
-                  <ZapIcon className="w-5 h-5 group-hover:animate-bounce" />
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <section className="py-0 bg-dark-200 w-full">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
-          <h2 className="text-5xl font-black mb-4">
-            VANTAGEM <span className="text-primary">MÚTUA</span>
-          </h2>
-          <p className="text-xl text-gray-400">Por que Profissionais e Clientes preferem Comvaga</p>
-        </div>
-
-        <div className="w-full bg-gray-800 border-y border-gray-800 grid sm:grid-cols-2 lg:grid-cols-3 gap-px">
+        <div className="flex w-full flex-col gap-px border-b border-gray-800 bg-gray-800">
           {[
-            { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
-            { icon: ZapIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
-            { icon: ZapIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
-            { icon: MoneyGlyph, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
-            { icon: SmileGlyph, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
-            { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
-          ].map(({ icon: Icon, title, text }, i) => (
+            {
+              title: 'REAPROVEITAMENTO AUTOMÁTICO DE HORÁRIOS',
+              lead: 'Cancelou?',
+              text: 'O horário não precisa ficar parado. A Comvaga recalcula a janela disponível e transforma o espaço liberado em novas oportunidades de atendimento.',
+            },
+            {
+              title: 'ZONA DE CALOR: AGENDA SEM BURACOS',
+              lead: 'O horário mais inteligente nem sempre é o primeiro horário livre.',
+              text: 'O sistema identifica espaços próximos dos atendimentos já confirmados e prioriza esses encaixes, ajudando a compactar o dia e reduzir intervalos.',
+            },
+            {
+              title: 'AGENDAMENTO MÚLTIPLO SEQUENCIAL',
+              lead: 'O cliente pode resolver mais de uma coisa de uma vez.',
+              text: 'O sistema calcula a duração dos trabalhos, considera as margens operacionais e verifica se tudo cabe no turno antes de confirmar a reserva.',
+            },
+          ].map(({ title, lead, text }) => (
             <div
-              key={i}
-              className="bg-dark-200 p-8 sm:p-10 hover:bg-dark-100 transition-colors flex flex-col px-4 sm:px-8 md:px-16 lg:px-24"
+              key={title}
+              className="bg-dark-100 p-8 transition-colors hover:bg-dark-200/50 sm:p-12 md:px-16 lg:px-24"
             >
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                <Icon className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-              <p className="text-gray-400 leading-relaxed">{text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-0 bg-dark-100 w-full">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
-          <h2 className="text-5xl font-normal mb-4">
-            SEM <span className="text-primary">BUROCRACIA</span>
-          </h2>
-          <p className="text-xl text-gray-400">Teste grátis por 30 dias o plano escolhido. Sem compromisso e sem burocracia ;)</p>
-        </div>
-
-        <div className="
-          w-full bg-gray-800 border-y border-gray-800
-          flex md:grid md:grid-cols-2 gap-px
-          overflow-x-auto md:overflow-visible
-          snap-x snap-mandatory md:snap-none
-          [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-        ">
-          <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-100 px-4 sm:px-8 md:px-12 lg:px-16 py-12 md:py-16">
-            <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-              Todos os planos incluem
-            </span>
-            <h3 className="text-3xl md:text-4xl font-black text-white mb-2">TODOS OS RECURSOS</h3>
-            <p className="text-gray-400 mb-8">A mesma inteligência em todos os planos. Nenhum recurso fica bloqueado atrás de um plano mais caro.</p>
-
-            <div>
-              <div className="flex flex-col gap-5">
-                {[
-                  {
-                    title: 'Reabertura automática de horários cancelados na agenda',
-                    text: 'Horários liberados por cancelamentos voltam automaticamente à disponibilidade, via particionamento dinâmico da agenda.',
-                  },
-                  {
-                    title: 'Reserva em lote de múltiplos trabalhos',
-                    text: 'O sistema organiza e reserva vários atendimentos em sequência dentro do mesmo período disponível.',
-                  },
-                  {
-                    title: 'Direcionamento inteligente de novos agendamentos',
-                    text: 'Novas reservas seguem para as zonas de calor, os horários mais próximos dos atendimentos já confirmados, compactando a agenda.',
-                  },
-                  {
-                    title: 'Comprometimento da agenda e receita futura projetada',
-                    text: 'Acompanhe quanto da agenda já está preenchido e quanto já está projetado de receita para o dia seguinte.',
-                  },
-                  {
-                    title: 'Agendamento assistido pelo profissional',
-                    text: 'O profissional registra o agendamento pela agenda quando o cliente precisa de ajuda para concluir a reserva.',
-                  },
-                  {
-                    title: 'Reagendamento inteligente pela área exclusiva do cliente',
-                    text: 'Um novo horário pode ser escolhido sem repetir as etapas da reserva.',
-                  },
-                  {
-                    title: 'Alertas por e-mail em tempo real',
-                    text: 'Sem precisar checar manualmente, o sistema avisa você e seu cliente instantaneamente sobre qualquer novo agendamento ou cancelamento.',
-                  },
-                  {
-                    title: 'Lembrete automático + WhatsApp',
-                    text: 'Um lembrete automático avisa o cliente 30 minutos antes, e você pode complementar enviando uma mensagem direto pro WhatsApp dele quando quiser.',
-                  },
-                  {
-                    title: 'Sincronia com o Google Agenda',
-                    text: 'O cliente confirma se quer manter ou criar o agendamento no Google Agenda, sem precisar fazer isso manualmente depois.',
-                  },
-                ].map((item) => (
-                  <div key={item.title} className="flex items-start gap-2.5">
-                    <CheckIcon className="w-4 h-4 text-primary shrink-0 mt-1" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-200 leading-snug">{item.title}</p>
-                      <p className="text-sm text-gray-500 leading-snug mt-0.5">{item.text}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-200 flex flex-col divide-y divide-gray-800">
-            <div className="px-4 sm:px-8 md:px-12 lg:px-16 pt-12 md:pt-16 pb-6">
-              <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
-                Escolha a capacidade
-              </span>
-              <h3 className="text-3xl md:text-4xl font-black text-white mb-2">QUANTOS PROFISSIONAIS?</h3>
-              <p className="text-gray-400">Mesmo sistema. A capacidade acompanha o tamanho da sua equipe. Do primeiro profissional até uma estrutura maior.</p>
-            </div>
-
-            {[
-              {
-                code: 'essencial',
-                name: 'Essencial',
-                capacity: '1 profissional',
-                oldPrice: null,
-                price: 'R$ 69,99',
-                badge: null,
-              },
-              {
-                code: 'profissional',
-                name: 'Profissional',
-                capacity: 'Até 3 profissionais',
-                oldPrice: 'R$ 99,99',
-                price: 'R$ 69,99',
-                badge: 'OFERTA',
-              },
-              {
-                code: 'premium',
-                name: 'Premium',
-                capacity: 'Até 9 profissionais',
-                oldPrice: null,
-                price: 'R$ 129,99',
-                badge: null,
-              },
-            ].map((plan) => (
-              <div
-                key={plan.code}
-                className="px-4 sm:px-8 md:px-12 lg:px-16 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6"
-              >
-                <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[10px] font-normal uppercase tracking-widest text-gray-400">
-                      {plan.name}
-                    </span>
-                    {plan.badge && (
-                      <span className="inline-flex items-center rounded-full bg-green-400 px-2.5 py-0.5 text-[9px] font-normal uppercase tracking-widest text-white">
-                        {plan.badge}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-lg md:text-xl font-normal uppercase text-primary mb-2">{plan.capacity}</p>
-                  <div className="flex items-end gap-x-3 gap-y-1 flex-wrap">
-                    {plan.oldPrice && (
-                      <span className="text-base font-normal text-red-500 line-through decoration-red-500 decoration-2">
-                        {plan.oldPrice}
-                      </span>
-                    )}
-                    <span className={`text-xl font-normal ${plan.code === 'profissional' ? 'text-green-400' : 'text-white'}`}>
-                      {plan.price}<span className="text-sm font-normal text-gray-500">/mês</span>
-                    </span>
-                  </div>
+              <div className="flex flex-col items-start gap-6 md:flex-row">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary/20">
+                  <ZapIcon className="h-8 w-8 text-primary" />
                 </div>
 
-                <Link
-                  to={planSignupTo(plan.code)}
-                  onClick={() => saveSelectedPlanIntent(plan.code)}
-                  className="shrink-0 flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
-                >
-                   Testar o {plan.name} <ZapIcon className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            ))}
+                <div>
+                  <h3 className="mb-3 text-2xl font-normal text-white">
+                    {title}
+                  </h3>
 
-            <div className="flex-1 flex flex-col items-start justify-center text-left gap-3 px-4 sm:px-8 md:px-12 lg:px-16 py-10 bg-primary/5">
-              <span className="text-[10px] font-normal uppercase tracking-widest text-primary">
-                Personalizado
-              </span>
-              <p className="text-xl md:text-2xl font-normal text-white">
-                Precisa de um plano personalizado?
+                  <p className="leading-relaxed text-gray-300">
+                    <span className="text-primary">{lead}</span>{' '}
+                    {text}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* VITRINE */}
+
+      <section className="border-b border-gray-800 bg-black py-0">
+        <div className="w-full overflow-hidden bg-dark-200">
+          <div className="bg-gray-800">
+            <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center justify-center px-4 py-16 text-center sm:px-8 sm:py-20 md:px-16 lg:px-24">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                </span>
+
+                <span className="text-[10px] uppercase tracking-widest text-gray-400">
+                  VEJA AO VIVO
+                </span>
+              </div>
+
+              <h2 className="mb-6 text-4xl font-black leading-tight text-white sm:text-5xl">
+                NÃO APENAS UMA AGENDA,
+                <br />
+                <span className="text-primary">
+                  UMA VITRINE PROFISSIONAL.
+                </span>
+              </h2>
+
+              <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
+                Seu cliente não precisa começar uma conversa no WhatsApp
+                para descobrir quem você é, o que oferece ou quando pode
+                atender. Ele pode conhecer seu trabalho e agendar no mesmo
+                lugar.
               </p>
-              <p className="text-sm text-gray-400 max-w-sm">
-                Se o seu negócio já passou dos 9 profissionais, fale com a gente e monte um plano sob medida para a sua estrutura.
-              </p>
+
               <a
-                href={getCustomPlanHref()}
+                href="https://comvaga.com.br/v/vikings"
                 target="_blank"
                 rel="noreferrer"
-                className="mt-2 w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-yellow-600 text-black text-xs font-normal uppercase tracking-wider rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all"
+                className="group flex items-center justify-center gap-3 rounded-button bg-primary px-8 py-4 font-black text-black transition-all hover:shadow-[0_0_30px_rgba(255,209,26,0.3)]"
               >
-                Falar com suporte <ZapIcon className="w-3.5 h-3.5" />
+                VER VITRINE EXEMPLO
+                <ZapIcon className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </a>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-black text-black mb-6">ELEVE SEU NÍVEL PROFISSIONAL</h2>
-          <p className="text-2xl text-black/80 mb-8">Uma vitrine para vender, um painel para operar e uma agenda que pensa antes de confirmar.</p>
-          <Link
-            to="/cadastro"
-            className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all"
-          >
-            ACESSAR AGORA SEM CUSTO <ZapIcon className="w-6 h-6" />
-          </Link>
-          <p className="text-black/60 text-sm mt-6">Eficiência comprovada em barbearias, estúdios e clínicas.</p>
+      {/* BENEFÍCIOS */}
+
+      <section className="w-full bg-dark-200 py-0">
+        <div className="mx-auto mb-16 max-w-7xl px-4 pt-24 text-center">
+          <span className="mb-4 inline-block text-[10px] uppercase tracking-widest text-primary">
+            O resultado na prática
+          </span>
+
+          <h2 className="mb-4 text-4xl font-black sm:text-5xl">
+            VANTAGEM <span className="text-primary">MÚTUA</span>
+          </h2>
+
+          <p className="text-lg text-gray-400 sm:text-xl">
+            Mais eficiência para quem trabalha. Mais facilidade para quem
+            agenda.
+          </p>
+        </div>
+
+        <div className="grid w-full gap-px border-y border-gray-800 bg-gray-800 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              icon: StarGlyph,
+              title: 'VITRINE PROFISSIONAL',
+              text: 'Um link profissional para apresentar seu negócio, seus trabalhos, sua equipe e seus horários.',
+            },
+            {
+              icon: ZapIcon,
+              title: 'AGENDA INTELIGENTE',
+              text: 'Os horários exibidos já consideram a realidade da agenda e os próximos atendimentos.',
+            },
+            {
+              icon: ZapIcon,
+              title: 'RESGATE IMEDIATO',
+              text: 'Cancelamentos deixam de ser simplesmente um horário perdido. O espaço volta para a vitrine.',
+            },
+            {
+              icon: MoneyGlyph,
+              title: 'MAIS APROVEITAMENTO',
+              text: 'A agenda trabalha para reduzir tempo ocioso e aproveitar melhor a capacidade disponível.',
+            },
+            {
+              icon: SmileGlyph,
+              title: 'CLIENTE SATISFEITO',
+              text: 'O cliente escolhe um horário que realmente cabe no dia do profissional, reduzindo conflitos.',
+            },
+            {
+              icon: CheckDoubleIcon,
+              title: 'FLUXO COMPLETO',
+              text: 'Da descoberta ao agendamento e ao pós-atendimento, profissional e cliente continuam no mesmo sistema.',
+            },
+          ].map(({ icon: Icon, title, text }, i) => (
+            <div
+              key={i}
+              className="flex flex-col bg-dark-200 p-8 px-4 transition-colors hover:bg-dark-100 sm:p-10 sm:px-8 md:px-16 lg:px-24"
+            >
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                <Icon className="h-8 w-8 text-primary" />
+              </div>
+
+              <h3 className="mb-3 text-2xl font-normal text-white">
+                {title}
+              </h3>
+
+              <p className="leading-relaxed text-gray-400">{text}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      <footer className="bg-black py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+      {/* PLANOS */}
+
+      <section id="planos" className="w-full bg-dark-100 py-0">
+        <div className="mx-auto mb-16 max-w-7xl px-4 pt-24 text-center">
+          <span className="mb-4 inline-block rounded-full bg-primary/10 px-3 py-1 text-[10px] uppercase tracking-widest text-primary">
+            30 dias grátis
+          </span>
+
+          <h2 className="mb-4 text-4xl font-black sm:text-5xl">
+            ESCOLHA O TAMANHO
+            <br />
+            <span className="text-primary">DA SUA EQUIPE.</span>
+          </h2>
+
+          <p className="mx-auto max-w-2xl text-lg text-gray-400 sm:text-xl">
+            Todos os planos usam a mesma inteligência. Você escolhe apenas
+            a capacidade que precisa.
+          </p>
+        </div>
+
+        <div className="flex w-full snap-x snap-mandatory gap-px overflow-x-auto border-y border-gray-800 bg-gray-800 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-2 md:overflow-visible md:snap-none">
+          {/* RECURSOS */}
+
+          <div className="w-[85vw] shrink-0 snap-start bg-dark-100 px-4 py-12 sm:px-8 md:w-auto md:px-12 md:py-16 lg:px-16">
+            <span className="mb-4 inline-block rounded-full bg-gray-800 px-3 py-1 text-[10px] uppercase tracking-widest text-gray-400">
+              Todos os planos incluem
+            </span>
+
+            <h3 className="mb-2 text-3xl font-black text-white md:text-4xl">
+              TODOS OS RECURSOS
+            </h3>
+
+            <p className="mb-8 text-gray-400">
+              A mesma inteligência em todos os planos. Nenhum recurso
+              essencial fica escondido atrás de um preço maior.
+            </p>
+
+            <div className="flex flex-col gap-5">
+              {[
+                {
+                  title: 'Reabertura automática de horários cancelados na agenda',
+                  text: 'Horários liberados por cancelamentos voltam automaticamente à disponibilidade.',
+                },
+                {
+                  title: 'Reserva em lote de múltiplos trabalhos',
+                  text: 'Vários atendimentos podem ser organizados em sequência dentro do mesmo período.',
+                },
+                {
+                  title: 'Direcionamento inteligente de novos agendamentos',
+                  text: 'Novas reservas seguem para zonas de calor e ajudam a compactar a agenda.',
+                },
+                {
+                  title: 'Comprometimento da agenda e receita futura projetada',
+                  text: 'Acompanhe o preenchimento da agenda e a receita já projetada.',
+                },
+                {
+                  title: 'Agendamento assistido pelo profissional',
+                  text: 'Registre um agendamento pela agenda quando o cliente precisar de ajuda.',
+                },
+                {
+                  title: 'Reagendamento inteligente pela área exclusiva do cliente',
+                  text: 'O cliente escolhe um novo horário sem repetir todo o processo.',
+                },
+                {
+                  title: 'Alertas por e-mail em tempo real',
+                  text: 'Você e seu cliente recebem avisos sobre novos agendamentos e cancelamentos.',
+                },
+                {
+                  title: 'Lembrete automático + WhatsApp',
+                  text: 'O sistema lembra o cliente e você pode complementar pelo WhatsApp.',
+                },
+                {
+                  title: 'Sincronia com o Google Agenda',
+                  text: 'O cliente pode manter o compromisso sincronizado com seu calendário.',
+                },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="flex items-start gap-2.5"
+                >
+                  <CheckIcon className="mt-1 h-4 w-4 shrink-0 text-primary" />
+
+                  <div>
+                    <p className="text-sm font-medium leading-snug text-gray-200">
+                      {item.title}
+                    </p>
+
+                    <p className="mt-0.5 text-sm leading-snug text-gray-500">
+                      {item.text}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* PLANOS */}
+
+          <div className="w-[85vw] shrink-0 snap-start bg-dark-200 md:w-auto">
+            <div className="px-4 pb-6 pt-12 sm:px-8 md:px-12 md:pt-16 lg:px-16">
+              <span className="mb-4 inline-block rounded-full bg-primary/15 px-3 py-1 text-[10px] uppercase tracking-widest text-primary">
+                Escolha a capacidade
+              </span>
+
+              <h3 className="mb-2 text-3xl font-black text-white md:text-4xl">
+                QUANTOS PROFISSIONAIS?
+              </h3>
+
+              <p className="text-gray-400">
+                Comece sozinho ou coloque toda a equipe dentro da mesma
+                operação.
+              </p>
+            </div>
+
+            {/* ESSENCIAL */}
+
+            <div className="flex flex-col gap-6 divide-y divide-gray-800 px-4 py-8 sm:px-8 md:flex-row md:items-center md:justify-between md:px-12 lg:px-16">
+              <div>
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="text-[10px] uppercase tracking-widest text-gray-400">
+                    Essencial
+                  </span>
+                </div>
+
+                <p className="mb-2 text-lg font-normal uppercase text-primary md:text-xl">
+                  1 profissional
+                </p>
+
+                <span className="text-xl font-normal text-white">
+                  R$ 69,99
+                  <span className="text-sm text-gray-500">/mês</span>
+                </span>
+              </div>
+
+              <Link
+                to={planSignupTo('essencial')}
+                onClick={() => saveSelectedPlanIntent('essencial')}
+                className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-white/10 px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-white transition-all hover:bg-white/20"
+              >
+                Testar Essencial
+                <ZapIcon className="h-3.5 w-3.5 text-primary" />
+              </Link>
+            </div>
+
+            {/* PROFISSIONAL */}
+
+            <div className="relative flex flex-col gap-6 border-y border-primary/20 bg-primary/5 px-4 py-8 sm:px-8 md:flex-row md:items-center md:justify-between md:px-12 lg:px-16">
+              <div className="absolute right-4 top-4 rounded-full bg-green-400 px-2.5 py-0.5 text-[9px] font-normal uppercase tracking-widest text-white sm:right-8 md:right-12">
+                MELHOR OFERTA
+              </div>
+
+              <div>
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="text-[10px] uppercase tracking-widest text-primary">
+                    Profissional
+                  </span>
+                </div>
+
+                <p className="mb-2 text-lg font-normal uppercase text-primary md:text-xl">
+                  Até 3 profissionais
+                </p>
+
+                <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
+                  <span className="text-base font-normal text-red-500 line-through decoration-red-500 decoration-2">
+                    R$ 99,99
+                  </span>
+
+                  <span className="text-xl font-normal text-green-400">
+                    R$ 69,99
+                    <span className="text-sm text-gray-500">/mês</span>
+                  </span>
+                </div>
+
+                <p className="mt-2 text-xs text-gray-500">
+                  Mais capacidade pelo mesmo valor promocional.
+                </p>
+              </div>
+
+              <Link
+                to={planSignupTo('profissional')}
+                onClick={() => saveSelectedPlanIntent('profissional')}
+                className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-yellow-600 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-black transition-all hover:shadow-lg hover:shadow-primary/30"
+              >
+                Testar Profissional
+                <ZapIcon className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+
+            {/* PREMIUM */}
+
+            <div className="flex flex-col gap-6 px-4 py-8 sm:px-8 md:flex-row md:items-center md:justify-between md:px-12 lg:px-16">
+              <div>
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="text-[10px] uppercase tracking-widest text-gray-400">
+                    Premium
+                  </span>
+                </div>
+
+                <p className="mb-2 text-lg font-normal uppercase text-primary md:text-xl">
+                  Até 9 profissionais
+                </p>
+
+                <span className="text-xl font-normal text-white">
+                  R$ 129,99
+                  <span className="text-sm text-gray-500">/mês</span>
+                </span>
+              </div>
+
+              <Link
+                to={planSignupTo('premium')}
+                onClick={() => saveSelectedPlanIntent('premium')}
+                className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-white/10 px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-white transition-all hover:bg-white/20"
+              >
+                Testar Premium
+                <ZapIcon className="h-3.5 w-3.5 text-primary" />
+              </Link>
+            </div>
+
+            {/* PERSONALIZADO */}
+
+            <div className="flex flex-col items-start justify-center gap-3 bg-primary/5 px-4 py-10 text-left sm:px-8 md:px-12 lg:px-16">
+              <span className="text-[10px] uppercase tracking-widest text-primary">
+                Personalizado
+              </span>
+
+              <p className="text-xl font-normal text-white md:text-2xl">
+                Passou de 9 profissionais?
+              </p>
+
+              <p className="max-w-sm text-sm text-gray-400">
+                Monte um plano sob medida para a estrutura do seu negócio.
+              </p>
+
+              <a
+                href={getCustomPlanHref()}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-yellow-600 px-5 py-2.5 text-xs font-normal uppercase tracking-wider text-black transition-all hover:shadow-lg hover:shadow-primary/30"
+              >
+                Falar com suporte
+                <ZapIcon className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="mx-auto max-w-3xl px-4 py-10 text-center">
+          <p className="text-sm text-gray-500">
+            Todos os planos começam com 30 dias grátis. Você pode escolher
+            a capacidade que faz sentido para sua operação.
+          </p>
+        </div>
+      </section>
+
+      {/* CTA FINAL */}
+
+      <section className="bg-gradient-to-r from-primary via-yellow-500 to-yellow-600 px-4 py-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <span className="mb-5 inline-block rounded-full bg-black/10 px-3 py-1 text-[10px] uppercase tracking-widest text-black/60">
+            Sua próxima agenda começa aqui
+          </span>
+
+          <h2 className="mb-6 text-4xl font-black text-black sm:text-5xl">
+            PARE DE ADMINISTRAR
+            <br />
+            HORÁRIOS VAZIOS.
+          </h2>
+
+          <p className="mb-8 text-xl text-black/80 sm:text-2xl">
+            Uma vitrine para vender, um painel para operar e uma agenda que
+            pensa antes de confirmar.
+          </p>
+
+          <Link
+            to="/cadastro"
+            className="inline-flex items-center gap-3 rounded-button bg-black px-10 py-5 text-lg font-black text-primary transition-all hover:scale-105 hover:shadow-2xl"
+          >
+            COMEÇAR MEU TESTE GRÁTIS
+            <ZapIcon className="h-5 w-5" />
+          </Link>
+
+          <p className="mt-6 text-sm text-black/60">
+            30 dias grátis · sem compromisso
+          </p>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+
+      <footer className="bg-black px-4 py-12">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-8 grid grid-cols-2 gap-8 md:grid-cols-4">
             <div className="flex flex-col justify-start">
-              <Link to="/" className="inline-block hover:opacity-75 transition-opacity">
+              <Link
+                to="/"
+                className="inline-block transition-opacity hover:opacity-75"
+              >
                 <img
                   src="/Comvaga Logo.png"
                   alt="Comvaga"
                   className="h-16 w-auto object-contain"
                 />
               </Link>
-              <p className="text-gray-600 text-xs mt-3 uppercase leading-relaxed">
-                Sua agenda,<br />matematicamente perfeita.
+
+              <p className="mt-3 text-xs uppercase leading-relaxed text-gray-600">
+                Sua agenda,
+                <br />
+                matematicamente perfeita.
               </p>
             </div>
 
             <div>
-              <h3 className="text-white font-normal mb-4">PARA VOCÊ</h3>
+              <h3 className="mb-4 font-normal text-white">PARA VOCÊ</h3>
+
               <ul className="space-y-2">
                 {isLogged ? (
                   <>
                     <li>
                       <Link
                         to={loggedAreaLink}
-                        className="text-gray-500 hover:text-primary transition-colors text-sm"
+                        className="text-sm text-gray-500 transition-colors hover:text-primary"
                       >
                         {loggedAreaLabel}
                       </Link>
                     </li>
+
                     <li>
                       <button
                         type="button"
                         onClick={handleLogoutClick}
-                        className="text-gray-500 hover:text-primary transition-colors text-sm"
+                        className="text-sm text-gray-500 transition-colors hover:text-primary"
                       >
                         SAIR
                       </button>
@@ -715,33 +1140,49 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 ) : (
                   <>
                     <li>
-                      <Link to="/login" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link
+                        to="/login"
+                        className="text-sm text-gray-500 transition-colors hover:text-primary"
+                      >
                         LOGIN
                       </Link>
                     </li>
+
                     <li>
-                      <Link to="/cadastro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link
+                        to="/cadastro"
+                        className="text-sm text-gray-500 transition-colors hover:text-primary"
+                      >
                         CADASTRAR GRÁTIS
                       </Link>
                     </li>
+
                     <li>
-                      <Link to="/login/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link
+                        to="/login/parceiro"
+                        className="text-sm text-gray-500 transition-colors hover:text-primary"
+                      >
                         LOGIN PARCEIRO
                       </Link>
                     </li>
+
                     <li>
-                      <Link to="/cadastro/parceiro" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                      <Link
+                        to="/cadastro/parceiro"
+                        className="text-sm text-gray-500 transition-colors hover:text-primary"
+                      >
                         CADASTRO PARCEIRO
                       </Link>
                     </li>
                   </>
                 )}
+
                 <li>
                   <a
                     href={supportHref}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-gray-500 hover:text-primary transition-colors text-sm"
+                    className="text-sm text-gray-500 transition-colors hover:text-primary"
                   >
                     SUPORTE
                   </a>
@@ -750,15 +1191,23 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             </div>
 
             <div>
-              <h3 className="text-white font-normal mb-4">EMPRESA</h3>
+              <h3 className="mb-4 font-normal text-white">EMPRESA</h3>
+
               <ul className="space-y-2">
                 <li>
-                  <Link to="/sobre" className="text-gray-400 hover:text-primary transition-colors text-sm">
+                  <Link
+                    to="/sobre"
+                    className="text-sm text-gray-400 transition-colors hover:text-primary"
+                  >
                     SOBRE
                   </Link>
                 </li>
+
                 <li>
-                  <a href="#" className="text-gray-400 hover:text-primary transition-colors text-sm">
+                  <a
+                    href="#"
+                    className="text-sm text-gray-400 transition-colors hover:text-primary"
+                  >
                     BLOG
                   </a>
                 </li>
@@ -766,15 +1215,23 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             </div>
 
             <div>
-              <h3 className="text-white font-normal mb-4">LEGAL</h3>
+              <h3 className="mb-4 font-normal text-white">LEGAL</h3>
+
               <ul className="space-y-2">
                 <li>
-                  <Link to="/privacidade" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                  <Link
+                    to="/privacidade"
+                    className="text-sm text-gray-500 transition-colors hover:text-primary"
+                  >
                     PRIVACIDADE
                   </Link>
                 </li>
+
                 <li>
-                  <Link to="/termos" className="text-gray-500 hover:text-primary transition-colors text-sm">
+                  <Link
+                    to="/termos"
+                    className="text-sm text-gray-500 transition-colors hover:text-primary"
+                  >
                     TERMOS
                   </Link>
                 </li>
@@ -783,7 +1240,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           </div>
 
           <div className="pt-6">
-            <p className="text-gray-600 text-sm">© 2026 COMVAGA. Todos os direitos reservados.</p>
+            <p className="text-sm text-gray-600">
+              © 2026 COMVAGA. Todos os direitos reservados.
+            </p>
           </div>
         </div>
       </footer>
