@@ -1,5 +1,6 @@
 import { ArrowLeft, Phone } from 'lucide-react';
 import { CheckedIcon, ProfessionalIcon, LocationIcon } from '../../../components/icons';
+import { formatPhoneForDisplay } from '../../../utils/phone';
 
 function FacebookIcon({ className = '', size = 16 }) {
   return (
@@ -111,7 +112,7 @@ export default function VitrineTopSection({ header, business, actions }) {
                 {business.negocio.telefone && (
                   <a href={`tel:${actions.sanitizeTel(business.negocio.telefone) || business.negocio.telefone}`} className={`flex items-center gap-2 text-sm font-normal transition-colors ${business.telClass}`}>
                     <Phone className="w-4 h-4" strokeWidth={1.5} />
-                    {business.negocio.telefone}
+                    {formatPhoneForDisplay(business.negocio.telefone)}
                   </a>
                 )}
                 {(business.instagramUrl || business.facebookUrl) && (
