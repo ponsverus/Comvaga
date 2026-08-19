@@ -4,10 +4,9 @@ import { LogOut } from 'lucide-react';
 import { SearchIcon, TimePastIcon, UserIcon } from '../components/icons';
 import AppFooter from '../components/AppFooter';
 import { supabase } from '../supabase';
-import { bookingService, clientService, reviewService } from '../services';
 import { useFeedback } from '../feedback/useFeedback';
 import { convertImageToWebp, isImageFile } from '../utils/media';
-import { normalizeBrazilPhone, formatPhoneForDisplay } from '../utils/phone';
+import { normalizeBrazilPhone } from '../utils/phone';
 import { getRequestErrorKey } from '../utils/requestError';
 import { searchHome } from '../utils/searchHome';
 import { withTimeout } from '../utils/withTimeout';
@@ -211,7 +210,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       const visibleFavoritos = getVisiblePageRows(favoritosRows);
       setNomePerfil(perfil.nome);
       setAvatarPath(perfil.avatarPath);
-      setTelefoneCliente(formatPhoneForDisplay(perfil.telefone) || '');
+      setTelefoneCliente(perfil.telefone || '');
       setAgendamentos(visibleAgendamentos);
       setFavoritos(visibleFavoritos);
       await syncAvaliacoesConcluidas(visibleAgendamentos);
@@ -315,13 +314,20 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       }, 1200);
     };
 
-    const unsubscribe = bookingService.subscribeToClientBookings(clienteId, scheduleRefresh);
+    const channel = supabase
+      .channel(`agendamentos_cliente:${clienteId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'agendamentos', filter: `cliente_id=eq.${clienteId}` },
+        scheduleRefresh
+      )
+      .subscribe();
     return () => {
       if (realtimeRefreshTimerRef.current) {
         window.clearTimeout(realtimeRefreshTimerRef.current);
         realtimeRefreshTimerRef.current = null;
       }
-      unsubscribe?.();
+      supabase.removeChannel(channel);
     };
   }, [clienteId, getHasMoreRows, getVisiblePageRows, syncAvaliacoesConcluidas]);
 
