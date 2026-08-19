@@ -6,7 +6,7 @@ import AppFooter from '../components/AppFooter';
 import { supabase } from '../supabase';
 import { useFeedback } from '../feedback/useFeedback';
 import { convertImageToWebp, isImageFile } from '../utils/media';
-import { normalizeBrazilPhone } from '../utils/phone';
+import { normalizeBrazilPhone, formatPhoneForDisplay } from '../utils/phone';
 import { getRequestErrorKey } from '../utils/requestError';
 import { searchHome } from '../utils/searchHome';
 import { withTimeout } from '../utils/withTimeout';
@@ -210,7 +210,7 @@ export default function ClientArea({ user, onLogout, userType = 'client' }) {
       const visibleFavoritos = getVisiblePageRows(favoritosRows);
       setNomePerfil(perfil.nome);
       setAvatarPath(perfil.avatarPath);
-      setTelefoneCliente(perfil.telefone || '');
+      setTelefoneCliente(formatPhoneForDisplay(perfil.telefone) || '');
       setAgendamentos(visibleAgendamentos);
       setFavoritos(visibleFavoritos);
       await syncAvaliacoesConcluidas(visibleAgendamentos);
