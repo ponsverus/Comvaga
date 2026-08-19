@@ -1,5 +1,5 @@
 import { MessageCircle } from 'lucide-react';
-import { normalizeBrazilPhone } from '../../../utils/phone';
+import { formatPhoneForWhatsAppLink } from '../../../utils/phone';
 import {
   computeStatusFromDb,
   formatDateBRFromISO,
@@ -20,7 +20,7 @@ function formatReminderTime(value) {
 }
 
 function buildReminderHref(agendamento, negocioNome) {
-  const phone = normalizeBrazilPhone(agendamento?.cliente?.telefone);
+  const phone = formatPhoneForWhatsAppLink(agendamento?.cliente?.telefone);
   if (!phone) return '';
 
   const clienteNome = agendamento?.cliente?.nome || '';
