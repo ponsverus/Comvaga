@@ -4,6 +4,7 @@ import { CalendarIcon, ProfessionalIcon, TrendingUpIcon, UsersIcon } from '../co
 import AppFooter from '../components/AppFooter';
 import { Eye, LogOut, AlertCircle } from 'lucide-react';
 import { supabase } from '../supabase';
+import { formatPhoneForDisplay } from '../utils/phone';
 import { useFeedback } from '../feedback/useFeedback';
 import { useBusinessGroup } from '../businessTerms';
 import EntregaModal from './dashboard/components/EntregaModal';
@@ -343,7 +344,7 @@ export default function Dashboard({ user, onLogout, userType = 'professional', p
     setFormInfo({
       nome: negocio.nome || '',
       descricao: negocio.descricao || '',
-      telefone: negocio.telefone || '',
+      telefone: formatPhoneForDisplay(negocio.telefone) || '',
       endereco_cep: negocio.endereco_cep || '',
       endereco_rua: negocio.endereco_rua || '',
       endereco_numero: negocio.endereco_numero || '',
