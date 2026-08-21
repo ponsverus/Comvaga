@@ -406,7 +406,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             A DIFERENÇA <span className="text-primary">NA PRÁTICA</span>
           </h2>
           <p className="text-xl text-gray-400">
-            Veja como a Comvaga elimina os horários vagos que outros sistemas deixam passar
+            Duas agendas com o mesmo início de dia. O que muda é como cada cancelamento é aproveitado.
           </p>
         </div>
 
@@ -471,14 +471,10 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido',
             ];
 
-            // Conexão aleatória e completa: cada ponto se liga a outro definido
-            // por um salto modular (não é uma linha reta sequencial). Como o
-            // passo (7) não divide 32, o resultado é um único ciclo que passa
-            // por todos os 32 pontos — todo mundo conectado, mas fora de ordem.
-            const randomEdges = Array.from({ length: comvaga.length }, (_, i) => [
-              i,
-              (i * 7 + 3) % comvaga.length,
-            ]);
+            // Ligação em "Z": ponto 0 → 1 → 2 ... até o último da linha, que se
+            // conecta ao primeiro ponto da linha seguinte, e assim sucessivamente
+            // até fechar a grade — uma sequência única, sem saltos aleatórios.
+            const zEdges = Array.from({ length: comvaga.length - 1 }, (_, i) => [i, i + 1]);
 
             const renderGrid = (data, connections) => (
               <svg viewBox="0 0 320 180" className="w-full">
@@ -491,8 +487,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                         key={`line-${i}`}
                         x1={a.x} y1={a.y} x2={b.x} y2={b.y}
                         stroke={STATUS_COLOR[data[from]]}
-                        strokeWidth="1"
-                        opacity="0.55"
+                        strokeWidth="1.5"
                       />
                     );
                   })}
@@ -516,9 +511,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
                     Sistema tradicional
                   </span>
-                  <h3 className="text-2xl md:text-3xl font-black text-white mb-2">AGENDA COM BURACOS</h3>
+                  <h3 className="text-2xl md:text-3xl font-black text-white mb-2">CANCELAMENTO VIRA VAGA PARADA</h3>
                   <p className="text-gray-400 mb-8">
-                    Horários vagos ficam parados, espalhados, até alguém perceber e preencher manualmente.
+                    Um cancelamento libera o horário, mas ele volta do mesmo tamanho original — inteiro — até alguém encontrar e preencher manualmente.
                   </p>
                   {renderGrid(tradicional, null)}
                 </div>
@@ -528,11 +523,11 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
                     Comvaga
                   </span>
-                  <h3 className="text-2xl md:text-3xl font-black text-white mb-2">AGENDA SEM BURACOS</h3>
+                  <h3 className="text-2xl md:text-3xl font-black text-white mb-2">CANCELAMENTO VIRA VAGA REDISTRIBUÍDA</h3>
                   <p className="text-gray-400 mb-8">
-                    No fim do dia, a agenda inteira está preenchida: a maior parte concluída normalmente, e só uma pequena parte veio de horários reaproveitados de cancelamentos.
+                    O horário liberado é redistribuído na hora: uma vaga de 60 minutos pode virar três de 20, encaixando mais atendimentos no mesmo espaço até o fim do dia.
                   </p>
-                  {renderGrid(comvaga, randomEdges)}
+                  {renderGrid(comvaga, zEdges)}
                 </div>
               </>
             );
