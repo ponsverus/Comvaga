@@ -194,6 +194,15 @@ export default function Home({ user, userType, professionalRole = null, onLogout
   const [buscando, setBuscando] = useState(false);
 
   const plansSectionRef = useRef(null);
+  const comparisonScrollRef = useRef(null);
+  const [activeComparisonCol, setActiveComparisonCol] = useState(0);
+
+  const handleComparisonScroll = () => {
+    const el = comparisonScrollRef.current;
+    if (!el) return;
+    const col = el.scrollLeft > el.scrollWidth / 4 ? 1 : 0;
+    setActiveComparisonCol(col);
+  };
 
   const { showMessage } = useFeedback();
   const isLogged = !!user && !!userType;
@@ -404,12 +413,12 @@ export default function Home({ user, userType, professionalRole = null, onLogout
         {/* Legenda com código de cores numerado */}
         <div className="flex flex-wrap justify-center gap-6 mb-8 px-4">
           <div className="flex items-center gap-2 text-xs text-gray-400 uppercase tracking-wide">
-            <span className="w-2.5 h-2.5 rounded-full border border-dashed border-gray-600" />
+            <span className="w-2.5 h-2.5 rounded-full bg-gray-600" />
             1. Livre
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-400 uppercase tracking-wide">
             <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-            2. Ocupado
+            2. Atendimento
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-400 uppercase tracking-wide">
             <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
@@ -418,6 +427,8 @@ export default function Home({ user, userType, professionalRole = null, onLogout
         </div>
 
         <div
+          ref={comparisonScrollRef}
+          onScroll={handleComparisonScroll}
           className="
             w-full bg-gray-800 border-y border-gray-800
             flex md:grid md:grid-cols-2 gap-px
@@ -433,14 +444,16 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             const X0 = 20;
             const Y0 = 24;
             const R = 7;
-            const STATUS_COLOR = { ocupado: '#FFD11A', reaproveitado: '#4ADE80' };
+            const LIVRE_COLOR = '#4B5563';
+            const STATUS_COLOR = { ocupado: '#FFD11A', concluido: '#FFD11A', reaproveitado: '#4ADE80' };
 
             const posFor = (i) => ({
               x: X0 + (i % COLS) * DX,
               y: Y0 + Math.floor(i / COLS) * DY,
             });
 
-            // Sistema tradicional: aleatório, sem sequência/conexão
+            // Sistema tradicional: aleatório, sem sequência/conexão.
+            // Livre = bolinha cinza sólida (não segmentada/tracejada).
             const tradicional = [
               'ocupado', 'livre', 'ocupado', 'ocupado', 'livre', 'ocupado', 'livre', 'ocupado',
               'livre', 'ocupado', 'livre', 'ocupado', 'ocupado', 'livre', 'ocupado', 'livre',
@@ -448,43 +461,49 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               'livre', 'ocupado', 'ocupado', 'livre', 'ocupado', 'livre', 'ocupado', 'livre',
             ];
 
-            // Comvaga: ocupado/reaproveitado em sequência conectada,
-            // vagos sempre compactados na última linha, nunca espalhados
+            // Comvaga: representação de FIM DE DIA — todas as 4 linhas e 8 colunas
+            // preenchidas, sem horário livre sobrando. A maioria é "concluído"
+            // (amarelo) e uma parcela menor é "reaproveitado" (verde).
             const comvaga = [
-              'ocupado', 'reaproveitado', 'ocupado', 'ocupado', 'reaproveitado', 'ocupado', 'ocupado', 'reaproveitado',
-              'ocupado', 'ocupado', 'reaproveitado', 'ocupado', 'ocupado', 'ocupado', 'reaproveitado', 'ocupado',
-              'ocupado', 'reaproveitado', 'ocupado', 'ocupado', 'reaproveitado', 'ocupado', 'ocupado', 'ocupado',
-              'livre', 'livre', 'livre', 'livre', 'livre', 'livre', 'livre', 'livre',
+              'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido', 'concluido', 'reaproveitado', 'concluido',
+              'concluido', 'reaproveitado', 'concluido', 'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido',
+              'reaproveitado', 'concluido', 'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido', 'concluido',
+              'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido',
             ];
 
-            const renderGrid = (data, connect) => (
+            // Conexão aleatória e completa: cada ponto se liga a outro definido
+            // por um salto modular (não é uma linha reta sequencial). Como o
+            // passo (7) não divide 32, o resultado é um único ciclo que passa
+            // por todos os 32 pontos — todo mundo conectado, mas fora de ordem.
+            const randomEdges = Array.from({ length: comvaga.length }, (_, i) => [
+              i,
+              (i * 7 + 3) % comvaga.length,
+            ]);
+
+            const renderGrid = (data, connections) => (
               <svg viewBox="0 0 320 180" className="w-full">
-                {connect &&
-                  data.slice(0, -1).map((status, i) => {
-                    const a = posFor(i);
-                    const b = posFor(i + 1);
-                    const next = data[i + 1];
-                    const isLivreSeg = status === 'livre' || next === 'livre';
+                {connections &&
+                  connections.map(([from, to], i) => {
+                    const a = posFor(from);
+                    const b = posFor(to);
                     return (
                       <line
                         key={`line-${i}`}
                         x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-                        stroke={isLivreSeg ? '#4B5563' : STATUS_COLOR[status]}
-                        strokeWidth="1.5"
-                        strokeDasharray={isLivreSeg ? '3 2' : undefined}
+                        stroke={STATUS_COLOR[data[from]]}
+                        strokeWidth="1"
+                        opacity="0.55"
                       />
                     );
                   })}
                 {data.map((status, i) => {
                   const p = posFor(i);
-                  return status === 'livre' ? (
+                  return (
                     <circle
                       key={`dot-${i}`}
                       cx={p.x} cy={p.y} r={R}
-                      fill="none" stroke="#4B5563" strokeWidth="1.5" strokeDasharray="3 2"
+                      fill={status === 'livre' ? LIVRE_COLOR : STATUS_COLOR[status]}
                     />
-                  ) : (
-                    <circle key={`dot-${i}`} cx={p.x} cy={p.y} r={R} fill={STATUS_COLOR[status]} />
                   );
                 })}
               </svg>
@@ -501,7 +520,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   <p className="text-gray-400 mb-8">
                     Horários vagos ficam parados, espalhados, até alguém perceber e preencher manualmente.
                   </p>
-                  {renderGrid(tradicional, false)}
+                  {renderGrid(tradicional, null)}
                 </div>
 
                 {/* Coluna 2 — Comvaga */}
@@ -511,19 +530,19 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                   </span>
                   <h3 className="text-2xl md:text-3xl font-black text-white mb-2">AGENDA SEM BURACOS</h3>
                   <p className="text-gray-400 mb-8">
-                    Cada horário se encaixa em sequência, e o que sobra fica sempre compactado no final.
+                    No fim do dia, a agenda inteira está preenchida: a maior parte concluída normalmente, e só uma pequena parte veio de horários reaproveitados de cancelamentos.
                   </p>
-                  {renderGrid(comvaga, true)}
+                  {renderGrid(comvaga, randomEdges)}
                 </div>
               </>
             );
           })()}
         </div>
 
-        {/* Indicador de swipe — só aparece no mobile */}
+        {/* Indicador de swipe — só aparece no mobile, reflete o scroll real */}
         <div className="flex md:hidden justify-center gap-1.5 py-4">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-          <span className="w-1.5 h-1.5 rounded-full bg-gray-700" />
+          <span className={`w-1.5 h-1.5 rounded-full transition-colors ${activeComparisonCol === 0 ? 'bg-primary' : 'bg-gray-700'}`} />
+          <span className={`w-1.5 h-1.5 rounded-full transition-colors ${activeComparisonCol === 1 ? 'bg-primary' : 'bg-gray-700'}`} />
         </div>
 
         {/* Texto explicativo — resposta à pergunta gerada pela comparação */}
