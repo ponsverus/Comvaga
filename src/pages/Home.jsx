@@ -194,15 +194,6 @@ export default function Home({ user, userType, professionalRole = null, onLogout
   const [buscando, setBuscando] = useState(false);
 
   const plansSectionRef = useRef(null);
-  const comparisonScrollRef = useRef(null);
-  const [activeComparisonCol, setActiveComparisonCol] = useState(0);
-
-  const handleComparisonScroll = () => {
-    const el = comparisonScrollRef.current;
-    if (!el) return;
-    const col = el.scrollLeft > el.scrollWidth / 4 ? 1 : 0;
-    setActiveComparisonCol(col);
-  };
 
   const { showMessage } = useFeedback();
   const isLogged = !!user && !!userType;
@@ -390,177 +381,48 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             </div>
           ))}
         </div>
-      </section>
 
-      {/*
-        SEÇÃO NOVA — comparação visual "sistema tradicional vs Comvaga"
-        Substitui o antigo bloco de REAPROVEITAMENTO INTELIGENTE / ZONA DE CALOR /
-        AGENDAMENTO MÚLTIPLO, que duplicava o conteúdo do card 2 (ENCAIXE AUTOMÁTICO)
-        acima. Agora a comparação mostra o resultado primeiro (visual), e o texto
-        "MAS COMO O COMVAGA FAZ ISSO?" abaixo aprofunda o mecanismo, sem repetir
-        o que a comparação já deixou claro.
-      */}
-      <section className="py-0 bg-dark-200 w-full border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-12 pt-24">
-          <h2 className="text-5xl font-black mb-4">
-            A DIFERENÇA <span className="text-primary">NA PRÁTICA</span>
-          </h2>
-          <p className="text-xl text-gray-400">
-            Duas agendas com o mesmo início de dia. O que muda é como cada cancelamento é aproveitado.
-          </p>
-        </div>
-
-        {/* Legenda com código de cores numerado */}
-        <div className="flex flex-wrap justify-center gap-6 mb-8 px-4">
-          <div className="flex items-center gap-2 text-xs text-gray-400 uppercase tracking-wide">
-            <span className="w-2.5 h-2.5 rounded-full bg-gray-600" />
-            1. Livre
+        <div className="w-full bg-gray-800 border-b border-gray-800 flex flex-col gap-px">
+          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
+            <div className="flex flex-col md:flex-row items-start gap-6">
+              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <ZapIcon className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-normal mb-3 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  <span className="text-primary">Cancelou?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-400 uppercase tracking-wide">
-            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-            2. Atendimento
+
+          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
+            <div className="flex flex-col md:flex-row items-start gap-6">
+              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <ZapIcon className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-normal mb-3 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  <span className="text-primary">A maioria dos sistemas exibe todos os horários livres.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-400 uppercase tracking-wide">
-            <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
-            3. Reaproveitado
-          </div>
-        </div>
 
-        <div
-          ref={comparisonScrollRef}
-          onScroll={handleComparisonScroll}
-          className="
-            w-full bg-gray-800 border-y border-gray-800
-            flex md:grid md:grid-cols-2 gap-px
-            overflow-x-auto md:overflow-visible
-            snap-x snap-mandatory md:snap-none
-            [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-          "
-        >
-          {(() => {
-            const COLS = 8;
-            const DX = 38;
-            const DY = 42;
-            const X0 = 20;
-            const Y0 = 24;
-            const R = 7;
-            const LIVRE_COLOR = '#4B5563';
-            const STATUS_COLOR = { ocupado: '#FFD11A', concluido: '#FFD11A', reaproveitado: '#4ADE80' };
-
-            const posFor = (i) => ({
-              x: X0 + (i % COLS) * DX,
-              y: Y0 + Math.floor(i / COLS) * DY,
-            });
-
-            // Sistema tradicional: aleatório, sem sequência/conexão.
-            // Livre = bolinha cinza sólida (não segmentada/tracejada).
-            const tradicional = [
-              'ocupado', 'livre', 'ocupado', 'ocupado', 'livre', 'ocupado', 'livre', 'ocupado',
-              'livre', 'ocupado', 'livre', 'ocupado', 'ocupado', 'livre', 'ocupado', 'livre',
-              'ocupado', 'livre', 'livre', 'ocupado', 'livre', 'ocupado', 'ocupado', 'livre',
-              'livre', 'ocupado', 'ocupado', 'livre', 'ocupado', 'livre', 'ocupado', 'livre',
-            ];
-
-            // Comvaga: representação de FIM DE DIA — todas as 4 linhas e 8 colunas
-            // preenchidas, sem horário livre sobrando. A maioria é "concluído"
-            // (amarelo) e uma parcela menor é "reaproveitado" (verde).
-            const comvaga = [
-              'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido', 'concluido', 'reaproveitado', 'concluido',
-              'concluido', 'reaproveitado', 'concluido', 'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido',
-              'reaproveitado', 'concluido', 'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido', 'concluido',
-              'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido', 'reaproveitado', 'concluido', 'concluido',
-            ];
-
-            // Ligação em "Z": ponto 0 → 1 → 2 ... até o último da linha, que se
-            // conecta ao primeiro ponto da linha seguinte, e assim sucessivamente
-            // até fechar a grade — uma sequência única, sem saltos aleatórios.
-            const zEdges = Array.from({ length: comvaga.length - 1 }, (_, i) => [i, i + 1]);
-
-            const renderGrid = (data, connections) => (
-              <svg viewBox="0 0 320 180" className="w-full">
-                {connections &&
-                  connections.map(([from, to], i) => {
-                    const a = posFor(from);
-                    const b = posFor(to);
-                    return (
-                      <line
-                        key={`line-${i}`}
-                        x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-                        stroke={STATUS_COLOR[data[from]]}
-                        strokeWidth="1.5"
-                      />
-                    );
-                  })}
-                {data.map((status, i) => {
-                  const p = posFor(i);
-                  return (
-                    <circle
-                      key={`dot-${i}`}
-                      cx={p.x} cy={p.y} r={R}
-                      fill={status === 'livre' ? LIVRE_COLOR : STATUS_COLOR[status]}
-                    />
-                  );
-                })}
-              </svg>
-            );
-
-            return (
-              <>
-                {/* Coluna 1 — Sistema tradicional */}
-                <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-100 px-4 sm:px-8 md:px-12 lg:px-16 py-12 md:py-16">
-                  <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-                    Sistema tradicional
-                  </span>
-                  <h3 className="text-2xl md:text-3xl font-black text-white mb-2">CANCELAMENTO VIRA VAGA PARADA</h3>
-                  <p className="text-gray-400 mb-8">
-                    Um cancelamento libera o horário, mas ele volta do mesmo tamanho original — inteiro — até alguém encontrar e preencher manualmente.
-                  </p>
-                  {renderGrid(tradicional, null)}
-                </div>
-
-                {/* Coluna 2 — Comvaga */}
-                <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-200 px-4 sm:px-8 md:px-12 lg:px-16 py-12 md:py-16">
-                  <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
-                    Comvaga
-                  </span>
-                  <h3 className="text-2xl md:text-3xl font-black text-white mb-2">CANCELAMENTO VIRA VAGA REDISTRIBUÍDA</h3>
-                  <p className="text-gray-400 mb-8">
-                    O horário liberado é redistribuído na hora: uma vaga de 60 minutos pode virar três de 20, encaixando mais atendimentos no mesmo espaço até o fim do dia.
-                  </p>
-                  {renderGrid(comvaga, zEdges)}
-                </div>
-              </>
-            );
-          })()}
-        </div>
-
-        {/* Indicador de swipe — só aparece no mobile, reflete o scroll real */}
-        <div className="flex md:hidden justify-center gap-1.5 py-4">
-          <span className={`w-1.5 h-1.5 rounded-full transition-colors ${activeComparisonCol === 0 ? 'bg-primary' : 'bg-gray-700'}`} />
-          <span className={`w-1.5 h-1.5 rounded-full transition-colors ${activeComparisonCol === 1 ? 'bg-primary' : 'bg-gray-700'}`} />
-        </div>
-
-        {/* Texto explicativo — resposta à pergunta gerada pela comparação */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-8 md:px-16 py-16 text-center">
-          <h3 className="text-3xl font-black text-white mb-10">MAS COMO O COMVAGA FAZ ISSO?</h3>
-          <div className="text-left flex flex-col gap-6">
-            <p className="text-gray-300 leading-relaxed">
-              <span className="text-primary font-normal">Redistribuição instantânea.</span> Cada
-              cancelamento é recalculado em segundos — o horário vago não fica esperando alguém
-              notar: ele já reaparece disponível, inteiro ou fracionado, do jeito que melhor
-              aproveita o espaço.
-            </p>
-            <p className="text-gray-300 leading-relaxed">
-              <span className="text-primary font-normal">Prioridade inteligente.</span> Em vez de
-              espalhar clientes aleatoriamente pela agenda, o sistema prioriza os horários colados
-              a atendimentos já confirmados — compactando o dia e eliminando os buracos que
-              custam faturamento.
-            </p>
-            <p className="text-gray-300 leading-relaxed">
-              <span className="text-primary font-normal">Reservas sem conflito.</span> Múltiplos
-              serviços em uma única reserva? O sistema verifica se cabe tudo no turno antes de
-              confirmar — zero sobreposição, zero retrabalho manual.
-            </p>
+          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
+            <div className="flex flex-col md:flex-row items-start gap-6">
+              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <ZapIcon className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-normal mb-3 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  <span className="text-primary">O cliente seleciona mais de um trabalho.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
