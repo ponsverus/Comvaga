@@ -401,6 +401,22 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           </p>
         </div>
 
+        {/* Legenda com código de cores numerado */}
+        <div className="flex flex-wrap justify-center gap-6 mb-8 px-4">
+          <div className="flex items-center gap-2 text-xs text-gray-400 uppercase tracking-wide">
+            <span className="w-2.5 h-2.5 rounded-full border border-dashed border-gray-600" />
+            1. Livre
+          </div>
+          <div className="flex items-center gap-2 text-xs text-gray-400 uppercase tracking-wide">
+            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+            2. Ocupado
+          </div>
+          <div className="flex items-center gap-2 text-xs text-gray-400 uppercase tracking-wide">
+            <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
+            3. Reaproveitado
+          </div>
+        </div>
+
         <div
           className="
             w-full bg-gray-800 border-y border-gray-800
@@ -410,81 +426,98 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
           "
         >
-          {/* Coluna 1 — Sistema tradicional */}
-          <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-100 px-4 sm:px-8 md:px-12 lg:px-16 py-12 md:py-16">
-            <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
-              Sistema tradicional
-            </span>
-            <h3 className="text-2xl md:text-3xl font-black text-white mb-2">AGENDA COM BURACOS</h3>
-            <p className="text-gray-400 mb-8">
-              Horários vagos ficam parados até alguém perceber e preencher manualmente.
-            </p>
+          {(() => {
+            const COLS = 8;
+            const DX = 38;
+            const DY = 42;
+            const X0 = 20;
+            const Y0 = 24;
+            const R = 7;
+            const STATUS_COLOR = { ocupado: '#FFD11A', reaproveitado: '#4ADE80' };
 
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { time: '9:00', status: 'ocupado' },
-                { time: '9:30', status: 'vago' },
-                { time: '10:00', status: 'vago' },
-                { time: '10:30', status: 'ocupado' },
-                { time: '11:00', status: 'vago' },
-                { time: '11:30', status: 'ocupado' },
-                { time: '12:00', status: 'vago' },
-                { time: '12:30', status: 'vago' },
-                { time: '13:00', status: 'ocupado' },
-              ].map((slot) => (
-                <div
-                  key={slot.time}
-                  className={[
-                    'h-12 rounded-full flex flex-col items-center justify-center',
-                    slot.status === 'ocupado'
-                      ? 'bg-primary/15 text-primary'
-                      : 'border border-dashed border-gray-700 text-gray-500',
-                  ].join(' ')}
-                >
-                  <span className="text-xs font-normal">{slot.time}</span>
-                  <span className="text-[9px] uppercase tracking-wide">{slot.status}</span>
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-gray-500 mt-6">5 horários vagos, espalhados pelo dia.</p>
-          </div>
+            const posFor = (i) => ({
+              x: X0 + (i % COLS) * DX,
+              y: Y0 + Math.floor(i / COLS) * DY,
+            });
 
-          {/* Coluna 2 — Comvaga */}
-          <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-200 px-4 sm:px-8 md:px-12 lg:px-16 py-12 md:py-16">
-            <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
-              Comvaga
-            </span>
-            <h3 className="text-2xl md:text-3xl font-black text-white mb-2">AGENDA SEM BURACOS</h3>
-            <p className="text-gray-400 mb-8">
-              Cada cancelamento é redistribuído automaticamente, na hora.
-            </p>
+            // Sistema tradicional: aleatório, sem sequência/conexão
+            const tradicional = [
+              'ocupado', 'livre', 'ocupado', 'ocupado', 'livre', 'ocupado', 'livre', 'ocupado',
+              'livre', 'ocupado', 'livre', 'ocupado', 'ocupado', 'livre', 'ocupado', 'livre',
+              'ocupado', 'livre', 'livre', 'ocupado', 'livre', 'ocupado', 'ocupado', 'livre',
+              'livre', 'ocupado', 'ocupado', 'livre', 'ocupado', 'livre', 'ocupado', 'livre',
+            ];
 
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { time: '9:00', status: 'ocupado' },
-                { time: '9:30', status: 'reaproveitado' },
-                { time: '10:00', status: 'ocupado' },
-                { time: '10:30', status: 'ocupado' },
-                { time: '11:00', status: 'reaproveitado' },
-                { time: '11:30', status: 'ocupado' },
-                { time: '12:00', status: 'reaproveitado' },
-                { time: '12:30', status: 'ocupado' },
-                { time: '13:00', status: 'ocupado' },
-              ].map((slot) => (
-                <div
-                  key={slot.time}
-                  className="h-12 rounded-full flex flex-col items-center justify-center bg-primary/15 text-primary"
-                >
-                  <span className="text-xs font-normal flex items-center justify-center gap-1">
-                    {slot.status === 'reaproveitado' && <ZapIcon className="w-3 h-3" />}
-                    {slot.time}
+            // Comvaga: ocupado/reaproveitado em sequência conectada,
+            // vagos sempre compactados na última linha, nunca espalhados
+            const comvaga = [
+              'ocupado', 'reaproveitado', 'ocupado', 'ocupado', 'reaproveitado', 'ocupado', 'ocupado', 'reaproveitado',
+              'ocupado', 'ocupado', 'reaproveitado', 'ocupado', 'ocupado', 'ocupado', 'reaproveitado', 'ocupado',
+              'ocupado', 'reaproveitado', 'ocupado', 'ocupado', 'reaproveitado', 'ocupado', 'ocupado', 'ocupado',
+              'livre', 'livre', 'livre', 'livre', 'livre', 'livre', 'livre', 'livre',
+            ];
+
+            const renderGrid = (data, connect) => (
+              <svg viewBox="0 0 320 180" className="w-full">
+                {connect &&
+                  data.slice(0, -1).map((status, i) => {
+                    const a = posFor(i);
+                    const b = posFor(i + 1);
+                    const next = data[i + 1];
+                    const isLivreSeg = status === 'livre' || next === 'livre';
+                    return (
+                      <line
+                        key={`line-${i}`}
+                        x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+                        stroke={isLivreSeg ? '#4B5563' : STATUS_COLOR[status]}
+                        strokeWidth="1.5"
+                        strokeDasharray={isLivreSeg ? '3 2' : undefined}
+                      />
+                    );
+                  })}
+                {data.map((status, i) => {
+                  const p = posFor(i);
+                  return status === 'livre' ? (
+                    <circle
+                      key={`dot-${i}`}
+                      cx={p.x} cy={p.y} r={R}
+                      fill="none" stroke="#4B5563" strokeWidth="1.5" strokeDasharray="3 2"
+                    />
+                  ) : (
+                    <circle key={`dot-${i}`} cx={p.x} cy={p.y} r={R} fill={STATUS_COLOR[status]} />
+                  );
+                })}
+              </svg>
+            );
+
+            return (
+              <>
+                {/* Coluna 1 — Sistema tradicional */}
+                <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-100 px-4 sm:px-8 md:px-12 lg:px-16 py-12 md:py-16">
+                  <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
+                    Sistema tradicional
                   </span>
-                  <span className="text-[9px] uppercase tracking-wide">{slot.status}</span>
+                  <h3 className="text-2xl md:text-3xl font-black text-white mb-2">AGENDA COM BURACOS</h3>
+                  <p className="text-gray-400 mb-8">
+                    Horários vagos ficam parados, espalhados, até alguém perceber e preencher manualmente.
+                  </p>
+                  {renderGrid(tradicional, false)}
                 </div>
-              ))}
-            </div>
-            <p className="text-sm text-primary mt-6">Zero horários vagos: tudo compactado.</p>
-          </div>
+
+                {/* Coluna 2 — Comvaga */}
+                <div className="shrink-0 w-[85vw] md:w-auto snap-start bg-dark-200 px-4 sm:px-8 md:px-12 lg:px-16 py-12 md:py-16">
+                  <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-primary bg-primary/15 rounded-full px-3 py-1 mb-4">
+                    Comvaga
+                  </span>
+                  <h3 className="text-2xl md:text-3xl font-black text-white mb-2">AGENDA SEM BURACOS</h3>
+                  <p className="text-gray-400 mb-8">
+                    Cada horário se encaixa em sequência, e o que sobra fica sempre compactado no final.
+                  </p>
+                  {renderGrid(comvaga, true)}
+                </div>
+              </>
+            );
+          })()}
         </div>
 
         {/* Indicador de swipe — só aparece no mobile */}
