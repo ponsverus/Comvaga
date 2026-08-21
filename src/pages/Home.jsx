@@ -528,16 +528,16 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               <div className="flex flex-col gap-5">
                 {[
                   {
-                    title: 'Reabertura automática de horários cancelados na agenda',
-                    text: 'Horários liberados por cancelamentos voltam automaticamente à disponibilidade, via particionamento dinâmico da agenda.',
+                    title: 'Reabertura automática de horários cancelados',
+                    text: 'O horário liberado volta pra vitrine na hora, sem esforço manual.',
                   },
                   {
                     title: 'Reserva em lote de múltiplos trabalhos',
-                    text: 'O sistema organiza e reserva vários atendimentos em sequência dentro do mesmo período disponível.',
+                    text: 'O cliente marca vários serviços e sai com tudo resolvido em uma única reserva.',
                   },
                   {
                     title: 'Direcionamento inteligente de novos agendamentos',
-                    text: 'Novas reservas seguem para as zonas de calor, os horários mais próximos dos atendimentos já confirmados, compactando a agenda.',
+                    text: 'A agenda se compacta sozinha, sem buracos entre um horário e outro.',
                   },
                   {
                     title: 'Comprometimento da agenda e receita futura projetada',
