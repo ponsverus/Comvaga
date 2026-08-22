@@ -361,16 +361,16 @@ export default function Home({ user, userType, professionalRole = null, onLogout
       <section id="como-funciona" className="py-0 bg-dark-100 w-full">
         <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
           <h2 className="text-5xl font-black mb-4">
-            A CIÊNCIA <span className="text-primary">POR TRÁS</span>
+            POR QUE A AGENDA <span className="text-primary">NUNCA ERRA</span>
           </h2>
-          <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
+          <p className="text-xl text-gray-400">O motor que roda por trás de cada reserva, cada troca, cada cancelamento</p>
         </div>
 
         <div className="w-full bg-gray-800 border-y border-gray-800 grid md:grid-cols-3 gap-px">
           {[
-            { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
-            { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada evento: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
-            { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
+            { num: 1, title: 'CADA PROFISSIONAL, SUA PRÓPRIA ROTINA', text: 'Dias, horários e pausas configurados por pessoa. A agenda se molda ao time, não o contrário.' },
+            { num: 2, title: 'NADA FICA DESATUALIZADO', text: 'Reserva, troca ou cancelamento: a tela mostra sempre o estado real da agenda, no mesmo instante em que ele muda.' },
+            { num: 3, title: 'SEM APP PRA BAIXAR', text: 'O cliente agenda pelo link, direto do navegador. Vê só os horários que existem de verdade.' },
           ].map(({ num, title, text }) => (
             <div key={num} className="bg-dark-100 p-8 md:p-12 flex flex-col px-4 sm:px-8 md:px-16 lg:px-24">
               <div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 mb-6 shrink-0">
@@ -389,9 +389,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 <ZapIcon className="w-8 h-8 text-primary" />
               </div>
               <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
+                <h3 className="text-2xl font-normal mb-3 text-white">POR QUE TODA AGENDA TRADICIONAL ACABA CHEIA DE BURACOS</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">Cancelou?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
+                  <span className="text-primary">O problema nunca foi o cancelamento em si.</span> É que agenda tradicional é estática: fecha um horário e esquece dele. Cada espaço vago vira um buraco que só alguém lembra de preencher, se lembrar. A Comvaga trata cada minuto livre como uma vaga em aberto, não como um espaço morto esperando atenção manual.
                 </p>
               </div>
             </div>
@@ -403,9 +403,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 <ZapIcon className="w-8 h-8 text-primary" />
               </div>
               <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
+                <h3 className="text-2xl font-normal mb-3 text-white">SUA AGENDA NUNCA É UMA FOTO DE ONTEM</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">A maioria dos sistemas exibe todos os horários livres.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
+                  <span className="text-primary">Nada de atualizar a página pra ver o que mudou.</span> A cada movimento, o sistema recalcula tudo antes de você perceber que algo aconteceu. O que está na tela é sempre o que está acontecendo agora, pro profissional e pro cliente ao mesmo tempo.
                 </p>
               </div>
             </div>
@@ -417,9 +417,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
                 <ZapIcon className="w-8 h-8 text-primary" />
               </div>
               <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
+                <h3 className="text-2xl font-normal mb-3 text-white">DOIS CLIENTES, UM HORÁRIO: ZERO CONFLITO</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">O cliente seleciona mais de um trabalho.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
+                  <span className="text-primary">Dois clientes tentando fechar a mesma vaga ao mesmo tempo?</span> O sistema decide em milissegundos quem fica com o horário e já mostra a alternativa mais próxima pro outro. Sem erro, sem overbooking, sem aquele "já foi marcado" depois que alguém organizou o dia.
                 </p>
               </div>
             </div>
@@ -528,16 +528,16 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               <div className="flex flex-col gap-5">
                 {[
                   {
-                    title: 'Reabertura automática de horários cancelados',
-                    text: 'O horário liberado volta pra vitrine na hora, sem esforço manual.',
+                    title: 'Reabertura automática de horários cancelados na agenda',
+                    text: 'Horários liberados por cancelamentos voltam automaticamente à disponibilidade, via particionamento dinâmico da agenda.',
                   },
                   {
                     title: 'Reserva em lote de múltiplos trabalhos',
-                    text: 'O cliente marca vários serviços e sai com tudo resolvido em uma única reserva.',
+                    text: 'O sistema organiza e reserva vários atendimentos em sequência dentro do mesmo período disponível.',
                   },
                   {
                     title: 'Direcionamento inteligente de novos agendamentos',
-                    text: 'A agenda se compacta sozinha, sem buracos entre um horário e outro.',
+                    text: 'Novas reservas seguem para as zonas de calor, os horários mais próximos dos atendimentos já confirmados, compactando a agenda.',
                   },
                   {
                     title: 'Comprometimento da agenda e receita futura projetada',
