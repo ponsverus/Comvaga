@@ -246,16 +246,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
 
   const handleLogoutClick = () => onLogout?.();
 
-  const handleResourcesClick = () => {
-    plansSectionRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
-  };
-
   return (
     <div className="min-h-screen bg-black text-white relative">
-      <div className="relative z-50 w-full bg-yellow-400 border-b border-yellow-300/50 overflow-hidden h-10 flex items-center">
+    <div className="relative z-50 w-full bg-yellow-400 border-b border-yellow-300/50 overflow-hidden h-10 flex items-center">
         <div className="announcement-bar-wrapper flex">
           {[1, 2].map((i) => (
             <div
@@ -292,6 +285,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
         `}</style>
       </div>
 
+
       <header className="absolute top-20 left-0 w-full z-40 bg-transparent border-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-center h-16 sm:h-20">
@@ -317,7 +311,6 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           </div>
         </div>
       </header>
-
       <section className="relative pt-32 pb-12 sm:pt-40 sm:pb-16 lg:pt-48 lg:pb-20 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-yellow-600/10"></div>
         <div className="absolute top-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
@@ -340,30 +333,114 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-0">
-            <button
-              type="button"
-              onClick={handleResourcesClick}
+            <Link
+              to="/cadastro"
               className="px-10 py-5 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-black text-lg hover:shadow-2xl hover:shadow-primary/50 transition-all hover:scale-105 flex items-center justify-center gap-3"
             >
-              RECURSOS <ZapIcon className="w-5 h-5" />
-            </button>
+              TESTAR GRÁTIS POR 30 DIAS <ZapIcon className="w-5 h-5" />
+            </Link>
             <button
               type="button"
               onClick={() => document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })}
               className="px-10 py-5 bg-white/10 border border-white/20 text-white rounded-button font-bold text-lg hover:bg-white/20 backdrop-blur-sm"
             >
-              ENTENDER A LÓGICA
+              VER COMO FUNCIONA
             </button>
           </div>
         </div>
       </section>
 
+
+      <section className="py-0 bg-dark-200 w-full">
+        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
+          <h2 className="text-5xl font-black mb-4">
+            O QUE VOCÊ <span className="text-primary">GANHA</span>
+          </h2>
+          <p className="text-xl text-gray-400">Uma operação mais organizada para o profissional e uma experiência mais simples para o cliente</p>
+        </div>
+
+        <div className="w-full bg-gray-800 border-y border-gray-800 grid sm:grid-cols-2 lg:grid-cols-3 gap-px">
+          {[
+            { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
+            { icon: ZapIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
+            { icon: ZapIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
+            { icon: MoneyGlyph, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
+            { icon: SmileGlyph, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
+            { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
+          ].map(({ icon: Icon, title, text }, i) => (
+            <div
+              key={i}
+              className="bg-dark-200 p-8 sm:p-10 hover:bg-dark-100 transition-colors flex flex-col px-4 sm:px-8 md:px-16 lg:px-24"
+            >
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                <Icon className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
+              <p className="text-gray-400 leading-relaxed">{text}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
+          <p className="text-gray-400 mb-5">Quer colocar essa lógica para trabalhar na sua operação?</p>
+          <Link
+            to="/cadastro"
+            className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-black hover:shadow-xl hover:shadow-primary/30 transition-all"
+          >
+            TESTAR GRÁTIS POR 30 DIAS <ZapIcon className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
+
+      <section className="py-0 bg-black overflow-hidden border-b border-gray-800">
+        <div className="w-full bg-dark-200 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
+
+          <div className="bg-gray-800 w-full">
+            <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center justify-center px-4 py-16 text-center sm:px-8 sm:py-20 md:px-16 lg:px-24">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                <span className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">VEJA AO VIVO</span>
+              </div>
+              
+              <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 leading-tight">
+                VEJA A COMVAGA <br/>
+                <span className="text-primary">EM FUNCIONAMENTO.</span>
+              </h2>
+              
+              <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-3xl">
+                Seu negócio merece mais do que um link de WhatsApp. Veja como seus clientes podem encontrar seus trabalhos, depoimentos, equipe e horários e chegar ao agendamento em uma experiência só.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="https://comvaga.com.br/v/vikings"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-8 py-4 bg-primary text-black font-black rounded-button hover:shadow-[0_0_30px_rgba(255,209,26,0.3)] transition-all flex items-center justify-center gap-3 group"
+                >
+                  VER VITRINE EXEMPLO 
+                  <ZapIcon className="w-5 h-5 group-hover:animate-bounce" />
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+
       <section id="como-funciona" className="py-0 bg-dark-100 w-full">
         <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
           <h2 className="text-5xl font-black mb-4">
-            A CIÊNCIA <span className="text-primary">POR TRÁS</span>
+            COMO A COMVAGA <span className="text-primary">PENSA</span>
           </h2>
-          <p className="text-xl text-gray-400">Como o sistema protege seu faturamento e respeita o cliente</p>
+          <p className="text-xl text-gray-400">A agenda considera a rotina real do profissional antes de confirmar cada atendimento</p>
         </div>
 
         <div className="w-full bg-gray-800 border-y border-gray-800 grid md:grid-cols-3 gap-px">
@@ -380,6 +457,16 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               <p className="text-gray-400 leading-relaxed">{text}</p>
             </div>
           ))}
+        </div>
+
+      </section>
+
+      <section className="py-0 bg-black overflow-hidden border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
+          <h2 className="text-5xl font-black mb-4">
+            A TECNOLOGIA <span className="text-primary">POR TRÁS</span>
+          </h2>
+          <p className="text-xl text-gray-400">É essa lógica que permite recuperar horários, compactar a agenda e evitar conflitos</p>
         </div>
 
         <div className="w-full bg-gray-800 border-b border-gray-800 flex flex-col gap-px">
@@ -427,87 +514,15 @@ export default function Home({ user, userType, professionalRole = null, onLogout
         </div>
       </section>
 
-      <section className="py-0 bg-black overflow-hidden border-b border-gray-800">
-        <div className="w-full bg-dark-200 overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
-
-          <div className="bg-gray-800 w-full">
-            <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center justify-center px-4 py-16 text-center sm:px-8 sm:py-20 md:px-16 lg:px-24">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-6">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                </span>
-                <span className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">VEJA AO VIVO</span>
-              </div>
-              
-              <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 leading-tight">
-                NÃO APENAS UMA AGENDA, <br/>
-                <span className="text-primary">UMA VITRINE PROFISSIONAL.</span>
-              </h2>
-              
-              <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-3xl">
-                Seu negócio merece mais do que um link de WhatsApp. Permita que seus clientes enxerguem seus trabalhos, depoimentos, equipe e horários em uma interface projetada para converter curiosos em agendamentos confirmados.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="https://comvaga.com.br/v/vikings"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-8 py-4 bg-primary text-black font-black rounded-button hover:shadow-[0_0_30px_rgba(255,209,26,0.3)] transition-all flex items-center justify-center gap-3 group"
-                >
-                  VER VITRINE EXEMPLO 
-                  <ZapIcon className="w-5 h-5 group-hover:animate-bounce" />
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <section className="py-0 bg-dark-200 w-full">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
-          <h2 className="text-5xl font-black mb-4">
-            VANTAGEM <span className="text-primary">MÚTUA</span>
-          </h2>
-          <p className="text-xl text-gray-400">Por que Profissionais e Clientes preferem Comvaga</p>
-        </div>
-
-        <div className="w-full bg-gray-800 border-y border-gray-800 grid sm:grid-cols-2 lg:grid-cols-3 gap-px">
-          {[
-            { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
-            { icon: ZapIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
-            { icon: ZapIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
-            { icon: MoneyGlyph, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
-            { icon: SmileGlyph, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
-            { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
-          ].map(({ icon: Icon, title, text }, i) => (
-            <div
-              key={i}
-              className="bg-dark-200 p-8 sm:p-10 hover:bg-dark-100 transition-colors flex flex-col px-4 sm:px-8 md:px-16 lg:px-24"
-            >
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                <Icon className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
-              <p className="text-gray-400 leading-relaxed">{text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section
         ref={plansSectionRef}
         className="py-0 bg-dark-100 w-full"
       >
         <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
           <h2 className="text-5xl font-normal mb-4">
-            SEM <span className="text-primary">BUROCRACIA</span>
+            RECURSOS E <span className="text-primary">PLANOS</span>
           </h2>
-          <p className="text-xl text-gray-400">Teste grátis por 30 dias o plano escolhido. Sem compromisso e sem burocracia ;)</p>
+          <p className="text-xl text-gray-400">Todos os planos têm a mesma inteligência. Você escolhe apenas a capacidade para sua equipe e testa grátis por 30 dias.</p>
         </div>
 
         <div className="
@@ -521,7 +536,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
               Todos os planos incluem
             </span>
-            <h3 className="text-3xl md:text-4xl font-black text-white mb-2">TODOS OS RECURSOS</h3>
+            <h3 className="text-3xl md:text-4xl font-black text-white mb-2">TUDO O QUE ESTÁ INCLUÍDO</h3>
             <p className="text-gray-400 mb-8">A mesma inteligência em todos os planos. Nenhum recurso fica bloqueado atrás de um plano mais caro.</p>
 
             <div>
@@ -674,15 +689,15 @@ export default function Home({ user, userType, professionalRole = null, onLogout
 
       <section className="py-24 px-4 bg-gradient-to-r from-primary via-yellow-500 to-yellow-600">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl font-black text-black mb-6">ELEVE SEU NÍVEL PROFISSIONAL</h2>
-          <p className="text-2xl text-black/80 mb-8">Uma vitrine para vender, um painel para operar e uma agenda que pensa antes de confirmar.</p>
+          <h2 className="text-5xl font-black text-black mb-6">SUA AGENDA PODE TRABALHAR MELHOR</h2>
+          <p className="text-2xl text-black/80 mb-8">Uma vitrine para apresentar seu negócio, um painel para operar e uma agenda que pensa antes de confirmar.</p>
           <Link
             to="/cadastro"
             className="inline-flex items-center gap-3 px-12 py-6 bg-black text-primary rounded-button font-black text-xl hover:shadow-2xl transition-all"
           >
             TESTAR AGORA <ZapIcon className="w-6 h-6" />
           </Link>
-          <p className="text-black/60 text-sm mt-6">Eficiência comprovada em barbearias, estúdios e clínicas.</p>
+          <p className="text-black/60 text-sm mt-6">Comece sem compromisso e descubra como a Comvaga se adapta à sua operação.</p>
         </div>
       </section>
 
