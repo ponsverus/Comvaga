@@ -356,14 +356,14 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           <h2 className="text-5xl font-black mb-4">
             O QUE VOCÊ <span className="text-primary">GANHA</span>
           </h2>
-          <p className="text-xl text-gray-400">Uma operação mais organizada para o profissional e uma experiência mais simples para o cliente</p>
+          <p className="text-xl text-gray-400">Menos atrito na sua rotina, mais praticidade na vida do seu cliente.</p>
         </div>
 
         <div className="w-full bg-gray-800 border-y border-gray-800 grid sm:grid-cols-2 lg:grid-cols-3 gap-px">
           {[
             { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
-            { icon: ZapIcon, title: 'MAIS HORÁRIOS APROVEITADOS', text: 'Menos espaços vazios na agenda e mais atendimentos cabendo no seu dia.' },
-            { icon: ZapIcon, title: 'CANCELAMENTO SEM PREJUÍZO', text: 'Um cancelamento deixa de ser tempo perdido: o horário volta a ficar disponível para outro cliente.' },
+            { icon: ZapIcon, title: 'MAIS HORÁRIOS APROVEITADOS', text: 'Zero tempo perdido entre clientes e mais atendimentos concluídos no mesmo dia.' },
+            { icon: ZapIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
             { icon: MoneyGlyph, title: 'LUCRO BLINDADO', text: 'Menos tempo ocioso entre atendimentos significa mais faturamento no fim do mês.' },
             { icon: SmileGlyph, title: 'CLIENTE SATISFEITO', text: 'Quem agenda tem a certeza de ser atendido no horário marcado, sem atrasos por erro de cálculo.' },
             { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
@@ -431,7 +431,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             A INTELIGÊNCIA <span className="text-primary">POR TRÁS DA COMVAGA</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            A Comvaga não trata sua agenda como uma simples grade de horários. Ela considera a duração dos serviços, a rotina de cada profissional e os espaços disponíveis para encontrar as melhores combinações antes de confirmar qualquer atendimento.
+            Muito além de uma grade fixa, a Comvaga avalia a dinâmica de cada profissional e o tempo exato de cada procedimento para validar agendamentos sem lacunas ociosas.
           </p>
         </div>
 
@@ -449,18 +449,18 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             },
             {
               num: '03',
-              title: 'REAPROVEITAMENTO INTELIGENTE',
-              text: 'Cancelou? O sistema reage em milissegundos e redistribui a janela vaga na vitrine como novas oportunidades: um horário de 60 minutos pode ser reservado inteiro ou virar três de 20 ou dois de 30, sempre identificado com um ícone discreto para o cliente.',
-            },
-            {
-              num: '04',
               title: 'ZONA DE CALOR',
               text: 'Em vez de distribuir clientes aleatoriamente pela agenda, o sistema prioriza os horários que encostam diretamente em atendimentos já confirmados, compactando o dia e eliminando intervalos vazios.',
             },
             {
-              num: '05',
+              num: '04',
               title: 'AGENDAMENTO MÚLTIPLO SEQUENCIAL',
               text: 'Quando o cliente seleciona mais de um trabalho, o sistema soma o tempo de cada um, adiciona a margem operacional entre atendimentos e só confirma se o bloco inteiro couber no turno do profissional.',
+            },
+            {
+              num: '05',
+              title: 'REAPROVEITAMENTO INTELIGENTE',
+              text: 'Cancelou? O sistema reage em milissegundos e redistribui a janela vaga na vitrine como novas oportunidades: um horário de 60 minutos pode ser reservado inteiro ou virar três de 20 ou dois de 30, sempre identificado com um ícone discreto para o cliente.',
             },
             {
               num: '06',
@@ -486,9 +486,9 @@ export default function Home({ user, userType, professionalRole = null, onLogout
       >
         <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
           <h2 className="text-5xl font-normal mb-4">
-            RECURSOS E <span className="text-primary">PLANOS</span>
+            SEM <span className="text-primary">BUROCRACIA</span>
           </h2>
-          <p className="text-xl text-gray-400">Todos os planos têm a mesma inteligência. Você escolhe apenas a capacidade para sua equipe e testa grátis por 30 dias.</p>
+          <p className="text-xl text-gray-400">Teste grátis por 30 dias o plano escolhido. Sem compromisso e sem burocracia ;)</p>
         </div>
 
         <div className="
@@ -502,7 +502,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
             <span className="inline-block text-[10px] font-normal uppercase tracking-widest text-gray-400 bg-gray-800 rounded-full px-3 py-1 mb-4">
               Todos os planos incluem
             </span>
-            <h3 className="text-3xl md:text-4xl font-black text-white mb-2">TUDO O QUE ESTÁ INCLUÍDO</h3>
+            <h3 className="text-3xl md:text-4xl font-black text-white mb-2">TODOS OS RECURSOS</h3>
             <p className="text-gray-400 mb-8">A mesma inteligência em todos os planos. Nenhum recurso fica bloqueado atrás de um plano mais caro.</p>
 
             <div>
@@ -663,7 +663,7 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           >
             TESTAR AGORA <ZapIcon className="w-6 h-6" />
           </Link>
-          <p className="text-black/60 text-sm mt-6">Comece sem compromisso e descubra como a Comvaga se adapta à sua operação.</p>
+          <p className="text-black/60 text-sm mt-6">Eficiência comprovada em barbearias, estúdios e clínicas.</p>
         </div>
       </section>
 
