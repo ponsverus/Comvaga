@@ -362,10 +362,10 @@ export default function Home({ user, userType, professionalRole = null, onLogout
         <div className="w-full bg-gray-800 border-y border-gray-800 grid sm:grid-cols-2 lg:grid-cols-3 gap-px">
           {[
             { icon: StarGlyph, title: 'VITRINE PROFISSIONAL', text: 'Tenha um link bio personalizado. O cliente vê profissionalismo desde o primeiro clique.' },
-            { icon: ZapIcon, title: 'AGENDA INTELIGENTE', text: 'Cada horário exibido já considera os próximos encaixes da agenda, evitando conflitos antes mesmo da reserva acontecer.' },
-            { icon: ZapIcon, title: 'RESGATE IMEDIATO', text: 'Cancelamentos deixam de ser prejuízo. O horário volta automaticamente para a vitrine e pode ser preenchido por outro cliente em segundos.' },
-            { icon: MoneyGlyph, title: 'LUCRO BLINDADO', text: 'Eliminamos o tempo ocioso. A agenda se ajusta sozinha para caber o máximo de clientes sem sobrecarga.' },
-            { icon: SmileGlyph, title: 'CLIENTE SATISFEITO', text: 'Para quem agenda: a certeza de ser atendido na hora. Nosso sistema impede que o profissional atrase por erro de cálculo.' },
+            { icon: ZapIcon, title: 'MAIS HORÁRIOS APROVEITADOS', text: 'Menos espaços vazios na agenda e mais atendimentos cabendo no seu dia.' },
+            { icon: ZapIcon, title: 'CANCELAMENTO SEM PREJUÍZO', text: 'Um cancelamento deixa de ser tempo perdido: o horário volta a ficar disponível para outro cliente.' },
+            { icon: MoneyGlyph, title: 'LUCRO BLINDADO', text: 'Menos tempo ocioso entre atendimentos significa mais faturamento no fim do mês.' },
+            { icon: SmileGlyph, title: 'CLIENTE SATISFEITO', text: 'Quem agenda tem a certeza de ser atendido no horário marcado, sem atrasos por erro de cálculo.' },
             { icon: CheckDoubleIcon, title: 'FLUXO COMPLETO', text: 'Da descoberta ao pós-atendimento, profissional e cliente continuam dentro do mesmo sistema.' },
           ].map(({ icon: Icon, title, text }, i) => (
             <div
@@ -379,16 +379,6 @@ export default function Home({ user, userType, professionalRole = null, onLogout
               <p className="text-gray-400 leading-relaxed">{text}</p>
             </div>
           ))}
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-          <p className="text-gray-400 mb-5">Quer colocar essa lógica para trabalhar na sua operação?</p>
-          <Link
-            to="/cadastro"
-            className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary to-yellow-600 text-black rounded-button font-black hover:shadow-xl hover:shadow-primary/30 transition-all"
-          >
-            TESTAR GRÁTIS POR 30 DIAS <ZapIcon className="w-5 h-5" />
-          </Link>
         </div>
       </section>
 
@@ -438,19 +428,48 @@ export default function Home({ user, userType, professionalRole = null, onLogout
       <section id="como-funciona" className="py-0 bg-dark-100 w-full">
         <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
           <h2 className="text-5xl font-black mb-4">
-            COMO A COMVAGA <span className="text-primary">PENSA</span>
+            A INTELIGÊNCIA <span className="text-primary">POR TRÁS DA COMVAGA</span>
           </h2>
-          <p className="text-xl text-gray-400">A agenda considera a rotina real do profissional antes de confirmar cada atendimento</p>
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            A Comvaga não trata sua agenda como uma simples grade de horários. Ela considera a duração dos serviços, a rotina de cada profissional e os espaços disponíveis para encontrar as melhores combinações antes de confirmar qualquer atendimento.
+          </p>
         </div>
 
-        <div className="w-full bg-gray-800 border-y border-gray-800 grid md:grid-cols-3 gap-px">
+        <div className="w-full bg-gray-800 border-y border-gray-800 grid md:grid-cols-2 lg:grid-cols-3 gap-px">
           {[
-            { num: 1, title: 'ROTINA REAL', text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.' },          
-            { num: 2, title: 'ENCAIXE AUTOMÁTICO', text: 'O algoritmo recalcula sua agenda a cada evento: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.' },
-            { num: 3, title: 'ACESSO SIMPLIFICADO', text: 'Seu cliente recebe um link exclusivo. Ele visualiza apenas os horários livres reais, sem precisar baixar nada.' },
+            {
+              num: '01',
+              title: 'ROTINA REAL',
+              text: 'Cada profissional trabalha com seus próprios dias, horários e pausas. A agenda se adapta à rotina individual de cada um, permitindo fluxos de trabalho independentes.',
+            },
+            {
+              num: '02',
+              title: 'ENCAIXE AUTOMÁTICO',
+              text: 'O algoritmo recalcula sua agenda a cada evento: novos horários marcados, desistências ou trocas. Tudo se reorganiza no ato para manter seu trabalho com o máximo de eficiência.',
+            },
+            {
+              num: '03',
+              title: 'REAPROVEITAMENTO INTELIGENTE',
+              text: 'Cancelou? O sistema reage em milissegundos e redistribui a janela vaga na vitrine como novas oportunidades: um horário de 60 minutos pode ser reservado inteiro ou virar três de 20 ou dois de 30, sempre identificado com um ícone discreto para o cliente.',
+            },
+            {
+              num: '04',
+              title: 'ZONA DE CALOR',
+              text: 'Em vez de distribuir clientes aleatoriamente pela agenda, o sistema prioriza os horários que encostam diretamente em atendimentos já confirmados, compactando o dia e eliminando intervalos vazios.',
+            },
+            {
+              num: '05',
+              title: 'AGENDAMENTO MÚLTIPLO SEQUENCIAL',
+              text: 'Quando o cliente seleciona mais de um trabalho, o sistema soma o tempo de cada um, adiciona a margem operacional entre atendimentos e só confirma se o bloco inteiro couber no turno do profissional.',
+            },
+            {
+              num: '06',
+              title: 'CONTROLE DE CONFLITOS',
+              text: 'Por trás de tudo isso está a mesma lógica de integridade usada em bancos de dados relacionais de alta performance, garantindo que dois agendamentos nunca colidam.',
+            },
           ].map(({ num, title, text }) => (
-            <div key={num} className="bg-dark-100 p-8 md:p-12 flex flex-col px-4 sm:px-8 md:px-16 lg:px-24">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/50 mb-6 shrink-0">
+            <div key={num} className="bg-dark-100 p-8 md:p-10 flex flex-col px-4 sm:px-8 md:px-10 lg:px-12">
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-yellow-600 rounded-full flex items-center justify-center text-black font-black text-xl shadow-lg shadow-primary/50 mb-6 shrink-0">
                 {num}
               </div>
               <h3 className="text-2xl font-normal mb-3 text-white">{title}</h3>
@@ -459,59 +478,6 @@ export default function Home({ user, userType, professionalRole = null, onLogout
           ))}
         </div>
 
-      </section>
-
-      <section className="py-0 bg-black overflow-hidden border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-16 pt-24">
-          <h2 className="text-5xl font-black mb-4">
-            A TECNOLOGIA <span className="text-primary">POR TRÁS</span>
-          </h2>
-          <p className="text-xl text-gray-400">É essa lógica que permite recuperar horários, compactar a agenda e evitar conflitos</p>
-        </div>
-
-        <div className="w-full bg-gray-800 border-b border-gray-800 flex flex-col gap-px">
-          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">REAPROVEITAMENTO INTELIGENTE E AUTOMÁTICO DE HORÁRIOS</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">Cancelou?</span> O sistema reage em milissegundos, recalculando toda a janela disponível por meio de particionamento dinâmico e controle de concorrência, a mesma lógica de integridade de bancos de dados relacionais de alta performance. O horário vago é redistribuído imediatamente na vitrine como novas oportunidades: assim, a vaga original de 60 minutos pode ser reservada inteira ou, de forma inteligente, se transformar em três horários de 20 minutos ou dois de 30 minutos. Os clientes visualizam essas oportunidades identificadas com um ícone discreto, garantindo total transparência.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">ZONA DE CALOR: AGENDA SEM BURACOS</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">A maioria dos sistemas exibe todos os horários livres.</span> A Comvaga vai além. No modo inteligente, o algoritmo identifica e prioriza os slots que encostam diretamente em agendamentos já confirmados, as chamadas zonas de calor. Ao invés de distribuir clientes aleatoriamente pela agenda, o sistema empurra os novos atendimentos para as bordas dos blocos já ocupados, compactando o dia e eliminando os intervalos vazios que consomem tempo e reduzem o faturamento.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-dark-100 p-8 sm:p-12 hover:bg-dark-200/50 transition-colors px-4 sm:px-8 md:px-16 lg:px-24">
-            <div className="flex flex-col md:flex-row items-start gap-6">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <ZapIcon className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-normal mb-3 text-white">AGENDAMENTO MÚLTIPLO SEQUENCIAL</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  <span className="text-primary">O cliente seleciona mais de um trabalho.</span> O motor calcula o tempo acumulado de cada um, adiciona a margem operacional entre atendimentos e verifica se o bloco inteiro cabe no turno do profissional, antes de confirmar qualquer coisa. Se couber, o sistema grava todos os trabalhos em sequência, sem conflitos, sem brechas. O profissional recebe um único bloco contínuo. O cliente sai com tudo resolvido em uma única reserva.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       <section
